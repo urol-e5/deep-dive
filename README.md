@@ -29,6 +29,6 @@ In brief some extra special data sets that will be generated
 
 ## Genomes
 
-- Pocillopora verrucosa genome v1.0 : http://pver.reefgenomics.org
+- Pocillopora verrucosa genome v1.0 : http://pver.reefgenomics.org : https://www.ncbi.nlm.nih.gov/data-hub/genome/GCA_014529365.1/
 - Montipora capitata v3 - http://cyanophora.rutgers.edu/montipora/
 - Pocillopora acuta v2 - http://cyanophora.rutgers.edu/Pocillopora_acuta/
