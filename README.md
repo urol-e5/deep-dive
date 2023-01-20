@@ -21,7 +21,13 @@ In brief some extra special data sets that will be generated
 
 
 
+Short-hand and other repos for the three experiments are
 
+A) https://github.com/hputnam/Becker_E5 (Pocillopora verrucosa genome)
+
+B) https://github.com/hputnam/HI_Bleaching_Timeseries/tree/main/Dec-July-2019-analysis (Montipora capitata genome)
+
+C) https://github.com/emmastrand/Acclim_Dynamics_molecular (Pocillopora acuta genome)
 
 
 
