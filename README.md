@@ -33,6 +33,8 @@ B) https://github.com/hputnam/HI_Bleaching_Timeseries/tree/main/Dec-July-2019-an
 
 C) https://github.com/emmastrand/Acclim_Dynamics_molecular (Pocillopora acuta genome)
 
+- This effort is somewhat comprimised as ploidy (unintended), overwhelm signals
+
 
 
 ---
