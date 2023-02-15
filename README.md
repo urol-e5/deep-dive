@@ -29,6 +29,10 @@ Short-hand and other repos for the three experiments are
 
 A) https://github.com/hputnam/Becker_E5 (Pocillopora verrucosa genome)
 
+- https://gannet.fish.washington.edu/Atumefaciens/hputnam-Becker_E5/
+- Nutrient exposure 
+- 
+
 B) https://github.com/hputnam/HI_Bleaching_Timeseries/tree/main/Dec-July-2019-analysis (Montipora capitata genome)
 
 C) https://github.com/emmastrand/Acclim_Dynamics_molecular (Pocillopora acuta genome)
