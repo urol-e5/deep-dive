@@ -15,6 +15,18 @@ Nutrient exposure experiment - P verrocosa genome
 
 ### DNA Methylation Analysis
 
+Deduplicated Alignment files (BAMs) were downloaded [from Becker](https://gannet.fish.washington.edu/Atumefaciens/hputnam-Becker_E5/WGBS_Becker_E5/Becker_WGBS/bismark_deduplicated/)
 
+Methylation level was extracted
 
+```{bash}
+${bismark_dir}/bismark_methylation_extractor \
+--bedGraph --counts --scaffolds \
+--multicore 28 \
+--counts \
+--comprehensive \
+--merge_non_CpG \
+--buffer_size 75% \
+*deduplicated.bam
+```
 
