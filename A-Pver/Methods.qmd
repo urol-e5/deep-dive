@@ -1,17 +1,17 @@
 ---
-title: "methods"
-format: html
+title: "methods section"
 editor: visual
+format:
+  html:
+    code-fold: true
+    code-summary: "Show the code"
 ---
 
-# Methods
-
 ::: callout-important
-This is draft method for Subproject "A" 
+This is draft method for Subproject "A"
 
 Nutrient exposure experiment - P verrocosa genome
 :::
-
 
 ### DNA Methylation Analysis
 
@@ -19,29 +19,24 @@ Deduplicated Alignment files (BAMs) were downloaded [from Becker](https://gannet
 
 Methylation level was extracted
 
-```{bash}
-${bismark_dir}/bismark_methylation_extractor \
---bedGraph --counts --scaffolds \
---multicore 28 \
---counts \
---comprehensive \
---merge_non_CpG \
---buffer_size 75% \
-*deduplicated.bam
-```
+    ${bismark_dir}/bismark_methylation_extractor \
+    --bedGraph --counts --scaffolds \
+    --multicore 28 \
+    --counts \
+    --comprehensive \
+    --merge_non_CpG \
+    --buffer_size 75% \
+    *deduplicated.bam
 
 This was followed by coverage file generation
 
-```{bash}
-find *deduplicated.bismark.cov.gz \
-| xargs basename -s _R1_001_val_1_bismark_bt2_pe.deduplicated.bismark.cov.gz \
-| xargs -I{} ${bismark_dir}/coverage2cytosine \
---genome_folder ${genome_folder} \
--o {} \
---merge_CpG \
---zero_based \
-{}_R1_001_val_1_bismark_bt2_pe.deduplicated.bismark.cov.gz
-```
+    find *deduplicated.bismark.cov.gz \
+    | xargs basename -s _R1_001_val_1_bismark_bt2_pe.deduplicated.bismark.cov.gz \
+    | xargs -I{} ${bismark_dir}/coverage2cytosine \
+    --genome_folder ${genome_folder} \
+    -o {} \
+    --merge_CpG \
+    --zero_based \
+    {}_R1_001_val_1_bismark_bt2_pe.deduplicated.bismark.cov.gz
 
-and file 
-
+and files generated fofre

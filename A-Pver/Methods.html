@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>methods</title>
+<title>methods section</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -45,7 +45,7 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">methods</h1>
+<h1 class="title">methods section</h1>
 </div>
 
 
@@ -60,8 +60,6 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
-<section id="methods" class="level1">
-<h1>Methods</h1>
 <div class="callout-important callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -78,7 +76,26 @@ Important
 </div>
 <section id="dna-methylation-analysis" class="level3">
 <h3 class="anchored" data-anchor-id="dna-methylation-analysis">DNA Methylation Analysis</h3>
-</section>
+<p>Deduplicated Alignment files (BAMs) were downloaded <a href="https://gannet.fish.washington.edu/Atumefaciens/hputnam-Becker_E5/WGBS_Becker_E5/Becker_WGBS/bismark_deduplicated/">from Becker</a></p>
+<p>Methylation level was extracted</p>
+<pre><code>${bismark_dir}/bismark_methylation_extractor \
+--bedGraph --counts --scaffolds \
+--multicore 28 \
+--counts \
+--comprehensive \
+--merge_non_CpG \
+--buffer_size 75% \
+*deduplicated.bam</code></pre>
+<p>This was followed by coverage file generation</p>
+<pre><code>find *deduplicated.bismark.cov.gz \
+| xargs basename -s _R1_001_val_1_bismark_bt2_pe.deduplicated.bismark.cov.gz \
+| xargs -I{} ${bismark_dir}/coverage2cytosine \
+--genome_folder ${genome_folder} \
+-o {} \
+--merge_CpG \
+--zero_based \
+{}_R1_001_val_1_bismark_bt2_pe.deduplicated.bismark.cov.gz</code></pre>
+<p>and file</p>
 </section>
 
 </main>
