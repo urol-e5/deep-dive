@@ -1,12 +1,15 @@
 ---
-title: "01-methylation-explore"
-output: html_document
-date: "2023-02-17"
+title: "01.1-methylation-explore"
+format: html
+editor: visual
 ---
 
-```{r}
+
+```{r, message=FALSE}
 library(tidyverse)
 ```
+
+
 
 Bismark + was done on Hyak.
 
@@ -15,6 +18,11 @@ Genmome stats
 ```{r}
 kt <- read.csv("../data/Pver-karytotype.tab", header = FALSE, sep = "\t")
 ```
+
+```{r}
+tibble(kt)
+```
+
 
 There are `r nrow(kt)` scaffolds
 
@@ -37,7 +45,7 @@ ggplot(kt, aes(x = V2)) +
 
 
 ```{r}
-kt %>% filter(V2 < 1000)
+kt %>% filter(V2 < 1000) %>% count()
 ```
 
 
