@@ -10,10 +10,6 @@ In brief some extra special data sets that will be generated
 - long non-coding RNA
 - Gene Methylation Modules
 
-### Moleculer Data (OSF)
-
-- [https://osf.io/uayvk/](https://osf.io/uayvk/)
-
 ### Gene Activity
 - Transcript expression
 - Gene Coeff Var
@@ -30,8 +26,9 @@ Short-hand and other repos for the three experiments are
 A) https://github.com/hputnam/Becker_E5 (Pocillopora verrucosa genome)
 
 - https://gannet.fish.washington.edu/Atumefaciens/hputnam-Becker_E5/
+- [OSF](https://osf.io/uayvk/)
 - Nutrient exposure 
-- 
+
 
 B) https://github.com/hputnam/HI_Bleaching_Timeseries/tree/main/Dec-July-2019-analysis (Montipora capitata genome)
 
