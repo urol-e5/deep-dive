@@ -4,12 +4,9 @@ format: html
 editor: visual
 ---
 
-
 ```{r, message=FALSE}
 library(tidyverse)
 ```
-
-
 
 Bismark + was done on Hyak.
 
@@ -20,9 +17,8 @@ kt <- read.csv("../data/Pver-karytotype.tab", header = FALSE, sep = "\t")
 ```
 
 ```{r}
-tibble(kt)
+knitr::kable(head(kt))
 ```
-
 
 There are `r nrow(kt)` scaffolds
 
@@ -36,22 +32,18 @@ ggplot(kt, aes(x = V2)) +
   scale_x_log10()
 ```
 
-
-```{r}
+```{r, warning=FALSE}
 ggplot(kt, aes(x = V2)) +
   geom_histogram(bins = 100) +
   xlim(0, 5000)
 ```
 
-
 ```{r}
-kt %>% filter(V2 < 1000) %>% count()
+knitr::kable(kt %>% filter(V2 < 1000) %>% count())
 ```
-
-
-
-
 
 First thing I want to do is do a simple histogram showing distribution of methylation levels. This will likely be done by taking 10 bedgraphs and concatenating then, making a histogram.
 
 After that I would want to look at distribution across features..
+
+## 
