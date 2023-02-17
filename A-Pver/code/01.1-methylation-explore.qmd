@@ -58,7 +58,6 @@ ls ../big-data
 head ../big-data/merge10x.bedgraph
 ```
 
-
 ```{r}
 read.csv("../big-data/12_10x.bedgraph", header = FALSE, sep = "\t") %>%
 ggplot(aes(x = V4)) +
@@ -66,15 +65,12 @@ ggplot(aes(x = V4)) +
   coord_cartesian(ylim=c(0, 100000))
 ```
 
-
 ```{r}
 read.csv("../big-data/1_10x.bedgraph", header = FALSE, sep = "\t") %>%
 ggplot(aes(x = V4)) +
   geom_histogram() +
   coord_cartesian(ylim=c(0, 100000))
 ```
-
-
 
 ```{r}
 read.csv("../big-data/5_10x.bedgraph", header = FALSE, sep = "\t") %>%

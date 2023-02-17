@@ -13,11 +13,15 @@ This is draft method for Subproject "A"
 Nutrient exposure experiment - P verrocosa genome
 :::
 
+::: callout-warning
+I have some concern about quality of genome
+:::
+
 ### DNA Methylation Analysis
 
 Deduplicated Alignment files (BAMs) were downloaded [from Becker](https://gannet.fish.washington.edu/Atumefaciens/hputnam-Becker_E5/WGBS_Becker_E5/Becker_WGBS/bismark_deduplicated/)
 
-Methylation level was extracted
+Methylation levels were extracted
 
     ${bismark_dir}/bismark_methylation_extractor \
     --bedGraph --counts --scaffolds \
@@ -39,4 +43,4 @@ This was followed by coverage file generation
     --zero_based \
     {}_R1_001_val_1_bismark_bt2_pe.deduplicated.bismark.cov.gz
 
-and files generated fofre
+and files generated for downstream analysis.
