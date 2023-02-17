@@ -46,4 +46,46 @@ First thing I want to do is do a simple histogram showing distribution of methyl
 
 After that I would want to look at distribution across features..
 
-## 
+```{bash}
+ls ../big-data
+```
+
+```{bash}
+#cat ../big-data/*10x.bedgraph > ../big-data/merge10x.bedgraph
+```
+
+```{bash}
+head ../big-data/merge10x.bedgraph
+```
+
+
+```{r}
+read.csv("../big-data/12_10x.bedgraph", header = FALSE, sep = "\t") %>%
+ggplot(aes(x = V4)) +
+  geom_histogram() +
+  coord_cartesian(ylim=c(0, 100000))
+```
+
+
+```{r}
+read.csv("../big-data/1_10x.bedgraph", header = FALSE, sep = "\t") %>%
+ggplot(aes(x = V4)) +
+  geom_histogram() +
+  coord_cartesian(ylim=c(0, 100000))
+```
+
+
+
+```{r}
+read.csv("../big-data/5_10x.bedgraph", header = FALSE, sep = "\t") %>%
+ggplot(aes(x = V4)) +
+  geom_histogram() +
+  coord_cartesian(ylim=c(0, 100000))
+```
+
+```{r}
+read.csv("../big-data/16_10x.bedgraph", header = FALSE, sep = "\t") %>%
+ggplot(aes(x = V4)) +
+  geom_histogram() +
+  coord_cartesian(ylim=c(0, 100000))
+```
