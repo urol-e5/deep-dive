@@ -123,9 +123,9 @@ data_directory
 # Load all measurement data
 bg_all <- ballgown(dataDir="../data/ballgown/", samplePattern='[CE]*', meas='all')
 bg_all
-bg_controls <- ballgown(dataDir="../data/ballgown/", samplePattern='C*', meas='all')
+bg_controls <- ballgown(dataDir="../data/ballgown/", samplePattern='C.*', meas='all')
 bg_controls
-bg_enriched <- ballgown(dataDir="../data/ballgown/", samplePattern='E*', meas='all')
+bg_enriched <- ballgown(dataDir="../data/ballgown/", samplePattern='E.*', meas='all')
 bg_enriched
 ```
 
@@ -143,8 +143,70 @@ head(sample_metadata_full)
 
 # Organize metadata in preparation of creating pData data frame far Ballgown
 # Sort by "sample_id" to ensure matches directory structure (required for Ballgown)
-sample_metadata_subset <- sample_metadata_full %>% select(OldSample.ID, Treatment, TreatmentN, Sex) %>% arrange(OldSample.ID)
+sample_metadata_full <- sample_metadata_full %>% 
+  select(fragment.ID, treatment, block, sample_id) %>% 
+  arrange(sample_id)
 # View organized metadata
-head(sample_metadata_subset)
+head(sample_metadata_full)
+```
+
+# Load ALL phenotype dataframe into Ballgown object
+```{r}
+# Load phenotype info into Ballgown
+pData(bg_all) <- sample_metadata_full
+# Examine phenotype data as it exists in Ballgown
+phenotype_table <-  pData(bg_all)
+head(phenotype_table)
+```
 
 
+### Look at ALL exon info
+```{r}
+# Exon info
+structure(bg_all)$exon
+```
+
+### Look at ALL intron info
+```{r}
+# Intron info
+structure(bg_all)$intron
+```
+
+###  Look at ALL transcript (isoform) info
+```{r}
+# Transcript info
+structure(bg_all)$trans
+```
+
+# Load ALL transcript expression data
+```{r load-all-transcript-expression-data}
+# Expression data
+whole_tx_table <-  texpr(bg_all, 'all')
+
+# Rename gene_names listed as a "."
+whole_tx_table <- whole_tx_table %>% mutate(gene_name = ifelse(gene_name == ".", t_name, gene_name))
+head(whole_tx_table)
+
+# FPKM values for all transcripts
+# Converts output to data frame
+transcript_fpkm <- as.data.frame(texpr(bg_all, 'FPKM'))
+
+# Put rownames into column for further manipulation
+transcript_fpkm <- rownames_to_column(transcript_fpkm, "t_id")
+head(transcript_fpkm)
+```
+
+## Write all transcript data to files
+```{r write-transcript-data-to-file}
+# Write all transcript FPKM data to file
+write.csv(transcript_fpkm,
+          file = "../output/02-ballgown-differential_gene_expression/fpkm-all_transcripts.csv",
+          quote = FALSE,
+          row.names = FALSE)
+
+# Write whole_tx_table to file
+write.csv(whole_tx_table,
+          file ="../output/02-ballgown-differential_gene_expression/whole_tx_table.csv",
+          quote = FALSE,
+          row.names = FALSE)
+```
