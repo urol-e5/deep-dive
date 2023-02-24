@@ -231,3 +231,50 @@ write.csv(whole_gx_table,
           quote = FALSE,
           row.names = FALSE)
 ```
+
+# Generate boxplots to compare FPKM across all samples
+```{r boxplots-to-compare-FPKM-across-all-samples} 
+# Load phenotype info into Ballgown
+pData(bg_all) <- sample_metadata_full
+
+# Pull all transcript expression values stored in FPKM measurement from ballgown object
+fpkm <- texpr(bg_all, meas = "FPKM")
+
+# Log transform data and add 1 to all values to artificially prevent log2(0).
+fpkm_df <- as.data.frame(log2(fpkm+1))
+head(fpkm_df)
+
+# Rotate data frame
+# Creates a "treatment" column by pulling last character from each sample name (C/E)
+fpkm_df_pivot <- pivot_longer(
+  fpkm_df, cols = starts_with("FPKM"), 
+  names_to = "library") %>% 
+  mutate(treatment = (str_sub(library, start = 6, end = 6)
+                )
+         )
+head(fpkm_df_pivot)
+
+# Sort data frame by treatment
+fpkm_df_pivot_sorted <- fpkm_df_pivot %>% arrange(treatment)
+head(fpkm_df_pivot_sorted)
+
+# Set unique library names as vector
+# Will be used to group boxplot by sex
+fpkm_libraries_sorted_unique <- (unique(fpkm_df_pivot_sorted$library))
+head(fpkm_libraries_sorted_unique)
+
+# Re-order data frame by treatment-sorted data
+fpkm_df_pivot$library <- factor(fpkm_df_pivot$library, levels = fpkm_libraries_sorted_unique)
+
+# Produce boxplots of FPKM for each library
+# Grouped by sex
+ggplot(fpkm_df_pivot, aes(library, value, color = treatment)) +
+  geom_boxplot() +
+  ggtitle("Comparisons of transcript FPKM values across all libraries") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ylab("FPKM") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5))
+
+# Save boxplot as PDF
+ggsave(filename = "../output/02-ballgown-differential_gene_expression/figures//fpkm_c-vs-e_boxplot.pdf")
+```
