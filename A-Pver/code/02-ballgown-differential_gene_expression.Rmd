@@ -110,6 +110,16 @@ done
 tree
 ```
 
+
+# Read in _P.verrucosa_ genes BED file
+```{r read-in-genes-BED}
+genes_BED <- read.table(file = "../data/Pver_genome_assembly_v1.0.genes.bed")
+
+# Add BED column names for more clarity
+colnames(genes_BED) <- c("chr", "start", "end", "name", "score", "strand")
+head(genes_BED)
+```
+
 # Find Ballgown installation location
 ```{r}
 data_directory <-  system.file('extdata', package='ballgown') # automatically finds ballgown's installation directory
