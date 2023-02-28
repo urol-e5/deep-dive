@@ -474,20 +474,22 @@ cat("Number of enriched DEG with p-values and q-values <= ", pvalue, ":", count_
 # Write merged dataframe to CSV
 write.csv(
   merged_DEG_treatment_filtered, 
-  file = "../output/02-ballgown-differential_gene_expression/DEG_treatment_filtered_p-0.05_q-0.05.csv", 
+  file = "../output/02-ballgown-differential_gene_expression/DEG_treatment_all_filtered_p-0.05_q-0.05.csv", 
   quote = FALSE, 
   row.names = FALSE)
+
 # Creates a BED file of all DEG. 
 write.table(
   (merged_DEG_treatment_filtered_genes_only %>% 
     select(chr, start, end, id, score, strand)
     ), 
-  file = "../output/02-ballgown-differential_gene_expression/DEG_treatment_filtered_p-0.05_q-0.05.bed",
+  file = "../output/02-ballgown-differential_gene_expression/DEG_treatment_all_filtered_p-0.05_q-0.05.bed",
   sep = "\t",
   col.names = FALSE,
   row.names = FALSE,
   quote = FALSE
 )
+
 # Creates a BED file of only controls DEGs.
 write.table(
   (
@@ -500,6 +502,7 @@ write.table(
   row.names = FALSE,
   quote = FALSE
 )
+
 # Creates a BED file of only enriched DEGs. 
 write.table(
   (
