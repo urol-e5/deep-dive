@@ -1,0 +1,360 @@
+---
+title: Calculating transcript counts per gene per sample in P.verrucosa enriched to
+  elevated nutrients using Ballgown
+author: "Sam White"
+date: "2/28/2023"
+output: html_document
+---
+
+# Uses all transcripts expression table, generated using [Ballgown](https://github.com/alyssafrazee/ballgown), for calculating transcript counts per gene per sample in _P.verrucosa_ enriched to elevated nutrients.
+
+REQUIRES the following R libraries:
+
+- `tidyverse`
+
+# Load `R` libraries
+
+```{r}
+library("tidyverse")
+```
+
+# Set variables
+
+```{r set-variables}
+# Vectors for subsetting samples by different groups
+all <- c("C17", "C18", "C19", "C20", "C21", "C22", "C23", "C24", "C25", "C26", "C27", "C28", "C29", "C30", "C31", "C32", "E1", "E10", "E11", "E12", "E13", "E14", "E15", "E16", "E2", "E3", "E4", "E5", "E6", "E7", "E8", "E9")
+controls <- c("C17", "C18", "C19", "C20", "C21", "C22", "C23", "C24", "C25", "C26", "C27", "C28", "C29", "C30", "C31", "C32")
+enriched <- c("E1", "E10", "E11", "E12", "E13", "E14", "E15", "E16", "E2", "E3", "E4", "E5", "E6", "E7", "E8", "E9")
+
+
+# Vector of comparisons
+comparisons <- c("c_vs_e")
+
+# Vector of count calculations column names
+count_calcs <- c("sum_transcript_counts",
+                 "median_transcript_counts",
+                 "mean_transcript_counts",
+                 "max_transcript_counts",
+                 "min_transcript_counts",
+                 "std_dev_transcript_counts",
+                 "controls_sum_transcript_counts",
+                 "controls_median_transcript_counts",
+                 "controls_mean_transcript_counts",
+                 "controls_max_transcript_counts",
+                 "controls_min_transcript_counts",
+                 "controls_std_dev_transcript_counts",
+                 "enriched_sum_transcript_counts",
+                 "enriched_median_transcript_counts",
+                 "enriched_mean_transcript_counts",
+                 "enriched_max_transcript_counts",
+                 "enriched_min_transcript_counts",
+                 "enriched_std_dev_transcript_counts"
+                 )
+
+# Initialize lists of data frames
+list_transcript_counts_dfs <- list()
+list_transcript_max_diffs_dfs <- list()
+```
+
+# Define functions
+```{r define-function(s)}
+
+#### Function for determining maximum transcripts per gene#####
+
+# Function accepts two data frames (df1 and df2), and a string (comparison)
+# Returns data frame containing:
+# - gene_name
+# - df1_max_transcript_counts
+# - df2_max_transcript_counts
+# - difference between max transcript counts
+
+diff_max_transcripts <- function(df1, df2, comparison) {
+  
+  # Select columns from first data frame
+  df1.max <- df1 %>% 
+      select(gene_name, contains("max_transcript_counts"))
+  
+  # Get name of max transcript counts column
+  df1.max.name <- df1.max %>%
+    select(contains("max_transcript_counts")) %>% 
+    colnames()
+  
+  # Select columns from second data frame
+  df2.max <- df2 %>% 
+      select(gene_name, contains("max_transcript_counts"))
+  
+   # Get name of max transcript counts column
+  df2.max.name <- df2.max %>%
+    select(contains("max_transcript_counts")) %>% 
+    colnames()
+  
+  # Join the two max transcripts data frames on gene_name
+  df1max.df2max.joined <- left_join(df1.max, df2.max, by = "gene_name")
+  
+  # Calculate difference between df1.max and df2.max
+  # Filter for only samples with different max transcript counts.
+  # The get() function is required to use the string of the corresponding variable.
+  df1max.df2max.joined %>% 
+    select(everything()) %>% 
+    mutate(difference = (get(df1.max.name) - get(df2.max.name))) %>% 
+    filter(difference != 0)
+
+}
+
+########################################################################
+```
+
+# Load all transcript expression data
+```{r load-transcript-data}
+# Expression data
+whole_tx_table <-  read.csv("../output/02-ballgown-differential_gene_expression/whole_tx_table.csv")
+
+head(whole_tx_table)
+
+# Rename gene_names listed as a "." to the associated transcript name
+whole_tx_table <- whole_tx_table %>% mutate(gene_name = ifelse(gene_name == ".", t_name, gene_name))
+
+head(whole_tx_table)
+```
+
+# Count transcripts for each gene for each sample.
+A transcript is counted if it has an FPKM value > 0.
+```{r count-transcripts-per-gene-per-sample}
+
+# Create table of transcript counts per gene per sample
+transcript_counts <- whole_tx_table %>%
+  select(starts_with(c("gene_name", "FPKM"))) %>%
+  group_by(gene_name) %>%
+  summarise((across(everything(), ~sum(. > 0))))
+
+head(transcript_counts)
+
+# Rename columns
+names(transcript_counts) <- gsub(x = names(transcript_counts), pattern = "FPKM", replacement = "transcript_counts")
+
+head(transcript_counts)
+```
+
+# Calculate max transcripts per gene across all samples
+```{r max-transcripts-per-gene}
+max_transcripts_per_gene <- transcript_counts %>% 
+  rowwise() %>% 
+  mutate(transcripts.max = max(across(contains(all, ignore.case = FALSE)))) %>% 
+  select(ends_with(c("name", "max")))
+
+head(max_transcripts_per_gene)
+```
+
+## Write max transcripts to tab-delimited file
+```{r write-max-transcripts-to-file}
+write.table(max_transcripts_per_gene,
+          file ="../output/03-transcript-counts/transcripts-counts-max_per_gene.tab",
+          quote = FALSE,
+          row.names = FALSE,
+          col.names = FALSE,
+          sep = "\t")
+```
+
+# Perform transcript count calcs
+```{r perform-transcript-count-calcs}
+# Perform calculations
+transcript_counts_per_gene_per_sample <- transcript_counts %>%
+  rowwise() %>% 
+  mutate(
+    sum_transcript_counts = sum(c_across(where(is.numeric) & -any_of(count_calcs))),
+    median_transcript_counts = median(c_across(where(is.numeric) & -any_of(count_calcs))),
+    mean_transcript_counts = mean(c_across(where(is.numeric) & -any_of(count_calcs))),
+    max_transcript_counts = max(c_across(where(is.numeric) & -any_of(count_calcs))),
+    min_transcript_counts = min(c_across(where(is.numeric) & -any_of(count_calcs))),
+    std_dev_transcript_counts = sd(c_across(where(is.numeric) & -any_of(count_calcs)))
+  )
+
+# Male stats
+transcript_counts_per_gene_per_sample_males <- transcript_counts %>%
+  rowwise() %>% 
+  select("gene_name", ends_with('M')) %>% 
+  mutate(
+    male_sum_transcript_counts = sum(c_across(where(is.numeric) & -any_of(count_calcs))),
+    male_median_transcript_counts = median(c_across(where(is.numeric) & -any_of(count_calcs))),
+    male_mean_transcript_counts = mean(c_across(where(is.numeric) & -any_of(count_calcs))),
+    male_max_transcript_counts = max(c_across(where(is.numeric) & -any_of(count_calcs))),
+    male_min_transcript_counts = min(c_across(where(is.numeric) & -any_of(count_calcs))),
+    male_std_dev_transcript_counts = sd(c_across(where(is.numeric) & -any_of(count_calcs)))
+  )
+
+# Female stats
+transcript_counts_per_gene_per_sample_females <- transcript_counts %>%
+  rowwise() %>% 
+  select("gene_name", ends_with('F')) %>% 
+  mutate(
+    female_sum_transcript_counts = sum(c_across(where(is.numeric) & -any_of(count_calcs))),
+    female_median_transcript_counts = median(c_across(where(is.numeric) & -any_of(count_calcs))),
+    female_mean_transcript_counts = mean(c_across(where(is.numeric) & -any_of(count_calcs))),
+    female_max_transcript_counts = max(c_across(where(is.numeric) & -any_of(count_calcs))),
+    female_min_transcript_counts = min(c_across(where(is.numeric) & -any_of(count_calcs))),
+    female_std_dev_transcript_counts = sd(c_across(where(is.numeric) & -any_of(count_calcs)))
+  )
+
+# Controls stats
+transcript_counts_per_gene_per_sample_controls <- transcript_counts %>%
+  rowwise() %>% 
+  select("gene_name", ends_with(controls)) %>% 
+  mutate(
+    controls_sum_transcript_counts = sum(c_across(where(is.numeric) & -any_of(count_calcs))),
+    controls_median_transcript_counts = median(c_across(where(is.numeric) & -any_of(count_calcs))),
+    controls_mean_transcript_counts = mean(c_across(where(is.numeric) & -any_of(count_calcs))),
+    controls_max_transcript_counts = max(c_across(where(is.numeric) & -any_of(count_calcs))),
+    controls_min_transcript_counts = min(c_across(where(is.numeric) & -any_of(count_calcs))),
+    controls_std_dev_transcript_counts = sd(c_across(where(is.numeric) & -any_of(count_calcs)))
+  )
+
+# enriched stats
+transcript_counts_per_gene_per_sample_enriched <- transcript_counts %>%
+  rowwise() %>% 
+  select("gene_name", ends_with(enriched)) %>% 
+  mutate(
+    enriched_sum_transcript_counts = sum(c_across(where(is.numeric) & -any_of(count_calcs))),
+    enriched_median_transcript_counts = median(c_across(where(is.numeric) & -any_of(count_calcs))),
+    enriched_mean_transcript_counts = mean(c_across(where(is.numeric) & -any_of(count_calcs))),
+    enriched_max_transcript_counts = max(c_across(where(is.numeric) & -any_of(count_calcs))),
+    enriched_min_transcript_counts = min(c_across(where(is.numeric) & -any_of(count_calcs))),
+    enriched_std_dev_transcript_counts = sd(c_across(where(is.numeric) & -any_of(count_calcs)))
+  )
+
+# Controls females stats
+transcript_counts_per_gene_per_sample_controls_females <- transcript_counts %>%
+  rowwise() %>% 
+  select("gene_name", ends_with(controls_females)) %>% 
+  mutate(
+    control_females_sum_transcript_counts = sum(c_across(where(is.numeric) & -any_of(count_calcs))),
+    control_females_median_transcript_counts = median(c_across(where(is.numeric) & -any_of(count_calcs))),
+    control_females_mean_transcript_counts = mean(c_across(where(is.numeric) & -any_of(count_calcs))),
+    control_females_max_transcript_counts = max(c_across(where(is.numeric) & -any_of(count_calcs))),
+    control_females_min_transcript_counts = min(c_across(where(is.numeric) & -any_of(count_calcs))),
+    control_females_std_dev_transcript_counts = sd(c_across(where(is.numeric) & -any_of(count_calcs)))
+  )
+
+# enriched females stats
+transcript_counts_per_gene_per_sample_enriched_females <- transcript_counts %>%
+  rowwise() %>% 
+  select("gene_name", ends_with(enriched_females)) %>% 
+  mutate(
+    enriched_females_sum_transcript_counts = sum(c_across(where(is.numeric) & -any_of(count_calcs))),
+    enriched_females_median_transcript_counts = median(c_across(where(is.numeric) & -any_of(count_calcs))),
+    enriched_females_mean_transcript_counts = mean(c_across(where(is.numeric) & -any_of(count_calcs))),
+    enriched_females_max_transcript_counts = max(c_across(where(is.numeric) & -any_of(count_calcs))),
+    enriched_females_min_transcript_counts = min(c_across(where(is.numeric) & -any_of(count_calcs))),
+    enriched_females_std_dev_transcript_counts = sd(c_across(where(is.numeric) & -any_of(count_calcs)))
+  )
+
+# Controls males stats
+transcript_counts_per_gene_per_sample_controls_males <- transcript_counts %>%
+  rowwise() %>% 
+  select("gene_name", ends_with(controls_males)) %>% 
+  mutate(
+    control_males_sum_transcript_counts = sum(c_across(where(is.numeric) & -any_of(count_calcs))),
+    control_males_median_transcript_counts = median(c_across(where(is.numeric) & -any_of(count_calcs))),
+    control_males_mean_transcript_counts = mean(c_across(where(is.numeric) & -any_of(count_calcs))),
+    control_males_max_transcript_counts = max(c_across(where(is.numeric) & -any_of(count_calcs))),
+    control_males_min_transcript_counts = min(c_across(where(is.numeric) & -any_of(count_calcs))),
+    control_males_std_dev_transcript_counts = sd(c_across(where(is.numeric) & -any_of(count_calcs)))
+  )
+
+# enriched males stats
+transcript_counts_per_gene_per_sample_enriched_males <- transcript_counts %>%
+  rowwise() %>% 
+  select("gene_name", ends_with(enriched_males)) %>% 
+  mutate(
+    enriched_males_sum_transcript_counts = sum(c_across(where(is.numeric) & -any_of(count_calcs))),
+    enriched_males_median_transcript_counts = median(c_across(where(is.numeric) & -any_of(count_calcs))),
+    enriched_males_mean_transcript_counts = mean(c_across(where(is.numeric) & -any_of(count_calcs))),
+    enriched_males_max_transcript_counts = max(c_across(where(is.numeric) & -any_of(count_calcs))),
+    enriched_males_min_transcript_counts = min(c_across(where(is.numeric) & -any_of(count_calcs))),
+    enriched_males_std_dev_transcript_counts = sd(c_across(where(is.numeric) & -any_of(count_calcs)))
+  )
+
+# Add data frames to list
+# Wraps ls() with grep to allow for needed Perl regex (the  "^(?!list).*" aspect) because
+# ls() doesn't support Perl regex
+# Regex excludes any results beginning with the word "list"
+list_transcript_counts_dfs <- mget(grep("^(?!list).*", ls(pattern = "transcript_counts_per_gene_per_sample"), value = TRUE, perl = TRUE))
+
+head(transcript_counts)
+```
+
+## Write transcript per gene counts to files.
+```{r write-transcript-per-gene-counts-to-files}
+
+# Write data frames to CSVs in ../output/34-transcript-counts/ dir
+# Uses names of data frames as names of output files.
+sapply(names(list_transcript_counts_dfs),
+       function(x) write.csv(list_transcript_counts_dfs[[x]],
+                             file = file.path("../output/34-transcript-counts/", paste(x, "csv", sep=".")),
+                             quote = FALSE,
+                             row.names = FALSE)
+       )
+```
+
+# Determine differences in max number of transcripts between comparisons
+```{r calculate-difference-max-transcripts}
+
+for (comparison in comparisons) {
+  
+  if (comparison == "f_vs_m") {
+    diffs.max.transcripts_per_gene.females.vs.males <-
+      diff_max_transcripts(transcript_counts_per_gene_per_sample_females,
+                         transcript_counts_per_gene_per_sample_males,
+                         comparison)
+  } else if (comparison == "c_vs_e") {
+    diffs.max.transcripts_per_gene.controls.vs.enriched <-
+      diff_max_transcripts(transcript_counts_per_gene_per_sample_controls,
+                         transcript_counts_per_gene_per_sample_enriched,
+                         comparison)
+  } else if (comparison == "c.f_vs_e.f") {
+    diffs.max.transcripts_per_gene.controls_females.vs.enriched_females <-
+      diff_max_transcripts(transcript_counts_per_gene_per_sample_controls_females,
+                         transcript_counts_per_gene_per_sample_enriched_females,
+                         comparison)
+  } else if (comparison == "c.m_vs_e.m") {
+    diffs.max.transcripts_per_gene.controls_males.vs.enriched_males <-
+      diff_max_transcripts(transcript_counts_per_gene_per_sample_controls_males,
+                         transcript_counts_per_gene_per_sample_enriched_males,
+                         comparison)
+  } else if (comparison == "c.f_vs_c.m") {
+    diffs.max.transcripts_per_gene.controls_females.vs.controls_males <-
+      diff_max_transcripts(transcript_counts_per_gene_per_sample_controls_females,
+                         transcript_counts_per_gene_per_sample_controls_males,
+                         comparison)
+  } else if (comparison == "e.f_vs_e.m") {
+    diffs.max.transcripts_per_gene.enriched_females.vs.enriched_males <-
+      diff_max_transcripts(transcript_counts_per_gene_per_sample_enriched_females,
+                         transcript_counts_per_gene_per_sample_enriched_males,
+                         comparison)
+  }
+  
+}
+
+# Add data frames to list
+# Wraps ls() with grep to allow for needed perl regex (the  "^(?!list).*" aspect) because
+# ls() doesn't support perl regex
+# Regex excludes any results beginning with the word "list"
+list_transcript_max_diffs_dfs <- mget(grep("^(?!list).*",
+                                           ls(pattern = "max.transcripts_per_gene"),
+                                           value = TRUE,
+                                           perl = TRUE)
+                                      )
+
+```
+
+## Write max transcript diffs to files.
+```{r write-transcript-per-gene-counts-to-files}
+
+# Write data frames to CSVs in ../output/34-transcript-counts/ dir
+# Uses names of data frames as names of output files.
+sapply(names(list_transcript_max_diffs_dfs),
+       function(x) write.csv(list_transcript_max_diffs_dfs[[x]],
+                             file = file.path("../output/34-transcript-counts/", paste(x, "csv", sep=".")),
+                             quote = FALSE,
+                             row.names = FALSE)
+       )
+```
