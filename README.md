@@ -36,6 +36,8 @@ C) https://github.com/emmastrand/Acclim_Dynamics_molecular (Pocillopora acuta ge
 
 - This effort is somewhat comprimised as ploidy (unintended), overwhelm signals
 
+D) Acropora
+
 
 
 ---
