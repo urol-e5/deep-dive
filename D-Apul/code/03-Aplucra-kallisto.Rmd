@@ -1,0 +1,43 @@
+---
+title: "03-Apulcra-kallisto"
+output: md_document
+---
+
+```{bash}
+/home/shared/kallisto/kallisto -h
+```
+
+```{bash}
+/home/shared/kallisto/kallisto \
+index -i \
+../data/Amil/ncbi_dataset/data/GCF_013753865.1/GCF_013753865.1_Amil_v2.1_genomic.index \
+../data/Amil/ncbi_dataset/data/GCF_013753865.1/GCF_013753865.1_Amil_v2.1_genomic.fna
+```
+```{bash}
+ls ../data/S*
+```
+
+
+```{bash}
+ /home/shared/kallisto/kallisto \
+quant -i ../data/Amil/ncbi_dataset/data/GCF_013753865.1/GCF_013753865.1_Amil_v2.1_genomic.index \
+-o ../output/03-kallisto/mil_SRR8601366 \
+-t 40 \
+../data/SRR8601366_1.fastq ../data/SRR8601366_2.fastq \
+2>&1 | tee ../output/03-kallisto/mil_SRR8601366.out
+```
+
+```{bash}
+/home/shared/kallisto/kallisto \
+index -i \
+../data/Adig/ncbi_dataset/data/GCF_000222465.1/GCF_000222465.1_Adig_1.1_genomic.index \
+../data/Adig/ncbi_dataset/data/GCF_000222465.1/GCF_000222465.1_Adig_1.1_genomic.fna
+```
+```{bash}
+ /home/shared/kallisto/kallisto \
+quant -i ../data/Adig/ncbi_dataset/data/GCF_000222465.1/GCF_000222465.1_Adig_1.1_genomic.index \
+-o ../output/03-kallisto/dig_SRR8601366 \
+-t 40 \
+../data/SRR8601366_1.fastq ../data/SRR8601366_2.fastq \
+2>&1 | tee ../output/03-kallisto/dig_SRR8601366.out
+```
