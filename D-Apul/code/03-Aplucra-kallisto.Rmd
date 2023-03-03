@@ -17,6 +17,8 @@ index -i \
 ls ../data/S*
 ```
 
+# Amil2.1
+
 
 ```{bash}
  /home/shared/kallisto/kallisto \
@@ -26,6 +28,30 @@ quant -i ../data/Amil/ncbi_dataset/data/GCF_013753865.1/GCF_013753865.1_Amil_v2.
 ../data/SRR8601366_1.fastq ../data/SRR8601366_2.fastq \
 2>&1 | tee ../output/03-kallisto/mil_SRR8601366.out
 ```
+```{bash}
+ /home/shared/kallisto/kallisto \
+quant -i ../data/Amil/ncbi_dataset/data/GCF_013753865.1/GCF_013753865.1_Amil_v2.1_genomic.index \
+-o ../output/03-kallisto/mil02_SRR8601366 \
+-t 40 \
+--genomebam \
+--gtf ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gff \
+../data/SRR8601366_1.fastq ../data/SRR8601366_2.fastq \
+2>&1 | tee ../output/03-kallisto/mil02_SRR8601366.out
+```
+
+
+```{bash}
+ /home/shared/kallisto/kallisto \
+quant -i ../data/Amil/ncbi_dataset/data/GCF_013753865.1/GCF_013753865.1_Amil_v2.1_genomic.index \
+-o ../output/03-kallisto/mil03_SRR8601366 \
+-t 40 \
+--genomebam \
+--gtf ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gtf \
+../data/SRR8601366_1.fastq ../data/SRR8601366_2.fastq \
+2>&1 | tee ../output/03-kallisto/mil03_SRR8601366.out
+```
+
+# Adig
 
 ```{bash}
 /home/shared/kallisto/kallisto \
@@ -33,6 +59,9 @@ index -i \
 ../data/Adig/ncbi_dataset/data/GCF_000222465.1/GCF_000222465.1_Adig_1.1_genomic.index \
 ../data/Adig/ncbi_dataset/data/GCF_000222465.1/GCF_000222465.1_Adig_1.1_genomic.fna
 ```
+
+
+
 ```{bash}
  /home/shared/kallisto/kallisto \
 quant -i ../data/Adig/ncbi_dataset/data/GCF_000222465.1/GCF_000222465.1_Adig_1.1_genomic.index \
@@ -40,4 +69,72 @@ quant -i ../data/Adig/ncbi_dataset/data/GCF_000222465.1/GCF_000222465.1_Adig_1.1
 -t 40 \
 ../data/SRR8601366_1.fastq ../data/SRR8601366_2.fastq \
 2>&1 | tee ../output/03-kallisto/dig_SRR8601366.out
+```
+
+
+
+# Ahya
+
+
+```{bash}
+/home/shared/kallisto/kallisto \
+index -i \
+../data/Ahya/ncbi_dataset/data/GCA_020536085.1/GCA_020536085.1_Ahyacinthus.chrsV1_genomic.index \
+../data/Ahya/ncbi_dataset/data/GCA_020536085.1/GCA_020536085.1_Ahyacinthus.chrsV1_genomic.fna
+```
+
+
+
+```{bash}
+ /home/shared/kallisto/kallisto \
+quant -i ../data/Ahya/ncbi_dataset/data/GCA_020536085.1/GCA_020536085.1_Ahyacinthus.chrsV1_genomic.index \
+-o ../output/03-kallisto/hya_SRR8601366 \
+-t 40 \
+../data/SRR8601366_1.fastq ../data/SRR8601366_2.fastq \
+2>&1 | tee ../output/03-kallisto/hya_SRR8601366.out
+```
+
+
+
+
+
+
+
+# Comparing alignment rates
+
+```{bash}
+grep 'p_' ../output/03-kallisto/dig_SRR8601366/run_info.json
+```
+
+
+```{bash}
+grep 'p_' ../output/03-kallisto/mil_SRR8601366/run_info.json
+```
+
+```{bash}
+grep 'p_' ../output/03-kallisto/mil02_SRR8601366/run_info.json
+```
+
+```{bash}
+grep 'p_' ../output/03-kallisto/mil03_SRR8601366/run_info.json
+```
+
+
+
+
+```{bash}
+grep 'p_' ../output/03-kallisto/hya_SRR8601366/run_info.json
+```
+
+
+
+
+
+```{bash}
+echo "A hyacinthus"
+grep 'p_' ../output/03-kallisto/hya_SRR8601366/run_info.json
+echo "A millipora"
+grep 'p_' ../output/03-kallisto/mil_SRR8601366/run_info.json
+echo "A digitera"
+grep 'p_' ../output/03-kallisto/dig_SRR8601366/run_info.json
 ```

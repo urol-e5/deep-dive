@@ -44,5 +44,47 @@ GCF_013753865.1_Amil_v2.1 \
 
 
 
+# Alignment
+
+Hisat2 alignments
+"${programs_array[hisat2]}" \
+-x "${genome_index_name}" \
+-1 "${fastq_list_R1}" \
+-2 "${fastq_list_R2}" \
+-S "${sample_name}".sam \
+2> "${sample_name}"-hisat2_stats.txt
+
+```{bash}
+/home/shared/hisat2-2.2.1/hisat2 \
+-x ../output/04-Apulcra-hisat/GCF_013753865.1_Amil_v2.1 \
+-p 48 \
+-1 ../data/SRR8601366_1.fastq \
+-2 ../data/SRR8601366_2.fastq \
+-S ../output/04-Apulcra-hisat/SRR8601366_mil.sam \
+2>&1 | tee ../output/04-Apulcra-hisat/hisat2_stats.txt
+```
 
 
+
+# Align with no splice sites
+
+
+```{bash}
+/home/shared/hisat2-2.2.1/hisat2-build \
+../data/Amil/ncbi_dataset/data/GCF_013753865.1/GCF_013753865.1_Amil_v2.1_genomic.fna \
+GCF_013753865.1_Amil_v2.1_nosplice \
+-p 48 \
+2>&1 | tee ../output/04-Apulcra-hisat/hisat2-build_stats_nosplice.txt
+```
+
+
+
+```{bash}
+/home/shared/hisat2-2.2.1/hisat2 \
+-x ../output/04-Apulcra-hisat/GCF_013753865.1_Amil_v2.1_nosplice \
+-p 48 \
+-1 ../data/SRR8601366_1.fastq \
+-2 ../data/SRR8601366_2.fastq \
+-S ../output/04-Apulcra-hisat/SRR8601366_mil_nosplice.sam \
+2>&1 | tee ../output/04-Apulcra-hisat/hisat2_stats_nosplice.txt
+```
