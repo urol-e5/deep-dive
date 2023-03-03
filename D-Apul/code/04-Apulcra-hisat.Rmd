@@ -1,0 +1,48 @@
+---
+title: "04-Apulcra-hisat"
+output: html_document
+---
+
+millipora genome prep
+
+```{bash}
+/home/shared/hisat2-2.2.1/hisat2_extract_exons.py \
+../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gtf \
+> ../output/04-Apulcra-hisat/m_exon.tab
+```
+
+```{bash}
+head ../output/04-Apulcra-hisat/m_exon.tab
+
+```
+```{bash}
+/home/shared/hisat2-2.2.1/hisat2_extract_splice_sites.py \
+../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gtf \
+> ../output/04-Apulcra-hisat/m_splice_sites.tab
+```
+
+"${programs_array[hisat2_build]}" \
+"${genome_fasta}" \
+"${genome_index_name}" \
+--exon "${exons}" \
+--ss "${splice_sites}" \
+-p "${threads}" \
+2> hisat2-build_stats.txt
+
+
+
+```{bash}
+/home/shared/hisat2-2.2.1/hisat2-build \
+../data/Amil/ncbi_dataset/data/GCF_013753865.1/GCF_013753865.1_Amil_v2.1_genomic.fna \
+GCF_013753865.1_Amil_v2.1 \
+--exon ../output/04-Apulcra-hisat/m_exon.tab \
+--ss ../output/04-Apulcra-hisat/m_splice_sites.tab \
+-p 40 \
+../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gtf \
+2> ../output/04-Apulcra-hisat/hisat2-build_stats.txt
+```
+
+
+
+
+
