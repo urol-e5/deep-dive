@@ -119,6 +119,59 @@ GCF_013753865.1_Amil_v2.1_nosplice \
 # A digitera
 
 
+```{bash}
+/home/shared/hisat2-2.2.1/hisat2_extract_exons.py \
+../data/Adig/ncbi_dataset/data/GCF_000222465.1/genomic.gtf \
+> ../output/04-Apulcra-hisat/d_exon.tab
+```
+
+
+```{bash}
+/home/shared/hisat2-2.2.1/hisat2_extract_splice_sites.py \
+../data/Adig/ncbi_dataset/data/GCF_000222465.1/genomic.gtf \
+> ../output/04-Apulcra-hisat/d_splice_sites.tab
+```
 
 
 
+```{bash}
+/home/shared/hisat2-2.2.1/hisat2-build \
+../data/Adig/ncbi_dataset/data/GCF_000222465.1/GCF_000222465.1_Adig_1.1_genomic.fna \
+../output/04-Apulcra-hisat/GCF_000222465.1_Adig \
+--exon ../output/04-Apulcra-hisat/d_exon.tab \
+--ss ../output/04-Apulcra-hisat/d_splice_sites.tab \
+-p 48 \
+../data/Adig/ncbi_dataset/data/GCF_000222465.1/genomic.gtf \
+2> ../output/04-Apulcra-hisat/hisat2-build_stats_Adig.txt
+```
+
+
+```{bash}
+/home/shared/hisat2-2.2.1/hisat2 \
+-x ../output/04-Apulcra-hisat/GCF_000222465.1_Adig \
+-p 48 \
+-1 ../data/SRR8601366_1.fastq \
+-2 ../data/SRR8601366_2.fastq \
+-S ../output/04-Apulcra-hisat/SRR8601366_dig.sam \
+2>&1 | tee ../output/04-Apulcra-hisat/hisat2_stats_dig.txt
+```
+## dig no splice
+
+```{bash}
+/home/shared/hisat2-2.2.1/hisat2-build \
+../data/Adig/ncbi_dataset/data/GCF_000222465.1/GCF_000222465.1_Adig_1.1_genomic.fna \
+../output/04-Apulcra-hisat/GCF_000222465.1_Adig_nosplice \
+-p 48 \
+2> ../output/04-Apulcra-hisat/hisat2-build_stats_Adig.txt
+```
+
+
+```{bash}
+/home/shared/hisat2-2.2.1/hisat2 \
+-x ../output/04-Apulcra-hisat/GCF_000222465.1_Adig_nosplice \
+-p 48 \
+-1 ../data/SRR8601366_1.fastq \
+-2 ../data/SRR8601366_2.fastq \
+-S ../output/04-Apulcra-hisat/SRR8601366_dig_nosplice.sam \
+2>&1 | tee ../output/04-Apulcra-hisat/hisat2_stats_dig_nosplice.txt
+```
