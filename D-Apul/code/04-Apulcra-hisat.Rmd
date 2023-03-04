@@ -88,3 +88,37 @@ GCF_013753865.1_Amil_v2.1_nosplice \
 -S ../output/04-Apulcra-hisat/SRR8601366_mil_nosplice.sam \
 2>&1 | tee ../output/04-Apulcra-hisat/hisat2_stats_nosplice.txt
 ```
+
+# A hyacinthus
+
+
+## no splice
+
+```{bash}
+/home/shared/hisat2-2.2.1/hisat2-build \
+../data/Ahya/ncbi_dataset/data/GCA_020536085.1/GCA_020536085.1_Ahyacinthus.chrsV1_genomic.fna \
+../output/04-Apulcra-hisat/GCA_020536085.1_Ahya_nosplice \
+-p 48 \
+2> ../output/04-Apulcra-hisat/hisat2-build_stats_Ahya_nosplice.txt
+```
+
+
+
+
+```{bash}
+/home/shared/hisat2-2.2.1/hisat2 \
+-x ../output/04-Apulcra-hisat/GCA_020536085.1_Ahya_nosplice \
+-p 48 \
+-1 ../data/SRR8601366_1.fastq \
+-2 ../data/SRR8601366_2.fastq \
+-S ../output/04-Apulcra-hisat/SRR8601366_hya_nosplice.sam \
+2>&1 | tee ../output/04-Apulcra-hisat/hisat2_stats_Ahya_nosplice.txt
+```
+
+
+# A digitera
+
+
+
+
+
