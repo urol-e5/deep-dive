@@ -43,7 +43,7 @@ data
 code
 output
 ```
-For any document code it should start with a 2 number prefix (eg `01-methylation-explore.Rmd`). All output from that code should be in a sub-directory of `output` named the same as the code. For example the output of ``01-methylation-explore.Rmd` would be in `A-pver/output/01-methylation-explore/`
+For any document code it should start with a 2 number prefix (eg `01-methylation-explore.Rmd`). All output from that code should be in a sub-directory of `output` named the same as the code. For example the output of `01-methylation-explore.Rmd` would be in `A-pver/output/01-methylation-explore/`
 
 Please use **Relative Paths**. Commit and Push often. 
 
