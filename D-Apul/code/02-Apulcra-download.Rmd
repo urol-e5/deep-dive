@@ -53,10 +53,13 @@ SRR8601397
 SRR8601398
 SRR8601399
 ```
+```{bash}
+/home/shared/sratoolkit.2.11.2-ubuntu64/bin/fasterq-dump.2.11.2 --help
+
+```
 
 
 ```{bash}
-
 for i in $(cat ../data/acc_list01.txt); do echo $i; date; 
 /home/shared/sratoolkit.2.11.2-ubuntu64/bin/fasterq-dump.2.11.2 \
 --outdir /home/sr320/ncbi  \
@@ -64,6 +67,6 @@ for i in $(cat ../data/acc_list01.txt); do echo $i; date;
 --threads 48 \
 --mem 100GB \
 --progress \
--S $i; done
+$i; done
 
 ```
