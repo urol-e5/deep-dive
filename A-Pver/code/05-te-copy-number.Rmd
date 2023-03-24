@@ -1,0 +1,21 @@
+---
+title: "05-te-copy-number"
+output: md_document
+---
+
+```{r}
+library(tidyverse)
+```
+
+
+# Is there a TE track?
+
+```{bash}
+head ../data/Pver_genome_assembly_v1.0.gff3
+```
+
+```{bash}
+awk -F"\t" '{print $3}' ../data/Pver_genome_assembly_v1.0.gff3 | sort -u
+
+```
+
