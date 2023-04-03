@@ -1,0 +1,66 @@
+---
+title: "pverr GFF fixing"
+author: "jillashey"
+date: "2023-04-03"
+output: html_document
+---
+
+This script add transcript and gene id into GFF file for alignment.  
+
+Here, I'll be adding transcript_id= and gene_id= to 'gene' column in order to properly assemble our aligned data  
+
+Load libraries and data. 
+```{r}
+#Load libraries
+library(tidyverse)
+library(R.utils)
+```
+
+Load gene gff file 
+```{r}
+gff <- read.csv(file = "~/Desktop/GFFs/pverr/Pver_genome_assembly_v1.0.gff3", header = F, sep = "\t", skip = 1)
+```
+
+Rename columns 
+```{r}
+colnames(gff) <- c("scaffold", "Gene.Predict", "id", "gene.start","gene.stop", "pos1", "pos2","pos3", "gene")
+
+# Remove all rows with "#" character - this gff has # denoting protein sequences. Since we don't need the protein sequences right now, I'm going to remove them 
+gff <- gff[!grepl("#", gff$scaffold),]
+```
+
+Create transcript ID
+```{r}
+gff$transcript_id <- sub(";.*", "", gff$gene)
+gff$transcript_id <- gsub("ID=", "", gff$transcript_id) #remove ID= 
+head(gff)
+```
+
+Create Parent ID
+```{r}
+gff$parent_id <- sub(".*Parent=", "", gff$gene)
+gff$parent_id <- sub(";.*", "", gff$parent_id)
+gff$parent_id <- gsub("ID=", "", gff$parent_id) #remove ID= 
+head(gff)
+```
+
+Add these values back into the gene column separated by semicolons
+```{r}
+gff <- gff %>% 
+  mutate(gene = ifelse(id != "gene", paste0(gene, ";transcript_id=", gff$transcript_id, ";gene_id=", gff$parent_id),  paste0(gene)))
+head(gff)
+
+## if this gff does not work in the stringtie script, go back and edit so that transcript_id=Pver_g1.t2 instead of transcript_id=Pver_g1.t2.utr5p1 or transcript_id=Pver_g1.t2.exon1, etc
+```
+
+Save file 
+```{r}
+write.table(gff, file = "~/Desktop/GFFs/pverr/Pver_genome_assembly_v1_fixed.gff3", sep="\t", col.names = FALSE, row.names=FALSE, quote=FALSE)
+```
+
+Zip file and upload to HPC for bioinformatic use
+
+`gzip /Users/jillashey/Desktop/GFFs/pverr/Pver_genome_assembly_v1_fixed.gff3`
+
+`scp /Users/jillashey/Desktop/GFFs/pverr/Pver_genome_assembly_v1_fixed.gff3.gz jillashey@ssh3.hac.uri.edu:/data/putnamlab/ashuffmyer/e5-deepdive/rna-seq/refs`
+
