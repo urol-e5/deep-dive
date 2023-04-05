@@ -53,6 +53,13 @@ head(gff)
 ## if this gff does not work in the stringtie script, go back and edit so that transcript_id=Pver_g1.t2 instead of transcript_id=Pver_g1.t2.utr5p1 or transcript_id=Pver_g1.t2.exon1, etc
 ```
 
+Remove parent and transcript columns
+```{r}
+gff <- gff %>%
+  select(!transcript_id)%>%
+  select(!parent_id)
+```
+
 Save file 
 ```{r}
 write.table(gff, file = "~/Desktop/GFFs/pverr/Pver_genome_assembly_v1_fixed.gff3", sep="\t", col.names = FALSE, row.names=FALSE, quote=FALSE)
