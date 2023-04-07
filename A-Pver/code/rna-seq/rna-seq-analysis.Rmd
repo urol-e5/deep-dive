@@ -1,0 +1,369 @@
+---
+title: "RNAseq gene expression"
+author: "Ariana S Huffmyer"
+date: "2023"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+# Set up 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# The following setting is important, do not omit.
+options(stringsAsFactors = FALSE) #Set Strings to character
+```
+
+# Load libraries
+
+```{r}
+if ("tidyverse" %in% rownames(installed.packages()) == 'FALSE') install.packages('tidyverse') 
+if ("genefilter" %in% rownames(installed.packages()) == 'FALSE') BiocManager::install("genefilter") 
+if ("DESeq2" %in% rownames(installed.packages()) == 'FALSE') BiocManager::install('DESeq2') 
+if ("RColorBrewer" %in% rownames(installed.packages()) == 'FALSE') install.packages('RColorBrewer') 
+if ("WGCNA" %in% rownames(installed.packages()) == 'FALSE') install.packages('WGCNA') 
+if ("flashClust" %in% rownames(installed.packages()) == 'FALSE') install.packages('flashClust') 
+if ("gridExtra" %in% rownames(installed.packages()) == 'FALSE') install.packages('gridExtra') 
+if ("ComplexHeatmap" %in% rownames(installed.packages()) == 'FALSE') BiocManager::install('ComplexHeatmap') 
+if ("goseq" %in% rownames(installed.packages()) == 'FALSE') BiocManager::install('goseq')
+if ("dplyr" %in% rownames(installed.packages()) == 'FALSE') install.packages('dplyr') 
+if ("clusterProfiler" %in% rownames(installed.packages()) == 'FALSE') BiocManager::install('clusterProfiler') 
+if ("pheatmap" %in% rownames(installed.packages()) == 'FALSE') install.packages('pheatmap') 
+if ("magrittr" %in% rownames(installed.packages()) == 'FALSE') install.packages('magrittr') 
+if ("vegan" %in% rownames(installed.packages()) == 'FALSE') install.packages('vegan') 
+if ("factoextra" %in% rownames(installed.packages()) == 'FALSE') install.packages('factoextra') 
+
+library("tidyverse")
+library("genefilter")
+library("DESeq2")
+library("RColorBrewer")
+library("WGCNA")
+library("flashClust")
+library("gridExtra")
+library("ComplexHeatmap")
+library("goseq")
+library("dplyr")
+library("clusterProfiler")
+library("pheatmap")
+library("magrittr")
+library("vegan")
+library("factoextra")
+library("dplyr")
+library("viridis")
+```
+
+# Load data and metadata  
+
+Load metadata and gene count matrix.  
+```{r}
+#load metadata sheet with sample name and treatment information
+metadata <- read.csv("A-Pver/data/rna-seq/metadata_NutrientEnrichment_Pverr_RNASeq.csv", header = TRUE, sep = ",")
+
+metadata<-metadata%>%
+  select(SampleID, Block, FragmentID, Treatment, SRR)
+
+head(metadata)
+
+#load gene count matrix generated from cluster computation
+gcount <- as.data.frame(read.csv("A-Pver/data/rna-seq/Pverr_gene_count_matrix.csv", row.names="gene_id"), colClasses = double)
+
+head(gcount)
+names(gcount)
+```
+
+Match file name with SRR number to instead be the Fragment ID.  
+
+```{r}
+names(gcount)<-gsub("^[^.]*\\.|_.*$", "", names(gcount)) #restructure column names
+
+names(gcount) <- metadata$FragmentID[match(names(gcount), metadata$SRR)]
+```
+
+# Filter data 
+
+*Remove 0 count genes*: Check that there are no genes with 0 counts across all samples.
+
+```{r}
+nrow(gcount)
+gcount<-gcount %>%
+     mutate(Total = rowSums(.[, 1:32]))%>%
+    filter(!Total==0)%>%
+    dplyr::select(!Total)
+nrow(gcount)
+```
+We had 28,111 genes, which was filtered down to 25,172 by removing genes with row sums of 0 (those not detected at all in our sequences).  
+
+*pOverA*: Specifying the minimum count for a proportion of samples for each gene. Here, we are using a pOverA of XXX. This is because we have 32 samples with a minimum of n=1 sample per fragment Therefore, we will accept genes that are present in 1/32 = 0.03 of the samples because we might expect different expression by fragment. We are further setting the minimum count of genes to 10, such that 3% of the samples must have a gene count of >10 in order for the gene to remain in the data set.  
+
+Filter in the package "genefilter". Pre-filtering our dataset to reduce the memory size dataframe, increase the speed of the transformation and testing functions, and improve quality of statistical analysis by removing low-coverage counts.   
+
+```{r}
+filt <- filterfun(pOverA(0.03,10))
+
+#create filter for the counts data
+gfilt <- genefilter(gcount, filt)
+
+#identify genes to keep by count filter
+gkeep <- gcount[gfilt,]
+
+#identify genes to keep by count filter
+gkeep <- gcount[gfilt,]
+
+#identify gene lists
+gn.keep <- rownames(gkeep)
+
+#gene count data filtered in PoverA, P percent of the samples have counts over A
+gcount_filt <- as.data.frame(gcount[which(rownames(gcount) %in% gn.keep),])
+
+#How many rows do we have before and after filtering?
+nrow(gcount) #Before
+nrow(gcount_filt) #After
+```
+
+Before filtering we had 25,172 genes and after we have 24,031 genes. 
+
+Check that row and column names match from metadata to the count matrix in the correct order. 
+
+Display current order of metadata and gene count matrix.  
+```{r}
+metadata$FragmentID
+colnames(gcount_filt)
+```
+
+These are not in the same order, re order them.  
+```{r}
+list<-colnames(gcount_filt)
+list<-as.factor(list)
+
+metadata$FragmentID<-as.factor(metadata$FragmentID)
+
+# Re-order the levels
+metadata$FragmentID <- factor(as.character(metadata$FragmentID), levels=list)
+# Re-order the data.frame
+metadata_ordered <- metadata[order(metadata$FragmentID),]
+metadata_ordered$FragmentID
+
+metadata_ordered<-metadata_ordered%>%
+  dplyr::select(FragmentID, Block, Treatment)
+```
+
+Check the order now that it has been corrected. 
+```{r}
+metadata_ordered$FragmentID
+colnames(gcount_filt)
+```
+
+These now match. 
+
+# Contruct DESeq2 dataset 
+
+```{r}
+#Set DESeq2 design
+gdds <- DESeqDataSetFromMatrix(countData = gcount_filt,
+                              colData = metadata_ordered,
+                              design = ~Treatment)
+```
+
+Conduct VST transformation.  
+```{r}
+SF.gdds <- estimateSizeFactors(gdds) #estimate size factors to determine if we can use vst  to transform our data. Size factors should be less than 4 for us to use vst
+print(sizeFactors(SF.gdds)) #View size factors
+```
+
+All size factors are less than 4, so we can use VST transformation.  
+
+```{r}
+gvst <- vst(gdds, blind=FALSE) #apply a variance stabilizing transformation to minimize effects of small counts and normalize wrt library size
+head(assay(gvst), 3) #view transformed gene count data for the first three genes in the dataset.  
+```
+
+# **Conduct PERMANOVA and PCA**  
+
+Export data for PERMANOVA test.  
+```{r}
+test<-t(assay(gvst)) #export as matrix
+test<-as.data.frame(test)
+
+#add category columns
+test$FragmentID<-rownames(test)
+test$Treatment<-metadata_ordered$Treatment[match(test$FragmentID, metadata_ordered$FragmentID)]
+```
+
+Build PERMANOVA model.  
+```{r}
+scaled_test <-prcomp(test[c(1:24031)], scale=TRUE, center=TRUE)
+fviz_eig(scaled_test)
+
+# scale data
+vegan <- scale(test[c(1:24031)])
+
+# PerMANOVA 
+permanova<-adonis2(vegan ~ Treatment, data = test, method='eu')
+permanova
+```
+
+Gene expression is significantly different between Treatments (p=0.009).  
+
+Permutation test for adonis under reduced model
+Terms added sequentially (first to last)
+Permutation: free
+Number of permutations: 999
+
+adonis2(formula = vegan ~ Treatment, data = test, method = "eu")
+          Df SumOfSqs      R2      F Pr(>F)   
+Treatment  1    36934 0.04958 1.5649  0.009 **
+Residual  30   708027 0.95042                 
+Total     31   744961 1.00000                 
+
+Plot a heatmap to sample to sample distances  
+
+```{r}
+gsampleDists <- dist(t(assay(gvst))) #calculate distance matix
+gsampleDistMatrix <- as.matrix(gsampleDists) #distance matrix
+rownames(gsampleDistMatrix) <- colnames(gvst) #assign row names
+colnames(gsampleDistMatrix) <- NULL #assign col names
+colors <- colorRampPalette( rev(brewer.pal(9, "Blues")) )(255) #assign colors
+
+save_pheatmap_pdf <- function(x, filename, width=7, height=7) {
+   stopifnot(!missing(x))
+   stopifnot(!missing(filename))
+   pdf(filename, width=width, height=height)
+   grid::grid.newpage()
+   grid::grid.draw(x$gtable)
+   dev.off()
+}
+
+pht<-pheatmap(gsampleDistMatrix, #plot matrix
+         clustering_distance_rows=gsampleDists, #cluster rows
+         clustering_distance_cols=gsampleDists, #cluster columns
+         col=colors) #set colors
+
+save_pheatmap_pdf(pht, "A-Pver/output/rna-seq/sample_distance_heatmap.pdf")
+```
+
+Plot a PCA of samples by Treatment.   
+
+```{r}
+gPCAdata <- plotPCA(gvst, intgroup = c("Treatment"), returnData=TRUE, ntop=24031) #use ntop to specify all genes
+
+percentVar <- round(100*attr(gPCAdata, "percentVar")) #plot PCA of samples with all data
+
+allgenesfilt_PCA <- ggplot(gPCAdata, aes(PC1, PC2, color=Treatment)) + 
+  geom_point(size=3) +
+  xlab(paste0("PC1: ",percentVar[1],"% variance")) +
+  ylab(paste0("PC2: ",percentVar[2],"% variance")) +
+  coord_fixed()+
+  theme_classic() + #Set background color
+  theme(panel.border = element_blank(), # Set border
+                     #panel.grid.major = element_blank(), #Set major gridlines 
+                     #panel.grid.minor = element_blank(), #Set minor gridlines
+                     axis.line = element_line(colour = "black"), #Set axes color
+        plot.background=element_blank()) #Set the plot background
+
+allgenesfilt_PCA
+
+ggsave("A-Pver/output/rna-seq/treatment_pca.png", allgenesfilt_PCA, width=6, height=4)
+```
+
+Confirm that PCA viaualization in DESeq is the same. 
+```{r}
+plotPCA(gvst, intgroup = "Treatment")
+```
+
+Yes, these visualizations are the same as manual method above. 
+
+# View Differential Expression 
+
+Examine differential expressed genes. 
+
+## Run without shrinkage 
+
+Run differential expression analysis between treatment and alpha set at 0.05.  
+```{r}
+degenes<-DESeq(gdds)
+degenes<-results(degenes, contrast=c("Treatment","Control","Enriched"), alpha=0.05)
+
+#order by p value 
+degenes <- degenes[order(degenes$padj),]
+
+head(degenes)
+summary(degenes)
+
+sum(degenes$padj < 0.05, na.rm=TRUE)
+```
+
+There are 80 up regulated genes and 164 down regulated genes between our treatments. There are 0 outliers and 5218 genes with low counts. There are 244 genes with an adjusted p-value of <0.05. 
+
+Plot log fold change. 
+```{r}
+plotMA(degenes, ylim=c(-8,8), alpha = 0.05, colSig="red")
+```
+
+```{r}
+plotCounts(gdds, gene=which.min(degenes$padj), intgroup="Treatment")
+```
+
+## Next, run results with shrinkage
+
+```{r}
+degenes_shrink<-DESeq(gdds)
+degenes_shrink<-lfcShrink(degenes_shrink, coef=2, type="normal", alpha=0.05)
+
+#order by p value 
+degenes_shrink <- degenes_shrink[order(degenes_shrink$padj),]
+
+head(degenes_shrink)
+summary(degenes_shrink)
+
+sum(degenes_shrink$padj < 0.05, na.rm=TRUE)
+```
+
+Results are similar between methods. I was not able to set alpha in the shrinkage method. for now I will proceed without shrinkage and we can return to this step. 
+
+
+## Export data  
+
+```{r}
+write.csv(as.data.frame(degenes), 
+          file="A-Pver/output/rna-seq/treatment_deg_results.csv")
+```
+
+# Plot DEG heatmap 
+
+Run differential expression test using a Wald model on DEGs. 
+
+Extract DEGs that are padj<0.05 and log2fold change >1. 
+```{r, message = FALSE}
+degenes<-DESeq(gdds)
+DEG.results.all <- results(degenes)
+DEG.results.all<-as.data.frame(DEG.results.all)
+
+DEG.results.all <- as.data.frame(subset(DEG.results.all, padj<0.05))
+DEG.results.all <- as.data.frame(subset(DEG.results.all, abs(log2FoldChange)>1))
+dim(DEG.results.all)
+
+DEGlist <- gdds[rownames(DEG.results.all)]
+
+DEGvst <- varianceStabilizingTransformation(DEGlist) 
+```
+
+Plot a heatmap of DEG expression. 
+```{r}
+df <- as.data.frame(colData(DEGvst)[,c("Treatment")])
+names(df)<-"Treatment"
+rownames(df) <- colnames(DEGlist)
+
+pdf("A-Pver/output/rna-seq/DEG_pheatmap.pdf")
+pheatmap(assay(DEGvst), cluster_rows=TRUE, show_rownames=FALSE, 
+         show_colnames=FALSE, fontsize_row=3,
+         scale="row", cluster_cols=TRUE, annotation_col=df)
+dev.off()
+```
+
+These results are quite different from Danielles: https://github.com/hputnam/Becker_E5/tree/master/RAnalysis. I will dig into these differences and see how we are doing things differently. 
+
+
+
+
