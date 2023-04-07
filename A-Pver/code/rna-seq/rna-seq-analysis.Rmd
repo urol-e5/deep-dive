@@ -283,7 +283,7 @@ Examine differential expressed genes.
 Run differential expression analysis between treatment and alpha set at 0.05.  
 ```{r}
 degenes<-DESeq(gdds)
-degenes<-results(degenes, contrast=c("Treatment","Control","Enriched"), alpha=0.05)
+degenes<-results(degenes, contrast=c("Treatment","Control","Enriched"), alpha=0.1)
 
 #order by p value 
 degenes <- degenes[order(degenes$padj),]
@@ -309,7 +309,7 @@ plotCounts(gdds, gene=which.min(degenes$padj), intgroup="Treatment")
 
 ```{r}
 degenes_shrink<-DESeq(gdds)
-degenes_shrink<-lfcShrink(degenes_shrink, coef=2, type="normal", alpha=0.05)
+degenes_shrink<-lfcShrink(degenes_shrink, coef=2, type="normal", alpha=0.1)
 
 #order by p value 
 degenes_shrink <- degenes_shrink[order(degenes_shrink$padj),]
