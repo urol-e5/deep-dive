@@ -1,26 +1,53 @@
 ---
-title: "03-Apulcra-kallisto"
-output: md_document
+title: "A pulcra kallisto"
+author: Steven Roberts
+date: "`r format(Sys.time(), '%d %B, %Y')`"  
+output: 
+  html_document:
+    theme: readable
+    highlight: zenburn
+    toc: true
+    toc_float: true
+    number_sections: true
+    code_folding: show
+    code_download: true
 ---
 
-```{bash}
+```{r setup, include=FALSE}
+library(knitr)
+library(tidyverse)
+knitr::opts_chunk$set(
+  echo = TRUE,         # Display code chunks
+  eval = FALSE,         # Evaluate code chunks
+  warning = FALSE,     # Hide warnings
+  message = FALSE,     # Hide messages
+  fig.width = 6,       # Set plot width in inches
+  fig.height = 4,      # Set plot height in inches
+  fig.align = "center" # Align plots to the center
+)
+```
+
+
+
+
+```{r, engine='bash'}
 /home/shared/kallisto/kallisto -h
 ```
 
-```{bash}
+```{r, engine='bash'}
 /home/shared/kallisto/kallisto \
 index -i \
 ../data/Amil/ncbi_dataset/data/GCF_013753865.1/GCF_013753865.1_Amil_v2.1_genomic.index \
 ../data/Amil/ncbi_dataset/data/GCF_013753865.1/GCF_013753865.1_Amil_v2.1_genomic.fna
 ```
-```{bash}
+```{r, engine='bash'}
 ls ../data/S*
 ```
 
 # Amil2.1
 
 
-```{bash}
+```{r, engine='bash'}
  /home/shared/kallisto/kallisto \
 quant -i ../data/Amil/ncbi_dataset/data/GCF_013753865.1/GCF_013753865.1_Amil_v2.1_genomic.index \
 -o ../output/03-kallisto/mil_SRR8601366 \
@@ -28,7 +55,7 @@ quant -i ../data/Amil/ncbi_dataset/data/GCF_013753865.1/GCF_013753865.1_Amil_v2.
 ../data/SRR8601366_1.fastq ../data/SRR8601366_2.fastq \
 2>&1 | tee ../output/03-kallisto/mil_SRR8601366.out
 ```
-```{bash}
+```{r, engine='bash'}
  /home/shared/kallisto/kallisto \
 quant -i ../data/Amil/ncbi_dataset/data/GCF_013753865.1/GCF_013753865.1_Amil_v2.1_genomic.index \
 -o ../output/03-kallisto/mil02_SRR8601366 \
@@ -40,7 +67,7 @@ quant -i ../data/Amil/ncbi_dataset/data/GCF_013753865.1/GCF_013753865.1_Amil_v2.
 ```
 
 
-```{bash}
+```{r, engine='bash'}
  /home/shared/kallisto/kallisto \
 quant -i ../data/Amil/ncbi_dataset/data/GCF_013753865.1/GCF_013753865.1_Amil_v2.1_genomic.index \
 -o ../output/03-kallisto/mil03_SRR8601366 \
@@ -53,7 +80,7 @@ quant -i ../data/Amil/ncbi_dataset/data/GCF_013753865.1/GCF_013753865.1_Amil_v2.
 
 # Adig
 
-```{bash}
+```{r, engine='bash'}
 /home/shared/kallisto/kallisto \
 index -i \
 ../data/Adig/ncbi_dataset/data/GCF_000222465.1/GCF_000222465.1_Adig_1.1_genomic.index \
@@ -62,7 +89,7 @@ index -i \
 
 
 
-```{bash}
+```{r, engine='bash'}
  /home/shared/kallisto/kallisto \
 quant -i ../data/Adig/ncbi_dataset/data/GCF_000222465.1/GCF_000222465.1_Adig_1.1_genomic.index \
 -o ../output/03-kallisto/dig_SRR8601366 \
@@ -76,7 +103,7 @@ quant -i ../data/Adig/ncbi_dataset/data/GCF_000222465.1/GCF_000222465.1_Adig_1.1
 # Ahya
 
 
-```{bash}
+```{r, engine='bash'}
 /home/shared/kallisto/kallisto \
 index -i \
 ../data/Ahya/ncbi_dataset/data/GCA_020536085.1/GCA_020536085.1_Ahyacinthus.chrsV1_genomic.index \
@@ -85,7 +112,7 @@ index -i \
 
 
 
-```{bash}
+```{r, engine='bash'}
  /home/shared/kallisto/kallisto \
 quant -i ../data/Ahya/ncbi_dataset/data/GCA_020536085.1/GCA_020536085.1_Ahyacinthus.chrsV1_genomic.index \
 -o ../output/03-kallisto/hya_SRR8601366 \
@@ -102,27 +129,27 @@ quant -i ../data/Ahya/ncbi_dataset/data/GCA_020536085.1/GCA_020536085.1_Ahyacint
 
 # Comparing alignment rates
 
-```{bash}
+```{r, engine='bash', eval=TRUE}
 grep 'p_' ../output/03-kallisto/dig_SRR8601366/run_info.json
 ```
 
 
-```{bash}
+```{r, engine='bash', eval=TRUE}
 grep 'p_' ../output/03-kallisto/mil_SRR8601366/run_info.json
 ```
 
-```{bash}
+```{r, engine='bash', eval=TRUE}
 grep 'p_' ../output/03-kallisto/mil02_SRR8601366/run_info.json
 ```
 
-```{bash}
+```{r, engine='bash', eval=TRUE}
 grep 'p_' ../output/03-kallisto/mil03_SRR8601366/run_info.json
 ```
 
 
 
 
-```{bash}
+```{r, engine='bash', eval=TRUE}
 grep 'p_' ../output/03-kallisto/hya_SRR8601366/run_info.json
 ```
 
@@ -130,7 +157,7 @@ grep 'p_' ../output/03-kallisto/hya_SRR8601366/run_info.json
 
 
 
-```{bash}
+```{r, engine='bash', eval=TRUE}
 echo "A hyacinthus"
 grep 'p_' ../output/03-kallisto/hya_SRR8601366/run_info.json
 echo "A millipora"

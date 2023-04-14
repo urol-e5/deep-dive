@@ -1,21 +1,44 @@
 ---
-title: "04-Apulcra-hisat"
-output: html_document
+title: "A pulcra HiSat2"
+author: Steven Roberts
+date: "`r format(Sys.time(), '%d %B, %Y')`"  
+output: 
+  html_document:
+    theme: readable
+    highlight: zenburn
+    toc: true
+    toc_float: true
+    number_sections: true
+    code_folding: show
+    code_download: true
 ---
 
+```{r setup, include=FALSE}
+library(knitr)
+library(tidyverse)
+knitr::opts_chunk$set(
+  echo = TRUE,         # Display code chunks
+  eval = FALSE,         # Evaluate code chunks
+  warning = FALSE,     # Hide warnings
+  message = FALSE,     # Hide messages
+  fig.width = 6,       # Set plot width in inches
+  fig.height = 4,      # Set plot height in inches
+  fig.align = "center" # Align plots to the center
+)
+```
 millipora genome prep
 
-```{bash}
+```{r, engine='bash'}
 /home/shared/hisat2-2.2.1/hisat2_extract_exons.py \
 ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gtf \
 > ../output/04-Apulcra-hisat/m_exon.tab
 ```
 
-```{bash}
+```{r, engine='bash'}
 head ../output/04-Apulcra-hisat/m_exon.tab
 
 ```
-```{bash}
+```{r, engine='bash'}
 /home/shared/hisat2-2.2.1/hisat2_extract_splice_sites.py \
 ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gtf \
 > ../output/04-Apulcra-hisat/m_splice_sites.tab
@@ -31,7 +54,7 @@ head ../output/04-Apulcra-hisat/m_exon.tab
 
 
 
-```{bash}
+```{r, engine='bash'}
 /home/shared/hisat2-2.2.1/hisat2-build \
 ../data/Amil/ncbi_dataset/data/GCF_013753865.1/GCF_013753865.1_Amil_v2.1_genomic.fna \
 GCF_013753865.1_Amil_v2.1 \
@@ -54,7 +77,7 @@ Hisat2 alignments
 -S "${sample_name}".sam \
 2> "${sample_name}"-hisat2_stats.txt
 
-```{bash}
+```{r, engine='bash'}
 /home/shared/hisat2-2.2.1/hisat2 \
 -x ../output/04-Apulcra-hisat/GCF_013753865.1_Amil_v2.1 \
 -p 48 \
@@ -69,7 +92,7 @@ Hisat2 alignments
 # Align with no splice sites
 
 
-```{bash}
+```{r, engine='bash'}
 /home/shared/hisat2-2.2.1/hisat2-build \
 ../data/Amil/ncbi_dataset/data/GCF_013753865.1/GCF_013753865.1_Amil_v2.1_genomic.fna \
 GCF_013753865.1_Amil_v2.1_nosplice \
@@ -79,7 +102,7 @@ GCF_013753865.1_Amil_v2.1_nosplice \
 
 
 
-```{bash}
+```{r, engine='bash'}
 /home/shared/hisat2-2.2.1/hisat2 \
 -x ../output/04-Apulcra-hisat/GCF_013753865.1_Amil_v2.1_nosplice \
 -p 48 \
@@ -94,7 +117,7 @@ GCF_013753865.1_Amil_v2.1_nosplice \
 
 ## no splice
 
-```{bash}
+```{r, engine='bash'}
 /home/shared/hisat2-2.2.1/hisat2-build \
 ../data/Ahya/ncbi_dataset/data/GCA_020536085.1/GCA_020536085.1_Ahyacinthus.chrsV1_genomic.fna \
 ../output/04-Apulcra-hisat/GCA_020536085.1_Ahya_nosplice \
@@ -105,7 +128,7 @@ GCF_013753865.1_Amil_v2.1_nosplice \
 
 
 
-```{bash}
+```{r, engine='bash'}
 /home/shared/hisat2-2.2.1/hisat2 \
 -x ../output/04-Apulcra-hisat/GCA_020536085.1_Ahya_nosplice \
 -p 48 \
@@ -119,14 +142,14 @@ GCF_013753865.1_Amil_v2.1_nosplice \
 # A digitera
 
 
-```{bash}
+```{r, engine='bash'}
 /home/shared/hisat2-2.2.1/hisat2_extract_exons.py \
 ../data/Adig/ncbi_dataset/data/GCF_000222465.1/genomic.gtf \
 > ../output/04-Apulcra-hisat/d_exon.tab
 ```
 
 
-```{bash}
+```{r, engine='bash'}
 /home/shared/hisat2-2.2.1/hisat2_extract_splice_sites.py \
 ../data/Adig/ncbi_dataset/data/GCF_000222465.1/genomic.gtf \
 > ../output/04-Apulcra-hisat/d_splice_sites.tab
@@ -134,7 +157,7 @@ GCF_013753865.1_Amil_v2.1_nosplice \
 
 
 
-```{bash}
+```{r, engine='bash'}
 /home/shared/hisat2-2.2.1/hisat2-build \
 ../data/Adig/ncbi_dataset/data/GCF_000222465.1/GCF_000222465.1_Adig_1.1_genomic.fna \
 ../output/04-Apulcra-hisat/GCF_000222465.1_Adig \
@@ -146,7 +169,7 @@ GCF_013753865.1_Amil_v2.1_nosplice \
 ```
 
 
-```{bash}
+```{r, engine='bash'}
 /home/shared/hisat2-2.2.1/hisat2 \
 -x ../output/04-Apulcra-hisat/GCF_000222465.1_Adig \
 -p 48 \
@@ -157,7 +180,7 @@ GCF_013753865.1_Amil_v2.1_nosplice \
 ```
 ## dig no splice
 
-```{bash}
+```{r, engine='bash'}
 /home/shared/hisat2-2.2.1/hisat2-build \
 ../data/Adig/ncbi_dataset/data/GCF_000222465.1/GCF_000222465.1_Adig_1.1_genomic.fna \
 ../output/04-Apulcra-hisat/GCF_000222465.1_Adig_nosplice \
@@ -166,7 +189,7 @@ GCF_013753865.1_Amil_v2.1_nosplice \
 ```
 
 
-```{bash}
+```{r, engine='bash'}
 /home/shared/hisat2-2.2.1/hisat2 \
 -x ../output/04-Apulcra-hisat/GCF_000222465.1_Adig_nosplice \
 -p 48 \
