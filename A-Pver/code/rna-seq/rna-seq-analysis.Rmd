@@ -371,7 +371,7 @@ dev.off()
 
 These results are quite different from Danielle's: https://github.com/hputnam/Becker_E5/blob/master/RAnalysis/Scripts/RNA-seq/Host/Host_Differential_Gene_Expression_Analysis.Rmd. We need to figure out why. This analysis doesn't show much difference in treatments, but Danielle's figures show more difference. 
 
-# WGCNA
+# WGCNA analysis to treatment
 
 ## WGCNA analysis using Dynamic Tree Cut  
 
@@ -737,7 +737,7 @@ dev.off()
 
 There are two clusters of modules that are correlated with the enriched treatment and one cluster of modules associated with the control treatment.  
 
-# **Plot mean eigengene over treatments**  
+## Plot mean eigengene over treatments  
 
 View module eigengene data and make dataframe for Strader plots.  
 ```{r}
@@ -800,3 +800,131 @@ expression_plots<-plot_MEs%>%
 ggsave(expression_plots, file="A-Pver/output/rna-seq/expression_eigengene.jpeg", height=16, width=10)
 ```
 
+# WGCNA analysis to physiological variables 
+
+Download data from Danielle's repository for this project. 
+
+Thermal performance curve metrics: 
+https://raw.githubusercontent.com/daniellembecker/Chronic_low_nutrient_enrichment_benefits_coral_thermal_performance_fore_reef_habitat/master/Thermal_Performance/Data/Topt_data.csv
+
+Photosynthesis curve data: 
+https://raw.githubusercontent.com/daniellembecker/Chronic_low_nutrient_enrichment_benefits_coral_thermal_performance_fore_reef_habitat/master/Thermal_Performance/Data/Pmax_data.csv
+
+Chlorophyll and cell density: 
+https://raw.githubusercontent.com/daniellembecker/Chronic_low_nutrient_enrichment_benefits_coral_thermal_performance_fore_reef_habitat/master/Endosymbiont_Coral_Response/Data/chl_zoox_sheet.csv
+
+Ash free dry weight: 
+https://raw.githubusercontent.com/daniellembecker/Chronic_low_nutrient_enrichment_benefits_coral_thermal_performance_fore_reef_habitat/master/Endosymbiont_Coral_Response/Data/AFDW.csv
+
+## Load data and prepare 
+
+```{r}
+pmax<-read.csv("https://raw.githubusercontent.com/daniellembecker/Chronic_low_nutrient_enrichment_benefits_coral_thermal_performance_fore_reef_habitat/master/Thermal_Performance/Data/Pmax_data.csv", sep=",", header=TRUE)
+```
+
+Prepare data to merge with above wgcna data frames. 
+```{r}
+pmax_df<-pmax%>%
+  select(fragment.ID, Topt, rate.type)%>%
+  mutate(fragment.ID=str_remove(fragment.ID, "_.*"))%>%
+  pivot_wider(names_from="rate.type", values_from="Topt")%>%
+  rename(Topt_R=`Dark Respiration`, Topt_P=`Gross Photosynthesis`)
+
+pmax_df$fragment.ID<-gsub("([[:alpha:]])([[:digit:]])", "\\1_\\2", pmax_df$fragment.ID) #insert underscore betweeen letter and first number in fragment ID
+```
+
+```{r}
+str(datTraits)
+
+datTraits$Topt_R<-pmax_df$Topt_R[match(rownames(datTraits), pmax_df$fragment.ID)]
+datTraits$Topt_P<-pmax_df$Topt_P[match(rownames(datTraits), pmax_df$fragment.ID)]
+
+str(datTraits)
+```
+
+## Run correlation WGCNA 
+
+Correlations of treatment with eigengenes
+```{r}
+moduleTraitCor = cor(MEs, datTraits, use = "p");
+moduleTraitPvalue = corPvalueStudent(moduleTraitCor, nSamples);
+Colors=sub("ME","", names(MEs))
+
+moduleTraitTree = hclust(dist(t(moduleTraitCor)), method = "average")
+
+#pdf(file="A-Pver/output/rna-seq/ModuleTraitClusterTree.pdf")
+#plot(moduleTraitTree)
+#dev.off()
+```
+
+Correlations of genes with eigengenes. Calculate correlations between ME's and treatment 
+```{r}
+moduleGeneCor=cor(MEs,datExpr)
+moduleGenePvalue = corPvalueStudent(moduleGeneCor, nSamples);
+```
+
+Calculate kME values (module membership). 
+
+```{r}
+datKME = signedKME(datExpr, MEs, outputColumnName = "kME")
+head(datKME)
+```
+
+### Plot module-treatment associations
+
+Generate a complex heatmap of module-treatment relationships.  
+
+```{r}
+#bold sig p-values
+#dendrogram with WGCNA MEtree cut-off
+#colored y-axis
+
+
+#Create list of pvalues for eigengene correlation with specific life stages
+heatmappval <- signif(moduleTraitPvalue, 1)
+
+#Make list of heatmap row colors
+htmap.colors <- names(MEs)
+htmap.colors <- gsub("ME", "", htmap.colors)
+
+treatment_order<-c("Control", "Enriched", "Topt_R", "Topt_P")
+
+library(dendsort)
+row_dend = dendsort(hclust(dist(moduleTraitCor)))
+col_dend = dendsort(hclust(dist(t(moduleTraitCor))))
+
+pdf(file = "A-Pver/output/rna-seq/Module-trait-relationship-heatmap.pdf", height = 16, width = 8)
+Heatmap(moduleTraitCor, name = "Eigengene", row_title = "Gene Module", column_title = "Module-Lifestage Eigengene Correlation", 
+        col = blueWhiteRed(50), 
+        row_names_side = "left", 
+        #row_dend_side = "left",
+        width = unit(5, "in"), 
+        height = unit(12, "in"), 
+        #column_dend_reorder = TRUE, 
+        #cluster_columns = col_dend,
+        row_dend_reorder = TRUE,
+        #column_split = 2,
+        row_split=8,
+        #column_dend_height = unit(.5, "in"),
+        column_order = treatment_order, 
+        cluster_rows = row_dend, 
+        row_gap = unit(2.5, "mm"), 
+        border = TRUE,
+        cell_fun = function(j, i, x, y, w, h, col) {
+        if(heatmappval[i, j] < 0.05) {
+            grid.text(sprintf("%s", heatmappval[i, j]), x, y, gp = gpar(fontsize = 10, fontface = "bold"))
+        }
+        else {
+            grid.text(sprintf("%s", heatmappval[i, j]), x, y, gp = gpar(fontsize = 10, fontface = "plain"))
+        }},
+        column_names_gp =  gpar(fontsize = 12, border=FALSE),
+        column_names_rot = 35,
+        row_names_gp = gpar(fontsize = 12, alpha = 0.75, border = FALSE))
+#draw(ht)
+dev.off()
+
+```
+ 
+## Plot mean eigengene over variables  
+
+Plot these as correlations for each modle across quantitative variables 
