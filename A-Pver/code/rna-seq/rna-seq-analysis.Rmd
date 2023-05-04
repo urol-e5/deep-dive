@@ -95,12 +95,14 @@ nrow(gcount)
 ```
 We had 28,111 genes, which was filtered down to 25,172 by removing genes with row sums of 0 (those not detected at all in our sequences).  
 
-*pOverA*: Specifying the minimum count for a proportion of samples for each gene. Here, we are using a pOverA of XXX. This is because we have 32 samples with a minimum of n=1 sample per fragment Therefore, we will accept genes that are present in 1/32 = 0.03 of the samples because we might expect different expression by fragment. We are further setting the minimum count of genes to 10, such that 3% of the samples must have a gene count of >10 in order for the gene to remain in the data set.  
+*pOverA*: Specifying the minimum count for a proportion of samples for each gene. Here, we are using a pOverA of 0.5, 10. This is because we have 32 samples with a minimum of n=1 sample per fragment and half in enriched and half in control. Therefore, we will accept genes that are present in 16/32 = 0.5 of the samples because we may expect different expression by treatment We are further setting the minimum count of genes to 10, such that 50% of the samples must have a gene count of >10 in order for the gene to remain in the data set.  
+
+*Note: Danielle used a PoverA of 0.90,10 - not sure why.* 
 
 Filter in the package "genefilter". Pre-filtering our dataset to reduce the memory size dataframe, increase the speed of the transformation and testing functions, and improve quality of statistical analysis by removing low-coverage counts.   
 
 ```{r}
-filt <- filterfun(pOverA(0.03,10))
+filt <- filterfun(pOverA(0.5,10))
 
 #create filter for the counts data
 gfilt <- genefilter(gcount, filt)
@@ -122,7 +124,7 @@ nrow(gcount) #Before
 nrow(gcount_filt) #After
 ```
 
-Before filtering we had 25,172 genes and after we have 24,031 genes. 
+Before filtering we had 25,172 genes and after we have 20,326 genes. 
 
 Check that row and column names match from metadata to the count matrix in the correct order. 
 
@@ -166,6 +168,8 @@ gdds <- DESeqDataSetFromMatrix(countData = gcount_filt,
                               design = ~Treatment)
 ```
 
+*check that Danielle's data is properly ordered - this could be a reason our data do not match*  
+
 Conduct VST transformation.  
 ```{r}
 SF.gdds <- estimateSizeFactors(gdds) #estimate size factors to determine if we can use vst  to transform our data. Size factors should be less than 4 for us to use vst
@@ -179,7 +183,7 @@ gvst <- vst(gdds, blind=FALSE) #apply a variance stabilizing transformation to m
 head(assay(gvst), 3) #view transformed gene count data for the first three genes in the dataset.  
 ```
 
-# **Conduct PERMANOVA and PCA**  
+# Conduct PERMANOVA and PCA  
 
 Export data for PERMANOVA test.  
 ```{r}
@@ -193,18 +197,18 @@ test$Treatment<-metadata_ordered$Treatment[match(test$FragmentID, metadata_order
 
 Build PERMANOVA model.  
 ```{r}
-scaled_test <-prcomp(test[c(1:24031)], scale=TRUE, center=TRUE)
+scaled_test <-prcomp(test[c(1:20326)], scale=TRUE, center=TRUE)
 fviz_eig(scaled_test)
 
 # scale data
-vegan <- scale(test[c(1:24031)])
+vegan <- scale(test[c(1:20326)])
 
 # PerMANOVA 
 permanova<-adonis2(vegan ~ Treatment, data = test, method='eu')
 permanova
 ```
 
-Gene expression is significantly different between Treatments (p=0.009).  
+Gene expression is significantly different between Treatments (p=0.023).  
 
 Permutation test for adonis under reduced model
 Terms added sequentially (first to last)
@@ -212,10 +216,10 @@ Permutation: free
 Number of permutations: 999
 
 adonis2(formula = vegan ~ Treatment, data = test, method = "eu")
-          Df SumOfSqs      R2      F Pr(>F)   
-Treatment  1    36934 0.04958 1.5649  0.009 **
-Residual  30   708027 0.95042                 
-Total     31   744961 1.00000                 
+          Df SumOfSqs      R2      F Pr(>F)  
+Treatment  1    33129 0.05258 1.6648  0.023 *
+Residual  30   596977 0.94742                
+Total     31   630106 1.00000     
 
 Plot a heatmap to sample to sample distances  
 
@@ -246,7 +250,7 @@ save_pheatmap_pdf(pht, "A-Pver/output/rna-seq/sample_distance_heatmap.pdf")
 Plot a PCA of samples by Treatment.   
 
 ```{r}
-gPCAdata <- plotPCA(gvst, intgroup = c("Treatment"), returnData=TRUE, ntop=24031) #use ntop to specify all genes
+gPCAdata <- plotPCA(gvst, intgroup = c("Treatment"), returnData=TRUE, ntop=20326) #use ntop to specify all genes
 
 percentVar <- round(100*attr(gPCAdata, "percentVar")) #plot PCA of samples with all data
 
@@ -294,7 +298,7 @@ summary(degenes)
 sum(degenes$padj < 0.05, na.rm=TRUE)
 ```
 
-There are 80 up regulated genes and 164 down regulated genes between our treatments. There are 0 outliers and 5218 genes with low counts. There are 244 genes with an adjusted p-value of <0.05. 
+There are 175 up regulated genes and 339 down regulated genes between our treatments. There are 0 outliers and 789 genes with low counts. There are 233 genes with an adjusted p-value of <0.05. 
 
 Plot log fold change. 
 ```{r}
@@ -320,8 +324,7 @@ summary(degenes_shrink)
 sum(degenes_shrink$padj < 0.05, na.rm=TRUE)
 ```
 
-Results are similar between methods. I was not able to set alpha in the shrinkage method. for now I will proceed without shrinkage and we can return to this step. 
-
+Results are the same between methods. I was not able to set alpha in the shrinkage method. for now I will proceed without shrinkage and we can return to this step. 
 
 ## Export data  
 
@@ -355,15 +358,445 @@ df <- as.data.frame(colData(DEGvst)[,c("Treatment")])
 names(df)<-"Treatment"
 rownames(df) <- colnames(DEGlist)
 
+df_DEGSeq2 <- as.data.frame(colData(DEGvst)[c("Treatment")]) #make dataframe for column naming and associated treatment
+
 pdf("A-Pver/output/rna-seq/DEG_pheatmap.pdf")
-pheatmap(assay(DEGvst), cluster_rows=TRUE, show_rownames=FALSE, 
-         show_colnames=FALSE, fontsize_row=3,
-         scale="row", cluster_cols=TRUE, annotation_col=df)
+pheatmap(assay(DEGvst), scale= "row", legend=TRUE, annotation_legend=TRUE, annotation_col=df_DEGSeq2,
+                            clustering_distance_rows="euclidean", clustering_method = "average",
+                            show_rownames =FALSE,
+                            show_colnames =TRUE,
+                            cluster_cols = TRUE)
 dev.off()
 ```
 
-These results are quite different from Danielles: https://github.com/hputnam/Becker_E5/tree/master/RAnalysis. I will dig into these differences and see how we are doing things differently. 
+These results are quite different from Danielle's: https://github.com/hputnam/Becker_E5/blob/master/RAnalysis/Scripts/RNA-seq/Host/Host_Differential_Gene_Expression_Analysis.Rmd. We need to figure out why. This analysis doesn't show much difference in treatments, but Danielle's figures show more difference. 
+
+# WGCNA
+
+## WGCNA analysis using Dynamic Tree Cut  
+
+This code uses step by step network analysis and module detection based on scripts from https://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/Tutorials/index.html. 
+
+Transpose the filtered gene count matrix so that the gene IDs are rows and the sample IDs are columns.
+```{r}
+datExpr <- as.data.frame(t(assay(gvst))) #transpose to output to a new data frame with the column names as row names. And make all data numeric
+```
+
+Check for genes and samples with too many missing values with goodSamplesGenes. There shouldn't be any because we performed pre-filtering
+```{r}
+gsg = goodSamplesGenes(datExpr, verbose = 3)
+gsg$allOK #Should return TRUE if not, the R chunk below will take care of flagged data
+```
+
+Remove flagged samples if the allOK is FALSE, not used here.  
+```{r}
+#ncol(datExpr) #number genes before
+#if (!gsg$allOK) #If the allOK is FALSE...
+#{
+# Optionally, print the gene and sample names that are flagged:
+#if (sum(!gsg$goodGenes)>0)
+#printFlush(paste("Removing genes:", paste(names(datExpr)[!gsg$goodGenes], collapse = ", ")));
+#if (sum(!gsg$goodSamples)>0)
+#printFlush(paste("Removing samples:", paste(rownames(datExpr)[!gsg$goodSamples], collapse = ", ")));
+# Remove the offending genes and samples from the data:
+#datExpr = datExpr[gsg$goodSamples, gsg$goodGenes]
+#}
+#ncol(datExpr) #number genes after
+```
+
+Look for outliers by examining tree of samples  
+```{r}
+sampleTree = hclust(dist(datExpr), method = "average");
+# Plot the sample tree: Open a graphic output window of size 12 by 9 inches
+# The user should change the dimensions if the window is too large or too small.
+pdf("A-Pver/output/rna-seq/wgcna_outliers.pdf")
+plot(sampleTree, main = "Sample clustering to detect outliers", sub="", xlab="", cex.lab = 1.5, cex.axis = 1.5, cex.main = 2)
+dev.off()
+```
+There don't look to be any outliers, so we will move on with business as usual.  
+
+## Network construction and consensus module detection  
+
+### Choosing a soft-thresholding power: Analysis of network topology β  
+
+The soft thresholding power (β) is the number to which the co-expression similarity is raised to calculate adjacency. The function pickSoftThreshold performs a network topology analysis. The user chooses a set of candidate powers, however the default parameters are suitable values.  
+```{r, message=FALSE, warning=FALSE}
+allowWGCNAThreads()
+# # Choose a set of soft-thresholding powers
+powers <- c(seq(from = 1, to=19, by=2), c(21:30)) #Create a string of numbers from 1 through 10, and even numbers from 10 through 20
+# 
+# # Call the network topology analysis function
+sft <-pickSoftThreshold(datExpr, powerVector = powers, verbose = 5)
+```
+
+Plot the results.  
+```{r}
+sizeGrWindow(9, 5)
+par(mfrow = c(1,2));
+cex1 = 0.9;
+# # # Scale-free topology fit index as a function of the soft-thresholding power
+plot(sft$fitIndices[,1], -sign(sft$fitIndices[,3])*sft$fitIndices[,2],
+      xlab="Soft Threshold (power)",ylab="Scale Free Topology Model Fit,signed R^2",type="n",
+     main = paste("Scale independence"));
+ text(sft$fitIndices[,1], -sign(sft$fitIndices[,3])*sft$fitIndices[,2],
+     labels=powers,cex=cex1,col="red");
+# # # this line corresponds to using an R^2 cut-off
+ abline(h=0.9,col="red")
+# # # Mean connectivity as a function of the soft-thresholding power
+ plot(sft$fitIndices[,1], sft$fitIndices[,5],
+     xlab="Soft Threshold (power)",ylab="Mean Connectivity", type="n",
+     main = paste("Mean connectivity"))
+ text(sft$fitIndices[,1], sft$fitIndices[,5], labels=powers, cex=cex1,col="red")
+```
+I used a scale-free topology fit index **R^2 of 0.9**. This lowest recommended R^2 by Langfelder and Horvath is 0.8. I chose 0.9 because we want to use the smallest soft thresholding power that maximizes with model fit. It appears that our **soft thresholding power is 5** because it is the lowest power above the R^2=0.9 threshold that maximizes with model fit.  
+
+### Co-expression adjacency and topological overlap matrix similarity  
+
+Save Rdata necessary for analysis
+```{r}
+save(datExpr, file = "A-Pver/output/rna-seq/datExpr.RData")
+```
+
+Co-expression similarity and adjacency, using the soft thresholding power 5 and translate the adjacency into topological overlap matrix to calculate the corresponding dissimilarity. I will use a **signed network**.  
+```{r, }
+# #Set up workspace
+#getwd() #Display the current working directory
+# #If necessary, change the path below to the directory where the data files are stored. "." means current directory. On Windows use a forward slash / instead of the usual \.
+#workingDir = ".";
+# setwd(WGCNA_dev);
+# library(WGCNA) #Load the WGCNA package
+options(stringsAsFactors = FALSE) #The following setting is important, do not omit.
+enableWGCNAThreads() #Allow multi-threading within WGCNA. 
+# 
+# #Load the data saved in the first part
+adjTOM <- load(file="A-Pver/output/rna-seq/datExpr.RData")
+adjTOM
+# 
+# #Run analysis
+softPower=5 #Set softPower to 5
+adjacency=adjacency(datExpr, power=softPower,type="signed") #Calculate adjacency
+
+TOM= TOMsimilarity(adjacency,TOMType = "signed") #Translate adjacency into topological overlap matrix
+#this step can take awhile 
+
+dissTOM= 1-TOM #Calculate dissimilarity in TOM
+
+#save(adjacency, TOM, dissTOM, file = "Mcap2020/Output/TagSeq/adjTOM.RData") #Save 
+
+#save(dissTOM, file = "Mcap2020/Output/TagSeq/dissTOM.RData") #Save 
+```
+
+Load in dissTOM file obtained from previous R chunk.    
+```{r}
+#dissTOM_in <- load(file="Mcap2020/Output/TagSeq/dissTOM.RData") 
+#dissTOM_in
+```
+
+### Clustering using TOM
+
+Form distance matrix  
+```{r}
+geneTree=flashClust(as.dist(dissTOM), method="average")
+```
+
+We will now plot a dendrogram of genes. Each leaf corresponds to a gene, branches grouping together densely are interconnected, highly co-expressed genes.  
+```{r}
+pdf(file="A-Pver/output/rna-seq/dissTOMClustering.pdf", width=20, height=20)
+plot(geneTree, xlab="", sub="", main= "Gene Clustering on TOM-based dissimilarity", labels= FALSE,hang=0.04)
+dev.off()
+```
+
+### Module identification using dynamicTreeCut  
+
+Module identification is essentially cutting the branches off the tree in the dendrogram above. We like large modules, so we set the **minimum module size** relatively high, so we will set the minimum size at 30. 
+
+```{r}
+minModuleSize = 30
+dynamicMods = cutreeDynamic(dendro = geneTree, distM = dissTOM,
+deepSplit = TRUE, pamRespectsDendro = FALSE,
+minClusterSize = minModuleSize)
+table<-as.data.frame(table(dynamicMods)) #list modules and respective sizes
+table(dynamicMods)
+save(dynamicMods, geneTree, file = "A-Pver/output/rna-seq/dyMod_geneTree.RData") #Save to load into RStudio
+```
+There are 59 modules! We will merge modules in the next few steps. 
+
+Load modules calculated from the adjacency matrix.  
+```{r}
+dyMod_geneTree <- load(file = "A-Pver/output/rna-seq/dyMod_geneTree.RData")
+dyMod_geneTree
+```
+
+Plot the module assignment under the gene dendrogram
+```{r}
+#dynamicColors = labels2colors(dynamicMods) # Convert numeric labels into colors
+dynamicColors=dynamicMods
+table(dynamicColors)
+
+pdf(file="A-Pver/output/rna-seq/dissTOMColorClustering.pdf", width=20, height=20)
+plotDendroAndColors(geneTree, dynamicColors, "Dynamic Tree Cut", dendroLabels = FALSE, hang = 0.03, addGuide = TRUE, guideHang = 0.05, main = "Gene dendrogram and module colors")
+dev.off()
+```
+
+### Merge modules with similar expression profiles  
+
+Plot module similarity based on eigengene value 
+```{r}
+#Calculate eigengenes
+MEList = moduleEigengenes(datExpr, colors = dynamicColors, softPower = 5)
+MEs = MEList$eigengenes
+
+#Calculate dissimilarity of module eigengenes
+MEDiss = 1-cor(MEs)
+
+#Cluster again and plot the results
+METree = flashClust(as.dist(MEDiss), method = "average")
+
+pdf(file="A-Pver/output/rna-seq/eigengeneClustering1.pdf", width = 20)
+plot(METree, main = "Clustering of module eigengenes", xlab = "", sub = "")
+dev.off()
+```
+
+**Merge modules with >85% eigengene similarity.** Most studies use somewhere between 80-90% similarity. I will use 85% similarity as my merging threshold.
+```{r}
+MEDissThres= 0.15 #merge modules that are 85% similar
+
+pdf(file="A-Pver/output/rna-seq/eigengeneClustering2.pdf", width = 20)
+plot(METree, main = "Clustering of module eigengenes", xlab = "", sub = "")
+abline(h=MEDissThres, col="red")
+dev.off()
+
+merge= mergeCloseModules(datExpr, dynamicColors, cutHeight= MEDissThres, verbose =3)
+
+mergedColors= merge$colors
+mergedMEs= merge$newMEs
+
+pdf(file="A-Pver/output/rna-seq/mergedClusters.pdf", width=20, height=20)
+plotDendroAndColors(geneTree, cbind(dynamicColors, mergedColors), c("Dynamic Tree Cut", "Merged dynamic"), dendroLabels= FALSE, hang=0.03, addGuide= TRUE, guideHang=0.05)
+dev.off()
+```
+
+Save new modules
+```{r}
+moduleLabels=mergedColors
+moduleColors = mergedColors # Rename to moduleColors
+#colorOrder = c("grey", standardColors(50)); # Construct numerical labels corresponding to the colors
+#moduleLabels = match(moduleColors, colorOrder)-1;
+MEs = mergedMEs;
+ncol(MEs) #How many modules do we have now?
+```
+
+We have 43 modules after merging with 85% similarity as compared to 59 before.   
+
+Plot new tree with new modules.  
+```{r}
+#Calculate dissimilarity of module eigengenes
+MEDiss = 1-cor(MEs)
+#Cluster again and plot the results
+pdf(file="A-Pver/output/rna-seq/eigengeneClustering3.pdf")
+METree = flashClust(as.dist(MEDiss), method = "average")
+MEtreePlot = plot(METree, main = "Clustering of module eigengenes", xlab = "", sub = "")
+dev.off()
+```
+
+Display table of module gene counts.  
+
+```{r}
+table(mergedColors)
+table<-as.data.frame(table(mergedColors))
+write_csv(table, "A-Pver/output/rna-seq/genes_per_module.csv")
+```
+
+The number of genes per module range from 38 to 4168. 
+
+##  Relating modules to treatment 
+
+### Quantifying module–trait associations
+
+Prepare trait data. Data has to be numeric, so I will substitute treatment for numeric values. The "trait" we are considering here is treatment.   
+
+Make a dataframe that has a column for each treatment and a row for samples. Populate a 1 for samples in the enriched treatment and a 0 for samples in the control treatment. 
+
+This process changes treatment from a categorical variable into a binary variable. This will allow for correlations between mean eigengenes and treatment. 
+
+We are doing treatment for now, but will do physiological variables next. 
+ 
+```{r}
+metadata_ordered$num <- c("1")
+allTraits <- as.data.frame(pivot_wider(metadata_ordered, names_from = Treatment, values_from = num, id_cols = FragmentID))
+allTraits[is.na(allTraits)] <- c("0")
+rownames(allTraits) <- allTraits$FragmentID
+datTraits <- allTraits[,c(-1)]
+datTraits
+```
+
+Define numbers of genes and samples and print.  
+```{r}
+nGenes = ncol(datExpr)
+nSamples = nrow(datExpr)
+
+nGenes
+nSamples
+```
+
+We have 20,326 genes and 32 samples.  
+
+Generate labels for module eigengenes as numbers.  
+```{r}
+MEs0 = moduleEigengenes(datExpr, moduleLabels, softPower=5)$eigengenes
+MEs = orderMEs(MEs0)
+names(MEs)
+```
+Our module names are:  
+
+ [1] "ME33" "ME11" "ME3"  "ME14" "ME17" "ME35" "ME26" "ME46" "ME55" "ME53" "ME57" "ME31"
+[13] "ME32" "ME49" "ME56" "ME9"  "ME41" "ME18" "ME34" "ME5"  "ME25" "ME39" "ME21" "ME10"
+[25] "ME20" "ME2"  "ME50" "ME42" "ME22" "ME23" "ME8"  "ME52" "ME58" "ME1"  "ME28" "ME54"
+[37] "ME15" "ME12" "ME27" "ME47" "ME7"  "ME6"  "ME43"
+
+Correlations of treatment with eigengenes
+```{r}
+moduleTraitCor = cor(MEs, datTraits, use = "p");
+moduleTraitPvalue = corPvalueStudent(moduleTraitCor, nSamples);
+Colors=sub("ME","", names(MEs))
+
+moduleTraitTree = hclust(dist(t(moduleTraitCor)), method = "average")
+
+#pdf(file="A-Pver/output/rna-seq/ModuleTraitClusterTree.pdf")
+#plot(moduleTraitTree)
+#dev.off()
+```
+
+Correlations of genes with eigengenes. Calculate correlations between ME's and treatment 
+```{r}
+moduleGeneCor=cor(MEs,datExpr)
+moduleGenePvalue = corPvalueStudent(moduleGeneCor, nSamples);
+```
+
+Calculate kME values (module membership). 
+
+```{r}
+datKME = signedKME(datExpr, MEs, outputColumnName = "kME")
+head(datKME)
+```
+
+### Plot module-treatment associations
+
+Generate a complex heatmap of module-treatment relationships.  
+
+```{r}
+#bold sig p-values
+#dendrogram with WGCNA MEtree cut-off
+#colored y-axis
 
 
+#Create list of pvalues for eigengene correlation with specific life stages
+heatmappval <- signif(moduleTraitPvalue, 1)
 
+#Make list of heatmap row colors
+htmap.colors <- names(MEs)
+htmap.colors <- gsub("ME", "", htmap.colors)
+
+treatment_order<-c("Control", "Enriched")
+
+library(dendsort)
+row_dend = dendsort(hclust(dist(moduleTraitCor)))
+col_dend = dendsort(hclust(dist(t(moduleTraitCor))))
+
+pdf(file = "A-Pver/output/rna-seq/Module-trait-relationship-heatmap.pdf", height = 16, width = 8)
+Heatmap(moduleTraitCor, name = "Eigengene", row_title = "Gene Module", column_title = "Module-Lifestage Eigengene Correlation", 
+        col = blueWhiteRed(50), 
+        row_names_side = "left", 
+        #row_dend_side = "left",
+        width = unit(5, "in"), 
+        height = unit(12, "in"), 
+        #column_dend_reorder = TRUE, 
+        #cluster_columns = col_dend,
+        row_dend_reorder = TRUE,
+        #column_split = 2,
+        row_split=3,
+        #column_dend_height = unit(.5, "in"),
+        column_order = treatment_order, 
+        cluster_rows = row_dend, 
+        row_gap = unit(2.5, "mm"), 
+        border = TRUE,
+        cell_fun = function(j, i, x, y, w, h, col) {
+        if(heatmappval[i, j] < 0.05) {
+            grid.text(sprintf("%s", heatmappval[i, j]), x, y, gp = gpar(fontsize = 10, fontface = "bold"))
+        }
+        else {
+            grid.text(sprintf("%s", heatmappval[i, j]), x, y, gp = gpar(fontsize = 10, fontface = "plain"))
+        }},
+        column_names_gp =  gpar(fontsize = 12, border=FALSE),
+        column_names_rot = 35,
+        row_names_gp = gpar(fontsize = 12, alpha = 0.75, border = FALSE))
+#draw(ht)
+dev.off()
+
+```
+
+There are two clusters of modules that are correlated with the enriched treatment and one cluster of modules associated with the control treatment.  
+
+# **Plot mean eigengene over treatments**  
+
+View module eigengene data and make dataframe for Strader plots.  
+```{r}
+head(MEs)
+names(MEs)
+Strader_MEs <- MEs
+Strader_MEs$Treatment <- metadata_ordered$Treatment
+Strader_MEs$FragmentID <- rownames(Strader_MEs)
+head(Strader_MEs)
+
+Strader_MEs<-Strader_MEs%>%
+  droplevels() #drop unused level
+
+dim(Strader_MEs)
+head(Strader_MEs)
+```
+
+Plot mean module eigengene for each module.  
+
+```{r}
+#convert wide format to long format for plotting  
+plot_MEs<-Strader_MEs%>%
+  gather(., key="Module", value="Mean", ME33:ME43)
+
+write_csv(plot_MEs, "A-Pver/output/rna-seq/WGCNA_eigengene_expression.csv")
+
+plot_MEs<- read_csv("A-Pver/output/rna-seq/WGCNA_eigengene_expression.csv")
+#dev.off() 
+
+treatment_order = c("Control", "Enriched") #Set time_point order
+
+list_groups<-c("Control", "Enriched")
+levels(as.factor(plot_MEs$Treatment))
+
+plot_MEs$Treatment<-factor(plot_MEs$Treatment, levels=list_groups)
+
+expression_plots<-plot_MEs%>%
+  group_by(Module, Treatment) %>%
+  ggplot(aes(x=Treatment, y=Mean, group=Treatment, colour=Treatment)) +
+  facet_wrap(~ Module)+
+  geom_jitter(alpha = 0.5) +
+  geom_boxplot(alpha=0) +
+  scale_x_discrete(name="", limits=treatment_order) +
+  #ylim(-0.5,1) +
+  ylab("Mean Module Eigenegene") +
+  geom_hline(yintercept = 0, linetype="dashed", color = "grey")+
+  theme_bw() + 
+  theme(axis.text.x=element_text(angle = 45, hjust=1, size = 12), #set x-axis label size
+        axis.title.x=element_text(size = 14), #set x-axis title size
+        axis.ticks.x=element_blank(), #No x-label ticks
+        #axis.title.y=element_blank(), #No y-axis title
+        axis.text.y=element_text(size = 14), #set y-axis label size, 
+        panel.border = element_rect(color = "black", fill = NA, size = 1), #set border
+        panel.grid.major = element_blank(), #Set major gridlines
+        panel.grid.minor = element_blank(), #Set minor gridlines
+        axis.line = element_line(colour = "black"), #Set axes color
+        plot.background=element_blank(),
+        plot.title = element_text(size=22)); expression_plots
+
+ggsave(expression_plots, file="A-Pver/output/rna-seq/expression_eigengene.jpeg", height=16, width=10)
+```
 
