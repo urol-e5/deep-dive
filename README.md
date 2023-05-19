@@ -35,6 +35,8 @@ A-Pver
 B-Mcap
 C-Pacu
 D-Apul
+E-Peve
+F-Pmea
 ```
 
 Within each top level directory there should be 3 directories
@@ -43,6 +45,7 @@ data
 code
 output
 ```
+
 For any document code it should start with a 2 number prefix (eg `01-methylation-explore.Rmd`). All output from that code should be in a sub-directory of `output` named the same as the code. For example the output of `01-methylation-explore.Rmd` would be in `A-pver/output/01-methylation-explore/`
 
 Please use **Relative Paths**. Commit and Push often. 
@@ -57,3 +60,8 @@ Please use **Relative Paths**. Commit and Push often.
 - *Pocillopora verrucosa* genome v1.0 : http://pver.reefgenomics.org : https://www.ncbi.nlm.nih.gov/data-hub/genome/GCA_014529365.1/
 - *Montipora capitata* v3 - http://cyanophora.rutgers.edu/montipora/ : https://www.ncbi.nlm.nih.gov/data-hub/genome/GCA_006542545.1/
 - *Pocillopora acuta* v2 - http://cyanophora.rutgers.edu/Pocillopora_acuta/ : 
+- _Pocillopora meandrina_ - http://cyanophora.rutgers.edu/Pocillopora_meandrina/ :
+
+### Workflows
+
+
