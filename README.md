@@ -4,7 +4,7 @@ This repository is focused on takeing molecular data from three experiments wher
 
 # Specific sub-efforts
 
-Short-hand and other repos for the three experiments are
+Short-hand for organsization of this repo and other repos
 
 A) https://github.com/hputnam/Becker_E5 (Pocillopora verrucosa genome)
 
@@ -20,6 +20,10 @@ C) https://github.com/emmastrand/Acclim_Dynamics_molecular (Pocillopora acuta ge
 - This effort is somewhat comprimised as ploidy (unintended), overwhelm signals
 
 D) Acropora pulcra
+
+E)
+
+F) 
 
 ---
 
