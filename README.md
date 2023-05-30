@@ -54,6 +54,7 @@ For any document code it should start with a 2 number prefix (eg `01-methylation
 
 Please use **Relative Paths**. Commit and Push often. 
 
+Links to other data types (e.g. FastQs, BAMs) can be [found in the project wiki](https://github.com/urol-e5/deep-dive/wiki).
 
 ---
 
