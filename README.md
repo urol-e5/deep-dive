@@ -23,7 +23,7 @@ Short-hand for organsization of this repo and other repos
 
 **E**) Porites evermanni
 
-**F**) Porites meandrina
+**F**) Pocillopora meandrina
 
 ---
 
