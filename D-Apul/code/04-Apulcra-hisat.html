@@ -1691,120 +1691,202 @@ border-radius: 0px;
 </div>
 
 
-<p>millipora genome prep</p>
+<p>#millipora genome prep</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/home/shared/hisat2-2.2.1/hisat2_extract_exons.py</span> <span class="dt">\</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gtf <span class="dt">\</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> ../output/04-Apulcra-hisat/m_exon.tab</span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span> ../output/04-Apulcra-hisat/m_exon.tab</span></code></pre></div>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/home/shared/hisat2-2.2.1/hisat2_extract_splice_sites.py</span> <span class="dt">\</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gtf <span class="dt">\</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> ../output/04-Apulcra-hisat/m_splice_sites.tab</span></code></pre></div>
-<p>“<span class="math inline">\({programs_array[hisat2_build]}&quot; \
-&quot;\)</span>{genome_fasta}”<br />
-“<span class="math inline">\({genome_index_name}&quot; \
---exon &quot;\)</span>{exons}”<br />
-–ss “<span class="math inline">\({splice_sites}&quot; \
--p &quot;\)</span>{threads}”<br />
-2&gt; hisat2-build_stats.txt</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/home/shared/hisat2-2.2.1/hisat2-build</span> <span class="dt">\</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>../data/Amil/ncbi_dataset/data/GCF_013753865.1/GCF_013753865.1_Amil_v2.1_genomic.fna <span class="dt">\</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>GCF_013753865.1_Amil_v2.1 <span class="dt">\</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>--exon ../output/04-Apulcra-hisat/m_exon.tab <span class="dt">\</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>--ss ../output/04-Apulcra-hisat/m_splice_sites.tab <span class="dt">\</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>-p 40 <span class="dt">\</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gtf <span class="dt">\</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>2<span class="op">&gt;</span> ../output/04-Apulcra-hisat/hisat2-build_stats.txt</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/bin/bash</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># This script will extract splice sites from the gtf file</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># This is the command to extract splice sites from the gtf file</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="ex">/home/shared/hisat2-2.2.1/hisat2_extract_splice_sites.py</span> <span class="dt">\</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co"># This is the gtf file</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="ex">../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gtf</span> <span class="dt">\</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co"># This is the output file</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> ../output/04-Apulcra-hisat/m_splice_sites.tab</span></code></pre></div>
+<pre><code>&quot;${programs_array[hisat2_build]}&quot; \
+&quot;${genome_fasta}&quot; \
+&quot;${genome_index_name}&quot; \
+--exon &quot;${exons}&quot; \
+--ss &quot;${splice_sites}&quot; \
+-p &quot;${threads}&quot; \
+2&gt; hisat2-build_stats.txt</code></pre>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/bin/bash</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># hisat2-build is a program that builds a hisat2 index for the reference genome</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># ../data/Amil/ncbi_dataset/data/GCF_013753865.1/GCF_013753865.1_Amil_v2.1_genomic.fna is the reference genome</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># GCF_013753865.1_Amil_v2.1 is the name of the index</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># --exon ../output/04-Apulcra-hisat/m_exon.tab is the exon file</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># --ss ../output/04-Apulcra-hisat/m_splice_sites.tab is the splice site file</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co"># -p 40 is the number of threads</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co"># ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gtf is the gtf file</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 2&gt; ../output/04-Apulcra-hisat/hisat2-build_stats.txt is the output file</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="ex">/home/shared/hisat2-2.2.1/hisat2-build</span> <span class="dt">\</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>../data/Amil/ncbi_dataset/data/GCF_013753865.1/GCF_013753865.1_Amil_v2.1_genomic.fna <span class="dt">\</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>GCF_013753865.1_Amil_v2.1 <span class="dt">\</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>--exon ../output/04-Apulcra-hisat/m_exon.tab <span class="dt">\</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>--ss ../output/04-Apulcra-hisat/m_splice_sites.tab <span class="dt">\</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>-p 40 <span class="dt">\</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gtf <span class="dt">\</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>2<span class="op">&gt;</span> ../output/04-Apulcra-hisat/hisat2-build_stats.txt</span></code></pre></div>
 <div id="alignment" class="section level1" number="1">
 <h1><span class="header-section-number">1</span> Alignment</h1>
-<p>Hisat2 alignments “<span class="math inline">\({programs_array[hisat2]}&quot; \
--x &quot;\)</span>{genome_index_name}”<br />
--1 “<span class="math inline">\({fastq_list_R1}&quot; \
--2 &quot;\)</span>{fastq_list_R2}”<br />
--S “<span class="math inline">\({sample_name}&quot;.sam \
-2&gt; &quot;\)</span>{sample_name}”-hisat2_stats.txt</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/home/shared/hisat2-2.2.1/hisat2</span> <span class="dt">\</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>-x ../output/04-Apulcra-hisat/GCF_013753865.1_Amil_v2.1 <span class="dt">\</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>-p 48 <span class="dt">\</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>-1 ../data/SRR8601366_1.fastq <span class="dt">\</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>-2 ../data/SRR8601366_2.fastq <span class="dt">\</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>-S ../output/04-Apulcra-hisat/SRR8601366_mil.sam <span class="dt">\</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>2<span class="op">&gt;&amp;</span><span class="dv">1</span> <span class="kw">|</span> <span class="fu">tee</span> ../output/04-Apulcra-hisat/hisat2_stats.txt</span></code></pre></div>
+<pre><code>Hisat2 alignments
+&quot;${programs_array[hisat2]}&quot; \
+-x &quot;${genome_index_name}&quot; \
+-1 &quot;${fastq_list_R1}&quot; \
+-2 &quot;${fastq_list_R2}&quot; \
+-S &quot;${sample_name}&quot;.sam \
+2&gt; &quot;${sample_name}&quot;-hisat2_stats.txt</code></pre>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/bin/bash comment with GPT Studio</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># run hisat2 to align reads to the reference genome</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="ex">/home/shared/hisat2-2.2.1/hisat2</span> <span class="dt">\</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co"># specify the reference genome</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="ex">-x</span> ../output/04-Apulcra-hisat/GCF_013753865.1_Amil_v2.1 <span class="dt">\</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>-p 48 <span class="dt">\</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>-1 ../data/SRR8601366_1.fastq <span class="dt">\</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>-2 ../data/SRR8601366_2.fastq <span class="dt">\</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>-S ../output/04-Apulcra-hisat/SRR8601366_mil.sam <span class="dt">\</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>2<span class="op">&gt;&amp;</span><span class="dv">1</span> <span class="kw">|</span> <span class="fu">tee</span> ../output/04-Apulcra-hisat/hisat2_stats.txt</span></code></pre></div>
+<div id="chatgpt-comment-test---same-chunk-as-above" class="section level3" number="1.0.1">
+<h3><span class="header-section-number">1.0.1</span> chatgpt comment
+test - same chunk as above</h3>
+<p>this with ChatGPT not inline</p>
+<p>This R code is actually a command-line script written in Bash which
+can be run in the terminal or within an R script using the
+<code>system()</code> or <code>system2()</code> commands. It runs the
+program HISAT2 with specific options and parameters on paired-end
+RNA-seq data for a specific species of organism called <em>Acanthopleura
+granulata</em> (also known as <em>Acmaea intestinalis</em>) to align the
+sequencing reads to its reference genome.</p>
+<hr />
+<p>ChatGPT output:</p>
+<p>This code is running the HISAT2 alignment tool, which is used to
+align RNA sequencing reads to a reference genome. It is specifying the
+following options:</p>
+<p><code>-x</code> specifies the reference genome index to use for the
+alignment.</p>
+<p><code>-p</code> specifies the number of CPU cores to use in the
+alignment.</p>
+<p><code>-1</code> and <code>-2</code> specify the input paired-end
+fastq read files to align.</p>
+<p><code>-S</code> specifies the output SAM file to save the alignment
+results.</p>
+<p><code>2&gt;&amp;1 | tee</code> specifies that both stdout and stderr
+are to be written to a file
+<code>../output/04-Apulcra-hisat/hisat2_stats.txt</code>, while also
+being printed to the console for the user to see.</p>
+<p>The code is assuming that the input fastq files are located at
+<code>../data/SRR8601366_1.fastq</code> and
+<code>../data/SRR8601366_2.fastq</code>, and that the reference genome
+index is located at <code>/home/shared/hisat2-2.2.1/hisat2</code>.</p>
+<p>The aligned output will be saved to a SAM file located at
+<code>../output/04-Apulcra-hisat/SRR8601366_mil.sam</code>.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/home/shared/hisat2-2.2.1/hisat2</span> <span class="dt">\</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>-x ../output/04-Apulcra-hisat/GCF_013753865.1_Amil_v2.1 <span class="dt">\</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>-p 48 <span class="dt">\</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>-1 ../data/SRR8601366_1.fastq <span class="dt">\</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>-2 ../data/SRR8601366_2.fastq <span class="dt">\</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>-S ../output/04-Apulcra-hisat/SRR8601366_mil.sam <span class="dt">\</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>2<span class="op">&gt;&amp;</span><span class="dv">1</span> <span class="kw">|</span> <span class="fu">tee</span> ../output/04-Apulcra-hisat/hisat2_stats.txt</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/home/shared/hisat2-2.2.1/hisat2</span> <span class="dt">\</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>-x ../output/04-Apulcra-hisat/GCF_013753865.1_Amil_v2.1 <span class="dt">\</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>-p 48 <span class="dt">\</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>-1 ../data/SRR8601366_1.fastq <span class="dt">\</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>-2 ../data/SRR8601366_2.fastq <span class="dt">\</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>-S ../output/04-Apulcra-hisat/SRR8601366_mil.sam <span class="dt">\</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>2<span class="op">&gt;&amp;</span><span class="dv">1</span> <span class="kw">|</span> <span class="fu">tee</span> ../output/04-Apulcra-hisat/hisat2_stats.txt</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/home/shared/hisat2-2.2.1/hisat2</span> <span class="dt">\</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>-x ../output/04-Apulcra-hisat/GCF_013753865.1_Amil_v2.1 <span class="dt">\</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>-p 48 <span class="dt">\</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>-1 ../data/SRR8601366_1.fastq <span class="dt">\</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>-2 ../data/SRR8601366_2.fastq <span class="dt">\</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>-S ../output/04-Apulcra-hisat/SRR8601366_mil.sam <span class="dt">\</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>2<span class="op">&gt;&amp;</span><span class="dv">1</span> <span class="kw">|</span> <span class="fu">tee</span> ../output/04-Apulcra-hisat/hisat2_stats.txt</span></code></pre></div>
+</div>
 </div>
 <div id="align-with-no-splice-sites" class="section level1" number="2">
 <h1><span class="header-section-number">2</span> Align with no splice
 sites</h1>
-<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/home/shared/hisat2-2.2.1/hisat2-build</span> <span class="dt">\</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>../data/Amil/ncbi_dataset/data/GCF_013753865.1/GCF_013753865.1_Amil_v2.1_genomic.fna <span class="dt">\</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>GCF_013753865.1_Amil_v2.1_nosplice <span class="dt">\</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>-p 48 <span class="dt">\</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>2<span class="op">&gt;&amp;</span><span class="dv">1</span> <span class="kw">|</span> <span class="fu">tee</span> ../output/04-Apulcra-hisat/hisat2-build_stats_nosplice.txt</span></code></pre></div>
-<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/home/shared/hisat2-2.2.1/hisat2</span> <span class="dt">\</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>-x ../output/04-Apulcra-hisat/GCF_013753865.1_Amil_v2.1_nosplice <span class="dt">\</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>-p 48 <span class="dt">\</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>-1 ../data/SRR8601366_1.fastq <span class="dt">\</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>-2 ../data/SRR8601366_2.fastq <span class="dt">\</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>-S ../output/04-Apulcra-hisat/SRR8601366_mil_nosplice.sam <span class="dt">\</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>2<span class="op">&gt;&amp;</span><span class="dv">1</span> <span class="kw">|</span> <span class="fu">tee</span> ../output/04-Apulcra-hisat/hisat2_stats_nosplice.txt</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/home/shared/hisat2-2.2.1/hisat2-build</span> <span class="dt">\</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>../data/Amil/ncbi_dataset/data/GCF_013753865.1/GCF_013753865.1_Amil_v2.1_genomic.fna <span class="dt">\</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>GCF_013753865.1_Amil_v2.1_nosplice <span class="dt">\</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>-p 48 <span class="dt">\</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>2<span class="op">&gt;&amp;</span><span class="dv">1</span> <span class="kw">|</span> <span class="fu">tee</span> ../output/04-Apulcra-hisat/hisat2-build_stats_nosplice.txt</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/home/shared/hisat2-2.2.1/hisat2</span> <span class="dt">\</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>-x ../output/04-Apulcra-hisat/GCF_013753865.1_Amil_v2.1_nosplice <span class="dt">\</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>-p 48 <span class="dt">\</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>-1 ../data/SRR8601366_1.fastq <span class="dt">\</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>-2 ../data/SRR8601366_2.fastq <span class="dt">\</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>-S ../output/04-Apulcra-hisat/SRR8601366_mil_nosplice.sam <span class="dt">\</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>2<span class="op">&gt;&amp;</span><span class="dv">1</span> <span class="kw">|</span> <span class="fu">tee</span> ../output/04-Apulcra-hisat/hisat2_stats_nosplice.txt</span></code></pre></div>
 </div>
 <div id="a-hyacinthus" class="section level1" number="3">
 <h1><span class="header-section-number">3</span> A hyacinthus</h1>
 <div id="no-splice" class="section level2" number="3.1">
 <h2><span class="header-section-number">3.1</span> no splice</h2>
-<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/home/shared/hisat2-2.2.1/hisat2-build</span> <span class="dt">\</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>../data/Ahya/ncbi_dataset/data/GCA_020536085.1/GCA_020536085.1_Ahyacinthus.chrsV1_genomic.fna <span class="dt">\</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>../output/04-Apulcra-hisat/GCA_020536085.1_Ahya_nosplice <span class="dt">\</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>-p 48 <span class="dt">\</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>2<span class="op">&gt;</span> ../output/04-Apulcra-hisat/hisat2-build_stats_Ahya_nosplice.txt</span></code></pre></div>
-<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/home/shared/hisat2-2.2.1/hisat2</span> <span class="dt">\</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>-x ../output/04-Apulcra-hisat/GCA_020536085.1_Ahya_nosplice <span class="dt">\</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>-p 48 <span class="dt">\</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>-1 ../data/SRR8601366_1.fastq <span class="dt">\</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>-2 ../data/SRR8601366_2.fastq <span class="dt">\</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>-S ../output/04-Apulcra-hisat/SRR8601366_hya_nosplice.sam <span class="dt">\</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>2<span class="op">&gt;&amp;</span><span class="dv">1</span> <span class="kw">|</span> <span class="fu">tee</span> ../output/04-Apulcra-hisat/hisat2_stats_Ahya_nosplice.txt</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/home/shared/hisat2-2.2.1/hisat2-build</span> <span class="dt">\</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>../data/Ahya/ncbi_dataset/data/GCA_020536085.1/GCA_020536085.1_Ahyacinthus.chrsV1_genomic.fna <span class="dt">\</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>../output/04-Apulcra-hisat/GCA_020536085.1_Ahya_nosplice <span class="dt">\</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>-p 48 <span class="dt">\</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>2<span class="op">&gt;</span> ../output/04-Apulcra-hisat/hisat2-build_stats_Ahya_nosplice.txt</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/home/shared/hisat2-2.2.1/hisat2</span> <span class="dt">\</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>-x ../output/04-Apulcra-hisat/GCA_020536085.1_Ahya_nosplice <span class="dt">\</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>-p 48 <span class="dt">\</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>-1 ../data/SRR8601366_1.fastq <span class="dt">\</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>-2 ../data/SRR8601366_2.fastq <span class="dt">\</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>-S ../output/04-Apulcra-hisat/SRR8601366_hya_nosplice.sam <span class="dt">\</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>2<span class="op">&gt;&amp;</span><span class="dv">1</span> <span class="kw">|</span> <span class="fu">tee</span> ../output/04-Apulcra-hisat/hisat2_stats_Ahya_nosplice.txt</span></code></pre></div>
 </div>
 </div>
 <div id="a-digitera" class="section level1" number="4">
 <h1><span class="header-section-number">4</span> A digitera</h1>
-<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/home/shared/hisat2-2.2.1/hisat2_extract_exons.py</span> <span class="dt">\</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>../data/Adig/ncbi_dataset/data/GCF_000222465.1/genomic.gtf <span class="dt">\</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> ../output/04-Apulcra-hisat/d_exon.tab</span></code></pre></div>
-<div class="sourceCode" id="cb11"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/home/shared/hisat2-2.2.1/hisat2_extract_splice_sites.py</span> <span class="dt">\</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>../data/Adig/ncbi_dataset/data/GCF_000222465.1/genomic.gtf <span class="dt">\</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> ../output/04-Apulcra-hisat/d_splice_sites.tab</span></code></pre></div>
-<div class="sourceCode" id="cb12"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/home/shared/hisat2-2.2.1/hisat2-build</span> <span class="dt">\</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>../data/Adig/ncbi_dataset/data/GCF_000222465.1/GCF_000222465.1_Adig_1.1_genomic.fna <span class="dt">\</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>../output/04-Apulcra-hisat/GCF_000222465.1_Adig <span class="dt">\</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>--exon ../output/04-Apulcra-hisat/d_exon.tab <span class="dt">\</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>--ss ../output/04-Apulcra-hisat/d_splice_sites.tab <span class="dt">\</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>-p 48 <span class="dt">\</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>../data/Adig/ncbi_dataset/data/GCF_000222465.1/genomic.gtf <span class="dt">\</span></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>2<span class="op">&gt;</span> ../output/04-Apulcra-hisat/hisat2-build_stats_Adig.txt</span></code></pre></div>
-<div class="sourceCode" id="cb13"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/home/shared/hisat2-2.2.1/hisat2</span> <span class="dt">\</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>-x ../output/04-Apulcra-hisat/GCF_000222465.1_Adig <span class="dt">\</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>-p 48 <span class="dt">\</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>-1 ../data/SRR8601366_1.fastq <span class="dt">\</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>-2 ../data/SRR8601366_2.fastq <span class="dt">\</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>-S ../output/04-Apulcra-hisat/SRR8601366_dig.sam <span class="dt">\</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>2<span class="op">&gt;&amp;</span><span class="dv">1</span> <span class="kw">|</span> <span class="fu">tee</span> ../output/04-Apulcra-hisat/hisat2_stats_dig.txt</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/home/shared/hisat2-2.2.1/hisat2_extract_exons.py</span> <span class="dt">\</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>../data/Adig/ncbi_dataset/data/GCF_000222465.1/genomic.gtf <span class="dt">\</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> ../output/04-Apulcra-hisat/d_exon.tab</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/home/shared/hisat2-2.2.1/hisat2_extract_splice_sites.py</span> <span class="dt">\</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>../data/Adig/ncbi_dataset/data/GCF_000222465.1/genomic.gtf <span class="dt">\</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> ../output/04-Apulcra-hisat/d_splice_sites.tab</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/home/shared/hisat2-2.2.1/hisat2-build</span> <span class="dt">\</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>../data/Adig/ncbi_dataset/data/GCF_000222465.1/GCF_000222465.1_Adig_1.1_genomic.fna <span class="dt">\</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>../output/04-Apulcra-hisat/GCF_000222465.1_Adig <span class="dt">\</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>--exon ../output/04-Apulcra-hisat/d_exon.tab <span class="dt">\</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>--ss ../output/04-Apulcra-hisat/d_splice_sites.tab <span class="dt">\</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>-p 48 <span class="dt">\</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>../data/Adig/ncbi_dataset/data/GCF_000222465.1/genomic.gtf <span class="dt">\</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>2<span class="op">&gt;</span> ../output/04-Apulcra-hisat/hisat2-build_stats_Adig.txt</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/home/shared/hisat2-2.2.1/hisat2</span> <span class="dt">\</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>-x ../output/04-Apulcra-hisat/GCF_000222465.1_Adig <span class="dt">\</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>-p 48 <span class="dt">\</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>-1 ../data/SRR8601366_1.fastq <span class="dt">\</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>-2 ../data/SRR8601366_2.fastq <span class="dt">\</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>-S ../output/04-Apulcra-hisat/SRR8601366_dig.sam <span class="dt">\</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>2<span class="op">&gt;&amp;</span><span class="dv">1</span> <span class="kw">|</span> <span class="fu">tee</span> ../output/04-Apulcra-hisat/hisat2_stats_dig.txt</span></code></pre></div>
 <div id="dig-no-splice" class="section level2" number="4.1">
 <h2><span class="header-section-number">4.1</span> dig no splice</h2>
-<div class="sourceCode" id="cb14"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/home/shared/hisat2-2.2.1/hisat2-build</span> <span class="dt">\</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>../data/Adig/ncbi_dataset/data/GCF_000222465.1/GCF_000222465.1_Adig_1.1_genomic.fna <span class="dt">\</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>../output/04-Apulcra-hisat/GCF_000222465.1_Adig_nosplice <span class="dt">\</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>-p 48 <span class="dt">\</span></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>2<span class="op">&gt;</span> ../output/04-Apulcra-hisat/hisat2-build_stats_Adig.txt</span></code></pre></div>
-<div class="sourceCode" id="cb15"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/home/shared/hisat2-2.2.1/hisat2</span> <span class="dt">\</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>-x ../output/04-Apulcra-hisat/GCF_000222465.1_Adig_nosplice <span class="dt">\</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>-p 48 <span class="dt">\</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>-1 ../data/SRR8601366_1.fastq <span class="dt">\</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>-2 ../data/SRR8601366_2.fastq <span class="dt">\</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>-S ../output/04-Apulcra-hisat/SRR8601366_dig_nosplice.sam <span class="dt">\</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>2<span class="op">&gt;&amp;</span><span class="dv">1</span> <span class="kw">|</span> <span class="fu">tee</span> ../output/04-Apulcra-hisat/hisat2_stats_dig_nosplice.txt</span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/home/shared/hisat2-2.2.1/hisat2-build</span> <span class="dt">\</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>../data/Adig/ncbi_dataset/data/GCF_000222465.1/GCF_000222465.1_Adig_1.1_genomic.fna <span class="dt">\</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>../output/04-Apulcra-hisat/GCF_000222465.1_Adig_nosplice <span class="dt">\</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>-p 48 <span class="dt">\</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>2<span class="op">&gt;</span> ../output/04-Apulcra-hisat/hisat2-build_stats_Adig.txt</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/home/shared/hisat2-2.2.1/hisat2</span> <span class="dt">\</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>-x ../output/04-Apulcra-hisat/GCF_000222465.1_Adig_nosplice <span class="dt">\</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>-p 48 <span class="dt">\</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>-1 ../data/SRR8601366_1.fastq <span class="dt">\</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>-2 ../data/SRR8601366_2.fastq <span class="dt">\</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>-S ../output/04-Apulcra-hisat/SRR8601366_dig_nosplice.sam <span class="dt">\</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>2<span class="op">&gt;&amp;</span><span class="dv">1</span> <span class="kw">|</span> <span class="fu">tee</span> ../output/04-Apulcra-hisat/hisat2_stats_dig_nosplice.txt</span></code></pre></div>
 </div>
 </div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiQSBwdWxjcmEgSGlTYXQyIgphdXRob3I6IFN0ZXZlbiBSb2JlcnRzCmRhdGU6ICJgciBmb3JtYXQoU3lzLnRpbWUoKSwgJyVkICVCLCAlWScpYCIgIApvdXRwdXQ6IAogIGh0bWxfZG9jdW1lbnQ6CiAgICB0aGVtZTogcmVhZGFibGUKICAgIGhpZ2hsaWdodDogemVuYnVybgogICAgdG9jOiB0cnVlCiAgICB0b2NfZmxvYXQ6IHRydWUKICAgIG51bWJlcl9zZWN0aW9uczogdHJ1ZQogICAgY29kZV9mb2xkaW5nOiBzaG93CiAgICBjb2RlX2Rvd25sb2FkOiB0cnVlCi0tLQoKYGBge3Igc2V0dXAsIGluY2x1ZGU9RkFMU0V9CmxpYnJhcnkoa25pdHIpCmxpYnJhcnkodGlkeXZlcnNlKQprbml0cjo6b3B0c19jaHVuayRzZXQoCiAgZWNobyA9IFRSVUUsICAgICAgICAgIyBEaXNwbGF5IGNvZGUgY2h1bmtzCiAgZXZhbCA9IEZBTFNFLCAgICAgICAgICMgRXZhbHVhdGUgY29kZSBjaHVua3MKICB3YXJuaW5nID0gRkFMU0UsICAgICAjIEhpZGUgd2FybmluZ3MKICBtZXNzYWdlID0gRkFMU0UsICAgICAjIEhpZGUgbWVzc2FnZXMKICBmaWcud2lkdGggPSA2LCAgICAgICAjIFNldCBwbG90IHdpZHRoIGluIGluY2hlcwogIGZpZy5oZWlnaHQgPSA0LCAgICAgICMgU2V0IHBsb3QgaGVpZ2h0IGluIGluY2hlcwogIGZpZy5hbGlnbiA9ICJjZW50ZXIiICMgQWxpZ24gcGxvdHMgdG8gdGhlIGNlbnRlcgopCmBgYAptaWxsaXBvcmEgZ2Vub21lIHByZXAKCmBgYHtyLCBlbmdpbmU9J2Jhc2gnfQovaG9tZS9zaGFyZWQvaGlzYXQyLTIuMi4xL2hpc2F0Ml9leHRyYWN0X2V4b25zLnB5IFwKLi4vZGF0YS9BbWlsL25jYmlfZGF0YXNldC9kYXRhL0dDRl8wMTM3NTM4NjUuMS9nZW5vbWljLmd0ZiBcCj4gLi4vb3V0cHV0LzA0LUFwdWxjcmEtaGlzYXQvbV9leG9uLnRhYgpgYGAKCmBgYHtyLCBlbmdpbmU9J2Jhc2gnfQpoZWFkIC4uL291dHB1dC8wNC1BcHVsY3JhLWhpc2F0L21fZXhvbi50YWIKCmBgYApgYGB7ciwgZW5naW5lPSdiYXNoJ30KL2hvbWUvc2hhcmVkL2hpc2F0Mi0yLjIuMS9oaXNhdDJfZXh0cmFjdF9zcGxpY2Vfc2l0ZXMucHkgXAouLi9kYXRhL0FtaWwvbmNiaV9kYXRhc2V0L2RhdGEvR0NGXzAxMzc1Mzg2NS4xL2dlbm9taWMuZ3RmIFwKPiAuLi9vdXRwdXQvMDQtQXB1bGNyYS1oaXNhdC9tX3NwbGljZV9zaXRlcy50YWIKYGBgCgoiJHtwcm9ncmFtc19hcnJheVtoaXNhdDJfYnVpbGRdfSIgXAoiJHtnZW5vbWVfZmFzdGF9IiBcCiIke2dlbm9tZV9pbmRleF9uYW1lfSIgXAotLWV4b24gIiR7ZXhvbnN9IiBcCi0tc3MgIiR7c3BsaWNlX3NpdGVzfSIgXAotcCAiJHt0aHJlYWRzfSIgXAoyPiBoaXNhdDItYnVpbGRfc3RhdHMudHh0CgoKCmBgYHtyLCBlbmdpbmU9J2Jhc2gnfQovaG9tZS9zaGFyZWQvaGlzYXQyLTIuMi4xL2hpc2F0Mi1idWlsZCBcCi4uL2RhdGEvQW1pbC9uY2JpX2RhdGFzZXQvZGF0YS9HQ0ZfMDEzNzUzODY1LjEvR0NGXzAxMzc1Mzg2NS4xX0FtaWxfdjIuMV9nZW5vbWljLmZuYSBcCkdDRl8wMTM3NTM4NjUuMV9BbWlsX3YyLjEgXAotLWV4b24gLi4vb3V0cHV0LzA0LUFwdWxjcmEtaGlzYXQvbV9leG9uLnRhYiBcCi0tc3MgLi4vb3V0cHV0LzA0LUFwdWxjcmEtaGlzYXQvbV9zcGxpY2Vfc2l0ZXMudGFiIFwKLXAgNDAgXAouLi9kYXRhL0FtaWwvbmNiaV9kYXRhc2V0L2RhdGEvR0NGXzAxMzc1Mzg2NS4xL2dlbm9taWMuZ3RmIFwKMj4gLi4vb3V0cHV0LzA0LUFwdWxjcmEtaGlzYXQvaGlzYXQyLWJ1aWxkX3N0YXRzLnR4dApgYGAKCgoKIyBBbGlnbm1lbnQKCkhpc2F0MiBhbGlnbm1lbnRzCiIke3Byb2dyYW1zX2FycmF5W2hpc2F0Ml19IiBcCi14ICIke2dlbm9tZV9pbmRleF9uYW1lfSIgXAotMSAiJHtmYXN0cV9saXN0X1IxfSIgXAotMiAiJHtmYXN0cV9saXN0X1IyfSIgXAotUyAiJHtzYW1wbGVfbmFtZX0iLnNhbSBcCjI+ICIke3NhbXBsZV9uYW1lfSItaGlzYXQyX3N0YXRzLnR4dAoKYGBge3IsIGVuZ2luZT0nYmFzaCd9Ci9ob21lL3NoYXJlZC9oaXNhdDItMi4yLjEvaGlzYXQyIFwKLXggLi4vb3V0cHV0LzA0LUFwdWxjcmEtaGlzYXQvR0NGXzAxMzc1Mzg2NS4xX0FtaWxfdjIuMSBcCi1wIDQ4IFwKLTEgLi4vZGF0YS9TUlI4NjAxMzY2XzEuZmFzdHEgXAotMiAuLi9kYXRhL1NSUjg2MDEzNjZfMi5mYXN0cSBcCi1TIC4uL291dHB1dC8wNC1BcHVsY3JhLWhpc2F0L1NSUjg2MDEzNjZfbWlsLnNhbSBcCjI+JjEgfCB0ZWUgLi4vb3V0cHV0LzA0LUFwdWxjcmEtaGlzYXQvaGlzYXQyX3N0YXRzLnR4dApgYGAKCgoKIyBBbGlnbiB3aXRoIG5vIHNwbGljZSBzaXRlcwoKCmBgYHtyLCBlbmdpbmU9J2Jhc2gnfQovaG9tZS9zaGFyZWQvaGlzYXQyLTIuMi4xL2hpc2F0Mi1idWlsZCBcCi4uL2RhdGEvQW1pbC9uY2JpX2RhdGFzZXQvZGF0YS9HQ0ZfMDEzNzUzODY1LjEvR0NGXzAxMzc1Mzg2NS4xX0FtaWxfdjIuMV9nZW5vbWljLmZuYSBcCkdDRl8wMTM3NTM4NjUuMV9BbWlsX3YyLjFfbm9zcGxpY2UgXAotcCA0OCBcCjI+JjEgfCB0ZWUgLi4vb3V0cHV0LzA0LUFwdWxjcmEtaGlzYXQvaGlzYXQyLWJ1aWxkX3N0YXRzX25vc3BsaWNlLnR4dApgYGAKCgoKYGBge3IsIGVuZ2luZT0nYmFzaCd9Ci9ob21lL3NoYXJlZC9oaXNhdDItMi4yLjEvaGlzYXQyIFwKLXggLi4vb3V0cHV0LzA0LUFwdWxjcmEtaGlzYXQvR0NGXzAxMzc1Mzg2NS4xX0FtaWxfdjIuMV9ub3NwbGljZSBcCi1wIDQ4IFwKLTEgLi4vZGF0YS9TUlI4NjAxMzY2XzEuZmFzdHEgXAotMiAuLi9kYXRhL1NSUjg2MDEzNjZfMi5mYXN0cSBcCi1TIC4uL291dHB1dC8wNC1BcHVsY3JhLWhpc2F0L1NSUjg2MDEzNjZfbWlsX25vc3BsaWNlLnNhbSBcCjI+JjEgfCB0ZWUgLi4vb3V0cHV0LzA0LUFwdWxjcmEtaGlzYXQvaGlzYXQyX3N0YXRzX25vc3BsaWNlLnR4dApgYGAKCiMgQSBoeWFjaW50aHVzCgoKIyMgbm8gc3BsaWNlCgpgYGB7ciwgZW5naW5lPSdiYXNoJ30KL2hvbWUvc2hhcmVkL2hpc2F0Mi0yLjIuMS9oaXNhdDItYnVpbGQgXAouLi9kYXRhL0FoeWEvbmNiaV9kYXRhc2V0L2RhdGEvR0NBXzAyMDUzNjA4NS4xL0dDQV8wMjA1MzYwODUuMV9BaHlhY2ludGh1cy5jaHJzVjFfZ2Vub21pYy5mbmEgXAouLi9vdXRwdXQvMDQtQXB1bGNyYS1oaXNhdC9HQ0FfMDIwNTM2MDg1LjFfQWh5YV9ub3NwbGljZSBcCi1wIDQ4IFwKMj4gLi4vb3V0cHV0LzA0LUFwdWxjcmEtaGlzYXQvaGlzYXQyLWJ1aWxkX3N0YXRzX0FoeWFfbm9zcGxpY2UudHh0CmBgYAoKCgoKYGBge3IsIGVuZ2luZT0nYmFzaCd9Ci9ob21lL3NoYXJlZC9oaXNhdDItMi4yLjEvaGlzYXQyIFwKLXggLi4vb3V0cHV0LzA0LUFwdWxjcmEtaGlzYXQvR0NBXzAyMDUzNjA4NS4xX0FoeWFfbm9zcGxpY2UgXAotcCA0OCBcCi0xIC4uL2RhdGEvU1JSODYwMTM2Nl8xLmZhc3RxIFwKLTIgLi4vZGF0YS9TUlI4NjAxMzY2XzIuZmFzdHEgXAotUyAuLi9vdXRwdXQvMDQtQXB1bGNyYS1oaXNhdC9TUlI4NjAxMzY2X2h5YV9ub3NwbGljZS5zYW0gXAoyPiYxIHwgdGVlIC4uL291dHB1dC8wNC1BcHVsY3JhLWhpc2F0L2hpc2F0Ml9zdGF0c19BaHlhX25vc3BsaWNlLnR4dApgYGAKCgojIEEgZGlnaXRlcmEKCgpgYGB7ciwgZW5naW5lPSdiYXNoJ30KL2hvbWUvc2hhcmVkL2hpc2F0Mi0yLjIuMS9oaXNhdDJfZXh0cmFjdF9leG9ucy5weSBcCi4uL2RhdGEvQWRpZy9uY2JpX2RhdGFzZXQvZGF0YS9HQ0ZfMDAwMjIyNDY1LjEvZ2Vub21pYy5ndGYgXAo+IC4uL291dHB1dC8wNC1BcHVsY3JhLWhpc2F0L2RfZXhvbi50YWIKYGBgCgoKYGBge3IsIGVuZ2luZT0nYmFzaCd9Ci9ob21lL3NoYXJlZC9oaXNhdDItMi4yLjEvaGlzYXQyX2V4dHJhY3Rfc3BsaWNlX3NpdGVzLnB5IFwKLi4vZGF0YS9BZGlnL25jYmlfZGF0YXNldC9kYXRhL0dDRl8wMDAyMjI0NjUuMS9nZW5vbWljLmd0ZiBcCj4gLi4vb3V0cHV0LzA0LUFwdWxjcmEtaGlzYXQvZF9zcGxpY2Vfc2l0ZXMudGFiCmBgYAoKCgpgYGB7ciwgZW5naW5lPSdiYXNoJ30KL2hvbWUvc2hhcmVkL2hpc2F0Mi0yLjIuMS9oaXNhdDItYnVpbGQgXAouLi9kYXRhL0FkaWcvbmNiaV9kYXRhc2V0L2RhdGEvR0NGXzAwMDIyMjQ2NS4xL0dDRl8wMDAyMjI0NjUuMV9BZGlnXzEuMV9nZW5vbWljLmZuYSBcCi4uL291dHB1dC8wNC1BcHVsY3JhLWhpc2F0L0dDRl8wMDAyMjI0NjUuMV9BZGlnIFwKLS1leG9uIC4uL291dHB1dC8wNC1BcHVsY3JhLWhpc2F0L2RfZXhvbi50YWIgXAotLXNzIC4uL291dHB1dC8wNC1BcHVsY3JhLWhpc2F0L2Rfc3BsaWNlX3NpdGVzLnRhYiBcCi1wIDQ4IFwKLi4vZGF0YS9BZGlnL25jYmlfZGF0YXNldC9kYXRhL0dDRl8wMDAyMjI0NjUuMS9nZW5vbWljLmd0ZiBcCjI+IC4uL291dHB1dC8wNC1BcHVsY3JhLWhpc2F0L2hpc2F0Mi1idWlsZF9zdGF0c19BZGlnLnR4dApgYGAKCgpgYGB7ciwgZW5naW5lPSdiYXNoJ30KL2hvbWUvc2hhcmVkL2hpc2F0Mi0yLjIuMS9oaXNhdDIgXAoteCAuLi9vdXRwdXQvMDQtQXB1bGNyYS1oaXNhdC9HQ0ZfMDAwMjIyNDY1LjFfQWRpZyBcCi1wIDQ4IFwKLTEgLi4vZGF0YS9TUlI4NjAxMzY2XzEuZmFzdHEgXAotMiAuLi9kYXRhL1NSUjg2MDEzNjZfMi5mYXN0cSBcCi1TIC4uL291dHB1dC8wNC1BcHVsY3JhLWhpc2F0L1NSUjg2MDEzNjZfZGlnLnNhbSBcCjI+JjEgfCB0ZWUgLi4vb3V0cHV0LzA0LUFwdWxjcmEtaGlzYXQvaGlzYXQyX3N0YXRzX2RpZy50eHQKYGBgCiMjIGRpZyBubyBzcGxpY2UKCmBgYHtyLCBlbmdpbmU9J2Jhc2gnfQovaG9tZS9zaGFyZWQvaGlzYXQyLTIuMi4xL2hpc2F0Mi1idWlsZCBcCi4uL2RhdGEvQWRpZy9uY2JpX2RhdGFzZXQvZGF0YS9HQ0ZfMDAwMjIyNDY1LjEvR0NGXzAwMDIyMjQ2NS4xX0FkaWdfMS4xX2dlbm9taWMuZm5hIFwKLi4vb3V0cHV0LzA0LUFwdWxjcmEtaGlzYXQvR0NGXzAwMDIyMjQ2NS4xX0FkaWdfbm9zcGxpY2UgXAotcCA0OCBcCjI+IC4uL291dHB1dC8wNC1BcHVsY3JhLWhpc2F0L2hpc2F0Mi1idWlsZF9zdGF0c19BZGlnLnR4dApgYGAKCgpgYGB7ciwgZW5naW5lPSdiYXNoJ30KL2hvbWUvc2hhcmVkL2hpc2F0Mi0yLjIuMS9oaXNhdDIgXAoteCAuLi9vdXRwdXQvMDQtQXB1bGNyYS1oaXNhdC9HQ0ZfMDAwMjIyNDY1LjFfQWRpZ19ub3NwbGljZSBcCi1wIDQ4IFwKLTEgLi4vZGF0YS9TUlI4NjAxMzY2XzEuZmFzdHEgXAotMiAuLi9kYXRhL1NSUjg2MDEzNjZfMi5mYXN0cSBcCi1TIC4uL291dHB1dC8wNC1BcHVsY3JhLWhpc2F0L1NSUjg2MDEzNjZfZGlnX25vc3BsaWNlLnNhbSBcCjI+JjEgfCB0ZWUgLi4vb3V0cHV0LzA0LUFwdWxjcmEtaGlzYXQvaGlzYXQyX3N0YXRzX2RpZ19ub3NwbGljZS50eHQKYGBg</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiQSBwdWxjcmEgSGlTYXQyIgphdXRob3I6IFN0ZXZlbiBSb2JlcnRzCmRhdGU6ICJgciBmb3JtYXQoU3lzLnRpbWUoKSwgJyVkICVCLCAlWScpYCIgIApvdXRwdXQ6IAogIGh0bWxfZG9jdW1lbnQ6CiAgICB0aGVtZTogcmVhZGFibGUKICAgIGhpZ2hsaWdodDogemVuYnVybgogICAgdG9jOiB0cnVlCiAgICB0b2NfZmxvYXQ6IHRydWUKICAgIG51bWJlcl9zZWN0aW9uczogdHJ1ZQogICAgY29kZV9mb2xkaW5nOiBzaG93CiAgICBjb2RlX2Rvd25sb2FkOiB0cnVlCi0tLQoKYGBge3Igc2V0dXAsIGluY2x1ZGU9RkFMU0V9CmxpYnJhcnkoa25pdHIpCmxpYnJhcnkodGlkeXZlcnNlKQprbml0cjo6b3B0c19jaHVuayRzZXQoCiAgZWNobyA9IFRSVUUsICAgICAgICAgIyBEaXNwbGF5IGNvZGUgY2h1bmtzCiAgZXZhbCA9IEZBTFNFLCAgICAgICAgICMgRXZhbHVhdGUgY29kZSBjaHVua3MKICB3YXJuaW5nID0gRkFMU0UsICAgICAjIEhpZGUgd2FybmluZ3MKICBtZXNzYWdlID0gRkFMU0UsICAgICAjIEhpZGUgbWVzc2FnZXMKICBmaWcud2lkdGggPSA2LCAgICAgICAjIFNldCBwbG90IHdpZHRoIGluIGluY2hlcwogIGZpZy5oZWlnaHQgPSA0LCAgICAgICMgU2V0IHBsb3QgaGVpZ2h0IGluIGluY2hlcwogIGZpZy5hbGlnbiA9ICJjZW50ZXIiICMgQWxpZ24gcGxvdHMgdG8gdGhlIGNlbnRlcgopCmBgYAoKI21pbGxpcG9yYSBnZW5vbWUgcHJlcAoKYGBge3IsIGVuZ2luZT0nYmFzaCd9Ci9ob21lL3NoYXJlZC9oaXNhdDItMi4yLjEvaGlzYXQyX2V4dHJhY3RfZXhvbnMucHkgXAouLi9kYXRhL0FtaWwvbmNiaV9kYXRhc2V0L2RhdGEvR0NGXzAxMzc1Mzg2NS4xL2dlbm9taWMuZ3RmIFwKPiAuLi9vdXRwdXQvMDQtQXB1bGNyYS1oaXNhdC9tX2V4b24udGFiCmBgYAoKYGBge3IsIGVuZ2luZT0nYmFzaCd9CmhlYWQgLi4vb3V0cHV0LzA0LUFwdWxjcmEtaGlzYXQvbV9leG9uLnRhYgoKYGBgCmBgYHtyLCBlbmdpbmU9J2Jhc2gnfQojIS9iaW4vYmFzaAoKIyBUaGlzIHNjcmlwdCB3aWxsIGV4dHJhY3Qgc3BsaWNlIHNpdGVzIGZyb20gdGhlIGd0ZiBmaWxlCgojIFRoaXMgaXMgdGhlIGNvbW1hbmQgdG8gZXh0cmFjdCBzcGxpY2Ugc2l0ZXMgZnJvbSB0aGUgZ3RmIGZpbGUKL2hvbWUvc2hhcmVkL2hpc2F0Mi0yLjIuMS9oaXNhdDJfZXh0cmFjdF9zcGxpY2Vfc2l0ZXMucHkgXAoKIyBUaGlzIGlzIHRoZSBndGYgZmlsZQouLi9kYXRhL0FtaWwvbmNiaV9kYXRhc2V0L2RhdGEvR0NGXzAxMzc1Mzg2NS4xL2dlbm9taWMuZ3RmIFwKCiMgVGhpcyBpcyB0aGUgb3V0cHV0IGZpbGUKPiAuLi9vdXRwdXQvMDQtQXB1bGNyYS1oaXNhdC9tX3NwbGljZV9zaXRlcy50YWIKCmBgYAoKYGBgCiIke3Byb2dyYW1zX2FycmF5W2hpc2F0Ml9idWlsZF19IiBcCiIke2dlbm9tZV9mYXN0YX0iIFwKIiR7Z2Vub21lX2luZGV4X25hbWV9IiBcCi0tZXhvbiAiJHtleG9uc30iIFwKLS1zcyAiJHtzcGxpY2Vfc2l0ZXN9IiBcCi1wICIke3RocmVhZHN9IiBcCjI+IGhpc2F0Mi1idWlsZF9zdGF0cy50eHQKYGBgCgoKYGBge3IsIGVuZ2luZT0nYmFzaCd9CiMhL2Jpbi9iYXNoCgojIGhpc2F0Mi1idWlsZCBpcyBhIHByb2dyYW0gdGhhdCBidWlsZHMgYSBoaXNhdDIgaW5kZXggZm9yIHRoZSByZWZlcmVuY2UgZ2Vub21lCiMgLi4vZGF0YS9BbWlsL25jYmlfZGF0YXNldC9kYXRhL0dDRl8wMTM3NTM4NjUuMS9HQ0ZfMDEzNzUzODY1LjFfQW1pbF92Mi4xX2dlbm9taWMuZm5hIGlzIHRoZSByZWZlcmVuY2UgZ2Vub21lCiMgR0NGXzAxMzc1Mzg2NS4xX0FtaWxfdjIuMSBpcyB0aGUgbmFtZSBvZiB0aGUgaW5kZXgKIyAtLWV4b24gLi4vb3V0cHV0LzA0LUFwdWxjcmEtaGlzYXQvbV9leG9uLnRhYiBpcyB0aGUgZXhvbiBmaWxlCiMgLS1zcyAuLi9vdXRwdXQvMDQtQXB1bGNyYS1oaXNhdC9tX3NwbGljZV9zaXRlcy50YWIgaXMgdGhlIHNwbGljZSBzaXRlIGZpbGUKIyAtcCA0MCBpcyB0aGUgbnVtYmVyIG9mIHRocmVhZHMKIyAuLi9kYXRhL0FtaWwvbmNiaV9kYXRhc2V0L2RhdGEvR0NGXzAxMzc1Mzg2NS4xL2dlbm9taWMuZ3RmIGlzIHRoZSBndGYgZmlsZQojIDI+IC4uL291dHB1dC8wNC1BcHVsY3JhLWhpc2F0L2hpc2F0Mi1idWlsZF9zdGF0cy50eHQgaXMgdGhlIG91dHB1dCBmaWxlCgovaG9tZS9zaGFyZWQvaGlzYXQyLTIuMi4xL2hpc2F0Mi1idWlsZCBcCi4uL2RhdGEvQW1pbC9uY2JpX2RhdGFzZXQvZGF0YS9HQ0ZfMDEzNzUzODY1LjEvR0NGXzAxMzc1Mzg2NS4xX0FtaWxfdjIuMV9nZW5vbWljLmZuYSBcCkdDRl8wMTM3NTM4NjUuMV9BbWlsX3YyLjEgXAotLWV4b24gLi4vb3V0cHV0LzA0LUFwdWxjcmEtaGlzYXQvbV9leG9uLnRhYiBcCi0tc3MgLi4vb3V0cHV0LzA0LUFwdWxjcmEtaGlzYXQvbV9zcGxpY2Vfc2l0ZXMudGFiIFwKLXAgNDAgXAouLi9kYXRhL0FtaWwvbmNiaV9kYXRhc2V0L2RhdGEvR0NGXzAxMzc1Mzg2NS4xL2dlbm9taWMuZ3RmIFwKMj4gLi4vb3V0cHV0LzA0LUFwdWxjcmEtaGlzYXQvaGlzYXQyLWJ1aWxkX3N0YXRzLnR4dAoKYGBgCgoKCiMgQWxpZ25tZW50CgpgYGAKSGlzYXQyIGFsaWdubWVudHMKIiR7cHJvZ3JhbXNfYXJyYXlbaGlzYXQyXX0iIFwKLXggIiR7Z2Vub21lX2luZGV4X25hbWV9IiBcCi0xICIke2Zhc3RxX2xpc3RfUjF9IiBcCi0yICIke2Zhc3RxX2xpc3RfUjJ9IiBcCi1TICIke3NhbXBsZV9uYW1lfSIuc2FtIFwKMj4gIiR7c2FtcGxlX25hbWV9Ii1oaXNhdDJfc3RhdHMudHh0CmBgYAoKYGBge3IsIGVuZ2luZT0nYmFzaCd9CiMhL2Jpbi9iYXNoIGNvbW1lbnQgd2l0aCBHUFQgU3R1ZGlvCgojIHJ1biBoaXNhdDIgdG8gYWxpZ24gcmVhZHMgdG8gdGhlIHJlZmVyZW5jZSBnZW5vbWUKL2hvbWUvc2hhcmVkL2hpc2F0Mi0yLjIuMS9oaXNhdDIgXAoKIyBzcGVjaWZ5IHRoZSByZWZlcmVuY2UgZ2Vub21lCi14IC4uL291dHB1dC8wNC1BcHVsY3JhLWhpc2F0L0dDRl8wMTM3NTM4NjUuMV9BbWlsX3YyLjEgXAotcCA0OCBcCi0xIC4uL2RhdGEvU1JSODYwMTM2Nl8xLmZhc3RxIFwKLTIgLi4vZGF0YS9TUlI4NjAxMzY2XzIuZmFzdHEgXAotUyAuLi9vdXRwdXQvMDQtQXB1bGNyYS1oaXNhdC9TUlI4NjAxMzY2X21pbC5zYW0gXAoyPiYxIHwgdGVlIC4uL291dHB1dC8wNC1BcHVsY3JhLWhpc2F0L2hpc2F0Ml9zdGF0cy50eHQKCmBgYAoKCiMjIyBjaGF0Z3B0IGNvbW1lbnQgdGVzdCAtIHNhbWUgY2h1bmsgYXMgYWJvdmUKdGhpcyB3aXRoIENoYXRHUFQgbm90IGlubGluZSAKCgoKVGhpcyBSIGNvZGUgaXMgYWN0dWFsbHkgYSBjb21tYW5kLWxpbmUgc2NyaXB0IHdyaXR0ZW4gaW4gQmFzaCB3aGljaCBjYW4gYmUgcnVuIGluIHRoZSB0ZXJtaW5hbCBvciB3aXRoaW4gYW4gUiBzY3JpcHQgdXNpbmcgdGhlIGBzeXN0ZW0oKWAgb3IgYHN5c3RlbTIoKWAgY29tbWFuZHMuIEl0IHJ1bnMgdGhlIHByb2dyYW0gSElTQVQyIHdpdGggc3BlY2lmaWMgb3B0aW9ucyBhbmQgcGFyYW1ldGVycyBvbiBwYWlyZWQtZW5kIFJOQS1zZXEgZGF0YSBmb3IgYSBzcGVjaWZpYyBzcGVjaWVzIG9mIG9yZ2FuaXNtIGNhbGxlZCAqQWNhbnRob3BsZXVyYSBncmFudWxhdGEqIChhbHNvIGtub3duIGFzICpBY21hZWEgaW50ZXN0aW5hbGlzKikgdG8gYWxpZ24gdGhlIHNlcXVlbmNpbmcgcmVhZHMgdG8gaXRzIHJlZmVyZW5jZSBnZW5vbWUuCgoKLS0tCgpDaGF0R1BUIG91dHB1dDoKClRoaXMgY29kZSBpcyBydW5uaW5nIHRoZSBISVNBVDIgYWxpZ25tZW50IHRvb2wsIHdoaWNoIGlzIHVzZWQgdG8gYWxpZ24gUk5BIHNlcXVlbmNpbmcgcmVhZHMgdG8gYSByZWZlcmVuY2UgZ2Vub21lLiBJdCBpcyBzcGVjaWZ5aW5nIHRoZSBmb2xsb3dpbmcgb3B0aW9uczoKCmAteGAgc3BlY2lmaWVzIHRoZSByZWZlcmVuY2UgZ2Vub21lIGluZGV4IHRvIHVzZSBmb3IgdGhlIGFsaWdubWVudC4KCmAtcGAgc3BlY2lmaWVzIHRoZSBudW1iZXIgb2YgQ1BVIGNvcmVzIHRvIHVzZSBpbiB0aGUgYWxpZ25tZW50LiAKCmAtMWAgYW5kIGAtMmAgc3BlY2lmeSB0aGUgaW5wdXQgcGFpcmVkLWVuZCBmYXN0cSByZWFkIGZpbGVzIHRvIGFsaWduLiAKCmAtU2Agc3BlY2lmaWVzIHRoZSBvdXRwdXQgU0FNIGZpbGUgdG8gc2F2ZSB0aGUgYWxpZ25tZW50IHJlc3VsdHMuCgpgMj4mMSB8IHRlZWAgc3BlY2lmaWVzIHRoYXQgYm90aCBzdGRvdXQgYW5kIHN0ZGVyciBhcmUgdG8gYmUgd3JpdHRlbiB0byBhIGZpbGUgYC4uL291dHB1dC8wNC1BcHVsY3JhLWhpc2F0L2hpc2F0Ml9zdGF0cy50eHRgLCB3aGlsZSBhbHNvIGJlaW5nIHByaW50ZWQgdG8gdGhlIGNvbnNvbGUgZm9yIHRoZSB1c2VyIHRvIHNlZS4KClRoZSBjb2RlIGlzIGFzc3VtaW5nIHRoYXQgdGhlIGlucHV0IGZhc3RxIGZpbGVzIGFyZSBsb2NhdGVkIGF0IGAuLi9kYXRhL1NSUjg2MDEzNjZfMS5mYXN0cWAgYW5kIGAuLi9kYXRhL1NSUjg2MDEzNjZfMi5mYXN0cWAsIGFuZCB0aGF0IHRoZSByZWZlcmVuY2UgZ2Vub21lIGluZGV4IGlzIGxvY2F0ZWQgYXQgYC9ob21lL3NoYXJlZC9oaXNhdDItMi4yLjEvaGlzYXQyYC4KClRoZSBhbGlnbmVkIG91dHB1dCB3aWxsIGJlIHNhdmVkIHRvIGEgU0FNIGZpbGUgbG9jYXRlZCBhdCBgLi4vb3V0cHV0LzA0LUFwdWxjcmEtaGlzYXQvU1JSODYwMTM2Nl9taWwuc2FtYC4KCmBgYHtyLCBlbmdpbmU9J2Jhc2gnfQovaG9tZS9zaGFyZWQvaGlzYXQyLTIuMi4xL2hpc2F0MiBcCi14IC4uL291dHB1dC8wNC1BcHVsY3JhLWhpc2F0L0dDRl8wMTM3NTM4NjUuMV9BbWlsX3YyLjEgXAotcCA0OCBcCi0xIC4uL2RhdGEvU1JSODYwMTM2Nl8xLmZhc3RxIFwKLTIgLi4vZGF0YS9TUlI4NjAxMzY2XzIuZmFzdHEgXAotUyAuLi9vdXRwdXQvMDQtQXB1bGNyYS1oaXNhdC9TUlI4NjAxMzY2X21pbC5zYW0gXAoyPiYxIHwgdGVlIC4uL291dHB1dC8wNC1BcHVsY3JhLWhpc2F0L2hpc2F0Ml9zdGF0cy50eHQKYGBgCgpgYGB7ciwgZW5naW5lPSdiYXNoJ30KL2hvbWUvc2hhcmVkL2hpc2F0Mi0yLjIuMS9oaXNhdDIgXAoteCAuLi9vdXRwdXQvMDQtQXB1bGNyYS1oaXNhdC9HQ0ZfMDEzNzUzODY1LjFfQW1pbF92Mi4xIFwKLXAgNDggXAotMSAuLi9kYXRhL1NSUjg2MDEzNjZfMS5mYXN0cSBcCi0yIC4uL2RhdGEvU1JSODYwMTM2Nl8yLmZhc3RxIFwKLVMgLi4vb3V0cHV0LzA0LUFwdWxjcmEtaGlzYXQvU1JSODYwMTM2Nl9taWwuc2FtIFwKMj4mMSB8IHRlZSAuLi9vdXRwdXQvMDQtQXB1bGNyYS1oaXNhdC9oaXNhdDJfc3RhdHMudHh0CmBgYAoKYGBge3IsIGVuZ2luZT0nYmFzaCd9Ci9ob21lL3NoYXJlZC9oaXNhdDItMi4yLjEvaGlzYXQyIFwKLXggLi4vb3V0cHV0LzA0LUFwdWxjcmEtaGlzYXQvR0NGXzAxMzc1Mzg2NS4xX0FtaWxfdjIuMSBcCi1wIDQ4IFwKLTEgLi4vZGF0YS9TUlI4NjAxMzY2XzEuZmFzdHEgXAotMiAuLi9kYXRhL1NSUjg2MDEzNjZfMi5mYXN0cSBcCi1TIC4uL291dHB1dC8wNC1BcHVsY3JhLWhpc2F0L1NSUjg2MDEzNjZfbWlsLnNhbSBcCjI+JjEgfCB0ZWUgLi4vb3V0cHV0LzA0LUFwdWxjcmEtaGlzYXQvaGlzYXQyX3N0YXRzLnR4dApgYGAKIyBBbGlnbiB3aXRoIG5vIHNwbGljZSBzaXRlcwoKCmBgYHtyLCBlbmdpbmU9J2Jhc2gnfQovaG9tZS9zaGFyZWQvaGlzYXQyLTIuMi4xL2hpc2F0Mi1idWlsZCBcCi4uL2RhdGEvQW1pbC9uY2JpX2RhdGFzZXQvZGF0YS9HQ0ZfMDEzNzUzODY1LjEvR0NGXzAxMzc1Mzg2NS4xX0FtaWxfdjIuMV9nZW5vbWljLmZuYSBcCkdDRl8wMTM3NTM4NjUuMV9BbWlsX3YyLjFfbm9zcGxpY2UgXAotcCA0OCBcCjI+JjEgfCB0ZWUgLi4vb3V0cHV0LzA0LUFwdWxjcmEtaGlzYXQvaGlzYXQyLWJ1aWxkX3N0YXRzX25vc3BsaWNlLnR4dApgYGAKCgoKYGBge3IsIGVuZ2luZT0nYmFzaCd9Ci9ob21lL3NoYXJlZC9oaXNhdDItMi4yLjEvaGlzYXQyIFwKLXggLi4vb3V0cHV0LzA0LUFwdWxjcmEtaGlzYXQvR0NGXzAxMzc1Mzg2NS4xX0FtaWxfdjIuMV9ub3NwbGljZSBcCi1wIDQ4IFwKLTEgLi4vZGF0YS9TUlI4NjAxMzY2XzEuZmFzdHEgXAotMiAuLi9kYXRhL1NSUjg2MDEzNjZfMi5mYXN0cSBcCi1TIC4uL291dHB1dC8wNC1BcHVsY3JhLWhpc2F0L1NSUjg2MDEzNjZfbWlsX25vc3BsaWNlLnNhbSBcCjI+JjEgfCB0ZWUgLi4vb3V0cHV0LzA0LUFwdWxjcmEtaGlzYXQvaGlzYXQyX3N0YXRzX25vc3BsaWNlLnR4dApgYGAKCiMgQSBoeWFjaW50aHVzCgoKIyMgbm8gc3BsaWNlCgpgYGB7ciwgZW5naW5lPSdiYXNoJ30KL2hvbWUvc2hhcmVkL2hpc2F0Mi0yLjIuMS9oaXNhdDItYnVpbGQgXAouLi9kYXRhL0FoeWEvbmNiaV9kYXRhc2V0L2RhdGEvR0NBXzAyMDUzNjA4NS4xL0dDQV8wMjA1MzYwODUuMV9BaHlhY2ludGh1cy5jaHJzVjFfZ2Vub21pYy5mbmEgXAouLi9vdXRwdXQvMDQtQXB1bGNyYS1oaXNhdC9HQ0FfMDIwNTM2MDg1LjFfQWh5YV9ub3NwbGljZSBcCi1wIDQ4IFwKMj4gLi4vb3V0cHV0LzA0LUFwdWxjcmEtaGlzYXQvaGlzYXQyLWJ1aWxkX3N0YXRzX0FoeWFfbm9zcGxpY2UudHh0CmBgYAoKCgoKYGBge3IsIGVuZ2luZT0nYmFzaCd9Ci9ob21lL3NoYXJlZC9oaXNhdDItMi4yLjEvaGlzYXQyIFwKLXggLi4vb3V0cHV0LzA0LUFwdWxjcmEtaGlzYXQvR0NBXzAyMDUzNjA4NS4xX0FoeWFfbm9zcGxpY2UgXAotcCA0OCBcCi0xIC4uL2RhdGEvU1JSODYwMTM2Nl8xLmZhc3RxIFwKLTIgLi4vZGF0YS9TUlI4NjAxMzY2XzIuZmFzdHEgXAotUyAuLi9vdXRwdXQvMDQtQXB1bGNyYS1oaXNhdC9TUlI4NjAxMzY2X2h5YV9ub3NwbGljZS5zYW0gXAoyPiYxIHwgdGVlIC4uL291dHB1dC8wNC1BcHVsY3JhLWhpc2F0L2hpc2F0Ml9zdGF0c19BaHlhX25vc3BsaWNlLnR4dApgYGAKCgojIEEgZGlnaXRlcmEKCgpgYGB7ciwgZW5naW5lPSdiYXNoJ30KL2hvbWUvc2hhcmVkL2hpc2F0Mi0yLjIuMS9oaXNhdDJfZXh0cmFjdF9leG9ucy5weSBcCi4uL2RhdGEvQWRpZy9uY2JpX2RhdGFzZXQvZGF0YS9HQ0ZfMDAwMjIyNDY1LjEvZ2Vub21pYy5ndGYgXAo+IC4uL291dHB1dC8wNC1BcHVsY3JhLWhpc2F0L2RfZXhvbi50YWIKYGBgCgoKYGBge3IsIGVuZ2luZT0nYmFzaCd9Ci9ob21lL3NoYXJlZC9oaXNhdDItMi4yLjEvaGlzYXQyX2V4dHJhY3Rfc3BsaWNlX3NpdGVzLnB5IFwKLi4vZGF0YS9BZGlnL25jYmlfZGF0YXNldC9kYXRhL0dDRl8wMDAyMjI0NjUuMS9nZW5vbWljLmd0ZiBcCj4gLi4vb3V0cHV0LzA0LUFwdWxjcmEtaGlzYXQvZF9zcGxpY2Vfc2l0ZXMudGFiCmBgYAoKCgpgYGB7ciwgZW5naW5lPSdiYXNoJ30KL2hvbWUvc2hhcmVkL2hpc2F0Mi0yLjIuMS9oaXNhdDItYnVpbGQgXAouLi9kYXRhL0FkaWcvbmNiaV9kYXRhc2V0L2RhdGEvR0NGXzAwMDIyMjQ2NS4xL0dDRl8wMDAyMjI0NjUuMV9BZGlnXzEuMV9nZW5vbWljLmZuYSBcCi4uL291dHB1dC8wNC1BcHVsY3JhLWhpc2F0L0dDRl8wMDAyMjI0NjUuMV9BZGlnIFwKLS1leG9uIC4uL291dHB1dC8wNC1BcHVsY3JhLWhpc2F0L2RfZXhvbi50YWIgXAotLXNzIC4uL291dHB1dC8wNC1BcHVsY3JhLWhpc2F0L2Rfc3BsaWNlX3NpdGVzLnRhYiBcCi1wIDQ4IFwKLi4vZGF0YS9BZGlnL25jYmlfZGF0YXNldC9kYXRhL0dDRl8wMDAyMjI0NjUuMS9nZW5vbWljLmd0ZiBcCjI+IC4uL291dHB1dC8wNC1BcHVsY3JhLWhpc2F0L2hpc2F0Mi1idWlsZF9zdGF0c19BZGlnLnR4dApgYGAKCgpgYGB7ciwgZW5naW5lPSdiYXNoJ30KL2hvbWUvc2hhcmVkL2hpc2F0Mi0yLjIuMS9oaXNhdDIgXAoteCAuLi9vdXRwdXQvMDQtQXB1bGNyYS1oaXNhdC9HQ0ZfMDAwMjIyNDY1LjFfQWRpZyBcCi1wIDQ4IFwKLTEgLi4vZGF0YS9TUlI4NjAxMzY2XzEuZmFzdHEgXAotMiAuLi9kYXRhL1NSUjg2MDEzNjZfMi5mYXN0cSBcCi1TIC4uL291dHB1dC8wNC1BcHVsY3JhLWhpc2F0L1NSUjg2MDEzNjZfZGlnLnNhbSBcCjI+JjEgfCB0ZWUgLi4vb3V0cHV0LzA0LUFwdWxjcmEtaGlzYXQvaGlzYXQyX3N0YXRzX2RpZy50eHQKYGBgCiMjIGRpZyBubyBzcGxpY2UKCmBgYHtyLCBlbmdpbmU9J2Jhc2gnfQovaG9tZS9zaGFyZWQvaGlzYXQyLTIuMi4xL2hpc2F0Mi1idWlsZCBcCi4uL2RhdGEvQWRpZy9uY2JpX2RhdGFzZXQvZGF0YS9HQ0ZfMDAwMjIyNDY1LjEvR0NGXzAwMDIyMjQ2NS4xX0FkaWdfMS4xX2dlbm9taWMuZm5hIFwKLi4vb3V0cHV0LzA0LUFwdWxjcmEtaGlzYXQvR0NGXzAwMDIyMjQ2NS4xX0FkaWdfbm9zcGxpY2UgXAotcCA0OCBcCjI+IC4uL291dHB1dC8wNC1BcHVsY3JhLWhpc2F0L2hpc2F0Mi1idWlsZF9zdGF0c19BZGlnLnR4dApgYGAKCgpgYGB7ciwgZW5naW5lPSdiYXNoJ30KL2hvbWUvc2hhcmVkL2hpc2F0Mi0yLjIuMS9oaXNhdDIgXAoteCAuLi9vdXRwdXQvMDQtQXB1bGNyYS1oaXNhdC9HQ0ZfMDAwMjIyNDY1LjFfQWRpZ19ub3NwbGljZSBcCi1wIDQ4IFwKLTEgLi4vZGF0YS9TUlI4NjAxMzY2XzEuZmFzdHEgXAotMiAuLi9kYXRhL1NSUjg2MDEzNjZfMi5mYXN0cSBcCi1TIC4uL291dHB1dC8wNC1BcHVsY3JhLWhpc2F0L1NSUjg2MDEzNjZfZGlnX25vc3BsaWNlLnNhbSBcCjI+JjEgfCB0ZWUgLi4vb3V0cHV0LzA0LUFwdWxjcmEtaGlzYXQvaGlzYXQyX3N0YXRzX2RpZ19ub3NwbGljZS50eHQKYGBg</div>
 
 
 </div>
