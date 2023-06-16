@@ -21,9 +21,9 @@ Short-hand for organsization of this repo and other repos
 
 **D**) Acropora pulcra
 
-**E**)
+**E**) Porites evermanni
 
-**F**) 
+**F**) Porites meandrina
 
 ---
 
