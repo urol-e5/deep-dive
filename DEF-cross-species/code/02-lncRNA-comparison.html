@@ -137,7 +137,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 </header>
 
-<p>grabbing 3 fastas..</p>
+<section id="grabbing-3-fastas.." class="level2">
+<h2 class="anchored" data-anchor-id="grabbing-3-fastas..">grabbing 3 fastas..</h2>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ../data</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -153,6 +154,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-O</span> https://raw.githubusercontent.com/zbengt/coral-lncRNA/main/ouput/pmea_bedtools_lncRNAs.fasta</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+</section>
+<section id="file-format" class="level2">
+<h2 class="anchored" data-anchor-id="file-format">File format</h2>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span> ../data/<span class="pp">*</span>fasta</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -194,6 +198,9 @@ CCTGACTTTCGCTACATGTTAAATTTCACTCAAAATTATTGATTGACATGCTACATACAGCAGCAGCACTACTATTGTTG
 TCAGTGAGCGAAATGCCAAGAATTTTGTTTTACAAATCGCTGAATGATCTCAGTACCGCGGATTTTTACACAGAGAGAAAGAGAAAAAAATCTAGATTCTACGAGATCGAAAGAGTCGTTTCAAAAAGAGTCAGTAAGAAAAAGGTAAGCGAATCTACTTTGCTCCGAGTGTTTGACTGAAATGAATCTCTCTTTCATAACGAATACTCGTTAAACCTTACTCAATCGTTGGTCTAGATTGAATATTTTTTCAAGTGGAAGGGCTACTCGAGCCTACAAAACTCCTGGGAGCCAGAAGAGAATTTAAACGCCTTTGCTTTGAGGTGAGATATCATGTGTGATTAACAGCTTTATAATTACACAAAAAACAGGAGAAATCCGTTACATTGGTTTTCTCTGTTGATATTCTCTGCTTGTATGTAATAATTTCCTATTCAATGTAAAAATTGTAATGCTATTTTTTAAGATGAATGTTTTTTCCTTGCCCTTAGGTCATTCAACAACCCAAGGCTCACACAGCAAGAGATTGCTGATGCCAGTGAGGGTCTCCACATTGGTATTTTAGAGCAATTAAAATCAAAGTCCCAATTACCCACTGTCATTGCTTTTAACCACACTTATTTTAACTTTTTGTTTAAAGATAAGGGACGGAAAAGTAATGACAGTGGATACATCCTCCTTGAAAAACAGGATTTTATAAGATGCCACTTTCCTAATGGATGGCACAGGCTAATAGATAGTATAGGGGATGGGGTGCAAATTGACTTTCCTGTGAAGGTCAGATTGTTTTTGTCATGGAGTCCAAAGACTCATAGCTTGACAGGGGAGTCAATTACACCTTGCCCACGATATAGGCCAGAAAAATTGAGTATTTCTTTTTGTAAAGCAGCATGTAGCCTGACATGAGACAAATTAAAGAAACCAAGACTTGATTTGATTCTATTTGGCATTGTGTATTTATTACAAAATAGAAAATCTATATTTTTGTAGTAGTTCATCACATATTCTTATATTGAGTCAAATTTTTCATATTTACAACCTAGAAGTACTTGCGGTGTGCAGGCTGTTTTTCAATTTGTTAAGTAAGTATAAAGGACACAAGAGTAGACCTCCACTTCATTGAATGCCAGAGAACATTTTTACAATCCAAAGAACAAAAAAATCAATAGTTTTGTAGTATTTGAGATTGCTATCCCAATCATTGTTGTTATTGTTCTATTTTTCAATACTGAGTTCTCTCCATTGTTCAGTGCAGTGGTGGTCTACTGAGACTACCCTAGATATATATGTTACCCTCATGGTAAACTAAGCGTTACTCAGGTTCTTCAGGATCAAATGTTGTTTTCCTTTTCTTGCTCCTTGCCTCAAGGAGATCTTTTTCCCAGTATTCTGTATTTGATTTATTATATGGCCTTTTCTCCCTTTCTGATTTACGTAGAGCCCATTGTCTGGCCTCAACTTTTAGGACATCTGAGGCAGCATCCCATTTATTTGATTTATGTAATACAATGTTTCTAGCATAATCATTGTTTTTCTCCACACCCTGCCCTGTGAAAATTTTTACAGACTTGTGGGTCCTGAAGAACTTGGGGATATGGAACACCATAGCATGGATATACGGTGTTATTCGTGCACGTTCATAGCCCTTTCTTTTGTCTCTTAGAGAAATGAAAAGGTTTACCCAGCTTTTAGCCTTTTCAAAAAAATCTGTAATTTGCTTATCTGAATTTTGACCACTTCCAATAAATGTATATAGTTCCCTAAAGTCTTCCCATATTTTCTTGACAGTATTTGAAGTTGAAGTCTGAACAACACTTAAAATTTTGCCTGGGAGCTCTCTCAGGAGTTGCTTTTTGTCATTCCCAAGCAAACTTGTAAAATCATAGGTGCCTGATCCCTTTCCATCAGCATTGGTTTTTTCCCAGATATCAAAACTAACCC</code></pre>
 </div>
 </div>
+</section>
+<section id="length-distribution" class="level2">
+<h2 class="anchored" data-anchor-id="length-distribution">length distribution</h2>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read FASTA file</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>fasta_file <span class="ot">&lt;-</span> <span class="st">"../data/apul_bedtools_lncRNAs.fasta"</span>  <span class="co"># Replace with the name of your FASTA file</span></span>
@@ -272,6 +279,9 @@ TCAGTGAGCGAAATGCCAAGAATTTTGTTTTACAAATCGCTGAATGATCTCAGTACCGCGGATTTTTACACAGAGAGAAA
 </div>
 </div>
 </div>
+</section>
+<section id="counts" class="level2">
+<h2 class="anchored" data-anchor-id="counts">counts</h2>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fgrep</span> <span class="st">"&gt;"</span> <span class="at">-c</span> ../data/<span class="pp">*</span>fasta</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -280,8 +290,11 @@ TCAGTGAGCGAAATGCCAAGAATTTTGTTTTACAAATCGCTGAATGATCTCAGTACCGCGGATTTTTACACAGAGAGAAA
 ../data/pmea_bedtools_lncRNAs.fasta:12370</code></pre>
 </div>
 </div>
-<section id="peve-coutn-matrix" class="level2">
-<h2 class="anchored" data-anchor-id="peve-coutn-matrix">Peve Coutn matrix</h2>
+</section>
+<section id="peve-count-matrix" class="level2">
+<h2 class="anchored" data-anchor-id="peve-count-matrix">Peve Count matrix</h2>
+<section id="avg-expression-distribution" class="level3">
+<h3 class="anchored" data-anchor-id="avg-expression-distribution">avg expression distribution</h3>
 <p>https://raw.githubusercontent.com/zbengt/coral-lncRNA/main/ouput/peve_lncRNA.isoform.counts.matrix</p>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ../data</span>
@@ -311,8 +324,9 @@ TCAGTGAGCGAAATGCCAAGAATTTTGTTTTACAAATCGCTGAATGATCTCAGTACCGCGGATTTTTACACAGAGAGAAA
 </div>
 </div>
 </section>
-<section id="lets-make-some-databases" class="level2">
-<h2 class="anchored" data-anchor-id="lets-make-some-databases">Lets make some databases</h2>
+</section>
+<section id="blast-comparison" class="level2">
+<h2 class="anchored" data-anchor-id="blast-comparison">blast comparison</h2>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/home/shared/ncbi-blast-2.11.0+/bin/makeblastdb</span> <span class="dt">\</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>-in ../data/apul_bedtools_lncRNAs.fasta <span class="dt">\</span></span>
@@ -345,46 +359,37 @@ TCAGTGAGCGAAATGCCAAGAATTTTGTTTTACAAATCGCTGAATGATCTCAGTACCGCGGATTTTTACACAGAGAGAAA
 <span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>-outfmt 6</span>
 <span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="fu">wc</span> <span class="at">-l</span> ../output/apul_peve_blastn.tab</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Warning: [blastn] Examining 5 or more matches is recommended
-1117 ../output/apul_peve_blastn.tab</code></pre>
 </div>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/home/shared/ncbi-blast-2.11.0+/bin/blastn</span> <span class="dt">\</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>-task blastn <span class="dt">\</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>-query ../data/apul_bedtools_lncRNAs.fasta <span class="dt">\</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>-db ../data/blast/pmea_bedtools_lncRNAs <span class="dt">\</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>-out ../output/apul_pmea_blastn.tab <span class="dt">\</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>-evalue 1E-40 <span class="dt">\</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>-num_threads 40 <span class="dt">\</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>-max_target_seqs 1 <span class="dt">\</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>-max_hsps 1 <span class="dt">\</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>-outfmt 6</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a><span class="fu">wc</span> <span class="at">-l</span> ../output/apul_pmea_blastn.tab</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/home/shared/ncbi-blast-2.11.0+/bin/blastn</span> <span class="dt">\</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>-task blastn <span class="dt">\</span></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>-query ../data/apul_bedtools_lncRNAs.fasta <span class="dt">\</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>-query ../data/peve_bedtools_lncRNAs.fasta <span class="dt">\</span></span>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>-db ../data/blast/pmea_bedtools_lncRNAs <span class="dt">\</span></span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>-out ../output/apul_pmea_blastn.tab <span class="dt">\</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>-out ../output/peve_pmea_blastn.tab <span class="dt">\</span></span>
 <span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>-evalue 1E-40 <span class="dt">\</span></span>
 <span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>-num_threads 40 <span class="dt">\</span></span>
 <span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>-max_target_seqs 1 <span class="dt">\</span></span>
 <span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>-max_hsps 1 <span class="dt">\</span></span>
 <span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>-outfmt 6</span>
 <span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="fu">wc</span> <span class="at">-l</span> ../output/apul_pmea_blastn.tab</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Warning: [blastn] Examining 5 or more matches is recommended
-1008 ../output/apul_pmea_blastn.tab</code></pre>
-</div>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="fu">wc</span> <span class="at">-l</span> ../output/peve_pmea_blastn.tab</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/home/shared/ncbi-blast-2.11.0+/bin/blastn</span> <span class="dt">\</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>-task blastn <span class="dt">\</span></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>-query ../data/peve_bedtools_lncRNAs.fasta <span class="dt">\</span></span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>-db ../data/blast/pmea_bedtools_lncRNAs <span class="dt">\</span></span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>-out ../output/peve_pmea_blastn.tab <span class="dt">\</span></span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>-evalue 1E-40 <span class="dt">\</span></span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>-num_threads 40 <span class="dt">\</span></span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>-max_target_seqs 1 <span class="dt">\</span></span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>-max_hsps 1 <span class="dt">\</span></span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>-outfmt 6</span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a><span class="fu">wc</span> <span class="at">-l</span> ../output/peve_pmea_blastn.tab</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Warning: [blastn] Examining 5 or more matches is recommended
-483 ../output/peve_pmea_blastn.tab</code></pre>
-</div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">wc</span> <span class="at">-l</span> ../output/<span class="pp">*</span>tab</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 
