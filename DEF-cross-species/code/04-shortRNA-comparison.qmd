@@ -1,26 +1,86 @@
 ---
-title: "04"
+title: "short RNA report"
 format: html
 editor: visual
 ---
 
-## Quarto
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+https://gannet.fish.washington.edu/Atumefaciens/20230620-E5_coral-fastqc-flexbar-multiqc-sRNAseq/A_pulchra/trimmed/sRNA-ACR-140-S1-TP2.flexbar_trim.20230621_1.fastq.gz 
 
-## Running Code
 
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
-
-```{r}
-1 + 1
+```{bash}
+wget -r \
+--no-directories --no-parent \
+-P ../data \
+-A "_1.fastq.gz" https://gannet.fish.washington.edu/Atumefaciens/20230620-E5_coral-fastqc-flexbar-multiqc-sRNAseq/A_pulchra/trimmed/
 ```
 
-You can add options to executable code like this
-
-```{r}
-#| echo: false
-2 * 2
+```{bash}
+gunzip ../data/*gz
 ```
 
-The `echo: false` option disables the printing of code (only output is displayed).
+
+
+```{bash}
+cat ../data/sRNA-ACR*fastq | awk 'NR%4==2' | wc -l 
+```
+
+```{bash}
+cat ../data/sRNA-ACR*fastq | awk 'NR%4==2' | sort | uniq | wc -l 
+```
+```{r}
+13018677 / 93798121
+```
+
+
+# evermani
+
+https://gannet.fish.washington.edu/Atumefaciens/20230620-E5_coral-fastqc-flexbar-multiqc-sRNAseq/P_evermanni/trimmed/sRNA-POR-73-S1-TP2.flexbar_trim.20230621_1.fastq.gz
+
+
+```{bash}
+wget -r \
+--no-directories --no-parent \
+-P ../data \
+-A "_1.fastq.gz" https://gannet.fish.washington.edu/Atumefaciens/20230620-E5_coral-fastqc-flexbar-multiqc-sRNAseq/P_evermanni/trimmed/
+```
+
+```{bash}
+gunzip ../data/sRNA-POR*gz
+```
+
+
+
+```{bash}
+cat ../data/sRNA-POR*fastq | awk 'NR%4==2' | wc -l 
+```
+
+```{bash}
+cat ../data/sRNA-POR*fastq | awk 'NR%4==2' | sort | uniq | wc -l 
+```
+
+
+Meandrina
+
+https://gannet.fish.washington.edu/Atumefaciens/20230620-E5_coral-fastqc-flexbar-multiqc-sRNAseq/P_meandrina/trimmed/sRNA-POC-48-S1-TP2.flexbar_trim.20230621_1.fastq.gz
+
+```{bash}
+wget -r \
+--no-directories --no-parent \
+-P ../data \
+-A "_1.fastq.gz" https://gannet.fish.washington.edu/Atumefaciens/20230620-E5_coral-fastqc-flexbar-multiqc-sRNAseq/P_meandrina/trimmed/
+```
+
+```{bash}
+gunzip ../data/sRNA-POC*gz
+```
+
+
+
+```{bash}
+cat ../data/sRNA-POC*fastq | awk 'NR%4==2' | wc -l 
+```
+
+```{bash}
+cat ../data/sRNA-POC*fastq | awk 'NR%4==2' | sort | uniq | wc -l 
+```
