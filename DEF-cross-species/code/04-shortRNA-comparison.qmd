@@ -1,9 +1,47 @@
 ---
-title: "short RNA report"
-format: html
-editor: visual
+title: "sRNA Comparison"
+author: Steven Roberts
+date: "`r format(Sys.time(), '%d %B, %Y')`" 
+output: 
+  github_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+    html_preview: true
+  html_document:
+    theme: readable
+    highlight: zenburn
+    toc: true
+    toc_float: true
+    number_sections: true
+    code_folding: show
+    code_download: true
+
 ---
 
+```{r setup, include=FALSE}
+library(knitr)
+library(tidyverse)
+library(kableExtra)
+library(DESeq2)
+library(pheatmap)
+library(RColorBrewer)
+library(data.table)
+library(DT)
+library(formattable)
+library(Biostrings)
+library(spaa)
+library(tm)
+knitr::opts_chunk$set(
+  echo = TRUE,         # Display code chunks
+  eval = FALSE,         # Evaluate code chunks
+  warning = FALSE,     # Hide warnings
+  message = FALSE,     # Hide messages
+  fig.width = 6,       # Set plot width in inches
+  fig.height = 4,      # Set plot height in inches
+  fig.align = "center" # Align plots to the center
+)
+```
 
 https://gannet.fish.washington.edu/Atumefaciens/20230620-E5_coral-fastqc-flexbar-multiqc-sRNAseq/A_pulchra/trimmed/sRNA-ACR-140-S1-TP2.flexbar_trim.20230621_1.fastq.gz 
 
@@ -83,4 +121,113 @@ cat ../data/sRNA-POC*fastq | awk 'NR%4==2' | wc -l
 
 ```{bash}
 cat ../data/sRNA-POC*fastq | awk 'NR%4==2' | sort | uniq | wc -l 
+```
+
+
+
+# blast comparison
+
+```{bash}
+cat /home/shared/8TB_HDD_01/sam/data/A_pulchra/sRNAseq/collapsed/*fasta > ../output/apul_coll.fasta
+```
+
+
+
+```{bash}
+cat /home/shared/8TB_HDD_01/sam/data/P_evermanni/sRNAseq/collapsed/*fasta > ../output/peve_coll.fasta
+```
+
+
+```{bash}
+cat /home/shared/8TB_HDD_01/sam/data/P_meandrina/sRNAseq/collapsed/*fasta > ../output/pmea_coll.fasta
+```
+
+```{r, engine='bash'}
+/home/shared/ncbi-blast-2.11.0+/bin/makeblastdb \
+-in ../output/apul_coll.fasta \
+-dbtype nucl \
+-out ../data/blast/apul_sRNA
+```
+
+```{r, engine='bash'}
+/home/shared/ncbi-blast-2.11.0+/bin/makeblastdb \
+-in ../output/peve_coll.fasta \
+-dbtype nucl \
+-out ../data/blast/peve_sRNA
+```
+
+```{r, engine='bash'}
+/home/shared/ncbi-blast-2.11.0+/bin/makeblastdb \
+-in ../output/pmea_coll.fasta \
+-dbtype nucl \
+-out ../data/blast/pmea_sRNA
+```
+
+
+
+```{r, engine='bash', eval=TRUE}
+ls ../output/*coll*
+```
+
+
+
+```{r, engine='bash', eval=TRUE}
+ls ../data/blast/*sRNA*
+```
+
+
+
+
+```{r, engine='bash'}
+/home/shared/ncbi-blast-2.11.0+/bin/blastn \
+-task blastn \
+-query ../output/apul_coll.fasta \
+-db ../data/blast/peve_sRNA \
+-out ../output/apul_peve_sRNA_blastn.tab \
+-evalue 1E-40 \
+-num_threads 40 \
+-max_target_seqs 1 \
+-max_hsps 1 \
+-outfmt 6
+
+
+```
+
+```{r, engine='bash'}
+/home/shared/ncbi-blast-2.11.0+/bin/blastn \
+-task blastn \
+-query ../output/apul_coll.fasta \
+-db ../data/blast/pmea_sRNA \
+-out ../output/apul_pmea_sRNA_blastn.tab \
+-evalue 1E-40 \
+-num_threads 40 \
+-max_target_seqs 1 \
+-max_hsps 1 \
+-outfmt 6
+
+
+```
+
+```{r, engine='bash'}
+/home/shared/ncbi-blast-2.11.0+/bin/blastn \
+-task blastn \
+-query ../output/peve_coll.fasta \
+-db ../data/blast/pmea_sRNAs \
+-out ../output/peve_pmea_sRNA_blastn.tab \
+-evalue 1E-40 \
+-num_threads 40 \
+-max_target_seqs 1 \
+-max_hsps 1 \
+-outfmt 6
+
+```
+
+
+```{r, engine='bash', eval=TRUE}
+grep ">" -c ../output/*coll*
+```
+
+
+```{r, engine='bash', eval=TRUE}
+wc -l ../output/*tab
 ```
