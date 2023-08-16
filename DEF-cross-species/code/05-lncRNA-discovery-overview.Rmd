@@ -159,3 +159,92 @@ Use BEDTools to extract sequences of lncRNAs using the reformatted GTF list of t
 getfasta -fi /home/shared/8TB_HDD_02/zbengt/github/coral-lncRNA/data/GCF_013753865.1_Amil_v2.1_genomic.fna -bed /home/shared/8TB_HDD_02/zbengt/github/coral-lncRNA/ouput/apul_deduplicated_final_lncRNAs.bed -fo /home/shared/8TB_HDD_02/zbengt/github/coral-lncRNA/ouput/apul_bedtools_lncRNAs.fasta -name
 
 ```
+
+# Untested Push-button after defining directory paths and bioinformatic tool locations
+
+```{bash}
+# Define directories and files
+ROOT_DIR="/home/shared"
+DATA_DIR="$ROOT_DIR/8TB_HDD_02/zbengt/github/coral-lncRNA/data"
+OUTPUT_DIR="$ROOT_DIR/8TB_HDD_02/zbengt/github/coral-lncRNA/ouput"
+APUL_DIR="$ROOT_DIR/8TB_HDD_01/apul"
+FASTA="$DATA_DIR/GCF_013753865.1_Amil_v2.1_genomic.fna"
+GFF="$DATA_DIR/GCF_013753865.1_Amil_v2.1_genomic.gff"
+INDEX="$OUTPUT_DIR/Amil.index"
+
+# Software paths
+HISAT_PATH="$ROOT_DIR/hisat2-2.2.1"
+SAMTOOLS_PATH="$ROOT_DIR/samtools-1.12"
+STRINGTIE_PATH="$ROOT_DIR/stringtie-2.2.1.Linux_x86_64"
+GFFCOMPARE_PATH="$ROOT_DIR/gffcompare-0.12.6.Linux_x86_64"
+BEDTOOLS_PATH="$ROOT_DIR/bedtools2/bin"
+CPC2_PATH="$ROOT_DIR/CPC2_standalone-1.0.1/bin"
+
+# HISAT
+$HISAT_PATH/hisat2-build -f "$FASTA" "$INDEX"
+
+find $APUL_DIR/trimmed/*gz \
+| xargs basename -s _R1_001.fastp-trim.20230519.fastq.gz | xargs -I{} \
+$HISAT_PATH/hisat2 \
+-x $INDEX \
+-p 20 \
+-1 $APUL_DIR/trimmed/{}_R1_001.fastp-trim.20230519.fastq.gz \
+-2 $APUL_DIR/trimmed/{}_R2_001.fastp-trim.20230519.fastq.gz \
+-S $APUL_DIR/sam/{}.sam
+
+# Samtools
+for file in $APUL_DIR/sam/*.sam; do
+    base=$(basename "$file" .sam)
+    $SAMTOOLS_PATH/samtools view -bS "$file" | \
+    $SAMTOOLS_PATH/samtools sort \
+    -o $APUL_DIR/bam/"$base".bam
+done
+
+# StringTie
+find $APUL_DIR/bam/*bam \
+| xargs basename -s .bam | xargs -I{} \
+$STRINGTIE_PATH/stringtie \
+-p 8 \
+-G $GFF \
+-o $APUL_DIR/stringtie-assembly/{}.gtf \
+$APUL_DIR/bam/{}.bam
+
+$STRINGTIE_PATH/stringtie \
+--merge \
+-G $GFF \
+-o $APUL_DIR/merged-gtf/stringtie_merged.gtf \
+$APUL_DIR/stringtie-assembly/*.gtf
+
+# GFFcompare
+$GFFCOMPARE_PATH/gffcompare \
+-r $GFF \
+-G $GFF \
+-o $APUL_DIR/gffcompare/gffcompare_merged \
+$APUL_DIR/merged-gtf/stringtie_merged.gtf
+
+# Filter
+awk '$3 == "transcript" && $1 !~ /^#/ {print}' $APUL_DIR/gffcompare/gffcompare_merged.combined.gtf | grep 'class_code "u"' | awk '$5 - $4 > 199 {print}' > $APUL_DIR/filter-one/merged_lncRNA_candidates.gtf
+
+# Bedtools
+$BEDTOOLS_PATH/bedtools \
+getfasta -fi $FASTA -bed $APUL_DIR/filter-one/merged_lncRNA_candidates.gtf -fo $APUL_DIR/get-fasta/merged_lncRNA_candidates.fasta -name -split
+
+# CPC2
+eval "$(/opt/anaconda/anaconda3/bin/conda shell.bash hook)"
+python $CPC2_PATH/CPC2.py -i $APUL_DIR/get-fasta/merged_lncRNA_candidates.fasta -o $OUTPUT_DIR/apul_merged_cpc2_results
+
+# Final Filter
+awk '$8 == "noncoding" {print $1}' $OUTPUT_DIR/apul_merged_cpc2_results.txt > $OUTPUT_DIR/apul_noncoding_transcripts_ids.txt
+grep -Fwf $OUTPUT_DIR/apul_noncoding_transcripts_ids.txt $APUL_DIR/get-fasta/merged_lncRNA_candidates.fasta > $OUTPUT_DIR/apul_merged_final_lncRNAs.gtf
+
+# De-duplicate GTF
+awk '!seen[$0]++' $OUTPUT_DIR/apul_merged_final_lncRNAs.gtf > $OUTPUT_DIR/apul_deduplicated_final_lncRNAs.gtf
+
+# Reformat to BED
+awk -F":|-" '{print $3 "\t" $4 "\t" $5}' $OUTPUT_DIR/apul_deduplicated_final_lncRNAs.gtf > $OUTPUT_DIR/apul_deduplicated_final_lncRNAs.bed
+
+# BEDTools
+$BEDTOOLS_PATH/bedtools \
+getfasta -fi $FASTA -bed $OUTPUT_DIR/apul_deduplicated_final_lncRNAs.bed -fo $OUTPUT_DIR/apul_bedtools_lncRNAs.fasta -name
+```
+
