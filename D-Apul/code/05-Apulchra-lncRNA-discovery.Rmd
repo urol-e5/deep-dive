@@ -1,5 +1,5 @@
 ---
-title: "05-lncRNA-discovery-overview"
+title: "05-Apulchra-lncRNA-discovery"
 author: "Zach Bengtsson"
 date: "2023-08-16"
 output: html_document
@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# lncRNA Discovery (using Acropora pulchra as example)
+# lncRNA Discovery for Acropora pulchra
 
 ## HISAT
 
@@ -247,4 +247,3 @@ awk -F":|-" '{print $3 "\t" $4 "\t" $5}' $OUTPUT_DIR/apul_deduplicated_final_lnc
 $BEDTOOLS_PATH/bedtools \
 getfasta -fi $FASTA -bed $OUTPUT_DIR/apul_deduplicated_final_lncRNAs.bed -fo $OUTPUT_DIR/apul_bedtools_lncRNAs.fasta -name
 ```
-
