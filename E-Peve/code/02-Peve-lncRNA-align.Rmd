@@ -1,0 +1,140 @@
+---
+title: "02 Peve lncRNA align"
+author: Steven Roberts
+date: "`r format(Sys.time(), '%d %B, %Y')`" 
+output: 
+  github_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+    html_preview: true
+  html_document:
+    theme: readable
+    highlight: zenburn
+    toc: true
+    toc_float: true
+    number_sections: true
+    code_folding: show
+    code_download: true
+
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(tidyverse)
+library(kableExtra)
+library(DESeq2)
+library(pheatmap)
+library(RColorBrewer)
+library(data.table)
+library(DT)
+library(formattable)
+library(Biostrings)
+library(spaa)
+library(tm)
+knitr::opts_chunk$set(
+  echo = TRUE,         # Display code chunks
+  eval = FALSE,         # Evaluate code chunks
+  warning = FALSE,     # Hide warnings
+  message = FALSE,     # Hide messages
+  fig.width = 6,       # Set plot width in inches
+  fig.height = 4,      # Set plot height in inches
+  fig.align = "center" # Align plots to the center
+)
+```
+
+
+Blast to mRNA, gene, genome....
+
+
+fasta 
+
+```{bash}
+head ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta
+```
+
+
+# make some blastdb
+
+
+sRNA database
+```{bash}
+ls ../../DEF-cross-species/data/blast/peve_sRNA*
+```
+
+Genome
+https://gannet.fish.washington.edu/seashell/snaps/Porites_evermanni_v1.fa
+
+```{bash}
+cd ../data/
+curl -O https://gannet.fish.washington.edu/seashell/snaps/Porites_evermanni_v1.fa
+```
+
+
+```{r, engine='bash'}
+/home/shared/ncbi-blast-2.11.0+/bin/makeblastdb \
+-in ../data/Porites_evermanni_v1.fa \
+-dbtype nucl \
+-out ../data/blast/pmea_genome
+```
+
+
+
+
+
+
+Proteins
+https://gannet.fish.washington.edu/seashell/snaps/Porites_evermanni_v1.annot.pep.fa
+
+```{bash}
+cd ../data/
+
+curl -O https://gannet.fish.washington.edu/seashell/snaps/Porites_evermanni_v1.annot.pep.fa
+```
+
+
+```{r, engine='bash'}
+/home/shared/ncbi-blast-2.11.0+/bin/makeblastdb \
+-in ../data/Porites_evermanni_v1.annot.pep.fa \
+-dbtype prot \
+-out ../data/blast/pmea_proteome
+```
+
+
+Genes
+???
+
+
+
+Blast comparison
+
+```{r, engine='bash'}
+/home/shared/ncbi-blast-2.11.0+/bin/blastn \
+-task blastn \
+-query ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta \
+-db ../../DEF-cross-species/data/blast/peve_sRNA \
+-out ../output/02-Peve-lncRNA-align/lncRNA_sRNA_blastn.tab \
+-evalue 1E-40 \
+-num_threads 40 \
+-max_target_seqs 5 \
+-max_hsps 1 \
+-outfmt 6
+
+
+```
+d
+
+```{r, engine='bash'}
+/home/shared/ncbi-blast-2.11.0+/bin/blastn \
+-task blastn \
+-query ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta \
+-db ../../DEF-cross-species/data/blast/peve_sRNA \
+-out ../output/02-Peve-lncRNA-align/lncRNA_sRNA_blastn.tab \
+-evalue 1E-40 \
+-num_threads 40 \
+-max_target_seqs 5 \
+-max_hsps 1 \
+-outfmt 6
+
+
+```
