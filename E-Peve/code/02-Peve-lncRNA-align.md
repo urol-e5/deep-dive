@@ -308,4 +308,4 @@ wc -l ../output/02-Peve-lncRNA-align/lncRNA_proteome_blastx02.tab
     ## 
     ## 
     ## 
-    ## 89444 ../output/02-Peve-lncRNA-align/lncRNA_proteome_blastx02.tab
+    ## 141599 ../output/02-Peve-lncRNA-align/lncRNA_proteome_blastx02.tab
