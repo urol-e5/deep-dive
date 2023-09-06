@@ -45,12 +45,12 @@ knitr::opts_chunk$set(
 ```
 
 
-Blast to mRNA, gene, genome....
+# Blast to sRNA, genome, proteome....
 
 
-fasta 
+## lncRNA fasta 
 
-```{bash}
+```{r, engine='bash', eval=TRUE}
 head ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta
 ```
 
@@ -58,12 +58,13 @@ head ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta
 # make some blastdb
 
 
-sRNA database
-```{bash}
+## sRNA
+
+```{r, engine='bash', eval=TRUE}
 ls ../../DEF-cross-species/data/blast/peve_sRNA*
 ```
 
-Genome
+## Genome
 https://gannet.fish.washington.edu/seashell/snaps/Porites_evermanni_v1.fa
 
 ```{bash}
@@ -72,6 +73,11 @@ curl -O https://gannet.fish.washington.edu/seashell/snaps/Porites_evermanni_v1.f
 ```
 
 
+```{r, engine='bash', eval=TRUE}
+head ../data/Porites_evermanni_v1.fa
+
+```
+
 ```{r, engine='bash'}
 /home/shared/ncbi-blast-2.11.0+/bin/makeblastdb \
 -in ../data/Porites_evermanni_v1.fa \
@@ -79,12 +85,15 @@ curl -O https://gannet.fish.washington.edu/seashell/snaps/Porites_evermanni_v1.f
 -out ../data/blast/pmea_genome
 ```
 
+```{r, engine='bash', eval=TRUE}
+ls ../data/blast/pmea_genome*
+```
 
 
 
 
+## Proteins
 
-Proteins
 https://gannet.fish.washington.edu/seashell/snaps/Porites_evermanni_v1.annot.pep.fa
 
 ```{bash}
@@ -92,6 +101,14 @@ cd ../data/
 
 curl -O https://gannet.fish.washington.edu/seashell/snaps/Porites_evermanni_v1.annot.pep.fa
 ```
+
+
+
+```{r, engine='bash', eval=TRUE}
+head ../data/Porites_evermanni_v1.annot.pep.fa
+```
+
+
 
 
 ```{r, engine='bash'}
@@ -102,28 +119,22 @@ curl -O https://gannet.fish.washington.edu/seashell/snaps/Porites_evermanni_v1.a
 ```
 
 
-Genes
+
+```{r, engine='bash', eval=TRUE}
+ls ../data/blast/pmea_proteome*
+```
+
+
+
+## Genes
 ???
 
 
 
 Blast comparison
 
-```{r, engine='bash'}
-/home/shared/ncbi-blast-2.11.0+/bin/blastn \
--task blastn \
--query ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta \
--db ../../DEF-cross-species/data/blast/peve_sRNA \
--out ../output/02-Peve-lncRNA-align/lncRNA_sRNA_blastn.tab \
--evalue 1E-40 \
--num_threads 40 \
--max_target_seqs 5 \
--max_hsps 1 \
--outfmt 6
 
-
-```
-d
+# database: sRNA
 
 ```{r, engine='bash'}
 /home/shared/ncbi-blast-2.11.0+/bin/blastn \
@@ -139,4 +150,110 @@ d
 
 
 ```
+
+
+```{r, engine='bash', eval=TRUE}
+head ../output/02-Peve-lncRNA-align/lncRNA_sRNA_blastn.tab
+```
+
+(nothing)
+
+
+```{r, engine='bash'}
+/home/shared/ncbi-blast-2.11.0+/bin/blastn \
+-task blastn \
+-query ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta \
+-db ../../DEF-cross-species/data/blast/peve_sRNA \
+-out ../output/02-Peve-lncRNA-align/lncRNA_sRNA_blastn02.tab \
+#-evalue 1E-40 \
+-num_threads 20 \
+#-max_target_seqs 5 \
+#-max_hsps 1 \
+-outfmt 6
+
+
+```
+
+
+```{r, engine='bash', eval=TRUE}
+head ../output/02-Peve-lncRNA-align/lncRNA_sRNA_blastn02.tab
+```
+
+
+# database: genome
+
+```{r, engine='bash'}
+/home/shared/ncbi-blast-2.11.0+/bin/blastn \
+-task blastn \
+-query ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta \
+-db ../data/blast/pmea_genome \
+-out ../output/02-Peve-lncRNA-align/lncRNA_genome_blastn.tab \
+#-evalue 1E-40 \
+-num_threads 20 \
+#-max_target_seqs 5 \
+#-max_hsps 1 \
+-outfmt 6
+
+
+```
+
+
+
+```{r, engine='bash', eval=TRUE}
+head ../output/02-Peve-lncRNA-align/lncRNA_genome_blastn.tab
+
+wc -l ../output/02-Peve-lncRNA-align/lncRNA_genome_blastn.tab
+```
+
+
+
+
+```{r, engine='bash'}
+/home/shared/ncbi-blast-2.11.0+/bin/blastn \
+-task blastn \
+-query ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta \
+-db ../data/blast/pmea_genome \
+-out ../output/02-Peve-lncRNA-align/lncRNA_genome_blastn02.tab \
+-evalue 1E-40 \
+-num_threads 20 \
+-max_target_seqs 5 \
+-max_hsps 1 \
+-outfmt 6
+
+
+```
+
+
+
+```{r, engine='bash', eval=TRUE}
+head ../output/02-Peve-lncRNA-align/lncRNA_genome_blastn02.tab
+
+wc -l ../output/02-Peve-lncRNA-align/lncRNA_genome_blastn02.tab
+```
+
+
+# database: proteome
+
+
+```{r, engine='bash'}
+/home/shared/ncbi-blast-2.11.0+/bin/tblastn \
+#-task blastn \
+-query ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta \
+-db ../data/blast/pmea_proteome \
+-out ../output/02-Peve-lncRNA-align/lncRNA_proteome_tblastn.tab \
+#-evalue 1E-40 \
+-num_threads 20 \
+#-max_target_seqs 5 \
+#-max_hsps 1 \
+-outfmt 6
+
+
+```
+
+
+
+```{r, engine='bash', eval=TRUE}
+head ../output/02-Peve-lncRNA-align/lncRNA_proteome_tblastn.tab
+```
+
 
