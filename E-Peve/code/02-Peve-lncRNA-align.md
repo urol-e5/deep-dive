@@ -1,7 +1,7 @@
 02 Peve lncRNA align
 ================
 Steven Roberts
-06 September, 2023
+07 September, 2023
 
 - <a href="#1-blast-to-srna-genome-proteome"
   id="toc-1-blast-to-srna-genome-proteome">1 Blast to sRNA, genome,
@@ -164,8 +164,18 @@ Blast comparison
 ```
 
 ``` bash
+
+echo "Number of hits?"
+wc -l ../output/02-Peve-lncRNA-align/lncRNA_sRNA_blastn.tab
+
+
+echo "File header"
 head ../output/02-Peve-lncRNA-align/lncRNA_sRNA_blastn.tab
 ```
+
+    ## Number of hits?
+    ## 0 ../output/02-Peve-lncRNA-align/lncRNA_sRNA_blastn.tab
+    ## File header
 
 (nothing)
 
@@ -180,9 +190,18 @@ head ../output/02-Peve-lncRNA-align/lncRNA_sRNA_blastn.tab
 ```
 
 ``` bash
+
+echo "Number of hits?"
+wc -l ../output/02-Peve-lncRNA-align/lncRNA_sRNA_blastn02.tab
+
+
+echo "File header"
 head ../output/02-Peve-lncRNA-align/lncRNA_sRNA_blastn02.tab
 ```
 
+    ## Number of hits?
+    ## 1798786 ../output/02-Peve-lncRNA-align/lncRNA_sRNA_blastn02.tab
+    ## File header
     ## ::Porites_evermani_scaffold_1:422643-423512  1830741-1   100.000 35  0   0   726 760 35  1   3.58e-10    64.4
     ## ::Porites_evermani_scaffold_1:422643-423512  1848065-1   100.000 35  0   0   748 782 35  1   3.58e-10    64.4
     ## ::Porites_evermani_scaffold_1:422643-423512  907001-1    100.000 35  0   0   261 295 1   35  3.58e-10    64.4
@@ -207,11 +226,18 @@ head ../output/02-Peve-lncRNA-align/lncRNA_sRNA_blastn02.tab
 ```
 
 ``` bash
-head ../output/02-Peve-lncRNA-align/lncRNA_genome_blastn.tab
 
+echo "Number of hits?"
 wc -l ../output/02-Peve-lncRNA-align/lncRNA_genome_blastn.tab
+
+
+echo "File header"
+head ../output/02-Peve-lncRNA-align/lncRNA_genome_blastn.tab
 ```
 
+    ## Number of hits?
+    ## 14547262 ../output/02-Peve-lncRNA-align/lncRNA_genome_blastn.tab
+    ## File header
     ## ::Porites_evermani_scaffold_1:422643-423512  Porites_evermani_scaffold_1 100.000 869 0   0   1   869 422644  423512  0.0 1568
     ## ::Porites_evermani_scaffold_1:422643-423512  Porites_evermani_scaffold_1 94.958  119 6   0   663 781 1690031 1690149 7.22e-46    188
     ## ::Porites_evermani_scaffold_1:422643-423512  Porites_evermani_scaffold_1 90.196  102 10  0   694 795 1764562 1764461 3.28e-31    140
@@ -222,7 +248,6 @@ wc -l ../output/02-Peve-lncRNA-align/lncRNA_genome_blastn.tab
     ## ::Porites_evermani_scaffold_1:422643-423512  Porites_evermani_scaffold_1 83.333  72  12  0   663 734 1340494 1340423 3.28e-12    77.0
     ## ::Porites_evermani_scaffold_1:422643-423512  Porites_evermani_scaffold_1 89.091  55  6   0   663 717 1269951 1270005 4.00e-11    73.4
     ## ::Porites_evermani_scaffold_1:422643-423512  Porites_evermani_scaffold_1 80.645  62  9   1   730 791 1333238 1333180 3.07e-06    57.2
-    ## 14547262 ../output/02-Peve-lncRNA-align/lncRNA_genome_blastn.tab
 
 ``` bash
 /home/shared/ncbi-blast-2.11.0+/bin/blastn \
@@ -238,11 +263,18 @@ wc -l ../output/02-Peve-lncRNA-align/lncRNA_genome_blastn.tab
 ```
 
 ``` bash
-head ../output/02-Peve-lncRNA-align/lncRNA_genome_blastn02.tab
 
+echo "Number of hits?"
 wc -l ../output/02-Peve-lncRNA-align/lncRNA_genome_blastn02.tab
+
+
+echo "File header"
+head ../output/02-Peve-lncRNA-align/lncRNA_genome_blastn02.tab
 ```
 
+    ## Number of hits?
+    ## 26669 ../output/02-Peve-lncRNA-align/lncRNA_genome_blastn02.tab
+    ## File header
     ## ::Porites_evermani_scaffold_1:422643-423512  Porites_evermani_scaffold_1 100.000 869 0   0   1   869 422644  423512  0.0 1568
     ## ::Porites_evermani_scaffold_1:422643-423512  Porites_evermani_scaffold_1058  95.035  141 7   0   655 795 26887   27027   3.50e-56    224
     ## ::Porites_evermani_scaffold_1:422643-423512  Porites_evermani_scaffold_940   94.366  142 8   0   654 795 11486   11627   1.22e-55    221
@@ -253,7 +285,6 @@ wc -l ../output/02-Peve-lncRNA-align/lncRNA_genome_blastn02.tab
     ## ::Porites_evermani_scaffold_1:1084867-1089422    Porites_evermani_scaffold_1041  90.661  257 21  2   942 1197    52891   52637   1.88e-93    350
     ## ::Porites_evermani_scaffold_1:1084867-1089422    Porites_evermani_scaffold_705   91.600  250 16  4   955 1201    50079   49832   8.01e-92    343
     ## ::Porites_evermani_scaffold_1:1084867-1089422    Porites_evermani_scaffold_3651  91.129  248 19  2   953 1199    5737    5982    2.80e-91    343
-    ## 26669 ../output/02-Peve-lncRNA-align/lncRNA_genome_blastn02.tab
 
 # 5 Result - database: proteome
 
@@ -267,9 +298,18 @@ wc -l ../output/02-Peve-lncRNA-align/lncRNA_genome_blastn02.tab
 ```
 
 ``` bash
+
+echo "Number of hits?"
+wc -l ../output/02-Peve-lncRNA-align/lncRNA_proteome_blastx.tab
+
+
+echo "File header"
 head ../output/02-Peve-lncRNA-align/lncRNA_proteome_blastx.tab
 ```
 
+    ## Number of hits?
+    ## 351260 ../output/02-Peve-lncRNA-align/lncRNA_proteome_blastx.tab
+    ## File header
     ## ::Porites_evermani_scaffold_1:422643-423512  Peve_00020583   75.000  40  7   2   791 672 1   37  2.36e-04    40.0
     ## ::Porites_evermani_scaffold_1:422643-423512  Peve_00044132   66.667  27  9   0   740 660 143 169 3.17e-04    41.2
     ## ::Porites_evermani_scaffold_1:422643-423512  Peve_00030450   60.606  33  12  1   740 642 926 957 4.05e-04    42.4
@@ -290,22 +330,29 @@ head ../output/02-Peve-lncRNA-align/lncRNA_proteome_blastx.tab
 -num_threads 20 \
 -max_target_seqs 5 \
 -max_hsps 1 \
+-outfmt 6
 ```
 
 ``` bash
-head ../output/02-Peve-lncRNA-align/lncRNA_proteome_blastx02.tab
 
+echo "Number of hits?"
 wc -l ../output/02-Peve-lncRNA-align/lncRNA_proteome_blastx02.tab
+
+
+echo "File header"
+head ../output/02-Peve-lncRNA-align/lncRNA_proteome_blastx02.tab
 ```
 
-    ## BLASTX 2.11.0+
-    ## 
-    ## 
-    ## Reference: Stephen F. Altschul, Thomas L. Madden, Alejandro A.
-    ## Schaffer, Jinghui Zhang, Zheng Zhang, Webb Miller, and David J.
-    ## Lipman (1997), "Gapped BLAST and PSI-BLAST: a new generation of
-    ## protein database search programs", Nucleic Acids Res. 25:3389-3402.
-    ## 
-    ## 
-    ## 
-    ## 141599 ../output/02-Peve-lncRNA-align/lncRNA_proteome_blastx02.tab
+    ## Number of hits?
+    ## 1684 ../output/02-Peve-lncRNA-align/lncRNA_proteome_blastx02.tab
+    ## File header
+    ## ::Porites_evermani_scaffold_10:260427-263111 Peve_00036837   51.678  149 68  3   1525    1965    1   147 5.36e-44    156
+    ## ::Porites_evermani_scaffold_10:260440-263111 Peve_00036837   51.678  149 68  3   1512    1952    1   147 5.30e-44    156
+    ## ::Porites_evermani_scaffold_10:25818-26461   Peve_00041908   52.577  97  42  1   6   296 76  168 1.79e-50    87.0
+    ## ::Porites_evermani_scaffold_1011:155450-155947   Peve_00036185   97.203  143 4   0   452 24  150 292 1.15e-59    187
+    ## ::Porites_evermani_scaffold_1013:148823-153034   Peve_00015807   58.736  269 47  5   3   809 59  263 2.61e-73    245
+    ## ::Porites_evermani_scaffold_1013:148823-153034   Peve_00025583   57.249  269 51  3   3   809 58  262 1.90e-72    243
+    ## ::Porites_evermani_scaffold_1013:148823-153034   Peve_00005800   57.249  269 51  3   3   809 59  263 6.57e-72    241
+    ## ::Porites_evermani_scaffold_1013:148823-153034   Peve_00004106   58.736  269 47  3   3   809 60  264 4.23e-71    239
+    ## ::Porites_evermani_scaffold_1013:148823-153034   Peve_00015805   55.390  269 56  3   3   809 59  263 7.84e-70    235
+    ## ::Porites_evermani_scaffold_1016:8862-9109   Peve_00015308   87.500  80  10  0   2   241 1125    1204    2.38e-42    146
