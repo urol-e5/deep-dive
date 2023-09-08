@@ -96,6 +96,8 @@ biological significance; further investigation is needed.
 
 ``` bash
 head ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta
+
+fgrep ">" -c ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta
 ```
 
     ## >::Porites_evermani_scaffold_1:422643-423512
@@ -108,6 +110,7 @@ head ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta
     ## TCTTGACTTTTACTTTTCGCTTTCTCTCCTCCCTTCTTTTTTCGCTTTTCTTGCCTCATTTTTTTTTCTCTTGCTGGGCATTTAGTAGGCTTCATTTTGGTGGGAAGAGTTTTTAGGAAAGCTTTTAGGATCTTAGGATTAGGTGAAAGGAAAGGTAGGTGGGTAATGGAACAAGATTTTCATGGAGATTTTCAGGTCCTTGTCACGTGGTTTTTTGCTTCTTTCTCCGGTGTCCTTGACTGAATTGTGCTCATTCTGGTATGGTTTGAAAGATCTCTTCACTCTGCACAAGTTAGCGAAGAAAGTTGTCCTTGACCGTTAAAACTGATGACGTCACAAAGGGTAGAAAGGACCTGGATCCGCACGGGCGGTTACGGGCGGTTCAGGGGCGAATGGGTTAAG
     ## >::Porites_evermani_scaffold_1:1202044-1202328
     ## GGGAGTAGCCTATGGATGAAAACATTTTGAGAACATGGTCAGGCAATGGTTTCGACTCCCTTTGGTCATAGCCTGCTCCAGGCGTTCTGATTGTGGAGCGTGGCGGCGTCGCTGTTTTTCCCGTCCCCACGATCTGAACGCCTGGAACAGGCTACTTTCGGCATTGCTAAACTTCTTACCCACAATTCGCGTTCCGTTTGTTTTTGTTGCTGTTGGCGGTTTTGTTGTTTTTTGTTGATGATGTTGTTGTTTTTTTAGTTCAGAGTGTTTCTCGACGTCTAGCG
+    ## 7018
 
 # 2 make some blastdb
 
@@ -523,29 +526,98 @@ head ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn.tab
 -out ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn02.tab \
 -evalue 1E-40 \
 -num_threads 20 \
+-max_hsps 1 \
 -outfmt 6
 ```
+
+Note
+
+``` bash
+
+fgrep ">" -c ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta
+```
+
+    ## 7018
 
 ``` bash
 
 echo "Number of hits?"
 wc -l ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn02.tab
-
-
-echo "File header"
-head ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn02.tab
 ```
 
     ## Number of hits?
-    ## 200919 ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn02.tab
+    ## 130492 ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn02.tab
+
+``` bash
+/home/shared/ncbi-blast-2.11.0+/bin/blastn \
+-task blastn \
+-query ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta \
+-db ../../DEF-cross-species/data/blast/peve_bedtools_lncRNAs \
+-out ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn03.tab \
+-evalue 1E-80 \
+-max_hsps 1 \
+-num_threads 20 \
+-outfmt 6
+```
+
+Note
+
+``` bash
+
+fgrep ">" -c ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta
+```
+
+    ## 7018
+
+``` bash
+
+echo "Number of hits?"
+wc -l ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn03.tab
+```
+
+    ## Number of hits?
+    ## 52624 ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn03.tab
+
+``` bash
+/home/shared/ncbi-blast-2.11.0+/bin/blastn \
+-task blastn \
+-query ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta \
+-db ../../DEF-cross-species/data/blast/peve_bedtools_lncRNAs \
+-out ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn04.tab \
+-evalue 1E-300 \
+-num_threads 20 \
+-max_hsps 1 \
+-outfmt 6
+```
+
+Note
+
+``` bash
+
+fgrep ">" -c ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta
+```
+
+    ## 7018
+
+``` bash
+
+echo "Number of hits?"
+wc -l ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn04.tab
+
+echo "File header"
+head ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn04.tab
+```
+
+    ## Number of hits?
+    ## 7189 ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn04.tab
     ## File header
     ## ::Porites_evermani_scaffold_1:422643-423512  ::Porites_evermani_scaffold_1:422643-423512 100.000 869 0   0   1   869 1   869 0.0 1568
-    ## ::Porites_evermani_scaffold_1:422643-423512  ::Porites_evermani_scaffold_6072:1826-3677  93.939  132 8   0   663 794 822 953 8.17e-52    203
-    ## ::Porites_evermani_scaffold_1:422643-423512  ::Porites_evermani_scaffold_4084:10-8062    93.077  130 9   0   661 790 3059    2930    4.23e-49    195
-    ## ::Porites_evermani_scaffold_1:422643-423512  ::Porites_evermani_scaffold_922:4504-6380   93.701  127 8   0   669 795 777 651 4.23e-49    194
-    ## ::Porites_evermani_scaffold_1:422643-423512  ::Porites_evermani_scaffold_542:179250-194358   93.701  127 8   0   669 795 14003   13877   4.23e-49    194
-    ## ::Porites_evermani_scaffold_1:422643-423512  ::Porites_evermani_scaffold_1017:156794-161692  95.161  124 5   1   672 795 827 949 4.23e-49    194
-    ## ::Porites_evermani_scaffold_1:422643-423512  ::Porites_evermani_scaffold_5962:1543-8505  91.729  133 11  0   663 795 3277    3409    5.16e-48    191
-    ## ::Porites_evermani_scaffold_1:422643-423512  ::Porites_evermani_scaffold_1691:92602-96741    92.913  127 9   0   669 795 2830    2704    1.80e-47    189
-    ## ::Porites_evermani_scaffold_1:422643-423512  ::Porites_evermani_scaffold_1691:92602-96741    95.283  106 5   0   690 795 2433    2538    1.69e-41    169
-    ## ::Porites_evermani_scaffold_1:422643-423512  ::Porites_evermani_scaffold_790:68425-76048 90.511  137 9   1   663 795 4828    4964    1.80e-47    188
+    ## ::Porites_evermani_scaffold_1:1084867-1089422    ::Porites_evermani_scaffold_1:1084867-1089422   100.000 4555    0   0   1   4555    1   4555    0.0 8215
+    ## ::Porites_evermani_scaffold_10:260427-263111 ::Porites_evermani_scaffold_10:260427-263111    100.000 2684    0   0   1   2684    1   2684    0.0 4841
+    ## ::Porites_evermani_scaffold_10:260427-263111 ::Porites_evermani_scaffold_10:260440-263111    100.000 2671    0   0   14  2684    1   2671    0.0 4818
+    ## ::Porites_evermani_scaffold_10:260440-263111 ::Porites_evermani_scaffold_10:260440-263111    100.000 2671    0   0   1   2671    1   2671    0.0 4818
+    ## ::Porites_evermani_scaffold_10:260440-263111 ::Porites_evermani_scaffold_10:260427-263111    100.000 2671    0   0   1   2671    14  2684    0.0 4818
+    ## ::Porites_evermani_scaffold_10:890033-892111 ::Porites_evermani_scaffold_10:890033-892111    100.000 2078    0   0   1   2078    1   2078    0.0 3748
+    ## ::Porites_evermani_scaffold_10:1071612-1085055   ::Porites_evermani_scaffold_10:1071612-1085055  100.000 13443   0   0   1   13443   1   13443   0.0 24243
+    ## ::Porites_evermani_scaffold_10:1071612-1085055   ::Porites_evermani_scaffold_10:1071808-1085055  100.000 13247   0   0   197 13443   1   13247   0.0 23890
+    ## ::Porites_evermani_scaffold_10:1071612-1085055   ::Porites_evermani_scaffold_10:1075979-1085055  100.000 9076    0   0   4368    13443   1   9076    0.0 16368

@@ -92,6 +92,8 @@ knitr::opts_chunk$set(
 
 ```{r, engine='bash', eval=TRUE}
 head ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta
+
+fgrep ">" -c ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta
 ```
 
 
@@ -424,21 +426,93 @@ head ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn.tab
 -out ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn02.tab \
 -evalue 1E-40 \
 -num_threads 20 \
+-max_hsps 1 \
 -outfmt 6
 
 
 ```
 
 
+Note 
+
+
+```{r, engine='bash', eval=TRUE}
+
+fgrep ">" -c ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta
+```
 
 ```{r, engine='bash', eval=TRUE}
 
 echo "Number of hits?"
 wc -l ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn02.tab
 
+```
+
+
+
+
+```{r, engine='bash'}
+/home/shared/ncbi-blast-2.11.0+/bin/blastn \
+-task blastn \
+-query ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta \
+-db ../../DEF-cross-species/data/blast/peve_bedtools_lncRNAs \
+-out ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn03.tab \
+-evalue 1E-80 \
+-max_hsps 1 \
+-num_threads 20 \
+-outfmt 6
+
+
+```
+
+
+Note 
+
+
+```{r, engine='bash', eval=TRUE}
+
+fgrep ">" -c ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta
+```
+
+```{r, engine='bash', eval=TRUE}
+
+echo "Number of hits?"
+wc -l ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn03.tab
+
+```
+
+
+
+```{r, engine='bash'}
+/home/shared/ncbi-blast-2.11.0+/bin/blastn \
+-task blastn \
+-query ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta \
+-db ../../DEF-cross-species/data/blast/peve_bedtools_lncRNAs \
+-out ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn04.tab \
+-evalue 1E-300 \
+-num_threads 20 \
+-max_hsps 1 \
+-outfmt 6
+
+
+```
+
+
+Note 
+
+
+```{r, engine='bash', eval=TRUE}
+
+fgrep ">" -c ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta
+```
+
+```{r, engine='bash', eval=TRUE}
+
+echo "Number of hits?"
+wc -l ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn04.tab
 
 echo "File header"
-head ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn02.tab
+head ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn04.tab
 
 
 ```
