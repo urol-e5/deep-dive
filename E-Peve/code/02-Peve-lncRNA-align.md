@@ -3,6 +3,9 @@
 Steven Roberts
 07 September, 2023
 
+- <a href="#001-analysis" id="toc-001-analysis">0.0.1 Analysis:</a>
+- <a href="#002-suggestions" id="toc-002-suggestions">0.0.2
+  Suggestions:</a>
 - <a href="#1-blast-to-srna-genome-proteome"
   id="toc-1-blast-to-srna-genome-proteome">1 Blast to sRNA, genome,
   proteome….</a>
@@ -13,12 +16,76 @@ Steven Roberts
   - <a href="#22-genome" id="toc-22-genome">2.2 Genome</a>
   - <a href="#23-proteins" id="toc-23-proteins">2.3 Proteins</a>
   - <a href="#24-genes" id="toc-24-genes">2.4 Genes</a>
-- <a href="#3-result---database-srna" id="toc-3-result---database-srna">3
+- <a href="#3-blast-comparison" id="toc-3-blast-comparison">3 Blast
+  comparison</a>
+- <a href="#4-result---database-srna" id="toc-4-result---database-srna">4
   Result - database: sRNA</a>
-- <a href="#4-result--database-genome"
-  id="toc-4-result--database-genome">4 Result -database: genome</a>
-- <a href="#5-result---database-proteome"
-  id="toc-5-result---database-proteome">5 Result - database: proteome</a>
+- <a href="#5-result--database-genome"
+  id="toc-5-result--database-genome">5 Result -database: genome</a>
+- <a href="#6-result---database-proteome"
+  id="toc-6-result---database-proteome">6 Result - database: proteome</a>
+
+\#TLDR
+
+The code and its output suggest that you are running BLAST comparisons
+on a set of long non-coding RNAs (lncRNAs) against different
+databases—small RNAs (sRNAs), genome, and proteome—and observing
+different patterns of hits.
+
+1.  **sRNA Database**:
+    - In the first run, you used a stringent e-value (1E-40) and got 0
+      hits.
+    - In the second run without e-value restriction, you got 1,798,786
+      hits.
+2.  **Genome Database**:
+    - Without an e-value restriction, you got 14,547,262 hits.
+    - With an e-value restriction of 1E-40, the hits reduced to 26,669.
+3.  **Proteome Database**:
+    - You got 351,260 hits when querying against the proteome database.
+
+### 0.0.1 Analysis:
+
+- **sRNA Database**: The 0 hits in the first run suggest that no lncRNAs
+  had significant similarity to sRNAs under the stringent conditions.
+  However, when the stringency was relaxed, a high number of hits were
+  observed. This suggests that there is some level of sequence
+  similarity between lncRNAs and sRNAs, but it may not be functionally
+  relevant (at least under stringent e-value settings).
+
+- **Genome Database**: As expected, you see a vast number of hits when
+  the e-value is not restricted. It narrows down to a more manageable
+  number when stringency is increased, but still, a large number of hits
+  are observed. This could be due to the fact that the lncRNAs are part
+  of the genome, and thus, self-matches and paralogous sequences might
+  be increasing the hits.
+
+- **Proteome Database**: The number of hits suggests that some of these
+  lncRNAs might have regions that could be translated into protein
+  sequences or resemble known proteins, although lncRNAs are generally
+  not translated.
+
+### 0.0.2 Suggestions:
+
+1.  **Analyze Overlap**: You could analyze the overlapping hits between
+    these databases to see if any lncRNAs show hits in all three
+    databases.
+
+2.  **Functional Annotation**: Use other bioinformatic tools to predict
+    the functional roles of the lncRNAs that show significant hits.
+
+3.  **Alignment Visualization**: You might want to visualize some of
+    these alignments to better understand the areas of similarity.
+
+4.  **Statistical Significance**: You may also apply statistical tests
+    to see if the number of hits in any of these databases is
+    significantly higher than expected by chance.
+
+5.  **Investigate Parameters**: Review BLAST parameters like
+    `-max_target_seqs` and `-max_hsps` based on your research questions,
+    as these can impact your results.
+
+Remember, the number of hits alone doesn’t convey functional or
+biological significance; further investigation is needed.
 
 # 1 Blast to sRNA, genome, proteome….
 
@@ -146,9 +213,9 @@ ls ../data/blast/pmea_proteome*
 
 ???
 
-Blast comparison
+# 3 Blast comparison
 
-# 3 Result - database: sRNA
+# 4 Result - database: sRNA
 
 ``` bash
 /home/shared/ncbi-blast-2.11.0+/bin/blastn \
@@ -213,7 +280,40 @@ head ../output/02-Peve-lncRNA-align/lncRNA_sRNA_blastn02.tab
     ## ::Porites_evermani_scaffold_1:422643-423512  535611-2    97.143  35  1   0   737 771 1   35  1.52e-08    59.9
     ## ::Porites_evermani_scaffold_1:422643-423512  342166-4    97.143  35  1   0   752 786 35  1   1.52e-08    59.9
 
-# 4 Result -database: genome
+``` bash
+/home/shared/ncbi-blast-2.11.0+/bin/blastn \
+-task blastn \
+-query ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta \
+-db ../../DEF-cross-species/data/blast/peve_sRNA \
+-out ../output/02-Peve-lncRNA-align/lncRNA_sRNA_blastn03.tab \
+-evalue 1E-08 \
+-num_threads 20 \
+-outfmt 6
+```
+
+``` bash
+echo "Number of hits?"
+wc -l ../output/02-Peve-lncRNA-align/lncRNA_sRNA_blastn03.tab
+
+echo "File header"
+head ../output/02-Peve-lncRNA-align/lncRNA_sRNA_blastn03.tab
+```
+
+    ## Number of hits?
+    ## 29152 ../output/02-Peve-lncRNA-align/lncRNA_sRNA_blastn03.tab
+    ## File header
+    ## ::Porites_evermani_scaffold_1:422643-423512  1830741-1   100.000 35  0   0   726 760 35  1   3.58e-10    64.4
+    ## ::Porites_evermani_scaffold_1:422643-423512  1848065-1   100.000 35  0   0   748 782 35  1   3.58e-10    64.4
+    ## ::Porites_evermani_scaffold_1:422643-423512  907001-1    100.000 35  0   0   261 295 1   35  3.58e-10    64.4
+    ## ::Porites_evermani_scaffold_1:422643-423512  874194-1    100.000 35  0   0   713 747 1   35  3.58e-10    64.4
+    ## ::Porites_evermani_scaffold_1:422643-423512  439663-3    100.000 34  0   0   753 786 1   34  1.25e-09    62.6
+    ## ::Porites_evermani_scaffold_1:1084867-1089422    2127498-1   100.000 35  0   0   962 996 35  1   7.70e-10    64.4
+    ## ::Porites_evermani_scaffold_1:683878-684280  1639214-1   100.000 35  0   0   222 256 1   35  1.60e-10    64.4
+    ## ::Porites_evermani_scaffold_1:683878-684280  1195174-1   100.000 35  0   0   248 282 1   35  1.60e-10    64.4
+    ## ::Porites_evermani_scaffold_1:683878-684280  1173775-1   100.000 35  0   0   244 278 1   35  1.60e-10    64.4
+    ## ::Porites_evermani_scaffold_1:683878-684280  903402-1    100.000 35  0   0   262 296 1   35  1.60e-10    64.4
+
+# 5 Result -database: genome
 
 ``` bash
 /home/shared/ncbi-blast-2.11.0+/bin/blastn \
@@ -286,7 +386,7 @@ head ../output/02-Peve-lncRNA-align/lncRNA_genome_blastn02.tab
     ## ::Porites_evermani_scaffold_1:1084867-1089422    Porites_evermani_scaffold_705   91.600  250 16  4   955 1201    50079   49832   8.01e-92    343
     ## ::Porites_evermani_scaffold_1:1084867-1089422    Porites_evermani_scaffold_3651  91.129  248 19  2   953 1199    5737    5982    2.80e-91    343
 
-# 5 Result - database: proteome
+# 6 Result - database: proteome
 
 ``` bash
 /home/shared/ncbi-blast-2.11.0+/bin/blastx \
