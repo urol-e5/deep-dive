@@ -1,7 +1,7 @@
 02 Peve lncRNA align
 ================
 Steven Roberts
-07 September, 2023
+08 September, 2023
 
 - <a href="#001-analysis" id="toc-001-analysis">0.0.1 Analysis:</a>
 - <a href="#002-suggestions" id="toc-002-suggestions">0.0.2
@@ -15,7 +15,8 @@ Steven Roberts
   - <a href="#21-srna" id="toc-21-srna">2.1 sRNA</a>
   - <a href="#22-genome" id="toc-22-genome">2.2 Genome</a>
   - <a href="#23-proteins" id="toc-23-proteins">2.3 Proteins</a>
-  - <a href="#24-genes" id="toc-24-genes">2.4 Genes</a>
+  - <a href="#24-lncrna" id="toc-24-lncrna">2.4 lncRNA</a>
+  - <a href="#25-genes" id="toc-25-genes">2.5 Genes</a>
 - <a href="#3-blast-comparison" id="toc-3-blast-comparison">3 Blast
   comparison</a>
 - <a href="#4-result---database-srna" id="toc-4-result---database-srna">4
@@ -24,6 +25,8 @@ Steven Roberts
   id="toc-5-result--database-genome">5 Result -database: genome</a>
 - <a href="#6-result---database-proteome"
   id="toc-6-result---database-proteome">6 Result - database: proteome</a>
+- <a href="#7-result---database-lncrna"
+  id="toc-7-result---database-lncrna">7 Result - database: lncRNA</a>
 
 \#TLDR
 
@@ -209,7 +212,21 @@ ls ../data/blast/pmea_proteome*
     ## ../data/blast/pmea_proteome.ptf
     ## ../data/blast/pmea_proteome.pto
 
-## 2.4 Genes
+## 2.4 lncRNA
+
+``` bash
+ls ../../DEF-cross-species/data/blast/peve*lncRNA*
+```
+
+    ## ../../DEF-cross-species/data/blast/peve_bedtools_lncRNAs.ndb
+    ## ../../DEF-cross-species/data/blast/peve_bedtools_lncRNAs.nhr
+    ## ../../DEF-cross-species/data/blast/peve_bedtools_lncRNAs.nin
+    ## ../../DEF-cross-species/data/blast/peve_bedtools_lncRNAs.not
+    ## ../../DEF-cross-species/data/blast/peve_bedtools_lncRNAs.nsq
+    ## ../../DEF-cross-species/data/blast/peve_bedtools_lncRNAs.ntf
+    ## ../../DEF-cross-species/data/blast/peve_bedtools_lncRNAs.nto
+
+## 2.5 Genes
 
 ???
 
@@ -456,3 +473,79 @@ head ../output/02-Peve-lncRNA-align/lncRNA_proteome_blastx02.tab
     ## ::Porites_evermani_scaffold_1013:148823-153034   Peve_00004106   58.736  269 47  3   3   809 60  264 4.23e-71    239
     ## ::Porites_evermani_scaffold_1013:148823-153034   Peve_00015805   55.390  269 56  3   3   809 59  263 7.84e-70    235
     ## ::Porites_evermani_scaffold_1016:8862-9109   Peve_00015308   87.500  80  10  0   2   241 1125    1204    2.38e-42    146
+
+# 7 Result - database: lncRNA
+
+../../DEF-cross-species/data/blast/peve_bedtools_lncRNAs
+
+``` bash
+/home/shared/ncbi-blast-2.11.0+/bin/blastn \
+-task blastn \
+-query ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta \
+-db ../../DEF-cross-species/data/blast/peve_bedtools_lncRNAs \
+-out ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn.tab \
+-evalue 1E-40 \
+-num_threads 20 \
+-max_target_seqs 5 \
+-max_hsps 1 \
+-outfmt 6
+```
+
+``` bash
+
+echo "Number of hits?"
+wc -l ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn.tab
+
+
+echo "File header"
+head ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn.tab
+```
+
+    ## Number of hits?
+    ## 20675 ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn.tab
+    ## File header
+    ## ::Porites_evermani_scaffold_1:422643-423512  ::Porites_evermani_scaffold_1:422643-423512 100.000 869 0   0   1   869 1   869 0.0 1568
+    ## ::Porites_evermani_scaffold_1:422643-423512  ::Porites_evermani_scaffold_6072:1826-3677  93.939  132 8   0   663 794 822 953 8.17e-52    203
+    ## ::Porites_evermani_scaffold_1:422643-423512  ::Porites_evermani_scaffold_4084:10-8062    93.077  130 9   0   661 790 3059    2930    4.23e-49    195
+    ## ::Porites_evermani_scaffold_1:422643-423512  ::Porites_evermani_scaffold_922:4504-6380   93.701  127 8   0   669 795 777 651 4.23e-49    194
+    ## ::Porites_evermani_scaffold_1:422643-423512  ::Porites_evermani_scaffold_542:179250-194358   93.701  127 8   0   669 795 14003   13877   4.23e-49    194
+    ## ::Porites_evermani_scaffold_1:1084867-1089422    ::Porites_evermani_scaffold_1:1084867-1089422   100.000 4555    0   0   1   4555    1   4555    0.0 8215
+    ## ::Porites_evermani_scaffold_1:1084867-1089422    ::Porites_evermani_scaffold_3651:5736-5980  91.057  246 19  2   953 1197    1   244 8.45e-92    339
+    ## ::Porites_evermani_scaffold_1:1084867-1089422    ::Porites_evermani_scaffold_3419:30975-37690    89.879  247 22  2   955 1200    2207    2451    1.53e-88    327
+    ## ::Porites_evermani_scaffold_1:1084867-1089422    ::Porites_evermani_scaffold_1800:46422-47018    89.919  248 21  3   951 1197    229 473 5.33e-88    325
+    ## ::Porites_evermani_scaffold_1:1084867-1089422    ::Porites_evermani_scaffold_4104:26106-31512    88.800  250 24  3   951 1198    3479    3232    9.64e-85    315
+
+``` bash
+/home/shared/ncbi-blast-2.11.0+/bin/blastn \
+-task blastn \
+-query ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta \
+-db ../../DEF-cross-species/data/blast/peve_bedtools_lncRNAs \
+-out ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn02.tab \
+-evalue 1E-40 \
+-num_threads 20 \
+-outfmt 6
+```
+
+``` bash
+
+echo "Number of hits?"
+wc -l ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn02.tab
+
+
+echo "File header"
+head ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn02.tab
+```
+
+    ## Number of hits?
+    ## 200919 ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn02.tab
+    ## File header
+    ## ::Porites_evermani_scaffold_1:422643-423512  ::Porites_evermani_scaffold_1:422643-423512 100.000 869 0   0   1   869 1   869 0.0 1568
+    ## ::Porites_evermani_scaffold_1:422643-423512  ::Porites_evermani_scaffold_6072:1826-3677  93.939  132 8   0   663 794 822 953 8.17e-52    203
+    ## ::Porites_evermani_scaffold_1:422643-423512  ::Porites_evermani_scaffold_4084:10-8062    93.077  130 9   0   661 790 3059    2930    4.23e-49    195
+    ## ::Porites_evermani_scaffold_1:422643-423512  ::Porites_evermani_scaffold_922:4504-6380   93.701  127 8   0   669 795 777 651 4.23e-49    194
+    ## ::Porites_evermani_scaffold_1:422643-423512  ::Porites_evermani_scaffold_542:179250-194358   93.701  127 8   0   669 795 14003   13877   4.23e-49    194
+    ## ::Porites_evermani_scaffold_1:422643-423512  ::Porites_evermani_scaffold_1017:156794-161692  95.161  124 5   1   672 795 827 949 4.23e-49    194
+    ## ::Porites_evermani_scaffold_1:422643-423512  ::Porites_evermani_scaffold_5962:1543-8505  91.729  133 11  0   663 795 3277    3409    5.16e-48    191
+    ## ::Porites_evermani_scaffold_1:422643-423512  ::Porites_evermani_scaffold_1691:92602-96741    92.913  127 9   0   669 795 2830    2704    1.80e-47    189
+    ## ::Porites_evermani_scaffold_1:422643-423512  ::Porites_evermani_scaffold_1691:92602-96741    95.283  106 5   0   690 795 2433    2538    1.69e-41    169
+    ## ::Porites_evermani_scaffold_1:422643-423512  ::Porites_evermani_scaffold_790:68425-76048 90.511  137 9   1   663 795 4828    4964    1.80e-47    188
