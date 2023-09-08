@@ -166,6 +166,12 @@ ls ../data/blast/pmea_proteome*
 
 
 
+## lncRNA
+
+```{r, engine='bash', eval=TRUE}
+ls ../../DEF-cross-species/data/blast/peve*lncRNA*
+```
+
 ## Genes
 ???
 
@@ -373,3 +379,66 @@ head ../output/02-Peve-lncRNA-align/lncRNA_proteome_blastx02.tab
 
 ```
 
+# Result - database: lncRNA
+
+
+../../DEF-cross-species/data/blast/peve_bedtools_lncRNAs
+
+
+
+```{r, engine='bash'}
+/home/shared/ncbi-blast-2.11.0+/bin/blastn \
+-task blastn \
+-query ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta \
+-db ../../DEF-cross-species/data/blast/peve_bedtools_lncRNAs \
+-out ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn.tab \
+-evalue 1E-40 \
+-num_threads 20 \
+-max_target_seqs 5 \
+-max_hsps 1 \
+-outfmt 6
+
+
+```
+
+
+
+```{r, engine='bash', eval=TRUE}
+
+echo "Number of hits?"
+wc -l ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn.tab
+
+
+echo "File header"
+head ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn.tab
+
+
+```
+
+
+```{r, engine='bash'}
+/home/shared/ncbi-blast-2.11.0+/bin/blastn \
+-task blastn \
+-query ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta \
+-db ../../DEF-cross-species/data/blast/peve_bedtools_lncRNAs \
+-out ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn02.tab \
+-evalue 1E-40 \
+-num_threads 20 \
+-outfmt 6
+
+
+```
+
+
+
+```{r, engine='bash', eval=TRUE}
+
+echo "Number of hits?"
+wc -l ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn02.tab
+
+
+echo "File header"
+head ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn02.tab
+
+
+```
