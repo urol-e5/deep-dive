@@ -32,6 +32,17 @@ fgrep ">" -c ../../DEF-cross-species/data/apul_bedtools_lncRNAs.fasta
 cat ../../DEF-cross-species/data/apul_bedtools_lncRNAs.fasta | grep '^>' | sed -n 's/.*::\([^:]*\):.*/\1/p' | sort | uniq -c | awk '{$1=$1; print}' |  head
 ```
 
+    ## 1160 NC_058066.1
+    ## 858 NC_058067.1
+    ## 625 NC_058068.1
+    ## 757 NC_058069.1
+    ## 787 NC_058070.1
+    ## 502 NC_058071.1
+    ## 777 NC_058072.1
+    ## 643 NC_058073.1
+    ## 557 NC_058074.1
+    ## 829 NC_058075.1
+
 ``` bash
 
 cat ../../DEF-cross-species/data/apul_bedtools_lncRNAs.fasta | grep '^>' | sed -n 's/.*::\([^:]*\):.*/\1/p' | sort | uniq -c  | awk '{$1=$1; print}' > ../output/07-Apul-lncRNA-dist/scaffold-count.txt
