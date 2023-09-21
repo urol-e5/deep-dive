@@ -1,0 +1,94 @@
+---
+title: "02 Apul lncRNA distribution"
+author: Steven Roberts
+date: "`r format(Sys.time(), '%d %B, %Y')`" 
+output: 
+  github_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+    html_preview: true
+  html_document:
+    theme: readable
+    highlight: zenburn
+    toc: true
+    toc_float: true
+    number_sections: true
+    code_folding: show
+    code_download: true
+
+---
+
+
+
+```{r setup, include=FALSE}
+library(knitr)
+library(tidyverse)
+library(kableExtra)
+library(DESeq2)
+library(pheatmap)
+library(RColorBrewer)
+library(data.table)
+library(DT)
+library(formattable)
+library(Biostrings)
+library(spaa)
+library(tm)
+knitr::opts_chunk$set(
+  echo = TRUE,         # Display code chunks
+  eval = FALSE,         # Evaluate code chunks
+  warning = FALSE,     # Hide warnings
+  message = FALSE,     # Hide messages
+  fig.width = 6,       # Set plot width in inches
+  fig.height = 4,      # Set plot height in inches
+  fig.align = "center" # Align plots to the center
+)
+
+```
+
+Lets take lncRNA file and see where in genome we find 
+
+
+## lncRNA fasta 
+
+
+```{r, engine='bash', eval=TRUE}
+tail ../../DEF-cross-species/data/apul_bedtools_lncRNAs.fasta
+
+fgrep ">" -c ../../DEF-cross-species/data/apul_bedtools_lncRNAs.fasta
+```
+
+
+```{bash}
+
+cat ../../DEF-cross-species/data/apul_bedtools_lncRNAs.fasta | grep '^>' | sed -n 's/.*::\([^:]*\):.*/\1/p' | sort | uniq -c | awk '{$1=$1; print}' |  head
+
+
+```
+
+
+
+```{bash}
+
+cat ../../DEF-cross-species/data/apul_bedtools_lncRNAs.fasta | grep '^>' | sed -n 's/.*::\([^:]*\):.*/\1/p' | sort | uniq -c  | awk '{$1=$1; print}' > ../output/07-Apul-lncRNA-dist/scaffold-count.txt
+
+
+```
+
+
+
+```{r, eval=TRUE}
+# Read the data using read.csv with a space separator
+data <- read.csv("../output/07-Apul-lncRNA-dist/scaffold-count.txt", header = FALSE, sep = " ", col.names = c("Value", "Label"))
+
+```
+
+
+```{r, eval=TRUE}
+ggplot(data, aes(x=Value)) +
+  geom_histogram(binwidth=20, fill="blue", alpha=0.7) +
+  ggtitle("Histogram of Values") +
+  xlab("Value") +
+  ylab("Frequency")
+```
+

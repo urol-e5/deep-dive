@@ -1,0 +1,518 @@
+---
+title: "02 Peve lncRNA align"
+author: Steven Roberts
+date: "`r format(Sys.time(), '%d %B, %Y')`" 
+output: 
+  github_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+    html_preview: true
+  html_document:
+    theme: readable
+    highlight: zenburn
+    toc: true
+    toc_float: true
+    number_sections: true
+    code_folding: show
+    code_download: true
+
+---
+
+#TLDR
+
+The code and its output suggest that you are running BLAST comparisons on a set of long non-coding RNAs (lncRNAs) against different databases—small RNAs (sRNAs), genome, and proteome—and observing different patterns of hits.
+
+1. **sRNA Database**: 
+    - In the first run, you used a stringent e-value (1E-40) and got 0 hits.
+    - In the second run without e-value restriction, you got 1,798,786 hits.
+   
+2. **Genome Database**: 
+    - Without an e-value restriction, you got 14,547,262 hits.
+    - With an e-value restriction of 1E-40, the hits reduced to 26,669.
+
+3. **Proteome Database**: 
+    - You got 351,260 hits when querying against the proteome database.
+
+### Analysis:
+
+- **sRNA Database**: The 0 hits in the first run suggest that no lncRNAs had significant similarity to sRNAs under the stringent conditions. However, when the stringency was relaxed, a high number of hits were observed. This suggests that there is some level of sequence similarity between lncRNAs and sRNAs, but it may not be functionally relevant (at least under stringent e-value settings).
+
+- **Genome Database**: As expected, you see a vast number of hits when the e-value is not restricted. It narrows down to a more manageable number when stringency is increased, but still, a large number of hits are observed. This could be due to the fact that the lncRNAs are part of the genome, and thus, self-matches and paralogous sequences might be increasing the hits.
+
+- **Proteome Database**: The number of hits suggests that some of these lncRNAs might have regions that could be translated into protein sequences or resemble known proteins, although lncRNAs are generally not translated.
+
+### Suggestions:
+
+1. **Analyze Overlap**: You could analyze the overlapping hits between these databases to see if any lncRNAs show hits in all three databases.
+  
+2. **Functional Annotation**: Use other bioinformatic tools to predict the functional roles of the lncRNAs that show significant hits.
+
+3. **Alignment Visualization**: You might want to visualize some of these alignments to better understand the areas of similarity.
+
+4. **Statistical Significance**: You may also apply statistical tests to see if the number of hits in any of these databases is significantly higher than expected by chance.
+
+5. **Investigate Parameters**: Review BLAST parameters like `-max_target_seqs` and `-max_hsps` based on your research questions, as these can impact your results.
+
+Remember, the number of hits alone doesn't convey functional or biological significance; further investigation is needed.
+
+
+
+
+```{r setup, include=FALSE}
+library(knitr)
+library(tidyverse)
+library(kableExtra)
+library(DESeq2)
+library(pheatmap)
+library(RColorBrewer)
+library(data.table)
+library(DT)
+library(formattable)
+library(Biostrings)
+library(spaa)
+library(tm)
+knitr::opts_chunk$set(
+  echo = TRUE,         # Display code chunks
+  eval = FALSE,         # Evaluate code chunks
+  warning = FALSE,     # Hide warnings
+  message = FALSE,     # Hide messages
+  fig.width = 6,       # Set plot width in inches
+  fig.height = 4,      # Set plot height in inches
+  fig.align = "center" # Align plots to the center
+)
+
+```
+
+
+# Blast to sRNA, genome, proteome....
+
+
+## lncRNA fasta 
+
+```{r, engine='bash', eval=TRUE}
+head ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta
+
+fgrep ">" -c ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta
+```
+
+
+# make some blastdb
+
+
+## sRNA
+
+```{r, engine='bash', eval=TRUE}
+ls ../../DEF-cross-species/data/blast/peve_sRNA*
+```
+
+## Genome
+https://gannet.fish.washington.edu/seashell/snaps/Porites_evermanni_v1.fa
+
+```{bash}
+cd ../data/
+curl -O https://gannet.fish.washington.edu/seashell/snaps/Porites_evermanni_v1.fa
+```
+
+
+```{r, engine='bash', eval=TRUE}
+head ../data/Porites_evermanni_v1.fa
+
+```
+
+```{r, engine='bash'}
+/home/shared/ncbi-blast-2.11.0+/bin/makeblastdb \
+-in ../data/Porites_evermanni_v1.fa \
+-dbtype nucl \
+-out ../data/blast/pmea_genome
+```
+
+```{r, engine='bash', eval=TRUE}
+ls ../data/blast/pmea_genome*
+```
+
+
+
+
+## Proteins
+
+https://gannet.fish.washington.edu/seashell/snaps/Porites_evermanni_v1.annot.pep.fa
+
+```{bash}
+cd ../data/
+
+curl -O https://gannet.fish.washington.edu/seashell/snaps/Porites_evermanni_v1.annot.pep.fa
+```
+
+
+
+```{r, engine='bash', eval=TRUE}
+head ../data/Porites_evermanni_v1.annot.pep.fa
+```
+
+
+
+
+```{r, engine='bash'}
+/home/shared/ncbi-blast-2.11.0+/bin/makeblastdb \
+-in ../data/Porites_evermanni_v1.annot.pep.fa \
+-dbtype prot \
+-out ../data/blast/pmea_proteome
+```
+
+
+
+```{r, engine='bash', eval=TRUE}
+ls ../data/blast/pmea_proteome*
+```
+
+
+
+## lncRNA
+
+```{r, engine='bash', eval=TRUE}
+ls ../../DEF-cross-species/data/blast/peve*lncRNA*
+```
+
+## Genes
+???
+
+
+
+# Blast comparison
+
+
+# Result - database: sRNA
+
+```{r, engine='bash'}
+/home/shared/ncbi-blast-2.11.0+/bin/blastn \
+-task blastn \
+-query ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta \
+-db ../../DEF-cross-species/data/blast/peve_sRNA \
+-out ../output/02-Peve-lncRNA-align/lncRNA_sRNA_blastn.tab \
+-evalue 1E-40 \
+-num_threads 40 \
+-max_target_seqs 5 \
+-max_hsps 1 \
+-outfmt 6
+
+
+```
+
+
+```{r, engine='bash', eval=TRUE}
+
+echo "Number of hits?"
+wc -l ../output/02-Peve-lncRNA-align/lncRNA_sRNA_blastn.tab
+
+
+echo "File header"
+head ../output/02-Peve-lncRNA-align/lncRNA_sRNA_blastn.tab
+
+```
+
+(nothing)
+
+
+```{r, engine='bash'}
+/home/shared/ncbi-blast-2.11.0+/bin/blastn \
+-task blastn \
+-query ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta \
+-db ../../DEF-cross-species/data/blast/peve_sRNA \
+-out ../output/02-Peve-lncRNA-align/lncRNA_sRNA_blastn02.tab \
+-num_threads 20 \
+-outfmt 6
+
+
+```
+
+
+```{r, engine='bash', eval=TRUE}
+
+echo "Number of hits?"
+wc -l ../output/02-Peve-lncRNA-align/lncRNA_sRNA_blastn02.tab
+
+
+echo "File header"
+head ../output/02-Peve-lncRNA-align/lncRNA_sRNA_blastn02.tab
+
+
+```
+
+
+
+
+
+```{r, engine='bash'}
+/home/shared/ncbi-blast-2.11.0+/bin/blastn \
+-task blastn \
+-query ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta \
+-db ../../DEF-cross-species/data/blast/peve_sRNA \
+-out ../output/02-Peve-lncRNA-align/lncRNA_sRNA_blastn03.tab \
+-evalue 1E-08 \
+-num_threads 20 \
+-outfmt 6
+
+
+```
+
+
+```{r, engine='bash', eval=TRUE}
+echo "Number of hits?"
+wc -l ../output/02-Peve-lncRNA-align/lncRNA_sRNA_blastn03.tab
+
+echo "File header"
+head ../output/02-Peve-lncRNA-align/lncRNA_sRNA_blastn03.tab
+```
+
+# Result -database: genome
+
+```{r, engine='bash'}
+/home/shared/ncbi-blast-2.11.0+/bin/blastn \
+-task blastn \
+-query ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta \
+-db ../data/blast/pmea_genome \
+-out ../output/02-Peve-lncRNA-align/lncRNA_genome_blastn.tab \
+-num_threads 20 \
+-outfmt 6
+
+
+```
+
+
+
+```{r, engine='bash', eval=TRUE}
+
+echo "Number of hits?"
+wc -l ../output/02-Peve-lncRNA-align/lncRNA_genome_blastn.tab
+
+
+echo "File header"
+head ../output/02-Peve-lncRNA-align/lncRNA_genome_blastn.tab
+
+
+```
+
+
+
+
+```{r, engine='bash'}
+/home/shared/ncbi-blast-2.11.0+/bin/blastn \
+-task blastn \
+-query ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta \
+-db ../data/blast/pmea_genome \
+-out ../output/02-Peve-lncRNA-align/lncRNA_genome_blastn02.tab \
+-evalue 1E-40 \
+-num_threads 20 \
+-max_target_seqs 5 \
+-max_hsps 1 \
+-outfmt 6
+
+
+```
+
+
+
+```{r, engine='bash', eval=TRUE}
+
+echo "Number of hits?"
+wc -l ../output/02-Peve-lncRNA-align/lncRNA_genome_blastn02.tab
+
+
+echo "File header"
+head ../output/02-Peve-lncRNA-align/lncRNA_genome_blastn02.tab
+
+```
+
+
+# Result - database: proteome
+
+
+```{r, engine='bash'}
+/home/shared/ncbi-blast-2.11.0+/bin/blastx \
+-query ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta \
+-db ../data/blast/pmea_proteome \
+-out ../output/02-Peve-lncRNA-align/lncRNA_proteome_blastx.tab \
+-num_threads 20 \
+-outfmt 6
+
+
+```
+
+
+
+```{r, engine='bash', eval=TRUE}
+
+echo "Number of hits?"
+wc -l ../output/02-Peve-lncRNA-align/lncRNA_proteome_blastx.tab
+
+
+echo "File header"
+head ../output/02-Peve-lncRNA-align/lncRNA_proteome_blastx.tab
+
+```
+
+
+```{r, engine='bash'}
+/home/shared/ncbi-blast-2.11.0+/bin/blastx \
+-query ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta \
+-db ../data/blast/pmea_proteome \
+-out ../output/02-Peve-lncRNA-align/lncRNA_proteome_blastx02.tab \
+-evalue 1E-40 \
+-num_threads 20 \
+-max_target_seqs 5 \
+-max_hsps 1 \
+-outfmt 6
+
+
+```
+
+
+
+```{r, engine='bash', eval=TRUE}
+
+echo "Number of hits?"
+wc -l ../output/02-Peve-lncRNA-align/lncRNA_proteome_blastx02.tab
+
+
+echo "File header"
+head ../output/02-Peve-lncRNA-align/lncRNA_proteome_blastx02.tab
+
+
+```
+
+# Result - database: lncRNA
+
+
+../../DEF-cross-species/data/blast/peve_bedtools_lncRNAs
+
+
+
+```{r, engine='bash'}
+/home/shared/ncbi-blast-2.11.0+/bin/blastn \
+-task blastn \
+-query ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta \
+-db ../../DEF-cross-species/data/blast/peve_bedtools_lncRNAs \
+-out ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn.tab \
+-evalue 1E-40 \
+-num_threads 20 \
+-max_target_seqs 5 \
+-max_hsps 1 \
+-outfmt 6
+
+
+```
+
+
+
+```{r, engine='bash', eval=TRUE}
+
+echo "Number of hits?"
+wc -l ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn.tab
+
+
+echo "File header"
+head ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn.tab
+
+
+```
+
+
+```{r, engine='bash'}
+/home/shared/ncbi-blast-2.11.0+/bin/blastn \
+-task blastn \
+-query ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta \
+-db ../../DEF-cross-species/data/blast/peve_bedtools_lncRNAs \
+-out ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn02.tab \
+-evalue 1E-40 \
+-num_threads 20 \
+-max_hsps 1 \
+-outfmt 6
+
+
+```
+
+
+Note 
+
+
+```{r, engine='bash', eval=TRUE}
+
+fgrep ">" -c ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta
+```
+
+```{r, engine='bash', eval=TRUE}
+
+echo "Number of hits?"
+wc -l ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn02.tab
+
+```
+
+
+
+
+```{r, engine='bash'}
+/home/shared/ncbi-blast-2.11.0+/bin/blastn \
+-task blastn \
+-query ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta \
+-db ../../DEF-cross-species/data/blast/peve_bedtools_lncRNAs \
+-out ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn03.tab \
+-evalue 1E-80 \
+-max_hsps 1 \
+-num_threads 20 \
+-outfmt 6
+
+
+```
+
+
+Note 
+
+
+```{r, engine='bash', eval=TRUE}
+
+fgrep ">" -c ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta
+```
+
+```{r, engine='bash', eval=TRUE}
+
+echo "Number of hits?"
+wc -l ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn03.tab
+
+```
+
+
+
+```{r, engine='bash'}
+/home/shared/ncbi-blast-2.11.0+/bin/blastn \
+-task blastn \
+-query ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta \
+-db ../../DEF-cross-species/data/blast/peve_bedtools_lncRNAs \
+-out ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn04.tab \
+-evalue 1E-300 \
+-num_threads 20 \
+-max_hsps 1 \
+-outfmt 6
+
+
+```
+
+
+Note 
+
+
+```{r, engine='bash', eval=TRUE}
+
+fgrep ">" -c ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta
+```
+
+```{r, engine='bash', eval=TRUE}
+
+echo "Number of hits?"
+wc -l ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn04.tab
+
+echo "File header"
+head ../output/02-Peve-lncRNA-align/lncRNA_lncRNA_blastn04.tab
+
+
+```

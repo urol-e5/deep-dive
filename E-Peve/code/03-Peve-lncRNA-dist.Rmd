@@ -1,0 +1,168 @@
+---
+title: "02 Peve lncRNA distribution"
+author: Steven Roberts
+date: "`r format(Sys.time(), '%d %B, %Y')`" 
+output: 
+  github_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+    html_preview: true
+  html_document:
+    theme: readable
+    highlight: zenburn
+    toc: true
+    toc_float: true
+    number_sections: true
+    code_folding: show
+    code_download: true
+
+---
+
+
+
+```{r setup, include=FALSE}
+library(knitr)
+library(tidyverse)
+library(kableExtra)
+library(DESeq2)
+library(pheatmap)
+library(RColorBrewer)
+library(data.table)
+library(DT)
+library(formattable)
+library(Biostrings)
+library(spaa)
+library(tm)
+knitr::opts_chunk$set(
+  echo = TRUE,         # Display code chunks
+  eval = FALSE,         # Evaluate code chunks
+  warning = FALSE,     # Hide warnings
+  message = FALSE,     # Hide messages
+  fig.width = 6,       # Set plot width in inches
+  fig.height = 4,      # Set plot height in inches
+  fig.align = "center" # Align plots to the center
+)
+
+```
+
+Lets take lncRNA file and see where in genome we find 
+
+
+## lncRNA fasta 
+
+```{r, engine='bash', eval=TRUE}
+head ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta
+
+fgrep ">" -c ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta
+```
+
+
+
+```{r, eval=TRUE}
+# Read the text file into a character vector
+lines <- readLines("../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta")
+
+# Use a regular expression to find lines with scaffold information
+scaffold_lines <- grep("^>::Porites_evermani_scaffold_([0-9]+)", lines, perl = TRUE, value = TRUE)
+
+# Extract the distinct scaffold numbers
+scaffold_numbers <- unique(gsub("^>::Porites_evermani_scaffold_([0-9]+).*", "\\1", scaffold_lines))
+
+# Count the number of distinct scaffold numbers
+count_distinct_scaffolds <- length(scaffold_numbers)
+
+# Print the count
+print(paste("Number of distinct scaffolds: ", count_distinct_scaffolds))
+```
+
+
+
+```{r, eval=TRUE}
+# Read the text file into a character vector
+lines <- readLines("../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta")
+
+# Use a regular expression to find lines with scaffold information
+scaffold_lines <- grep("^>::Porites_evermani_scaffold_([0-9]+)", lines, perl = TRUE, value = TRUE)
+
+# Extract the scaffold numbers
+scaffold_numbers <- gsub("^>::Porites_evermani_scaffold_([0-9]+).*", "\\1", scaffold_lines)
+
+# Count the number of distinct scaffold numbers
+count_distinct_scaffolds <- length(unique(scaffold_numbers))
+
+# Print the count
+print(paste("Number of distinct scaffolds: ", count_distinct_scaffolds))
+
+# Count the occurrences of each distinct scaffold
+scaffold_counts <- table(scaffold_numbers)
+
+# Generate a histogram (barplot) to visualize the occurrences of each distinct scaffold
+barplot(scaffold_counts,
+        main = "Occurrences of Distinct Scaffolds",
+        xlab = "Scaffold Number",
+        ylab = "Frequency",
+        col = "blue")
+
+# You can also optionally save the plot to a file
+# png("scaffold_histogram.png")
+# barplot(scaffold_counts,
+#         main = "Occurrences of Distinct Scaffolds",
+#         xlab = "Scaffold Number",
+#         ylab = "Frequency",
+#         col = "blue")
+# dev.off()
+```
+
+```{r, eval=TRUE}
+# Read the text file into a character vector
+lines <- readLines("../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta")
+
+# Use a regular expression to find lines with scaffold information
+scaffold_lines <- grep("^>::Porites_evermani_scaffold_([0-9]+)", lines, perl = TRUE, value = TRUE)
+
+# Extract the scaffold numbers
+scaffold_numbers <- gsub("^>::Porites_evermani_scaffold_([0-9]+).*", "\\1", scaffold_lines)
+
+# Count the number of distinct scaffold numbers
+count_distinct_scaffolds <- length(unique(scaffold_numbers))
+
+# Print the count
+print(paste("Number of distinct scaffolds: ", count_distinct_scaffolds))
+
+# Count the occurrences of each distinct scaffold
+scaffold_counts <- table(scaffold_numbers)
+
+# Sort the counts in descending order
+sorted_scaffold_counts <- sort(scaffold_counts, decreasing = TRUE)
+
+# Select the top 10 scaffolds with most occurrences
+top_10_scaffolds <- head(sorted_scaffold_counts, 10)
+
+# Print the top 10 scaffolds
+print("Top 10 scaffolds with most occurrences:")
+print(top_10_scaffolds)
+
+# Generate a barplot to visualize the occurrences of the top 10 distinct scaffolds
+barplot(top_10_scaffolds,
+        main = "Top 10 Scaffolds with Most Occurrences",
+        xlab = "Scaffold Number",
+        ylab = "Frequency",
+        col = "blue")
+
+# You can also optionally save the plot to a file
+# png("top_10_scaffolds_histogram.png")
+# barplot(top_10_scaffolds,
+#         main = "Top 10 Scaffolds with Most Occurrences",
+#         xlab = "Scaffold Number",
+#         ylab = "Frequency",
+#         col = "blue")
+# dev.off()
+```
+
+
+```{r, engine='bash', eval=TRUE}
+
+
+fgrep "scaffold_487:" -c ../../DEF-cross-species/data/peve_bedtools_lncRNAs.fasta
+```
