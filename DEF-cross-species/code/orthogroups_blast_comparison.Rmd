@@ -201,6 +201,13 @@ description_counts <- ortho_blast_annot %>%
   group_by(Description) %>%
   summarize(Count = n())
 ```
+Looking at the description_counts, it looks like the functions among all this shared data are: 
+
+- protein serine/threonine/tyrosine kinase activity
+- copper ion import across plasma membrane
+- Belongs to the heat shock protein 70 family
+
+This is just the 3 that had the highest number of counts. 
 
 Let's do a quick inventory of how many lncRNAs, proteins, smRNAs, etc that we have left after all that filtering and merging. 
 ```{r}
@@ -211,7 +218,6 @@ length(unique(ortho_blast_annot$smRNA)) # 288 small RNA sequences
 length(unique(ortho_blast_annot$Peve)) # 70 Peve protein sequences
 length(unique(ortho_blast_annot$Orthogroup)) # 70 orthogroups 
 length(unique(ortho_blast_annot$Apul)) # 119 Apul protein sequences
-
 ```
 
 
