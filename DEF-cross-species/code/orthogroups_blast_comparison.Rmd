@@ -1,0 +1,223 @@
+---
+title: "orthogroup comparison"
+author: "Jill Ashey"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+This script examines the orthogroups shared between the 3 species of interest and compares the orthogroups to the blast results that S. Roberts did. 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(UpSetR)
+library(grid)
+library(futile.logger)
+```
+
+## Load and clean data 
+```{r}
+ortho <- read.table(file = '../data/orthogroups/Orthogroups.tsv', sep = '\t', header = TRUE, na.strings=c(""," ","NA"))
+colnames(ortho) <- c("Orthogroup", "Apul", "Pmea", "Peve")
+length(unique(ortho$Orthogroup)) # 22783 unique orthogroups 
+head(ortho)
+```
+
+The dataframe has multiple protein IDs for each orthogroup, depending on the species. I need to split and unnest the 3 species columns so that each row has one orthogroup ID and one protein ID. 
+
+```{r}
+# Apulchra 
+apul_ortho <- ortho %>%
+  select(c("Orthogroup", "Apul")) %>% 
+  mutate(Apul = strsplit(as.character(Apul), ",")) %>% 
+  unnest(Apul)
+
+# Pmeandrina 
+pmea_ortho <- ortho %>%
+  select(c("Orthogroup", "Pmea")) %>% 
+  mutate(Pmea = strsplit(as.character(Pmea), ",")) %>% 
+  unnest(Pmea)
+
+# Pevermanni 
+peve_ortho <- ortho %>%
+  select(c("Orthogroup", "Peve")) %>% 
+  mutate(Peve = strsplit(as.character(Peve), ",")) %>% 
+  unnest(Peve)
+
+# Rejoin dataframes 
+full <- full_join(apul_ortho, pmea_ortho, by = "Orthogroup")
+full <- full_join(full, peve_ortho, by = "Orthogroup")
+```
+
+Now we have a dataframe with a column for orthogroup and columns for each species. 
+
+## Visualize data 
+
+Using a venn diagram, make a plot of the shared orthogroups 
+```{r}
+# Create a list of sets, one for each species
+set_list <- list(
+  Apul = unique(full$Orthogroup[!is.na(full$Apul)]),
+  Pmea = unique(full$Orthogroup[!is.na(full$Pmea)]),
+  Peve = unique(full$Orthogroup[!is.na(full$Peve)])
+)
+
+# Define colors for each species
+set_colors <- c("Apul" = "orange", "Pmea" = "blue", "Peve" = "coral3")
+
+# Create a Venn diagram
+venn.plot <- venn.diagram(
+  x = set_list,
+  category.names = c("Apul", "Pmea", "Peve"),
+  filename = "../output/orthogroups/Orthogroups_Venn.png",
+  output = TRUE,
+  fill = set_colors,  # Specify fill colors
+  alpha = 0.5  # Adjust transparency (alpha)
+)
+```
+
+## Merge with blast data 
+
+First, read in small RNA and lncRNA blast table and compute metrics 
+```{r}
+getwd()
+### LncRNA and smRNA comparison 
+# e-value of 1E-08
+smol <- read.table("../../E-Peve/output/02-Peve-lncRNA-align/lncRNA_sRNA_blastn03.tab")
+colnames(smol) <- c("qseqid", "sseqid", "pident", "length", "mismatch", "gapopen", "qstart", "qend", "sstart", "send", "evalue", "bitscore")
+
+## Column names
+# qseqid - query gene id (lncRNAs in this case)
+# sseqid - subject or target sequence id (smRNAs in this case)
+# pident - percentage of identical positions
+# length - alignment overlap/sequence overlap
+# mismatch - number of mismatches 
+# gapopen - number of gap openings
+# qstart - start of alignment in query
+# qend - end of alignment in query
+# sstart - start of alignment in subject
+# send - end of alignment in subject
+# evalue - expect value 
+# bitscore - bit score 
+
+# Remove :: in gene names 
+smol$qseqid <- gsub("::", "", smol$qseqid)
+
+# How many lncRNAs are there? How many smRNAs? 
+length(unique(smol$qseqid)) # 2952 lncRNAs
+length(unique(smol$sseqid)) # 14306 smRNAs
+
+# All of the matches have a pident of >97%
+
+# Remove all columns exceot qseqid and sseqid
+smol <- smol %>%
+  select(qseqid, sseqid)
+
+# Remove duplicate rows
+smol <- unique(smol)
+```
+
+First, read in protein and lncRNA blast table and compute metrics 
+```{r}
+### LncRNA and protein comparison 
+# e-value of 1E-40
+prot <- read.table("../../E-Peve/output/02-Peve-lncRNA-align/lncRNA_proteome_blastx02.tab")
+colnames(prot) <- c("qseqid", "sseqid", "pident", "length", "mismatch", "gapopen", "qstart", "qend", "sstart", "send", "evalue", "bitscore")
+
+# Remove :: in gene names 
+prot$qseqid <- gsub("::", "", prot$qseqid)
+
+# How many lncRNAs are there? How many proteins? 
+length(unique(prot$qseqid)) # 699 lncRNAs
+length(unique(prot$sseqid)) # 1282 proteins 
+
+# Look at mean, min, max and median of pident
+mean(prot$pident)
+min(prot$pident)
+max(prot$pident)
+median(prot$pident)
+
+# Remove all columns exceot qseqid and sseqid
+prot <- prot %>%
+  select(qseqid, sseqid)
+
+# Remove duplicate rows
+prot <- unique(prot)
+```
+
+Merge the two blast datasets
+```{r}
+# Merge datasets 
+all <- merge(smol, prot, by = "qseqid") # using merge here, but could switch to full_join. Merge is more strict 
+head(all)
+
+# Rename columns 
+colnames(all) <- c("lncRNA", "smRNA", "Peve") # renameing protein column 'Peve' so that I can join this df with the orthogroup df 
+
+# How many lncRNAs are there? How many smRNAs, proteins?
+length(unique(all$lncRNA)) # 382 lncRNAs
+length(unique(all$smRNA)) # 1890 smRNAs
+length(unique(all$Peve)) # 719 proteins
+```
+
+Merge the blast datasets and the orthogroup info 
+```{r}
+ortho_blast <- full_join(all, full, by = "Peve")
+head(ortho_blast)
+```
+
+Now we have a dataframe that includes orthogroups and the blast results for the Peve. This only includes lncRNAs, smRNAs and protein sequences that were shared. Eg it does not include the blast results for lncRNA and smRNA if there was no associated protein sequence. 
+
+## Merge with Pmea annotations 
+
+I'm not sure if we have annotations for any of the coral species yet, but there are KEGG annotations for Pmea. I'm going to merge the ortho_blast dataframe with that dataset. Maybe it'll give us an idea of what functions the lncRNAs and smRNAs could be involved in. 
+
+First, read in Pmea annotations
+```{r}
+pmea_annot <- read.csv('../data/Pocillopora_meandrina_HIv1.genes.EggNog_results.csv', sep = '\t', header = TRUE, na.strings=c(""," ","NA"))
+
+# rename first column so it can be merged properly 
+colnames(pmea_annot)[1] <- "Pmea"
+```
+
+Merge annotations with ortho_blast dataframe
+```{r}
+ortho_blast_annot <- full_join(pmea_annot, ortho_blast, by = "Pmea")
+head(ortho_blast_annot)
+```
+
+Let's remove the excess columns so we can have a better look at it. For now, I am just going to keep the Description column, but we can always add the GO, KEGG, etc columns back in at a later date. 
+```{r}
+colnames(ortho_blast_annot)
+
+# Select only specific columns
+ortho_blast_annot <- ortho_blast_annot %>%
+  select(Pmea, Description, lncRNA, smRNA, Peve, Orthogroup, Apul) %>%
+  na.omit(lncRNA) # remove all rows that have NAs in the lncRNA column
+
+# Count the number of times specific descriptions appear in the dataset
+description_counts <- ortho_blast_annot %>%
+  group_by(Description) %>%
+  summarize(Count = n())
+```
+
+Let's do a quick inventory of how many lncRNAs, proteins, smRNAs, etc that we have left after all that filtering and merging. 
+```{r}
+length(unique(ortho_blast_annot$Pmea)) # 70 Pmea protein sequences
+length(unique(ortho_blast_annot$Description)) # 68 descriptions of potential functions 
+length(unique(ortho_blast_annot$lncRNA)) # 84 Peve lncRNA sequences 
+length(unique(ortho_blast_annot$smRNA)) # 288 small RNA sequences
+length(unique(ortho_blast_annot$Peve)) # 70 Peve protein sequences
+length(unique(ortho_blast_annot$Orthogroup)) # 70 orthogroups 
+length(unique(ortho_blast_annot$Apul)) # 119 Apul protein sequences
+
+```
+
+
+
+
+
+
+
+
