@@ -1,7 +1,7 @@
 ---
-title: "05.2-lncRNA-discovery-overview"
+title: "05.3-lncRNA-discovery-overview.Rmd"
 author: "Zach Bengtsson"
-date: "2023-09-21"
+date: "2023-09-27"
 output: html_document
 ---
 
@@ -110,3 +110,5 @@ awk -F":|-" '{print $3 "\t" $4 "\t" $5}' $OUTPUT_DIR/apul_deduplicated_final_lnc
 $BEDTOOLS_PATH/bedtools \
 getfasta -fi $FASTA -bed $OUTPUT_DIR/apul_deduplicated_final_lncRNAs.bed -fo $OUTPUT_DIR/apul_bedtools_lncRNAs.fasta -name
 ```
+
+The results of this pipleine provide the user with GTF files containing transcript IDs (scaffold and sequence range), BED files displaying the same transcript IDs in BED format for use with BEDtools, and FASTA files containing the sequence of identified lncRNAs.
