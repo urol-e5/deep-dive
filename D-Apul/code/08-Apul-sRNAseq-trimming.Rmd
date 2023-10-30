@@ -9,3 +9,75 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# FastQC and flexbar trimming of E5 coral species sRNAseq data from 20230515.
+
+### flexbar expects input FastQ files to be in format: sRNA-ACR-178-S1-TP2_R1_001.fastq.gz
+
+### Adapter trimming and read length trimming is based off of NEB nebnext-small-rna-library-prep-set-for-illumina kit
+
+# Create a Bash variables file
+```{bash save-bash-variables-to-rvars-file}
+{
+echo "#### Assign Variables ####"
+echo ""
+
+echo "# Data directories"
+echo 'export reads_dir=/home/shared/8TB_HDD_01/sam/data'
+echo ""
+
+echo "# Paths to programs"
+echo 'export fastqc=/home/shared/FastQC-0.12.1fastqc'
+echo 'export flexbar=/home/shared/flexbar-3.5.0-linux/flexbar'
+echo 'export multiqc=/home/sam/programs/mambaforge/bin/multiqc'
+echo ""
+
+
+
+echo "# Set FastQ filename patterns"
+echo "export fastq_pattern='*.fastq.gz'"
+echo "export R1_fastq_pattern='*_R1_*.fastq.gz'"
+echo "export R2_fastq_pattern='*_R2_*.fastq.gz'"
+echo ""
+
+echo "# Set number of CPUs to use"
+echo 'export threads=40'
+echo ""
+
+echo "# Set maximum read length"
+echo 'export max_read_length=25'
+echo ""
+
+echo "# Input/output files"
+echo 'export trimmed_checksums=trimmed_fastq_checksums.md5'
+echo 'export fastq_checksums=input_fastq_checksums.md5'
+echo 'export NEB_adapters_fasta=NEB-adapters.fasta'
+echo ""
+
+echo "## NEB nebnext-small-rna-library-prep-set-for-illumina adapters"
+echo 'export first_adapter="AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC"'
+echo 'export second_adapter="GATCGTCGGACTGTAGAACTCTGAACGTGTAGATCTCGGTGGTCGCCGTATCATT"'
+echo ""
+
+echo "# Species array (must match data directory name usage)"
+echo 'export species_array=("A_pulchra")'
+echo ""
+
+echo "## Inititalize arrays"
+echo 'export raw_fastqs_array=()'
+echo 'export R1_names_array=()'
+echo 'export R2_names_array=()'
+echo 'export fastq_array_R1=()'
+echo 'export fastq_array_R2=()'
+echo ""
+
+echo "# Programs associative array"
+echo "declare -A programs_array"
+echo "programs_array=("
+echo '[fastqc]="${fastqc}" \\'
+echo '[multiqc]="${multiqc}" \\'
+echo '[flexbar]="${flexbar}"'
+echo ")"
+} > .bashvars
+
+cat .bashvars
+```
