@@ -9,11 +9,15 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# FastQC and flexbar trimming of E5 coral species sRNAseq data from 20230515.
+# FastQC/MultiQC assessment of raw and [flexbar](https://github.com/seqan/flexbar) trimmed sequences of E5 _A.pulchra sRNAseq data from 20230515.
 
-### flexbar expects input FastQ files to be in format: sRNA-ACR-178-S1-TP2_R1_001.fastq.gz
+Libraries were prepared and sequenced by Azenta:
 
-### Adapter trimming and read length trimming is based off of NEB nebnext-small-rna-library-prep-set-for-illumina kit
+- Library prep: [NEB nebnext-small-rna-library-prep-set-for-illumina kit](https://www.neb.com/en-us/-/media/nebus/files/manuals/manuale7300_e7330_e7560_e7580.pdf?rev=d0964a2e637843b1afcb9f7d666d07b2&hash=7AC0B0EB012708EFAB0E4DBEEAF1446A) (PDF)
+
+- Sequencing: Illumina HiSeq 4000, 150bp PE
+
+
 
 # Create a Bash variables file
 ```{bash save-bash-variables-to-rvars-file}
@@ -339,3 +343,16 @@ echo ""
 ls -lh ${trimmed_fastqc_dir}
 
 ```
+
+# Summary
+
+A quick comparison of raw and trimmed reads to show trimming worked:
+
+- quality is improved
+- length is 25bp
+- adapters removed
+
+| RAW                                                                                                                                                                                                | TRIMMED                                                                                                                                                                                                    |
+|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ![Raw MultiQC per base sequence quality plot](https://github.com/urol-e5/deep-dive/blob/main/D-Apul/output/08-Apul-sRNAseq-trimming/raw-fastqc/fastqc_per_base_sequence_quality_plot.png?raw=true) | ![Trimmed MultiQC per base sequence quality plot](https://github.com/urol-e5/deep-dive/blob/main/D-Apul/output/08-Apul-sRNAseq-trimming/trimmed-fastqc/fastqc_per_base_sequence_quality_plot.png?raw=true) |
+| ![Raw MultiQC adapter content plot](https://github.com/urol-e5/deep-dive/blob/main/D-Apul/output/08-Apul-sRNAseq-trimming/raw-fastqc/fastqc_adapter_content_plot.png?raw=true)                     | ![Trimmed MultiQC adapter content plot](https://github.com/urol-e5/deep-dive/blob/main/D-Apul/output/08-Apul-sRNAseq-trimming/trimmed-fastqc/fastqc_adapter_content_plot.png?raw=true)                     |
