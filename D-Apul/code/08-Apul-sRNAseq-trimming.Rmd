@@ -31,7 +31,7 @@ echo 'export raw_reads_url="https://owl.fish.washington.edu/nightingales/A_pulch
 echo ""
 
 echo "# Paths to programs"
-echo 'export fastqc=/home/shared/FastQC-0.12.1fastqc'
+echo 'export fastqc=/home/shared/FastQC-0.12.1/fastqc'
 echo 'export flexbar=/home/shared/flexbar-3.5.0-linux/flexbar'
 echo 'export multiqc=/home/sam/programs/mambaforge/bin/multiqc'
 echo ""
@@ -142,4 +142,63 @@ echo "Adapters FastA:"
 echo ""
 cat "${output_dir_top}/${NEB_adapters_fasta}"
 echo ""
+```
+# Run FastQC/MultiQC on raw reads
+```{bash raw-fastqc-multiqc}
+# Load bash variables into memory
+source .bashvars
+
+## Inititalize arrays
+raw_fastqs_array=()
+R1_names_array=()
+R2_names_array=()
+fastq_array_R1=()
+fastq_array_R2=()
+trimmed_fastq_array=()
+
+############ RUN FASTQC ############
+
+### NOTE: Do NOT quote raw_fastqc_list
+# Create array of trimmed FastQs
+raw_fastqs_array=(${raw_reads_dir}${fastq_pattern})
+
+# Pass array contents to new variable as space-delimited list
+raw_fastqc_list=$(echo "${raw_fastqs_array[*]}")
+
+echo "Beginning FastQC on raw reads..."
+echo ""
+
+# Run FastQC
+${programs_array[fastqc]} \
+--threads ${threads} \
+--outdir ${raw_fastqc_dir} \
+--quiet \
+${raw_fastqc_list}
+
+echo "FastQC on raw reads complete!"
+echo ""
+
+############ END FASTQC ############
+
+############ RUN MULTIQC ############
+echo "Beginning MultiQC on raw FastQC..."
+echo ""
+
+${programs_array[multiqc]} ${raw_fastqc_dir} -o ${raw_fastqc_dir}
+
+echo ""
+echo "MultiQC on raw FastQs complete."
+echo ""
+
+############ END MULTIQC ############
+
+echo "Removing FastQC zip files."
+echo ""
+rm ${raw_fastqc_dir}/*.zip
+echo "FastQC zip files removed."
+echo ""
+
+# View directory contents
+ls -lh ${raw_fastqc_dir}
+
 ```
