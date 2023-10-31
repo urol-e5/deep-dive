@@ -74,7 +74,7 @@ echo 'export R1_names_array=()'
 echo 'export R2_names_array=()'
 echo 'export fastq_array_R1=()'
 echo 'export fastq_array_R2=()'
-echo 'export trimmed_fastq_array=()'
+echo 'export trimmed_fastqs_array=()'
 echo ""
 
 echo "# Programs associative array"
@@ -286,5 +286,56 @@ echo ""
 cat "${trimmed_reads_dir}/${trimmed_checksums}"
 
 ############ END FLEXBAR ############
+
+```
+# FastQC/MultiQC on trimmed reads
+```{bash FastQC-MultiQC-trimmed-reads}
+# Load bash variables into memory
+source .bashvars
+
+############ RUN FASTQC ############
+
+### NOTE: Do NOT quote raw_fastqc_list
+# Create array of trimmed FastQs
+trimmed_fastqs_array=(${trimmed_reads_dir}/${fastq_pattern})
+
+# Pass array contents to new variable as space-delimited list
+trimmed_fastqc_list=$(echo "${trimmed_fastqs_array[*]}")
+
+echo "Beginning FastQC on raw reads..."
+echo ""
+
+# Run FastQC
+${programs_array[fastqc]} \
+--threads ${threads} \
+--outdir ${trimmed_fastqc_dir} \
+--quiet \
+${trimmed_fastqc_list}
+
+echo "FastQC on trimmed reads complete!"
+echo ""
+
+############ END FASTQC ############
+
+############ RUN MULTIQC ############
+echo "Beginning MultiQC on raw FastQC..."
+echo ""
+
+${programs_array[multiqc]} ${trimmed_fastqc_dir} -o ${trimmed_fastqc_dir}
+
+echo ""
+echo "MultiQC on trimmed FastQs complete."
+echo ""
+
+############ END MULTIQC ############
+
+echo "Removing FastQC zip files."
+echo ""
+rm ${trimmed_fastqc_dir}/*.zip
+echo "FastQC zip files removed."
+echo ""
+
+# View directory contents
+ls -lh ${trimmed_fastqc_dir}
 
 ```
