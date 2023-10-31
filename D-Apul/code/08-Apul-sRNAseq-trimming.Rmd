@@ -22,11 +22,12 @@ echo "#### Assign Variables ####"
 echo ""
 
 echo "# Data directories"
-echo 'export output_dir_top=../output/08-Apul-sRNAseq-trimming'
-echo 'export raw_reads_dir=../data/08-Apul-sRNAseq-trimming/raw-reads/'
-echo 'export trimmed_reads_dir=../output/08-Apul-sRNAseq-trimming/trimmed-reads'
-echo 'export raw_fastqc_dir=../output/08-Apul-sRNAseq-trimming/raw-fastqc'
-echo 'export trimmed_fastqc_dir=../output/08-Apul-sRNAseq-trimming/trimmed-fastqc'
+echo 'export deep_dive_dir=/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive'
+echo 'export output_dir_top=${deep_dive_dir}/D-Apul/output/08-Apul-sRNAseq-trimming'
+echo 'export raw_reads_dir=${deep_dive_dir}/D-Apul/data/08-Apul-sRNAseq-trimming/raw-reads'
+echo 'export trimmed_reads_dir=${deep_dive_dir}/D-Apul/output/08-Apul-sRNAseq-trimming/trimmed-reads'
+echo 'export raw_fastqc_dir=${deep_dive_dir}/D-Apul/output/08-Apul-sRNAseq-trimming/raw-fastqc'
+echo 'export trimmed_fastqc_dir=${deep_dive_dir}/D-Apul/output/08-Apul-sRNAseq-trimming/trimmed-fastqc'
 echo 'export raw_reads_url="https://owl.fish.washington.edu/nightingales/A_pulchra/30-852430235/"'
 echo ""
 
@@ -73,6 +74,7 @@ echo 'export R1_names_array=()'
 echo 'export R2_names_array=()'
 echo 'export fastq_array_R1=()'
 echo 'export fastq_array_R2=()'
+echo 'export trimmed_fastq_array=()'
 echo ""
 
 echo "# Programs associative array"
@@ -143,18 +145,10 @@ echo ""
 cat "${output_dir_top}/${NEB_adapters_fasta}"
 echo ""
 ```
-# Run FastQC/MultiQC on raw reads
+# FastQC/MultiQC on raw reads
 ```{bash raw-fastqc-multiqc}
 # Load bash variables into memory
 source .bashvars
-
-## Inititalize arrays
-raw_fastqs_array=()
-R1_names_array=()
-R2_names_array=()
-fastq_array_R1=()
-fastq_array_R2=()
-trimmed_fastq_array=()
 
 ############ RUN FASTQC ############
 
@@ -200,5 +194,97 @@ echo ""
 
 # View directory contents
 ls -lh ${raw_fastqc_dir}
+
+```
+
+# Trimming with flexbar
+```{bash flexbar-trimming}
+# Load bash variables into memory
+source .bashvars
+
+# Change to directory with raw reads
+cd "${raw_reads_dir}"
+
+# Create arrays of FastQ R1 files and sample names
+# Do NOT quote R1_fastq_pattern variable
+for fastq in ${R1_fastq_pattern}
+do
+  fastq_array_R1+=("${fastq}")
+
+  # Use parameter substitution to remove all text up to and including last "." from
+  # right side of string.
+  R1_names_array+=("${fastq%%.*}")
+done
+
+# Create array of FastQ R2 files
+# Do NOT quote R2_fastq_pattern variable
+for fastq in ${R2_fastq_pattern}
+do
+  fastq_array_R2+=("${fastq}")
+
+  # Use parameter substitution to remove all text up to and including last "." from
+  # right side of string.
+  R2_names_array+=("${fastq%%.*}")
+done
+
+
+############ RUN FLEXBAR ############
+# Uses parameter substitution (e.g. ${R1_sample_name%%_*})to rm the _R[12]
+# Uses NEB adapter file
+# --adapter-pair-overlap ON: Recommended by NEB sRNA kit
+# --qtrim-threshold 25: Minimum quality
+# --qtrim-format i1.8: Sets sequencer as illumina
+# --post-trim-length: Trim reads from 3' end to max length
+# --target: Sets file naming patterns
+# --zip-output GZ: Sets type of compression. GZ = gzip
+
+# Run flexbar on files
+echo "Beginning flexbar trimming."
+echo ""
+
+time \
+for index in "${!fastq_array_R1[@]}"
+do
+  R1_sample_name="${R1_names_array[index]}"
+  R2_sample_name="${R2_names_array[index]}"
+
+  # Begin flexbar trimming
+  ${programs_array[flexbar]} \
+  --reads ${fastq_array_R1[index]} \
+  --reads2 ${fastq_array_R2[index]}  \
+  --adapters ${output_dir_top}/${NEB_adapters_fasta} \
+  --adapter-pair-overlap ON \
+  --qtrim-format i1.8 \
+  --qtrim-threshold 25 \
+  --post-trim-length ${max_read_length} \
+  --threads ${threads} \
+  --target "${trimmed_reads_dir}/${R1_sample_name%%_*}.flexbar_trim.${max_read_length}bp" \
+  --zip-output GZ
+        
+    # Move to trimmed directory
+    # This is done so checksums file doesn't include excess path
+    cd ${trimmed_reads_dir}
+
+    # Generate md5 checksums for newly trimmed files
+    {
+      md5sum "${R1_sample_name%%_*}.flexbar_trim.${max_read_length}bp_1.fastq.gz"
+      md5sum "${R2_sample_name%%_*}.flexbar_trim.${max_read_length}bp_2.fastq.gz"
+    } >> "${trimmed_checksums}"
+    
+    # Change back to to raw reads directory
+    cd "${raw_reads_dir}"
+
+done
+
+echo ""
+echo "flexbar trimming complete."
+echo ""
+
+echo "Trimmed FastQs MD5 checksums:"
+echo ""
+
+cat "${trimmed_reads_dir}/${trimmed_checksums}"
+
+############ END FLEXBAR ############
 
 ```
