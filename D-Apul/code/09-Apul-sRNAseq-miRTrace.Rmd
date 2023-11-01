@@ -15,6 +15,8 @@ bibliography: references.bib
 
 ```{r setup, include=FALSE}
 library(knitr)
+library(kableExtra)
+library(dplyr)
 knitr::opts_chunk$set(
   echo = TRUE,         # Display code chunks
   eval = FALSE,        # Evaluate code chunks
@@ -74,17 +76,66 @@ fastq_array=(${trimmed_reads_dir}/${fastq_pattern})
 
 # Loop through read pairs
 # Increment by 2 to process next pair of FastQ files
-if [ -f "mirtrace.config" ]; then
+if [ -f "${output_dir_top}/mirtrace.config" ]; then
   echo "mirtrace.config already exists. Nothing to do."
   
 else
 
   for (( i=0; i<${#fastq_array[@]} ; i+=2 ))
   do
-    echo "${fastq_array[i]},${fastq_array[i+1]}"
+    R1_name=$(echo "${fastq_array[i]##*/}" | awk -F "-" '{print $1"-"$2"-"$3}')
+    R2_name=$(echo "${fastq_array[i+1]##*/}" | awk -F "-" '{print $1"-"$2"-"$3}')
+    echo "${fastq_array[i]},${R1_name}_1"
+    echo "${fastq_array[i+1]},${R2_name}_2"
   done >> "${output_dir_top}/mirtrace.config"
 
 fi
 
 cat "${output_dir_top}/mirtrace.config"
 ```
+# Run [miRTrace](https://github.com/friedlanderlab/mirtrace)
+```{r run-mirtrace, engine='bash', eval=FALSE}
+# Load bash variables into memory
+source .bashvars
+
+time \
+${programs_array[mirtrace]} trace \
+--config ${output_dir_top}/mirtrace.config \
+--write-fasta \
+--num-threads ${threads} \
+--output-dir ${output_dir_top} \
+--force
+
+tree -h ${output_dir_top}
+```
+
+```{r eval=TRUE}
+
+mirtrace.detailed.df <- read.csv("../output/09-Apul-sRNAseq-miRTrace/mirtrace-stats-contamination_detailed.tsv", sep = "\t", header = TRUE)
+
+```
+
+# Output table
+```{r eval=TRUE}
+
+mirtrace.detailed.df %>%
+  mutate(
+    across(
+      starts_with("sRNA"),
+      ~cell_spec(
+        .,
+        background = ifelse(
+          . > 0,
+          "lightgreen",
+          "white"
+          )
+        )
+      )
+    ) %>%
+  kable(escape = F) %>%
+  kable_styling("striped") %>% 
+  scroll_box(width = "100%", height = "500px")
+```
+
+# Citations
+
