@@ -10,6 +10,7 @@ output:
     number_sections: true
     code_folding: show
     code_download: true
+bibliography: references.bib
 ---
 
 ```{r setup, include=FALSE}
@@ -23,4 +24,67 @@ knitr::opts_chunk$set(
 )
 ```
 
+[@kang2018]
 
+# Create a Bash variables file
+
+This allows usage of Bash variables across R Markdown chunks.
+
+```{r save-bash-variables-to-rvars-file, engine='bash', eval=TRUE}
+{
+echo "#### Assign Variables ####"
+echo ""
+
+echo "# Data directories"
+echo 'export deep_dive_dir=/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive'
+echo 'export output_dir_top=${deep_dive_dir}/D-Apul/output/09-Apul-sRNAseq-miRTrace'
+echo 'export trimmed_reads_dir=${deep_dive_dir}/D-Apul/output/08-Apul-sRNAseq-trimming/trimmed-reads'
+echo ""
+
+echo "# Paths to programs"
+echo 'export mirtrace=/home/sam/programs/mambaforge/envs/miRTrace_env/bin/mirtrace'
+echo ""
+
+echo "# Set number of CPUs to use"
+echo 'export threads=40'
+echo ""
+
+echo "export fastq_pattern='*flexbar_trim.25bp*.gz'"
+
+echo "# Programs associative array"
+echo "declare -A programs_array"
+echo "programs_array=("
+echo '[mirtrace]="${mirtrace}"'
+echo ")"
+} > .bashvars
+
+cat .bashvars
+```
+
+# Create [miRTrace](https://github.com/friedlanderlab/mirtrace) config file
+```{r create-config-file, engine='bash', eval=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+# Declare array
+fastq_array=()
+
+# Populate array
+fastq_array=(${trimmed_reads_dir}/${fastq_pattern})
+
+# Loop through read pairs
+# Increment by 2 to process next pair of FastQ files
+if [ -f "mirtrace.config" ]; then
+  echo "mirtrace.config already exists. Nothing to do."
+  
+else
+
+  for (( i=0; i<${#fastq_array[@]} ; i+=2 ))
+  do
+    echo "${fastq_array[i]},${fastq_array[i+1]}"
+  done >> "${output_dir_top}/mirtrace.config"
+
+fi
+
+cat "${output_dir_top}/mirtrace.config"
+```
