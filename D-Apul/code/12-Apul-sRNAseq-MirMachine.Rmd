@@ -115,9 +115,28 @@ cd "${genome_fasta_dir}"
 # Checksums file contains other files, so this just looks for the sRNAseq files.
 grep "${genome_fasta_name}" md5checksums.txt | md5sum --check
 ```
+## Decompress FastA file
+```{r decompres-FastA, engine='bash', eval=TRUE}
+# Load bash variables into memory
+source .bashvars
 
-```{r engine='bash'}
-MirMachine.py -p
+cd "${genome_fasta_dir}"
+
+gunzip --keep "${genome_fasta_name}.gz"
+
+ls -lth
+```
+
+
+# Run [MirMachine](https://github.com/sinanugur/MirMachine)
+
+The `--species` option specifies output naming structure
+```{r mirmachine, engine='bash', eval=TRUE}
+MirMachine.py \
+--species Amil-MirMachine \
+--genome ${genome_fasta} \
+--cpu 40 \
+--add-all-nodes
 ```
 
 ```{r}
