@@ -50,6 +50,8 @@ echo 'export deep_dive_dir=/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive'
 echo 'export output_dir_top=${deep_dive_dir}/D-Apul/output/12-Apul-sRNAseq-MirMachine'
 echo ""
 
+echo 'export mirmarchine_output_prefix="Amil-MirMachine"'
+
 echo "# Input/Output files"
 echo 'export genome_fasta_dir=${deep_dive_dir}/D-Apul/data/Amil/ncbi_dataset/data/GCF_013753865.1'
 echo 'export genome_fasta_name="GCF_013753865.1_Amil_v2.1_genomic.fna"'
@@ -135,7 +137,7 @@ The `--species` option specifies output naming structure
 # Load bash variables into memory
 source .bashvars
 
-cd "${output_dir_top}"
+cd "${mirmarchine_output_prefix}"
 
 time \
 MirMachine.py \
@@ -147,8 +149,64 @@ MirMachine.py \
 &> mirmachine.log
 ```
 
-```{r}
+# Results
 
+## View [MirMachine](https://github.com/sinanugur/MirMachine) output structure
+```{r eval=TRUE, engine='bash'}
+# Load bash variables into memory
+source .bashvars
+
+tree -h ${output_dir_top}/results/predictions
+```
+
+## Check FastA
+```{r check-fasta, eval=TRUE, engine='bash'}
+# Load bash variables into memory
+source .bashvars
+
+echo "Total number of predicted miRNAs (high & low confidence):"
+grep --count "^>" "${output_dir_top}/results/predictions/fasta/${mirmarchine_output_prefix}.PRE.fasta"
+echo ""
+echo "----------------------------------------------------------------------------------"
+echo ""
+
+head "${output_dir_top}/results/predictions/fasta/${mirmarchine_output_prefix}.PRE.fasta"
+```
+## Check filtered GFF
+Per [MirMachine](https://github.com/sinanugur/MirMachine) recommendations:
+
+> `filtered_gff/` High confidence miRNA family predictions after bitscore filtering. (This file is what you need in most cases)
+
+So, we'll stick with that.
+```{r check-fasta, eval=TRUE, engine='bash'}
+# Load bash variables into memory
+source .bashvars
+
+# Avoid 10th line - lengthy list of all miRNA families examined
+head -n 9 "${output_dir_top}/results/predictions/filtered_gff/${mirmarchine_output_prefix}.PRE.gff"
+
+echo ""
+# Pull out lines that do _not_ begin with a '#'.
+grep "^[^#]" "${output_dir_top}/results/predictions/filtered_gff/${mirmarchine_output_prefix}.PRE.gff" \
+| head
+
+```
+
+## Counts of predicted high-confidence miRNAs
+```{r count-predicted-hc-mirnas, reval=TRUE, engine='bash'}
+# Load bash variables into memory
+source .bashvars
+
+# Skip lines which begin with '#' (i.e. the header components)
+echo "Predicted loci:"
+grep -c "^[^#]" "${output_dir_top}/results/predictions/filtered_gff/${mirmarchine_output_prefix}.PRE.gff"
+
+echo ""
+echo "Unique miRNA families:"
+grep "^[^#]" "${output_dir_top}/results/predictions/filtered_gff/${mirmarchine_output_prefix}.PRE.gff" \
+| awk -F"[\t=;]" '{print $10}' \
+| sort -u \
+| wc -l
 ```
 
 # Citations
