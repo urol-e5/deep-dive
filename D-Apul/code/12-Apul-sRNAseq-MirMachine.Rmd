@@ -131,12 +131,20 @@ ls -lth
 # Run [MirMachine](https://github.com/sinanugur/MirMachine)
 
 The `--species` option specifies output naming structure
-```{r mirmachine, engine='bash', eval=TRUE}
+```{r mirmachine, engine='bash', eval=TRUE, cache=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+cd "${output_dir_top}"
+
+time \
 MirMachine.py \
+--node Metazoa \
 --species Amil-MirMachine \
 --genome ${genome_fasta} \
 --cpu 40 \
---add-all-nodes
+--add-all-nodes \
+&> mirmachine.log
 ```
 
 ```{r}
