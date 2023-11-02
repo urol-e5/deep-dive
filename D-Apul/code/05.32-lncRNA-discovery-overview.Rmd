@@ -1,0 +1,175 @@
+---
+title: "05.3-Apul-lncRNA-discovery"
+author: "Steven Roberts"
+date: "`r format(Sys.time(), '%d %B, %Y')`"  
+output: 
+  github_document:
+    theme: readable
+    highlight: zenburn
+    toc: true
+    toc_float: true
+    number_sections: true
+    code_folding: show
+    code_download: true
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(tidyverse)
+library(kableExtra)
+library(DT)
+library(Biostrings)
+library(tm)
+knitr::opts_chunk$set(
+  echo = TRUE,         # Display code chunks
+  eval = FALSE,         # Evaluate code chunks
+  warning = FALSE,     # Hide warnings
+  message = FALSE,     # Hide messages
+  fig.width = 6,       # Set plot width in inches
+  fig.height = 4,      # Set plot height in inches
+  fig.align = "center" # Align plots to the center
+)
+```
+
+```{r, engine='bash', eval=TRUE}
+# Software paths to necessary tools: HISAT2, Samtools, StringTie, GFFCompare, Bedtools, and Coding Potential Calculator 2
+HISAT_PATH="/home/shared/hisat2-2.2.1"
+SAMTOOLS_PATH="/home/shared/samtools-1.12"
+STRINGTIE_PATH="/home/shared/stringtie-2.2.1.Linux_x86_64"
+GFFCOMPARE_PATH="/home/shared/gffcompare-0.12.6.Linux_x86_64"
+BEDTOOLS_PATH="/home/shared/bedtools2/bin"
+CPC2_PATH="/home/shared/CPC2_standalone-1.0.1/bin"
+```
+
+
+
+
+```{bash}
+# Define directories and files
+ROOT_DIR="/home/shared" #root directory
+DATA_DIR="$ROOT_DIR/8TB_HDD_02/zbengt/github/coral-lncRNA/data" # data directory with reference genome data
+OUTPUT_DIR="$ROOT_DIR/8TB_HDD_02/zbengt/github/coral-lncRNA/push/output" #directory where final outputs output directory (smaller size files)
+APUL_DIR="$ROOT_DIR/8TB_HDD_01/apul" #directory with trimmed RNA-seq data and directories to house larger intermediate processing files  
+FASTA="$DATA_DIR/GCF_013753865.1_Amil_v2.1_genomic.fna" #DATA_DIR path with name of genomic fasta
+GFF="$DATA_DIR/GCF_013753865.1_Amil_v2.1_genomic.gff" #DATA_DIR path with genomic gff
+INDEX="$OUTPUT_DIR/Amil.index" #path to index created using HISAT build 
+```
+
+# Run HiSat on RNA-seq
+
+## Grab Trimmed RNA-seq Reads
+
+```{r, engine='bash'}
+
+wget -r \
+--no-directories --no-parent \
+-P ../data/fastq/ \
+-A "*fastq.gz" https://gannet.fish.washington.edu/Atumefaciens/20230519-E5_coral-fastqc-fastp-multiqc-RNAseq/A_pulchra/trimmed/
+
+```
+## Genome
+
+```{r, engine='bash'}
+cd ../data
+
+curl -O http://gannet.fish.washington.edu/seashell/snaps/GCF_013753865.1_Amil_v2.1_genomic.fna
+```
+
+
+## HiSat
+
+```{r, engine='bash'}
+
+$HISAT_PATH/hisat2-build -f \
+../data/GCF_013753865.1_Amil_v2.1_genomic.fna \ 
+../data/GCF_013753865.1_Amil_v2.1_genomic.index
+```
+
+```{r, engine='bash'}
+find ../data/fastq/*gz \
+| xargs basename -s -S1-TP2_R1_001.fastp-trim.20230519.fastq.gz | xargs -I{} \
+$HISAT_PATH/hisat2 \
+-x ../data/GCF_013753865.1_Amil_v2.1_genomic.index \
+-p 20 \
+-1 $APUL_DIR/trimmed/{}_R1_001.fastp-trim.20230519.fastq.gz \
+-2 $APUL_DIR/trimmed/{}_R2_001.fastp-trim.20230519.fastq.gz \
+-S $APUL_DIR/push/sam/{}.sam
+```
+
+# Software paths to necessary tools: HISAT2, Samtools, StringTie, GFFCompare, Bedtools, and Coding Potential Calculator 2
+HISAT_PATH="$ROOT_DIR/hisat2-2.2.1"
+SAMTOOLS_PATH="$ROOT_DIR/samtools-1.12"
+STRINGTIE_PATH="$ROOT_DIR/stringtie-2.2.1.Linux_x86_64"
+GFFCOMPARE_PATH="$ROOT_DIR/gffcompare-0.12.6.Linux_x86_64"
+BEDTOOLS_PATH="$ROOT_DIR/bedtools2/bin"
+CPC2_PATH="$ROOT_DIR/CPC2_standalone-1.0.1/bin"
+
+# Samtools
+# Convert SAM files to Binary Alignment Map (BAM) files, then sorts and saves them in the $APUL_DIR/push/bam directory. BAM files save on storage and speed up the next step in processing.
+for file in $APUL_DIR/push/sam/*.sam; do
+    base=$(basename "$file" .sam)
+    $SAMTOOLS_PATH/samtools view -bS "$file" | \
+    $SAMTOOLS_PATH/samtools sort \
+    -o $APUL_DIR/push/bam/"$base".bam
+done
+
+# StringTie
+# StringTie uses the sorted BAM files to assemble transcripts for each sample, outputting them as GTF (Gene Transfer Format) files. And then merges all individual GTF assemblies into a single merged GTF file. This step extracts transcript information and merges GTFs from all samples--an important step in creating a canonical list of lncRNAs across all samples included in the pipeline.
+Merges all individual GTF assemblies into a single merged GTF file.
+find $APUL_DIR/push/bam/*bam \
+| xargs basename -s .bam | xargs -I{} \
+$STRINGTIE_PATH/stringtie \
+-p 8 \
+-G $GFF \
+-o $APUL_DIR/push/stringtie-assembly/{}.gtf \
+$APUL_DIR/push/bam/{}.bam
+
+$STRINGTIE_PATH/stringtie \
+--merge \
+-G $GFF \
+-o $APUL_DIR/push/merged-gtf/stringtie_merged.gtf \
+$APUL_DIR/push/stringtie-assembly/*.gtf
+
+# GFFcompare
+#This step compares data to the reference GFF and classifies transcripts based on their similarity to the reference. This classifies known protein coding transcripts so that we can exclude them in the following filtration step, since we are only interested in non-coding transcripts.
+$GFFCOMPARE_PATH/gffcompare \
+-r $GFF \
+-G $GFF \
+-o $APUL_DIR/push/gffcompare/gffcompare_merged \
+$APUL_DIR/push/merged-gtf/stringtie_merged.gtf
+
+# Filter
+#Filters the combined GTF output from GFFcompare to select only the lines representing "transcripts" and excluding lines starting with "#" (these are lines in the output format from GFFcompare that don't contain transcript information). This step further filters for a class code of "u", and keep only those with lengths greater than 199 bases. The "u' class code from the GFFcompare step is for "unknown" transcripts, that is those that are not previously annotated in our reference GFF as protein coding. The size filter of +200nt is a common filtering step for isolating lncRNAs.
+awk '$3 == "transcript" && $1 !~ /^#/ {print}' $APUL_DIR/push/gffcompare/gffcompare_merged.combined.gtf | grep 'class_code "u"' | awk '$5 - $4 > 199 {print}' > $APUL_DIR/push/filter-one/merged_lncRNA_candidates.gtf
+
+# Bedtools
+#Extracts the sequence data from the `$FASTA` reference file based on the coordinates from the filtered GTF. The resulting sequences represent potential lncRNA candidates.
+$BEDTOOLS_PATH/bedtools \
+getfasta -fi $FASTA -bed $APUL_DIR/push/filter-one/merged_lncRNA_candidates.gtf -fo $APUL_DIR/push/get-fasta/merged_lncRNA_candidates.fasta -name -split
+
+# CPC2
+#Initializes a conda environment (Anaconda) and runs CPC2, a software to predict whether a transcript is coding or non-coding. The results are saved to the $OUTPUT_DIR. CPC2 uses ORF (Open Reading Frame) Analysis, Isometric Feature Mapping (Isomap), Sequence Homology, RNA Sequence Features, and Quality of Translation to assess coding potential and flag any transcripts we would want to exclude using the FASTA generated in the previous step.
+eval "$(/opt/anaconda/anaconda3/bin/conda shell.bash hook)"
+python $CPC2_PATH/CPC2.py -i $APUL_DIR/push/get-fasta/merged_lncRNA_candidates.fasta -o $OUTPUT_DIR/apul_merged_cpc2_results
+
+# Final Filter
+#Filters the CPC2 results to get only noncoding transcripts (using the class "noncoding" from the CPC2 results) and extracts their IDs and matches these IDs with the sequences from the previous step to generate a GTF of long noncoding transcripts.
+Matches these IDs with the sequences from the previous step to generate a GTF of noncoding transcripts.
+awk '$8 == "noncoding" {print $1}' $OUTPUT_DIR/apul_merged_cpc2_results.txt > $OUTPUT_DIR/apul_noncoding_transcripts_ids.txt
+grep -Fwf $OUTPUT_DIR/apul_noncoding_transcripts_ids.txt $APUL_DIR/push/get-fasta/merged_lncRNA_candidates.fasta > $OUTPUT_DIR/apul_merged_final_lncRNAs.gtf
+
+# De-duplicate GTF
+#Removes duplicate entries from the GTF file. This results in a list of lncRNAs with transcript IDs that show scaffold and base range.
+awk '!seen[$0]++' $OUTPUT_DIR/apul_merged_final_lncRNAs.gtf > $OUTPUT_DIR/apul_deduplicated_final_lncRNAs.gtf
+
+# Reformat to BED
+#Converts the GTF format to BED (Browser Extensible Data) format, a commonly used format for representing genomic intervals. This allows us to use bedtools to generate a FASTA of lncRNAs.
+awk -F":|-" '{print $3 "\t" $4 "\t" $5}' $OUTPUT_DIR/apul_deduplicated_final_lncRNAs.gtf > $OUTPUT_DIR/apul_deduplicated_final_lncRNAs.bed
+
+# BEDTools
+#This extracts sequences from the reference FASTA based on the BED file's coordinates. The resulting sequences represent the final set of non-redundant lncRNAs.
+$BEDTOOLS_PATH/bedtools \
+getfasta -fi $FASTA -bed $OUTPUT_DIR/apul_deduplicated_final_lncRNAs.bed -fo $OUTPUT_DIR/apul_bedtools_lncRNAs.fasta -name
+```
+
+The results of this pipleine provide the user with GTF files containing transcript IDs (scaffold and sequence range), BED files displaying the same transcript IDs in BED format for use with BEDtools, and FASTA files containing the sequence of identified lncRNAs.
