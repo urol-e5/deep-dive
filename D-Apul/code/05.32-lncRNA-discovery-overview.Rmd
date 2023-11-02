@@ -4,6 +4,11 @@ author: "Steven Roberts"
 date: "`r format(Sys.time(), '%d %B, %Y')`"  
 output: 
   github_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+    html_preview: true
+  html_document:
     theme: readable
     highlight: zenburn
     toc: true
@@ -44,7 +49,7 @@ CPC2_PATH="/home/shared/CPC2_standalone-1.0.1/bin"
 
 
 
-```{bash}
+```
 # Define directories and files
 ROOT_DIR="/home/shared" #root directory
 DATA_DIR="$ROOT_DIR/8TB_HDD_02/zbengt/github/coral-lncRNA/data" # data directory with reference genome data
@@ -79,21 +84,51 @@ curl -O http://gannet.fish.washington.edu/seashell/snaps/GCF_013753865.1_Amil_v2
 ## HiSat
 
 ```{r, engine='bash'}
-
-$HISAT_PATH/hisat2-build -f \
-../data/GCF_013753865.1_Amil_v2.1_genomic.fna \ 
-../data/GCF_013753865.1_Amil_v2.1_genomic.index
+/home/shared/hisat2-2.2.1/hisat2_extract_exons.py \
+../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gtf \
+> ../output/05.32-lncRNA-discovery/m_exon.tab
 ```
+
+```{r, engine='bash', eval=TRUE}
+head ../output/05.32-lncRNA-discovery/m_exon.tab
+```
+
+```{r, engine='bash'}
+
+/home/shared/hisat2-2.2.1/hisat2_extract_splice_sites.py \
+../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gtf \
+> ../output/05.32-lncRNA-discovery/m_splice_sites.tab
+
+```
+
+
+```{r, engine='bash', eval=TRUE}
+head ../output/05.32-lncRNA-discovery/m_splice_sites.tab
+```
+
+```{r, engine='bash'}
+/home/shared/hisat2-2.2.1/hisat2-build \
+../data/GCF_013753865.1_Amil_v2.1_genomic.fna \
+../data/GCF_013753865.1_Amil_v2.1.index \
+--exon ../output/05.32-lncRNA-discovery/m_exon.tab \
+--ss ../output/05.32-lncRNA-discovery/m_splice_sites.tab \
+-p 40 \
+../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gtf \
+2> ../output/05.32-lncRNA-discovery/hisat2-build_stats.txt
+
+```
+
+
 
 ```{r, engine='bash'}
 find ../data/fastq/*gz \
 | xargs basename -s -S1-TP2_R1_001.fastp-trim.20230519.fastq.gz | xargs -I{} \
-$HISAT_PATH/hisat2 \
--x ../data/GCF_013753865.1_Amil_v2.1_genomic.index \
+/home/shared/hisat2-2.2.1/hisat2 \
+-x ../data/GCF_013753865.1_Amil_v2.1.index \
 -p 20 \
--1 $APUL_DIR/trimmed/{}_R1_001.fastp-trim.20230519.fastq.gz \
--2 $APUL_DIR/trimmed/{}_R2_001.fastp-trim.20230519.fastq.gz \
--S $APUL_DIR/push/sam/{}.sam
+-1 ../data/fastq/{}-S1-TP2_R1_001.fastp-trim.20230519.fastq.gz \
+-2 ../data/fastq/{}-S1-TP2_R2_001.fastp-trim.20230519.fastq.gz \
+-S ../output/05.32-lncRNA-discovery/sam/{}.sam
 ```
 
 # Software paths to necessary tools: HISAT2, Samtools, StringTie, GFFCompare, Bedtools, and Coding Potential Calculator 2
