@@ -30,7 +30,7 @@ knitr::opts_chunk$set(
 Use [MirMachine](https://github.com/sinanugur/MirMachine) [@umu2022]
 
 # Set R varialbes
-```{r R-variables}
+```{r R-variables, eval=TRUE}
 mirmachine_conda_env_name <- c("mirmachine_env")
 mirmachine_cond_path <- c("/home/sam/programs/mambaforge/condabin/conda")
 ```
@@ -71,7 +71,7 @@ echo ""
 cat .bashvars
 ```
 
-# Load Use [MirMachine](https://github.com/sinanugur/MirMachine) conda environment
+# Load [MirMachine](https://github.com/sinanugur/MirMachine) conda environment
 
 If this is successful, the first line of output should show that the Python being used
 is the one in your [MirMachine](https://github.com/sinanugur/MirMachine) conda environment path.
@@ -79,7 +79,7 @@ is the one in your [MirMachine](https://github.com/sinanugur/MirMachine) conda e
 E.g.
 
 `python:         /home/sam/programs/mambaforge/envs/mirmachine_env/bin/python`
-```{r load-mirmachine-conda-env eval=TRUE}
+```{r load-mirmachine-conda-env, eval=TRUE}
 use_condaenv(condaenv = mirmachine_conda_env_name, conda = mirmachine_cond_path)
 
 # Check successful env loading
@@ -117,8 +117,9 @@ cd "${genome_fasta_dir}"
 # Checksums file contains other files, so this just looks for the sRNAseq files.
 grep "${genome_fasta_name}" md5checksums.txt | md5sum --check
 ```
+
 ## Decompress FastA file
-```{r decompres-FastA, engine='bash', eval=TRUE}
+```{r decompress-FastA, engine='bash', eval=TRUE}
 # Load bash variables into memory
 source .bashvars
 
@@ -133,16 +134,16 @@ ls -lth
 # Run [MirMachine](https://github.com/sinanugur/MirMachine)
 
 The `--species` option specifies output naming structure
-```{r mirmachine, engine='bash', eval=TRUE, cache=TRUE}
+```{r mirmachine, engine='bash', eval=TRUE}
 # Load bash variables into memory
 source .bashvars
 
-cd "${mirmarchine_output_prefix}"
+cd "${output_dir_top}"
 
 time \
 MirMachine.py \
 --node Metazoa \
---species Amil-MirMachine \
+--species ${mirmarchine_output_prefix} \
 --genome ${genome_fasta} \
 --cpu 40 \
 --add-all-nodes \
@@ -152,7 +153,7 @@ MirMachine.py \
 # Results
 
 ## View [MirMachine](https://github.com/sinanugur/MirMachine) output structure
-```{r eval=TRUE, engine='bash'}
+```{r mirmachine-output-tree, eval=TRUE, engine='bash'}
 # Load bash variables into memory
 source .bashvars
 
@@ -160,7 +161,7 @@ tree -h ${output_dir_top}/results/predictions
 ```
 
 ## Check FastA
-```{r check-fasta, eval=TRUE, engine='bash'}
+```{r check-mirmachine-fasta, eval=TRUE, engine='bash'}
 # Load bash variables into memory
 source .bashvars
 
@@ -178,7 +179,7 @@ Per [MirMachine](https://github.com/sinanugur/MirMachine) recommendations:
 > `filtered_gff/` High confidence miRNA family predictions after bitscore filtering. (This file is what you need in most cases)
 
 So, we'll stick with that.
-```{r check-fasta, eval=TRUE, engine='bash'}
+```{r check-filtered-gff, eval=TRUE, engine='bash'}
 # Load bash variables into memory
 source .bashvars
 
