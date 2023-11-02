@@ -17,6 +17,7 @@ bibliography: references.bib
 library(knitr)
 library(kableExtra)
 library(dplyr)
+library(reticulate)
 knitr::opts_chunk$set(
   echo = TRUE,         # Display code chunks
   eval = FALSE,        # Evaluate code chunks
@@ -27,5 +28,92 @@ knitr::opts_chunk$set(
 ```
 
 Use [MirMachine](https://github.com/sinanugur/MirMachine) [@umu2022]
+
+# Set R varialbes
+```{r R-variables}
+mirmachine_conda_env_name <- c("mirmachine_env")
+mirmachine_cond_path <- c("/home/sam/programs/mambaforge/condabin/conda")
+```
+
+
+# Create a Bash variables file
+
+This allows usage of Bash variables across R Markdown chunks.
+
+```{r save-bash-variables-to-rvars-file, engine='bash', eval=TRUE}
+{
+echo "#### Assign Variables ####"
+echo ""
+
+echo "# Data directories"
+echo 'export deep_dive_dir=/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive'
+echo 'export output_dir_top=${deep_dive_dir}/D-Apul/output/12-Apul-sRNAseq-MirMachine'
+echo ""
+
+echo "# Input/Output files"
+echo 'export genome_fasta_dir=${deep_dive_dir}/D-Apul/data/Amil/ncbi_dataset/data/GCF_013753865.1'
+echo 'export genome_fasta="${genome_fasta_dir}/GCF_013753865.1_Amil_v2.1_genomic.fna"'
+echo ""
+
+echo "# External data URLs"
+echo 'export genome_fasta_url="https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/013/753/865/GCF_013753865.1_Amil_v2.1/"'
+echo ""
+
+echo "# Set number of CPUs to use"
+echo 'export threads=40'
+echo ""
+} > .bashvars
+
+cat .bashvars
+```
+
+# Load Use [MirMachine](https://github.com/sinanugur/MirMachine) conda environment
+
+If this is successful, the first line of output should show that the Python being used
+is the one in your [MirMachine](https://github.com/sinanugur/MirMachine) conda environment path.
+
+E.g.
+
+`python:         /home/sam/programs/mambaforge/envs/mirmachine_env/bin/python`
+```{r load-mirmachine-conda-env eval=TRUE}
+use_condaenv(condaenv = mirmachine_conda_env_name, conda = mirmachine_cond_path)
+
+# Check successful env loading
+py_config()
+```
+
+# Download _A.millepora_ genome from NCBI (`GCF_013753865.1_Amil_v2.1`)
+```{r download-ncbi-genome-fasta, engine='bash', eval=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+wget \
+--directory-prefix ${genome_fasta_dir} \
+--recursive \
+--no-check-certificate \
+--continue \
+--no-host-directories \
+--no-directories \
+--no-parent \
+--quiet \
+--execute robots=off \
+--accept "GCF_013753865.1_Amil_v2.1_genomic.fna.gz,md5checksums.txt" ${genome_fasta_url}
+
+ls -lh "${genome_fasta_dir}"
+```
+
+
+## Verify MD5 checksum
+```{r verify-genome-fasta-checksum, engine='bash'}
+
+```
+
+```{r engine='bash'}
+MirMachine.py -p
+```
+
+```{r}
+
+```
 
 # Citations
