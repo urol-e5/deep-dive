@@ -52,7 +52,9 @@ echo ""
 
 echo "# Input/Output files"
 echo 'export genome_fasta_dir=${deep_dive_dir}/D-Apul/data/Amil/ncbi_dataset/data/GCF_013753865.1'
-echo 'export genome_fasta="${genome_fasta_dir}/GCF_013753865.1_Amil_v2.1_genomic.fna"'
+echo 'export genome_fasta_name="GCF_013753865.1_Amil_v2.1_genomic.fna"'
+echo 'export genome_fasta="${genome_fasta_dir}/${genome_fasta_name}"'
+
 echo ""
 
 echo "# External data URLs"
@@ -97,15 +99,21 @@ wget \
 --no-parent \
 --quiet \
 --execute robots=off \
---accept "GCF_013753865.1_Amil_v2.1_genomic.fna.gz,md5checksums.txt" ${genome_fasta_url}
+--accept "${genome_fasta_name}.gz,md5checksums.txt" ${genome_fasta_url}
 
 ls -lh "${genome_fasta_dir}"
 ```
 
 
-## Verify MD5 checksum
-```{r verify-genome-fasta-checksum, engine='bash'}
+## Verify genome FastA MD5 checksum
+```{r verify-genome-fasta-checksum, engine='bash', eval=TRUE}
+# Load bash variables into memory
+source .bashvars
 
+cd "${genome_fasta_dir}"
+
+# Checksums file contains other files, so this just looks for the sRNAseq files.
+grep "${genome_fasta_name}" md5checksums.txt | md5sum --check
 ```
 
 ```{r engine='bash'}
