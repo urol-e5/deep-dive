@@ -27,7 +27,29 @@ knitr::opts_chunk$set(
 )
 ```
 
-Use [MirMachine](https://github.com/sinanugur/MirMachine) [@umu2022]
+Use [MirMachine](https://github.com/sinanugur/MirMachine) [@umu2022] to identify potential
+miRNA homologs in the _A.millepora_ genome.
+
+The _A.millepora_ genome will be used as the reference genome for _A.pulchra_, as _A.pulchra_ does not currently
+have a sequenced genome and _A.millepora_ had highest alignment rates for standard RNAseq data compared to other published genomes tested.
+
+---
+
+Inputs:
+
+- Genome FastA.
+
+Outputs:
+
+- Confidence-filtered GFF of predicted miRNAs.
+- Unfiltered FastA of predicted miRNAs.
+- Unfiltered GFF of predicted miRNAs.
+
+Software requirements:
+
+- Requires a [MirMachine](https://github.com/sinanugur/MirMachine) Conda/Mamba environment, per the installation instructions.
+
+---
 
 # Set R varialbes
 ```{r R-variables, eval=TRUE}
@@ -209,5 +231,7 @@ grep "^[^#]" "${output_dir_top}/results/predictions/filtered_gff/${mirmarchine_o
 | sort -u \
 | wc -l
 ```
+
+---
 
 # Citations
