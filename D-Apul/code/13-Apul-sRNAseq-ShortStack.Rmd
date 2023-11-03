@@ -26,3 +26,102 @@ knitr::opts_chunk$set(
   comment = ""         # Prevents appending '##' to beginning of lines in code output
 )
 ```
+
+Use [ShortStack](https://github.com/MikeAxtell/ShortStack) [@johnson2016][@axtell2013][@shahid2014] to perform alignment of sRNAseq data and annotation of sRNA-producing genes.
+
+Uses trimmed reads from [08-Apul-sRNAseq-trimming.Rmd](https://github.com/urol-e5/deep-dive/blob/main/D-Apul/code/08-Apul-sRNAseq-trimming.Rmd).  Expect FastQ filename format like:
+
+`*flexbar_trim.20230621_[12]*.fastq.gz`
+
+---
+Inputs:
+
+- Genome FastA.
+
+Outputs:
+
+- Confidence-filtered GFF of predicted miRNAs.
+- Unfiltered FastA of predicted miRNAs.
+- Unfiltered GFF of predicted miRNAs.
+
+Software requirements:
+
+- Utilizes a [ShortStack](https://github.com/MikeAxtell/ShortStack#installation) Conda/Mamba environment, per the installation instructions.
+
+---
+
+
+# Set R variables
+Replace with name of your ShortStack environment and the path to the corresponding
+conda installation (find this _after_ you've activated the environment).
+
+E.g. 
+
+```{r conda-evn-example, eval=FALSE}
+# Activate environment
+conda activate ShortStack4_env
+
+# Find conda path
+which conda
+```
+
+
+```{r R-variables, eval=TRUE}
+shortstack_conda_env_name <- c("ShortStack4_env")
+shortstack_cond_path <- c("/home/sam/programs/mambaforge/condabin/conda")
+```
+
+# Create a Bash variables file
+
+This allows usage of Bash variables across R Markdown chunks.
+
+```{r save-bash-variables-to-rvars-file, engine='bash', eval=TRUE}
+{
+echo "#### Assign Variables ####"
+echo ""
+
+echo "# Data directories"
+echo 'export deep_dive_dir=/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive'
+echo 'export output_dir_top=${deep_dive_dir}/D-Apul/output/12-Apul-sRNAseq-MirMachine'
+echo ""
+
+echo 'export mirmarchine_output_prefix="Amil-MirMachine"'
+
+echo "# Input/Output files"
+echo 'export genome_fasta_dir=${deep_dive_dir}/D-Apul/data/Amil/ncbi_dataset/data/GCF_013753865.1'
+echo 'export genome_fasta_name="GCF_013753865.1_Amil_v2.1_genomic.fna"'
+echo 'export genome_fasta="${genome_fasta_dir}/${genome_fasta_name}"'
+
+echo ""
+
+echo "# External data URLs"
+echo 'export genome_fasta_url="https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/013/753/865/GCF_013753865.1_Amil_v2.1/"'
+echo ""
+
+echo "# Set number of CPUs to use"
+echo 'export threads=40'
+echo ""
+} > .bashvars
+
+cat .bashvars
+```
+
+# Load [ShortStack](https://github.com/MikeAxtell/ShortStack conda environment
+
+If this is successful, the first line of output should show that the Python being used
+is the one in your [ShortStack](https://github.com/MikeAxtell/ShortStack conda environment path.
+
+E.g.
+
+`python:         /home/sam/programs/mambaforge/envs/mirmachine_env/bin/python`
+
+```{r load-shortstack-conda-env, eval=TRUE}
+use_condaenv(condaenv = shortstack_conda_env_name, conda = shortstack_cond_path)
+
+# Check successful env loading
+py_config()
+```
+
+------------------------------------------------------------------------
+
+# Citations
