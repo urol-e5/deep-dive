@@ -195,6 +195,7 @@ find ../data/fastq/*R2_001.fastp-trim.20230519.fastq.gz \
 55.21% overall alignment rate
 ```
 
+## convert to bams
 
 ```{r, engine='bash'}
 for samfile in ../output/05.32-lncRNA-discovery/*.sam; do
@@ -212,14 +213,12 @@ for samfile in ../output/05.32-lncRNA-discovery/*.sam; do
 done
 ```
 
-# Samtools
-Convert SAM files to Binary Alignment Map (BAM) files, then sorts and saves them in the $APUL_DIR/push/bam directory. BAM files save on storage and speed up the next step in processing.
+
 
 # StringTie
 StringTie uses the sorted BAM files to assemble transcripts for each sample, outputting them as GTF (Gene Transfer Format) files. And then merges all individual GTF assemblies into a single merged GTF file. This step extracts transcript information and merges GTFs from all samples--an important step in creating a canonical list of lncRNAs across all samples included in the pipeline.
 
 
-Merges all individual GTF assemblies into a single merged GTF file.
 
 ```{r, engine='bash'}
 find ../output/05.32-lncRNA-discovery/*sorted.bam \
@@ -236,6 +235,10 @@ wc -l ../output/05.32-lncRNA-discovery/RNA*.gtf
 ls ../output/05.32-lncRNA-discovery/RNA*.gtf
 ```
 
+
+Merges all individual GTF assemblies into a single merged GTF file.
+
+
 ```{r, engine='bash'}
 /home/shared/stringtie-2.2.1.Linux_x86_64/stringtie \
 --merge \
@@ -243,6 +246,8 @@ ls ../output/05.32-lncRNA-discovery/RNA*.gtf
 -o ../output/05.32-lncRNA-discovery/stringtie_merged.gtf \
 ../output/05.32-lncRNA-discovery/*.gtf
 ```
+
+
 
 ```{r, engine='bash', eval=TRUE}
 
@@ -252,7 +257,7 @@ head ../output/05.32-lncRNA-discovery/stringtie_merged.gtf
 
 ```
 
-
+# GFFcompare
 
 
 ```{r, engine='bash'}
