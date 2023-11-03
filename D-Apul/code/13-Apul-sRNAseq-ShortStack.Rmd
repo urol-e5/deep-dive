@@ -80,27 +80,37 @@ This allows usage of Bash variables across R Markdown chunks.
 echo "#### Assign Variables ####"
 echo ""
 
+echo "# Trimmed FastQ naming pattern"
+echo "export trimmed_fastq_pattern='*flexbar_trim.25bp.fastq.gz'"
+
 echo "# Data directories"
 echo 'export deep_dive_dir=/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive'
-echo 'export output_dir_top=${deep_dive_dir}/D-Apul/output/12-Apul-sRNAseq-MirMachine'
+echo 'export apu_data_dir="${deep_dive_dir}/data"'
+echo 'export output_dir_top=${deep_dive_dir}/D-Apul/output/13-Apul-sRNAseq-ShortStack'
+echo 'export trimmed_fastqs_dir="${deep_dive_dir}/D-Apul/output/08-Apul-sRNAseq-trimming/trimmed-reads"'
 echo ""
-
-echo 'export mirmarchine_output_prefix="Amil-MirMachine"'
 
 echo "# Input/Output files"
 echo 'export genome_fasta_dir=${deep_dive_dir}/D-Apul/data/Amil/ncbi_dataset/data/GCF_013753865.1'
 echo 'export genome_fasta_name="GCF_013753865.1_Amil_v2.1_genomic.fna"'
 echo 'export genome_fasta="${genome_fasta_dir}/${genome_fasta_name}"'
-
+echo 'export mirbase_mature_fasta=mature.fa'
+echo 'export mirbase_mature_fasta_version=mirbase-mature-v22.1.fa'
 echo ""
 
 echo "# External data URLs"
 echo 'export genome_fasta_url="https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/013/753/865/GCF_013753865.1_Amil_v2.1/"'
+echo 'export mirbase_fasta_url="https://mirbase.org/download_version_files/22.1/"'
 echo ""
 
 echo "# Set number of CPUs to use"
 echo 'export threads=40'
 echo ""
+
+echo "# Initialize arrays"
+echo 'export trimmed_fastqs_array()'
+
+
 } > .bashvars
 
 cat .bashvars
