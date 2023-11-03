@@ -17,6 +17,7 @@ bibliography: references.bib
 library(knitr)
 library(kableExtra)
 library(dplyr)
+library(reticulate)
 knitr::opts_chunk$set(
   echo = TRUE,         # Display code chunks
   eval = FALSE,        # Evaluate code chunks
@@ -26,6 +27,211 @@ knitr::opts_chunk$set(
 )
 ```
 
-Use [MirMachine](https://github.com/sinanugur/MirMachine) [@umu2022]
+Use [MirMachine](https://github.com/sinanugur/MirMachine) [@umu2022] to identify potential
+miRNA homologs in the _A.millepora_ genome.
+
+The _A.millepora_ genome will be used as the reference genome for _A.pulchra_, as _A.pulchra_ does not currently
+have a sequenced genome and _A.millepora_ had highest alignment rates for standard RNAseq data compared to other published genomes tested.
+
+---
+
+Inputs:
+
+- Genome FastA.
+
+Outputs:
+
+- Confidence-filtered GFF of predicted miRNAs.
+- Unfiltered FastA of predicted miRNAs.
+- Unfiltered GFF of predicted miRNAs.
+
+Software requirements:
+
+- Requires a [MirMachine](https://github.com/sinanugur/MirMachine) Conda/Mamba environment, per the installation instructions.
+
+---
+
+# Set R varialbes
+```{r R-variables, eval=TRUE}
+mirmachine_conda_env_name <- c("mirmachine_env")
+mirmachine_cond_path <- c("/home/sam/programs/mambaforge/condabin/conda")
+```
+
+
+# Create a Bash variables file
+
+This allows usage of Bash variables across R Markdown chunks.
+
+```{r save-bash-variables-to-rvars-file, engine='bash', eval=TRUE}
+{
+echo "#### Assign Variables ####"
+echo ""
+
+echo "# Data directories"
+echo 'export deep_dive_dir=/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive'
+echo 'export output_dir_top=${deep_dive_dir}/D-Apul/output/12-Apul-sRNAseq-MirMachine'
+echo ""
+
+echo 'export mirmarchine_output_prefix="Amil-MirMachine"'
+
+echo "# Input/Output files"
+echo 'export genome_fasta_dir=${deep_dive_dir}/D-Apul/data/Amil/ncbi_dataset/data/GCF_013753865.1'
+echo 'export genome_fasta_name="GCF_013753865.1_Amil_v2.1_genomic.fna"'
+echo 'export genome_fasta="${genome_fasta_dir}/${genome_fasta_name}"'
+
+echo ""
+
+echo "# External data URLs"
+echo 'export genome_fasta_url="https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/013/753/865/GCF_013753865.1_Amil_v2.1/"'
+echo ""
+
+echo "# Set number of CPUs to use"
+echo 'export threads=40'
+echo ""
+} > .bashvars
+
+cat .bashvars
+```
+
+# Load [MirMachine](https://github.com/sinanugur/MirMachine) conda environment
+
+If this is successful, the first line of output should show that the Python being used
+is the one in your [MirMachine](https://github.com/sinanugur/MirMachine) conda environment path.
+
+E.g.
+
+`python:         /home/sam/programs/mambaforge/envs/mirmachine_env/bin/python`
+```{r load-mirmachine-conda-env, eval=TRUE}
+use_condaenv(condaenv = mirmachine_conda_env_name, conda = mirmachine_cond_path)
+
+# Check successful env loading
+py_config()
+```
+
+# Download _A.millepora_ genome from NCBI (`GCF_013753865.1_Amil_v2.1`)
+```{r download-ncbi-genome-fasta, engine='bash', eval=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+wget \
+--directory-prefix ${genome_fasta_dir} \
+--recursive \
+--no-check-certificate \
+--continue \
+--no-host-directories \
+--no-directories \
+--no-parent \
+--quiet \
+--execute robots=off \
+--accept "${genome_fasta_name}.gz,md5checksums.txt" ${genome_fasta_url}
+
+ls -lh "${genome_fasta_dir}"
+```
+
+
+## Verify genome FastA MD5 checksum
+```{r verify-genome-fasta-checksum, engine='bash', eval=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+cd "${genome_fasta_dir}"
+
+# Checksums file contains other files, so this just looks for the sRNAseq files.
+grep "${genome_fasta_name}" md5checksums.txt | md5sum --check
+```
+
+## Decompress FastA file
+```{r decompress-FastA, engine='bash', eval=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+cd "${genome_fasta_dir}"
+
+gunzip --keep "${genome_fasta_name}.gz"
+
+ls -lth
+```
+
+
+# Run [MirMachine](https://github.com/sinanugur/MirMachine)
+
+The `--species` option specifies output naming structure
+```{r mirmachine, engine='bash', eval=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+cd "${output_dir_top}"
+
+time \
+MirMachine.py \
+--node Metazoa \
+--species ${mirmarchine_output_prefix} \
+--genome ${genome_fasta} \
+--cpu 40 \
+--add-all-nodes \
+&> mirmachine.log
+```
+
+# Results
+
+## View [MirMachine](https://github.com/sinanugur/MirMachine) output structure
+```{r mirmachine-output-tree, eval=TRUE, engine='bash'}
+# Load bash variables into memory
+source .bashvars
+
+tree -h ${output_dir_top}/results/predictions
+```
+
+## Check FastA
+```{r check-mirmachine-fasta, eval=TRUE, engine='bash'}
+# Load bash variables into memory
+source .bashvars
+
+echo "Total number of predicted miRNAs (high & low confidence):"
+grep --count "^>" "${output_dir_top}/results/predictions/fasta/${mirmarchine_output_prefix}.PRE.fasta"
+echo ""
+echo "----------------------------------------------------------------------------------"
+echo ""
+
+head "${output_dir_top}/results/predictions/fasta/${mirmarchine_output_prefix}.PRE.fasta"
+```
+## Check filtered GFF
+Per [MirMachine](https://github.com/sinanugur/MirMachine) recommendations:
+
+> `filtered_gff/` High confidence miRNA family predictions after bitscore filtering. (This file is what you need in most cases)
+
+So, we'll stick with that.
+```{r check-filtered-gff, eval=TRUE, engine='bash'}
+# Load bash variables into memory
+source .bashvars
+
+# Avoid 10th line - lengthy list of all miRNA families examined
+head -n 9 "${output_dir_top}/results/predictions/filtered_gff/${mirmarchine_output_prefix}.PRE.gff"
+
+echo ""
+# Pull out lines that do _not_ begin with a '#'.
+grep "^[^#]" "${output_dir_top}/results/predictions/filtered_gff/${mirmarchine_output_prefix}.PRE.gff" \
+| head
+
+```
+
+## Counts of predicted high-confidence miRNAs
+```{r count-predicted-hc-mirnas, reval=TRUE, engine='bash'}
+# Load bash variables into memory
+source .bashvars
+
+# Skip lines which begin with '#' (i.e. the header components)
+echo "Predicted loci:"
+grep -c "^[^#]" "${output_dir_top}/results/predictions/filtered_gff/${mirmarchine_output_prefix}.PRE.gff"
+
+echo ""
+echo "Unique miRNA families:"
+grep "^[^#]" "${output_dir_top}/results/predictions/filtered_gff/${mirmarchine_output_prefix}.PRE.gff" \
+| awk -F"[\t=;]" '{print $10}' \
+| sort -u \
+| wc -l
+```
+
+---
 
 # Citations
