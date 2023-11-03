@@ -93,9 +93,10 @@ echo ""
 echo "# Input/Output files"
 echo 'export genome_fasta_dir=${deep_dive_dir}/D-Apul/data/Amil/ncbi_dataset/data/GCF_013753865.1'
 echo 'export genome_fasta_name="GCF_013753865.1_Amil_v2.1_genomic.fna"'
-echo 'export genome_fasta="${genome_fasta_dir}/${genome_fasta_name}"'
+echo 'export shortstack_genome_fasta_name="GCF_013753865.1_Amil_v2.1_genomic.fa"'
 echo 'export mirbase_mature_fasta=mature.fa'
 echo 'export mirbase_mature_fasta_version=mirbase-mature-v22.1.fa'
+echo 'export genome_fasta="${genome_fasta_dir}/${shortstack_genome_fasta_name}"'
 echo ""
 
 echo "# External data URLs"
@@ -156,9 +157,16 @@ ls -lh "${deep_dive_data_dir}"
 ```
 # Run ShortStack
 
+Uses the `--dn_mirna` 
 ```{r shortstack, engine='bash', eval=TRUE}
 # Load bash variables into memory
 source .bashvars
+
+# Copy genome FastA to ShortStack-compatible filename (ending with .fa)
+cp ${genome_fasta_dir}/${genome_fasta_name} ${genome_fasta_dir}/${shortstack_genome_fasta_name}
+
+# Confirm
+ls -lh ${genome_fasta_dir}/${shortstack_genome_fasta_name}
 
 # Create array of trimmed FastQs
 trimmed_fastqs_array=(${fastq_pattern})
@@ -168,13 +176,13 @@ trimmed_fastqs_list=$(echo "${trimmed_fastq_array[*]}")
 
 ###### Run ShortStack ######
 time \
-${programs_array[ShortStack]} \
+ShortStack \
 --genomefile "${genome_fasta}" \
 --readfile ${trimmed_fastqs_list} \
 --known_miRNAs ${deep_dive_data_dir}/${mirbase_mature_fasta_version} \
 --dn_mirna \
 --threads ${threads} \
---outdir ${output_dir_top}
+--outdir ${output_dir_top}/ShortStack
 
 ######## Create MD5 checksums for trimmed FastQs ########
 # Serves a way to list FastQs used for ShortStack and record checksums
