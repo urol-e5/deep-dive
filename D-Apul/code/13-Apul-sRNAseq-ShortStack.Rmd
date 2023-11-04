@@ -36,34 +36,30 @@ Uses trimmed reads from [08-Apul-sRNAseq-trimming.Rmd](https://github.com/urol-e
 ---
 Inputs:
 
-- Genome FastA.
+
 
 Outputs:
 
-- Confidence-filtered GFF of predicted miRNAs.
-- Unfiltered FastA of predicted miRNAs.
-- Unfiltered GFF of predicted miRNAs.
+
 
 Software requirements:
 
 - Utilizes a [ShortStack](https://github.com/MikeAxtell/ShortStack#installation) Conda/Mamba environment, per the installation instructions.
-
----
-
-
 
 Replace with name of your ShortStack environment and the path to the corresponding
 conda installation (find this _after_ you've activated the environment).
 
 E.g. 
 
-```{r conda-evn-example, eval=FALSE}
+```bash
 # Activate environment
 conda activate ShortStack4_env
 
 # Find conda path
 which conda
 ```
+
+---
 
 # Set R variables
 
@@ -105,7 +101,7 @@ echo 'export mirbase_fasta_url="https://mirbase.org/download_version_files/22.1/
 echo ""
 
 echo "# Set number of CPUs to use"
-echo 'export threads=40'
+echo 'export threads=46'
 echo ""
 
 echo "# Initialize arrays"
@@ -161,7 +157,7 @@ ls -lh "${deep_dive_data_dir}"
 
 Uses the `--dn_mirna` option to identify miRNAs in the genome, without relying
 on the `--known_miRNAs`.
-```{r shortstack, engine='bash', eval=TRUE}
+```{r shortstack, engine='bash', eval=TRUE, cache=TRUE}
 # Load bash variables into memory
 source .bashvars
 
@@ -187,14 +183,9 @@ ShortStack \
 --known_miRNAs ${deep_dive_data_dir}/${mirbase_mature_fasta_version} \
 --dn_mirna \
 --threads ${threads} \
---outdir ${output_dir_top}/ShortStack
+--outdir ${output_dir_top}/ShortStack_out \
+&> ${output_dir_top}/ShortStack_out/shortstack.log
 
-######## Create MD5 checksums for trimmed FastQs ########
-# Serves a way to list FastQs used for ShortStack and record checksums
-for fastq in ${fastq_pattern}
-do
-  md5sum "${fastq}"
-done
 ```
 
 
