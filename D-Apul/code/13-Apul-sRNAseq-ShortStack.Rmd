@@ -184,11 +184,82 @@ ShortStack \
 --dn_mirna \
 --threads ${threads} \
 --outdir ${output_dir_top}/ShortStack_out \
-&> ${output_dir_top}/ShortStack_out/shortstack.log
+&> ${output_dir_top}/shortstack.log
+
+```
+# Results
+
+## ShortStack synopsis
+
+```{r shortstack-synopsis, engine='bash', eval=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+tail -n 20 ${output_dir_top}/shortstack.log
+```
+
+ShortStack didn't identify _any_ miRNAs.
+
+## Inspect `Results.txt`
+
+
+```{r results-txt-file, engine='bash', eval=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+head ${output_dir_top}/ShortStack_out/Results.txt
+
+echo ""
+echo "----------------------------------------------------------"
+echo ""
+
+echo "Nummber of potential loci:"
+awk '(NR>1)' ${output_dir_top}/ShortStack_out/Results.txt | wc -l
+```
+
+Column 20 of the `Results.txt` file identifies if a cluster is a miRNA or not (`Y` or `N`).
+
+```{r results-txt-miRNAs, engine='bash', eval=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+echo "Number of loci characterized as miRNA:"
+awk '$20=="Y" {print $0}' ${output_dir_top}/ShortStack_out/Results.txt \
+| wc -l
+echo ""
+
+echo "----------------------------------------------------------"
+
+echo ""
+echo "Number of loci _not_ characterized as miRNA:"
+awk '$20=="N" {print $0}' ${output_dir_top}/ShortStack_out/Results.txt \
+| wc -l
 
 ```
 
+Column 21 of the `Results.txt` file identifies if a cluster aligned to a known miRNA (miRBase) or not (`Y` or `NA`).
 
+Since there are no miRNAs, the following code will _not_ print any output.
+
+The `echo` command after the `awk` command is simply there to prove that the chunk executed.
+```{r results-txt-miRBase-miRNAs, engine='bash', eval=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+echo "Number of loci matching miRBase miRNAs:"
+awk '$21!="NA" {print $0}' ${output_dir_top}/ShortStack_out/Results.txt \
+| wc -l
+echo ""
+
+echo "----------------------------------------------------------"
+
+echo ""
+echo "Number of loci _not_ matching miRBase miRNAs:"
+awk '$21=="NA" {print $0}' ${output_dir_top}/ShortStack_out/Results.txt \
+| wc -l
+
+```
+Although there are loci with matches to miRBase miRNAs, ShortStack did _not_ annotated these clusters as miRNAs likely [because they do not _also_ match secondary structure criteria](https://github.com/MikeAxtell/ShortStack#mirna-annotation).
 
 ------------------------------------------------------------------------
 
