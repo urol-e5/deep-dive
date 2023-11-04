@@ -51,7 +51,7 @@ Software requirements:
 ---
 
 
-# Set R variables
+
 Replace with name of your ShortStack environment and the path to the corresponding
 conda installation (find this _after_ you've activated the environment).
 
@@ -65,6 +65,7 @@ conda activate ShortStack4_env
 which conda
 ```
 
+# Set R variables
 
 ```{r R-variables, eval=TRUE}
 shortstack_conda_env_name <- c("ShortStack4_env")
@@ -81,7 +82,7 @@ echo "#### Assign Variables ####"
 echo ""
 
 echo "# Trimmed FastQ naming pattern"
-echo "export trimmed_fastq_pattern='*flexbar_trim.25bp.fastq.gz'"
+echo "export trimmed_fastqs_pattern='*flexbar_trim.25bp*.fastq.gz'"
 
 echo "# Data directories"
 echo 'export deep_dive_dir=/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive'
@@ -116,7 +117,7 @@ echo 'export trimmed_fastqs_array=()'
 cat .bashvars
 ```
 
-# Load [ShortStack](https://github.com/MikeAxtell/ShortStack conda environment
+# Load [ShortStack](https://github.com/MikeAxtell/ShortStack) conda environment
 
 If this is successful, the first line of output should show that the Python being used
 is the one in your [ShortStack](https://github.com/MikeAxtell/ShortStack conda environment path.
@@ -155,9 +156,11 @@ mv ${deep_dive_data_dir}/${mirbase_mature_fasta} ${deep_dive_data_dir}/${mirbase
 
 ls -lh "${deep_dive_data_dir}"
 ```
+
 # Run ShortStack
 
-Uses the `--dn_mirna` 
+Uses the `--dn_mirna` option to identify miRNAs in the genome, without relying
+on the `--known_miRNAs`.
 ```{r shortstack, engine='bash', eval=TRUE}
 # Load bash variables into memory
 source .bashvars
@@ -169,10 +172,12 @@ cp ${genome_fasta_dir}/${genome_fasta_name} ${genome_fasta_dir}/${shortstack_gen
 ls -lh ${genome_fasta_dir}/${shortstack_genome_fasta_name}
 
 # Create array of trimmed FastQs
-trimmed_fastqs_array=(${fastq_pattern})
+trimmed_fastqs_array=(${trimmed_fastqs_dir}/${trimmed_fastqs_pattern})
+
 
 # Pass array contents to new variable as space-delimited list
-trimmed_fastqs_list=$(echo "${trimmed_fastq_array[*]}")
+trimmed_fastqs_list=$(echo "${trimmed_fastqs_array[*]}")
+
 
 ###### Run ShortStack ######
 time \
