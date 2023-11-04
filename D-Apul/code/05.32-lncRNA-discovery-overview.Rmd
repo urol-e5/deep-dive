@@ -32,7 +32,8 @@ knitr::opts_chunk$set(
   message = FALSE,     # Hide messages
   fig.width = 6,       # Set plot width in inches
   fig.height = 4,      # Set plot height in inches
-  fig.align = "center" # Align plots to the center
+  fig.align = "center", # Align plots to the center
+  comment = ""         # Prevents appending '##' to beginning of lines in code output
 )
 ```
 
@@ -238,6 +239,7 @@ ls ../output/05.32-lncRNA-discovery/RNA*.gtf
 
 Merges all individual GTF assemblies into a single merged GTF file.
 
+This is used to create a non-redundant set of transcripts after running StringTie separately on multiple RNA-Seq datasets.
 
 ```{r, engine='bash'}
 /home/shared/stringtie-2.2.1.Linux_x86_64/stringtie \
@@ -254,16 +256,21 @@ Merges all individual GTF assemblies into a single merged GTF file.
 wc -l ../output/05.32-lncRNA-discovery/stringtie_merged.gtf
 head ../output/05.32-lncRNA-discovery/stringtie_merged.gtf
 
+cat ../output/05.32-lncRNA-discovery/stringtie_merged.gtf | awk '$3 == "transcript"' | wc -l
+
+echo "what is possible"
+
+grep -v '^#' ../output/05.32-lncRNA-discovery/stringtie_merged.gtf | cut -f3 | sort | uniq
+
 
 ```
 
 # GFFcompare
-
+https://ccb.jhu.edu/software/stringtie/gffcompare.shtml
 
 ```{r, engine='bash'}
 /home/shared/gffcompare-0.12.6.Linux_x86_64/gffcompare \
 -r ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gff \
--G \
 -o ../output/05.32-lncRNA-discovery/gffcompare_merged \
 ../output/05.32-lncRNA-discovery/stringtie_merged.gtf
 ```
@@ -273,11 +280,46 @@ head ../output/05.32-lncRNA-discovery/stringtie_merged.gtf
 ls ../output/05.32-lncRNA-discovery/gffcompare_merged*
 ```
 
-```{r, engine='bash', eval=TRUE}
-head -3 ../output/05.32-lncRNA-discovery/gffcompare_merged.annotated.gtf
+```
+# gffcompare v0.12.6 | Command line was:
+#/home/shared/gffcompare-0.12.6.Linux_x86_64/gffcompare -r ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gff -o ../output/05.32-lncRNA-discovery/gffcompare_merged ../output/05.32-lncRNA-discovery/stringtie_merged.gtf
+#
+
+#= Summary for dataset: ../output/05.32-lncRNA-discovery/stringtie_merged.gtf 
+#     Query mRNAs :  113222 in   71018 loci  (75934 multi-exon transcripts)
+#            (15354 multi-transcript loci, ~1.6 transcripts per locus)
+# Reference mRNAs :   56768 in   42059 loci  (45231 multi-exon)
+# Super-loci w/ reference transcripts:    39560
+#-----------------| Sensitivity | Precision  |
+        Base level:   100.0     |    77.9    |
+        Exon level:    98.2     |    74.3    |
+      Intron level:    99.7     |    86.3    |
+Intron chain level:   100.0     |    59.6    |
+  Transcript level:    99.6     |    49.9    |
+       Locus level:    99.6     |    55.6    |
+
+     Matching intron chains:   45231
+       Matching transcripts:   56552
+              Matching loci:   41901
+
+          Missed exons:       0/255069	(  0.0%)
+           Novel exons:   52430/339451	( 15.4%)
+        Missed introns:     520/209271	(  0.2%)
+         Novel introns:   16647/241625	(  6.9%)
+           Missed loci:       0/42059	(  0.0%)
+            Novel loci:   31458/71018	( 44.3%)
+
+ Total union super-loci across all input datasets: 71018 
+113222 out of 113222 consensus transcripts written in ../output/05.32-lncRNA-discovery/gffcompare_merged.annotated.gtf (0 discarded as redundant)
 ```
 
 
+
+```{r, engine='bash', eval=TRUE}
+head -10 ../output/05.32-lncRNA-discovery/gffcompare_merged.annotated.gtf
+```
+
+![gff](http://gannet.fish.washington.edu/seashell/snaps/2023-11-03_09-25-24.png)
 
 
 # Filter
@@ -285,10 +327,11 @@ Filters the combined GTF output from GFFcompare to select only the lines represe
 
 ```{r, engine='bash'}
 awk '$3 == "transcript" && $1 !~ /^#/ {print}' \
-../output/05.32-lncRNA-discovery/gffcompare_merged.annotated.gtf | grep 'class_code "u"' | awk '$5 - $4 > 199 {print}' > ../output/05.32-lncRNA-discovery/Apul_lncRNA_candidates.gtf
+../output/05.32-lncRNA-discovery/gffcompare_merged.annotated.gtf | grep 'class_code "u"\|class_code "x"|\class_code "i"\|class_code "y"' | awk '$5 - $4 > 199 {print}' > ../output/05.32-lncRNA-discovery/Apul_lncRNA_candidates.gtf
 ```
 
 ```{r, engine='bash', eval=TRUE}
+wc -l ../output/05.32-lncRNA-discovery/Apul_lncRNA_candidates.gtf
 head ../output/05.32-lncRNA-discovery/Apul_lncRNA_candidates.gtf
 ```
 
@@ -333,15 +376,53 @@ Matches these IDs with the sequences from the previous step to generate a GTF of
 
 ```{r, engine='bash'}
 awk '$8 == "noncoding" {print $1}' ../output/05.32-lncRNA-discovery/Apul_CPC2.txt > ../output/05.32-lncRNA-discovery/Apul_noncoding_transcripts_ids.txt
-
-grep -Fwf ../output/05.32-lncRNA-discovery/Apul_noncoding_transcripts_ids.txt ../output/05.32-lncRNA-discovery/Apul_lncRNA_candidates.fasta > ../output/05.32-lncRNA-discovery/Apul_lncRNAs.gtf
 ```
 
+```{r, engine='bash'}
+wc -l ../output/05.32-lncRNA-discovery/Apul_noncoding_transcripts_ids.txt
+head ../output/05.32-lncRNA-discovery/Apul_noncoding_transcripts_ids.txt
+```
+
+
+```{bash}
+head ../output/05.32-lncRNA-discovery/Apul_lncRNA_candidates.fasta
+```
+
+
+```{r, engine='bash'}
+grep -Fwf ../output/05.32-lncRNA-discovery/Apul_noncoding_transcripts_ids.txt ../output/05.32-lncRNA-discovery/Apul_lncRNA_candidates.fasta > ../output/05.32-lncRNA-discovery/Apul_lncRNAs.txt
+```
+
+index fasta
+
+faidx 
+
+samtools 
+
+faidx --region-file listofids
 
 ```{r, engine='bash', eval=TRUE}
-wc -l ../output/05.32-lncRNA-discovery/Apul_lncRNAs.gtf
-head ../output/05.32-lncRNA-discovery/Apul_lncRNAs.gtf
+wc -l ../output/05.32-lncRNA-discovery/Apul_lncRNAs.txt
+head ../output/05.32-lncRNA-discovery/Apul_lncRNAs.txt
 ```
+
+```{bash}
+awk -F ":" '{print $3 "\t" $4 "\t" $5}' ../output/05.32-lncRNA-discovery/Apul_lncRNAs.txt >
+../output/05.32-lncRNA-discovery/Apul_CPT.bed
+
+```
+
+
+```{r, engine='bash'}
+/home/shared/bedtools2/bin/fastaFromBed \
+-fi ../data/GCF_013753865.1_Amil_v2.1_genomic.fna \
+-bed ../output/05.32-lncRNA-discovery/Apul_lncRNAs.gtf \
+-fo ../output/05.32-lncRNA-discovery/Apul_lncRNA.fasta \
+-name -split
+```
+
+
+
 
 # De-duplicate GTF
 Removes duplicate entries from the GTF file. This results in a list of lncRNAs with transcript IDs that show scaffold and base range.
