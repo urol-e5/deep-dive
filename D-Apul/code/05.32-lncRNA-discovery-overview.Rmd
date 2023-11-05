@@ -41,6 +41,8 @@ knitr::opts_chunk$set(
 
 # Run HiSat on RNA-seq
 
+Will end up with 5 sorted bam files. 
+
 ## Grab Trimmed RNA-seq Reads
 
 ```{r, engine='bash'}
@@ -70,6 +72,7 @@ curl -O http://gannet.fish.washington.edu/seashell/snaps/GCF_013753865.1_Amil_v2
 
 ```{r, engine='bash', eval=TRUE}
 head ../output/05.32-lncRNA-discovery/m_exon.tab
+wc -l ../output/05.32-lncRNA-discovery/m_exon.tab
 ```
 
 ```{r, engine='bash'}
@@ -216,6 +219,15 @@ done
 
 
 
+## Looking at Bams 
+
+![igv](http://gannet.fish.washington.edu/seashell/snaps/Monosnap_IGV_2023-11-05_09-57-16.png)
+
+
+```{r, engine='bash', eval=TRUE}
+ls ../output/05.32-lncRNA-discovery/*xml
+```
+
 # StringTie
 StringTie uses the sorted BAM files to assemble transcripts for each sample, outputting them as GTF (Gene Transfer Format) files. And then merges all individual GTF assemblies into a single merged GTF file. This step extracts transcript information and merges GTFs from all samples--an important step in creating a canonical list of lncRNAs across all samples included in the pipeline.
 
@@ -236,6 +248,7 @@ wc -l ../output/05.32-lncRNA-discovery/RNA*.gtf
 ls ../output/05.32-lncRNA-discovery/RNA*.gtf
 ```
 
+![gtf](http://gannet.fish.washington.edu/seashell/snaps/Monosnap_IGV_-_Session_Userssr320DesktopApul_lncRNA_igv_session.xml_2023-11-05_10-11-31.png)
 
 Merges all individual GTF assemblies into a single merged GTF file.
 
@@ -256,7 +269,6 @@ This is used to create a non-redundant set of transcripts after running StringTi
 wc -l ../output/05.32-lncRNA-discovery/stringtie_merged.gtf
 head ../output/05.32-lncRNA-discovery/stringtie_merged.gtf
 
-cat ../output/05.32-lncRNA-discovery/stringtie_merged.gtf | awk '$3 == "transcript"' | wc -l
 
 echo "what is possible"
 
@@ -384,61 +396,53 @@ head ../output/05.32-lncRNA-discovery/Apul_noncoding_transcripts_ids.txt
 ```
 
 
-```{bash}
+```{r, engine='bash', eval=TRUE}
 head ../output/05.32-lncRNA-discovery/Apul_lncRNA_candidates.fasta
+fgrep -c ">" ../output/05.32-lncRNA-discovery/Apul_lncRNA_candidates.fasta
 ```
 
 # subsetting fasta
 ```{r, engine='bash'}
 /home/shared/samtools-1.12/samtools faidx ../output/05.32-lncRNA-discovery/Apul_lncRNA_candidates.fasta \
--r ../output/05.32-lncRNA-discovery/Apul_noncoding_transcripts_ids.txt > ../output/05.32-lncRNA-discovery/Apul_lncRNAs.txt
+-r ../output/05.32-lncRNA-discovery/Apul_noncoding_transcripts_ids.txt > ../output/05.32-lncRNA-discovery/Apul_lncRNA.fasta
 
 ```
 
 
-
 ```{r, engine='bash', eval=TRUE}
-fgrep -c ">" ../output/05.32-lncRNA-discovery/Apul_lncRNAs.txt
-fgrep ">" ../output/05.32-lncRNA-discovery/Apul_lncRNAs.txt | head -5
+fgrep -c ">" ../output/05.32-lncRNA-discovery/Apul_lncRNA.fasta
+fgrep ">" ../output/05.32-lncRNA-discovery/Apul_lncRNA.fasta | head -5
 
-head ../output/05.32-lncRNA-discovery/Apul_lncRNAs.txt
+head ../output/05.32-lncRNA-discovery/Apul_lncRNA.fasta
+```
+
+# Getting genome feature track
+
+```{r, engine='python'}
+
+# Open the input file and the output file
+with open('../output/05.32-lncRNA-discovery/Apul_noncoding_transcripts_ids.txt', 'r') as infile, open('../output/05.32-lncRNA-discovery/Apul_lncRNA.bed', 'w') as outfile:
+    # Process each line in the input file
+    for line in infile:
+        # Remove 'transcript::' and then split the line by ':' to extract the relevant parts
+        parts = line.strip().replace('transcript::', '').split(':')
+        chromosome = parts[0]
+        # Split the position part by '-' to get start and end positions
+        start, end = parts[1].split('-')
+        
+        # BED format requires the start position to be 0-based
+        # Convert the start position to 0-based by subtracting 1
+        start = str(int(start) - 1)
+        
+        # Write the chromosome, start, and end positions to the output file
+        # Separate each field with a tab character
+        outfile.write(f'{chromosome}\t{start}\t{end}\n')
+
+# After running this script, 'output.bed' will contain the converted data in BED format.
+
 ```
 
 ```{bash}
-fgrep "468619	469943" ../output/05.32-lncRNA-discovery/Apul_lncRNA_candidates.gtf 
+head ../output/05.32-lncRNA-discovery/Apul_lncRNA.bed 
 ```
 
-
-
-NC_058066.1	StringTie	transcript	468618	469943	.	+	.	transcript_id "MSTRG.40.1"; gene_id "MSTRG.40"; xloc "XLOC_000020"; class_code "u"; tss_id "TSS38";
-
-
-```{r, engine='bash'}
-#sed 's/transcript::\(.*\)/\1/' ../output/05.32-lncRNA-discovery/Apul_lncRNAs.txt > ../output/05.32-lncRNA-discovery/patterns.txt
-grep -F -f ../output/05.32-lncRNA-discovery/Apul_lncRNAs.txt ../output/05.32-lncRNA-discovery/Apul_lncRNA_candidates.gtf > ../output/05.32-lncRNA-discovery/Apul_lncRNA.gtf
-```
-
-
-```{r, engine='bash'}
-patterns_file="../output/05.32-lncRNA-discovery/Apul_lncRNAs.txt"
-file_to_subset="../output/05.32-lncRNA-discovery/Apul_lncRNA_candidates.gtf"
-output_file="../output/05.32-lncRNA-discovery/Apul_lncRNA_subset.gtf"
-
-# Read each pattern and grep in the gtf file
-while IFS= read -r line
-do
-    # Extract the pattern from the line
-    pattern=$(echo "$line" | awk -F'::' '{print $2}' | sed 's/:/_/g; s/-/_/g')
-    # Use grep to search the pattern in the gtf file and append matches to the output file
-    grep "$pattern" "$file_to_subset" >> "$output_file"
-done < "$patterns_file"
-```
-
-
-
-
-```{r, engine='bash', eval=TRUE}
-
-wc -l  ../output/05.32-lncRNA-discovery/Apul_lncRNA.gtf
-head ../output/05.32-lncRNA-discovery/Apul_lncRNA.gtf
-```
