@@ -326,8 +326,8 @@ head -10 ../output/05.32-lncRNA-discovery/gffcompare_merged.annotated.gtf
 Filters the combined GTF output from GFFcompare to select only the lines representing "transcripts" and excluding lines starting with "#" (these are lines in the output format from GFFcompare that don't contain transcript information). This step further filters for a class code of "u", and keep only those with lengths greater than 199 bases. The "u' class code from the GFFcompare step is for "unknown" transcripts, that is those that are not previously annotated in our reference GFF as protein coding. The size filter of +200nt is a common filtering step for isolating lncRNAs.
 
 ```{r, engine='bash'}
-awk '$3 == "transcript" && $1 !~ /^#/ {print}' \
-../output/05.32-lncRNA-discovery/gffcompare_merged.annotated.gtf | grep 'class_code "u"\|class_code "x"|\class_code "i"\|class_code "y"' | awk '$5 - $4 > 199 {print}' > ../output/05.32-lncRNA-discovery/Apul_lncRNA_candidates.gtf
+awk '$3 == "transcript" && $1 !~ /^#/' \
+../output/05.32-lncRNA-discovery/gffcompare_merged.annotated.gtf | grep 'class_code "u"\|class_code "x"|\class_code "i"\|class_code "y"' | awk '($5 - $4 > 199) || ($4 - $5 > 199)' > ../output/05.32-lncRNA-discovery/Apul_lncRNA_candidates.gtf
 ```
 
 ```{r, engine='bash', eval=TRUE}
@@ -388,54 +388,57 @@ head ../output/05.32-lncRNA-discovery/Apul_noncoding_transcripts_ids.txt
 head ../output/05.32-lncRNA-discovery/Apul_lncRNA_candidates.fasta
 ```
 
-
+# subsetting fasta
 ```{r, engine='bash'}
-grep -Fwf ../output/05.32-lncRNA-discovery/Apul_noncoding_transcripts_ids.txt ../output/05.32-lncRNA-discovery/Apul_lncRNA_candidates.fasta > ../output/05.32-lncRNA-discovery/Apul_lncRNAs.txt
+/home/shared/samtools-1.12/samtools faidx ../output/05.32-lncRNA-discovery/Apul_lncRNA_candidates.fasta \
+-r ../output/05.32-lncRNA-discovery/Apul_noncoding_transcripts_ids.txt > ../output/05.32-lncRNA-discovery/Apul_lncRNAs.txt
+
 ```
 
-index fasta
 
-faidx 
-
-samtools 
-
-faidx --region-file listofids
 
 ```{r, engine='bash', eval=TRUE}
-wc -l ../output/05.32-lncRNA-discovery/Apul_lncRNAs.txt
+fgrep -c ">" ../output/05.32-lncRNA-discovery/Apul_lncRNAs.txt
+fgrep ">" ../output/05.32-lncRNA-discovery/Apul_lncRNAs.txt | head -5
+
 head ../output/05.32-lncRNA-discovery/Apul_lncRNAs.txt
 ```
 
 ```{bash}
-awk -F ":" '{print $3 "\t" $4 "\t" $5}' ../output/05.32-lncRNA-discovery/Apul_lncRNAs.txt >
-../output/05.32-lncRNA-discovery/Apul_CPT.bed
+fgrep "468619	469943" ../output/05.32-lncRNA-discovery/Apul_lncRNA_candidates.gtf 
+```
 
+
+
+NC_058066.1	StringTie	transcript	468618	469943	.	+	.	transcript_id "MSTRG.40.1"; gene_id "MSTRG.40"; xloc "XLOC_000020"; class_code "u"; tss_id "TSS38";
+
+
+```{r, engine='bash'}
+#sed 's/transcript::\(.*\)/\1/' ../output/05.32-lncRNA-discovery/Apul_lncRNAs.txt > ../output/05.32-lncRNA-discovery/patterns.txt
+grep -F -f ../output/05.32-lncRNA-discovery/Apul_lncRNAs.txt ../output/05.32-lncRNA-discovery/Apul_lncRNA_candidates.gtf > ../output/05.32-lncRNA-discovery/Apul_lncRNA.gtf
 ```
 
 
 ```{r, engine='bash'}
-/home/shared/bedtools2/bin/fastaFromBed \
--fi ../data/GCF_013753865.1_Amil_v2.1_genomic.fna \
--bed ../output/05.32-lncRNA-discovery/Apul_lncRNAs.gtf \
--fo ../output/05.32-lncRNA-discovery/Apul_lncRNA.fasta \
--name -split
+patterns_file="../output/05.32-lncRNA-discovery/Apul_lncRNAs.txt"
+file_to_subset="../output/05.32-lncRNA-discovery/Apul_lncRNA_candidates.gtf"
+output_file="../output/05.32-lncRNA-discovery/Apul_lncRNA_subset.gtf"
+
+# Read each pattern and grep in the gtf file
+while IFS= read -r line
+do
+    # Extract the pattern from the line
+    pattern=$(echo "$line" | awk -F'::' '{print $2}' | sed 's/:/_/g; s/-/_/g')
+    # Use grep to search the pattern in the gtf file and append matches to the output file
+    grep "$pattern" "$file_to_subset" >> "$output_file"
+done < "$patterns_file"
 ```
 
 
 
 
-# De-duplicate GTF
-Removes duplicate entries from the GTF file. This results in a list of lncRNAs with transcript IDs that show scaffold and base range.
-awk '!seen[$0]++' $OUTPUT_DIR/apul_merged_final_lncRNAs.gtf > $OUTPUT_DIR/apul_deduplicated_final_lncRNAs.gtf
+```{r, engine='bash', eval=TRUE}
 
-# Reformat to BED
-Converts the GTF format to BED (Browser Extensible Data) format, a commonly used format for representing genomic intervals. This allows us to use bedtools to generate a FASTA of lncRNAs.
-awk -F":|-" '{print $3 "\t" $4 "\t" $5}' $OUTPUT_DIR/apul_deduplicated_final_lncRNAs.gtf > $OUTPUT_DIR/apul_deduplicated_final_lncRNAs.bed
-
-# BEDTools
-This extracts sequences from the reference FASTA based on the BED file's coordinates. The resulting sequences represent the final set of non-redundant lncRNAs.
-$BEDTOOLS_PATH/bedtools \
-getfasta -fi $FASTA -bed $OUTPUT_DIR/apul_deduplicated_final_lncRNAs.bed -fo $OUTPUT_DIR/apul_bedtools_lncRNAs.fasta -name
+wc -l  ../output/05.32-lncRNA-discovery/Apul_lncRNA.gtf
+head ../output/05.32-lncRNA-discovery/Apul_lncRNA.gtf
 ```
-
-The results of this pipleine provide the user with GTF files containing transcript IDs (scaffold and sequence range), BED files displaying the same transcript IDs in BED format for use with BEDtools, and FASTA files containing the sequence of identified lncRNAs.
