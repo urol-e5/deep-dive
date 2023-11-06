@@ -165,7 +165,7 @@ done
 ![igv](http://gannet.fish.washington.edu/seashell/snaps/Monosnap_IGV_2023-11-05_09-57-16.png)
 
 
-```{r, engine='bash', eval=TRUE}
+```{r, engine='bash'}
 ls ../output/05.32-lncRNA-discovery/*xml
 ```
 
@@ -188,8 +188,8 @@ find ../output/05-lncRNA-discovery/*sorted.bam \
 
 
 ```{r, engine='bash', eval=TRUE}
-wc -l ../output/05.32-lncRNA-discovery/RNA*.gtf
-ls ../output/05.32-lncRNA-discovery/RNA*.gtf
+wc -l ../output/05-lncRNA-discovery/RNA*.gtf
+ls ../output/05-lncRNA-discovery/RNA*.gtf
 ```
 
 ![gtf](http://gannet.fish.washington.edu/seashell/snaps/Monosnap_IGV_-_Session_Userssr320DesktopApul_lncRNA_igv_session.xml_2023-11-05_10-11-31.png)
@@ -201,22 +201,22 @@ This is used to create a non-redundant set of transcripts after running StringTi
 ```{r, engine='bash'}
 /home/shared/stringtie-2.2.1.Linux_x86_64/stringtie \
 --merge \
--G ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gff \
--o ../output/05.32-lncRNA-discovery/stringtie_merged.gtf \
-../output/05.32-lncRNA-discovery/*.gtf
+-G ../data/Porites_evermanni_v1.annot.gff \
+-o ../output/05-lncRNA-discovery/stringtie_merged.gtf \
+../output/05-lncRNA-discovery/*.gtf
 ```
 
 
 
 ```{r, engine='bash', eval=TRUE}
 
-wc -l ../output/05.32-lncRNA-discovery/stringtie_merged.gtf
-head ../output/05.32-lncRNA-discovery/stringtie_merged.gtf
+wc -l ../output/05-lncRNA-discovery/stringtie_merged.gtf
+head ../output/05-lncRNA-discovery/stringtie_merged.gtf
 
 
 echo "what is possible"
 
-grep -v '^#' ../output/05.32-lncRNA-discovery/stringtie_merged.gtf | cut -f3 | sort | uniq
+grep -v '^#' ../output/05-lncRNA-discovery/stringtie_merged.gtf | cut -f3 | sort | uniq
 
 
 ```
@@ -226,53 +226,22 @@ https://ccb.jhu.edu/software/stringtie/gffcompare.shtml
 
 ```{r, engine='bash'}
 /home/shared/gffcompare-0.12.6.Linux_x86_64/gffcompare \
--r ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gff \
--o ../output/05.32-lncRNA-discovery/gffcompare_merged \
-../output/05.32-lncRNA-discovery/stringtie_merged.gtf
+-r ../data/Porites_evermanni_v1.annot.gff \
+-o ../output/05-lncRNA-discovery/gffcompare_merged \
+../output/05-lncRNA-discovery/stringtie_merged.gtf
 ```
 
 
 ```{r, engine='bash', eval=TRUE}
-ls ../output/05.32-lncRNA-discovery/gffcompare_merged*
+ls ../output/05-lncRNA-discovery/gffcompare_merged*
 ```
-
-```
-# gffcompare v0.12.6 | Command line was:
-#/home/shared/gffcompare-0.12.6.Linux_x86_64/gffcompare -r ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gff -o ../output/05.32-lncRNA-discovery/gffcompare_merged ../output/05.32-lncRNA-discovery/stringtie_merged.gtf
-#
-
-#= Summary for dataset: ../output/05.32-lncRNA-discovery/stringtie_merged.gtf 
-#     Query mRNAs :  113222 in   71018 loci  (75934 multi-exon transcripts)
-#            (15354 multi-transcript loci, ~1.6 transcripts per locus)
-# Reference mRNAs :   56768 in   42059 loci  (45231 multi-exon)
-# Super-loci w/ reference transcripts:    39560
-#-----------------| Sensitivity | Precision  |
-        Base level:   100.0     |    77.9    |
-        Exon level:    98.2     |    74.3    |
-      Intron level:    99.7     |    86.3    |
-Intron chain level:   100.0     |    59.6    |
-  Transcript level:    99.6     |    49.9    |
-       Locus level:    99.6     |    55.6    |
-
-     Matching intron chains:   45231
-       Matching transcripts:   56552
-              Matching loci:   41901
-
-          Missed exons:       0/255069	(  0.0%)
-           Novel exons:   52430/339451	( 15.4%)
-        Missed introns:     520/209271	(  0.2%)
-         Novel introns:   16647/241625	(  6.9%)
-           Missed loci:       0/42059	(  0.0%)
-            Novel loci:   31458/71018	( 44.3%)
-
- Total union super-loci across all input datasets: 71018 
-113222 out of 113222 consensus transcripts written in ../output/05.32-lncRNA-discovery/gffcompare_merged.annotated.gtf (0 discarded as redundant)
-```
-
-
 
 ```{r, engine='bash', eval=TRUE}
-head -10 ../output/05.32-lncRNA-discovery/gffcompare_merged.annotated.gtf
+cat ../output/05-lncRNA-discovery/gffcompare_merged.stats
+```
+
+```{r, engine='bash', eval=TRUE}
+head -10 ../output/05-lncRNA-discovery/gffcompare_merged.annotated.gtf
 ```
 
 ![gff](http://gannet.fish.washington.edu/seashell/snaps/2023-11-03_09-25-24.png)
@@ -283,12 +252,12 @@ Filters the combined GTF output from GFFcompare to select only the lines represe
 
 ```{r, engine='bash'}
 awk '$3 == "transcript" && $1 !~ /^#/' \
-../output/05.32-lncRNA-discovery/gffcompare_merged.annotated.gtf | grep 'class_code "u"\|class_code "x"|\class_code "i"\|class_code "y"' | awk '($5 - $4 > 199) || ($4 - $5 > 199)' > ../output/05.32-lncRNA-discovery/Apul_lncRNA_candidates.gtf
+../output/05-lncRNA-discovery/gffcompare_merged.annotated.gtf | grep 'class_code "u"\|class_code "x"|\class_code "i"\|class_code "y"' | awk '($5 - $4 > 199) || ($4 - $5 > 199)' > ../output/05-lncRNA-discovery/Peve_lncRNA_candidates.gtf
 ```
 
 ```{r, engine='bash', eval=TRUE}
-wc -l ../output/05.32-lncRNA-discovery/Apul_lncRNA_candidates.gtf
-head ../output/05.32-lncRNA-discovery/Apul_lncRNA_candidates.gtf
+wc -l ../output/05-lncRNA-discovery/Peve_lncRNA_candidates.gtf
+head ../output/05-lncRNA-discovery/Peve_lncRNA_candidates.gtf
 ```
 
 # Bedtools
@@ -296,15 +265,15 @@ Extracts the sequence data from the `$FASTA` reference file based on the coordin
 
 ```{r, engine='bash'}
 /home/shared/bedtools2/bin/fastaFromBed \
--fi ../data/GCF_013753865.1_Amil_v2.1_genomic.fna \
--bed ../output/05.32-lncRNA-discovery/Apul_lncRNA_candidates.gtf \
--fo ../output/05.32-lncRNA-discovery/Apul_lncRNA_candidates.fasta \
+-fi ../data/Porites_evermanni_v1.fa \
+-bed ../output/05-lncRNA-discovery/Peve_lncRNA_candidates.gtf \
+-fo ../output/05-lncRNA-discovery/Peve_lncRNA_candidates.fasta \
 -name -split
 ```
 
 ```{r, engine='bash'}
-fgrep -c ">" ../output/05.32-lncRNA-discovery/Apul_lncRNA_candidates.fasta
-head ../output/05.32-lncRNA-discovery/Apul_lncRNA_candidates.fasta
+fgrep -c ">" ../output/05-lncRNA-discovery/Peve_lncRNA_candidates.fasta
+head ../output/05-lncRNA-discovery/Peve_lncRNA_candidates.fasta
 ```
 
 
@@ -315,14 +284,14 @@ Initializes a conda environment (Anaconda) and runs CPC2, a software to predict 
 ```{r, engine='bash'}
 eval "$(/opt/anaconda/anaconda3/bin/conda shell.bash hook)"
 python /home/shared/CPC2_standalone-1.0.1/bin/CPC2.py \
--i ../output/05.32-lncRNA-discovery/Apul_lncRNA_candidates.fasta \
--o ../output/05.32-lncRNA-discovery/Apul_CPC2
+-i ../output/05-lncRNA-discovery/Peve_lncRNA_candidates.fasta \
+-o ../output/05-lncRNA-discovery/Peve_CPC2
 ```
 
 
 ```{r, engine='bash', eval=TRUE}
-wc -l head ../output/05.32-lncRNA-discovery/Apul_CPC2.txt
-head ../output/05.32-lncRNA-discovery/Apul_CPC2.txt
+wc -l ../output/05-lncRNA-discovery/Peve_CPC2.txt
+head ../output/05-lncRNA-discovery/Peve_CPC2.txt
 ```
 
 #Filter
@@ -331,18 +300,18 @@ Filters the CPC2 results to get only noncoding transcripts (using the class "non
 Matches these IDs with the sequences from the previous step to generate a GTF of noncoding transcripts.
 
 ```{r, engine='bash'}
-awk '$8 == "noncoding" {print $1}' ../output/05.32-lncRNA-discovery/Apul_CPC2.txt > ../output/05.32-lncRNA-discovery/Apul_noncoding_transcripts_ids.txt
+awk '$8 == "noncoding" {print $1}' ../output/05-lncRNA-discovery/Peve_CPC2.txt > ../output/05-lncRNA-discovery/Peve_noncoding_transcripts_ids.txt
 ```
 
 ```{r, engine='bash'}
-wc -l ../output/05.32-lncRNA-discovery/Apul_noncoding_transcripts_ids.txt
-head ../output/05.32-lncRNA-discovery/Apul_noncoding_transcripts_ids.txt
+wc -l ../output/05-lncRNA-discovery/Peve_noncoding_transcripts_ids.txt
+head ../output/05-lncRNA-discovery/Peve_noncoding_transcripts_ids.txt
 ```
 
 
-```{r, engine='bash', eval=TRUE}
-head ../output/05.32-lncRNA-discovery/Apul_lncRNA_candidates.fasta
-fgrep -c ">" ../output/05.32-lncRNA-discovery/Apul_lncRNA_candidates.fasta
+```{r, engine='bash'}
+head ../output/05-lncRNA-discovery/Apul_lncRNA_candidates.fasta
+fgrep -c ">" ../output/05-lncRNA-discovery/Apul_lncRNA_candidates.fasta
 ```
 
 # subsetting fasta
@@ -352,8 +321,8 @@ fgrep -c ">" ../output/05.32-lncRNA-discovery/Apul_lncRNA_candidates.fasta
 
 ```
 
-
-```{r, engine='bash', eval=TRUE}
+d
+```{r, engine='bash'}
 fgrep -c ">" ../output/05.32-lncRNA-discovery/Apul_lncRNA.fasta
 fgrep ">" ../output/05.32-lncRNA-discovery/Apul_lncRNA.fasta | head -5
 
