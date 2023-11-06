@@ -1,7 +1,7 @@
 ---
-title: "10-Apul-sRNAseq-BLASTn"
+title: "13-Apul-sRNAseq-ShortStack"
 author: "Sam White"
-date: "2023-11-02"
+date: "2023-11-03"
 output: 
   bookdown::html_document2:
     theme: cosmo
@@ -10,13 +10,22 @@ output:
     number_sections: true
     code_folding: show
     code_download: true
+  github_document:
+    theme: cosmo
+    toc: true
+    toc_float: true
+    number_sections: true
+    code_folding: show
+    code_download: true
 bibliography: references.bib
+link-citations: true
 ---
 
 ```{r setup, include=FALSE}
 library(knitr)
 library(kableExtra)
 library(dplyr)
+library(reticulate)
 knitr::opts_chunk$set(
   echo = TRUE,         # Display code chunks
   eval = FALSE,        # Evaluate code chunks
@@ -28,5 +37,7 @@ knitr::opts_chunk$set(
 
 
 
+
+---
 
 # Citations
