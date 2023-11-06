@@ -3,6 +3,8 @@ title: "13-Apul-sRNAseq-ShortStack"
 author: "Sam White"
 date: "2023-11-03"
 output: 
+  bookdown::pdf_document2:
+    latex_engine: xelatex
   bookdown::html_document2:
     theme: cosmo
     toc: true
@@ -11,6 +13,7 @@ output:
     code_folding: show
     code_download: true
 bibliography: references.bib
+link-citations: true
 ---
 
 ```{r setup, include=FALSE}
@@ -156,9 +159,9 @@ ls -lh "${deep_dive_data_dir}"
 
 # Run ShortStack
 
-Uses the `--dn_mirna` option to identify miRNAs in the genome, without relying on the `--known_miRNAs`.
+## Modify genome filename for ShortStack compatability
 
-```{r shortstack, engine='bash', eval=TRUE}
+```{r rename-genome-filename, engine='bash', cache=TRUE, eval=TRUE}
 # Load bash variables into memory
 source .bashvars
 
@@ -167,6 +170,21 @@ cp ${genome_fasta_dir}/${genome_fasta_name} ${genome_fasta_dir}/${shortstack_gen
 
 # Confirm
 ls -lh ${genome_fasta_dir}/${shortstack_genome_fasta_name}
+```
+
+## Excecute ShortStack command
+
+Uses the `--dn_mirna` option to identify miRNAs in the genome, without relying on the `--known_miRNAs`.
+
+This part of the code redirects the output of `time` to the end of `shortstack.log` file.
+
+-   `; } \ 2>> ${output_dir_top}/shortstack.log`
+
+
+
+```{r shortstack, engine='bash', cache=TRUE}
+# Load bash variables into memory
+source .bashvars
 
 # Create array of trimmed FastQs
 trimmed_fastqs_array=(${trimmed_fastqs_dir}/${trimmed_fastqs_pattern})
@@ -177,7 +195,7 @@ trimmed_fastqs_list=$(echo "${trimmed_fastqs_array[*]}")
 
 
 ###### Run ShortStack ######
-time \
+{ time \
 ShortStack \
 --genomefile "${genome_fasta}" \
 --readfile ${trimmed_fastqs_list} \
@@ -185,9 +203,23 @@ ShortStack \
 --dn_mirna \
 --threads ${threads} \
 --outdir ${output_dir_top}/ShortStack_out \
-&> ${output_dir_top}/shortstack.log
+&> ${output_dir_top}/shortstack.log ; } \
+2>> ${output_dir_top}/shortstack.log
 
 ```
+
+## Check runtime
+
+```{r engine='bash', eval=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+tail -n 3 ${output_dir_top}/shortstack.log \
+| grep "real" \
+| awk '{print "ShortStack runtime:" "\t" $2}'
+
+```
+
 
 # Results
 
