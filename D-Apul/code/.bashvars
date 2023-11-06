@@ -1,0 +1,19 @@
+#### Assign Variables ####
+
+# Data directories
+export deep_dive_dir=/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive
+export output_dir_top=${deep_dive_dir}/D-Apul/output/09-Apul-sRNAseq-miRTrace
+export trimmed_reads_dir=${deep_dive_dir}/D-Apul/output/08-Apul-sRNAseq-trimming/trimmed-reads
+
+# Paths to programs
+export mirtrace=/home/sam/programs/mambaforge/envs/miRTrace_env/bin/mirtrace
+
+# Set number of CPUs to use
+export threads=40
+
+export fastq_pattern='*flexbar_trim.25bp*.gz'
+# Programs associative array
+declare -A programs_array
+programs_array=(
+[mirtrace]="${mirtrace}"
+)
