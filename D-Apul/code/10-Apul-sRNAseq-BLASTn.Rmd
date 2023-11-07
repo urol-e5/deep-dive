@@ -64,6 +64,7 @@ echo 'export deep_dive_dir=/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive'
 echo 'export deep_dive_data_dir="${deep_dive_dir}/data"'
 echo 'export output_dir_top=${deep_dive_dir}/D-Apul/output/10-Apul-sRNAseq-BLASTn'
 echo 'export trimmed_fastqs_dir="${deep_dive_dir}/D-Apul/output/08-Apul-sRNAseq-trimming/trimmed-reads"'
+echo 'export blast_dbs_dir="${deep_dive_dir}/data/blast_dbs"'
 echo ""
 
 echo "# Input/Output files"
@@ -116,6 +117,7 @@ wget \
  
  ls -lh ${deep_dive_data_dir}
 ```
+
 ## Inspect miRNA FastAs
 ```{r inspect-miRNA-FastAs, engine='bash', eval=TRUE}
 # Load bash variables into memory
@@ -143,6 +145,41 @@ sed '/^[^>]/s/U/T/g' "${deep_dive_data_dir}/${mirgene_mature_fasta_name}" \
 
 head ${deep_dive_data_dir}/*.fa
   
+```
+
+# Create BLAST Databases
+```{r make-blast-dbs, engine='bash', eval=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+
+
+# miRBase BLAST DB
+## Make sure output directory exists
+if [ ! -d "${blast_dbs_dir}" ]; then
+  mkdir --parents "${blast_dbs_dir}"
+fi
+
+${ncbi_makeblast_db} \
+-in ${deep_dive_data_dir}/${mirgene_mature_fasta_no_U} \
+-title ${mirgene_mature_fasta_no_U%.*} \
+-dbtype nucl \
+-out ${blast_dbs_dir}/${mirgene_mature_fasta_no_U%.*} \
+-logfile ${blast_dbs_dir}/${mirgene_mature_fasta_no_U%.*}.blastdb.log
+
+
+# miRBase BLAST DB
+## Make sure output directory exists
+if [ ! -d "${blast_dbs_dir}" ]; then
+  mkdir --parents "${blast_dbs_dir}"
+fi
+
+${ncbi_makeblast_db} \
+-in ${deep_dive_data_dir}/${mirbase_mature_fasta_no_U} \
+-title ${mirbase_mature_fasta_no_U%.*} \
+-dbtype nucl \
+-out ${blast_dbs_dir}/${mirbase_mature_fasta_no_U%.*} \
+-logfile ${blast_dbs_dir}/${mirbase_mature_fasta_no_U%.*}.blastdb.log
 ```
 
 
