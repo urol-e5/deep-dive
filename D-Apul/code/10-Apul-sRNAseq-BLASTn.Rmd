@@ -3,6 +3,9 @@ title: "13-Apul-sRNAseq-ShortStack"
 author: "Sam White"
 date: "2023-11-03"
 output: 
+  github_document:
+    toc: true
+    number_sections: true
   bookdown::html_document2:
     theme: cosmo
     toc: true
@@ -10,7 +13,7 @@ output:
     number_sections: true
     code_folding: show
     code_download: true
-  github_document:
+  html_document:
     theme: cosmo
     toc: true
     toc_float: true
@@ -31,9 +34,11 @@ knitr::opts_chunk$set(
   eval = FALSE,        # Evaluate code chunks
   warning = FALSE,     # Hide warnings
   message = FALSE,     # Hide messages
-  comment = ""         # Prevents appending '##' to beginning of lines in code output
+  comment = "",        # Prevents appending '##' to beginning of lines in code output
+  width = 1000         # adds scroll bar
 )
 ```
+
 
 This notebook performs a simple [NCBI BLASTn](https://www.ncbi.nlm.nih.gov/books/NBK279690/) [@altschul1990] against two miRNA databases to attempt to identify miRNA in _A.pulchra_ sRNAseq:
 
@@ -197,7 +202,7 @@ fi
 source .bashvars
 
 # Check for existence of concatenated FastA before running
-if [ ! -f "${output_dir_top}/${concatenated_reads_fastq}" ]; then
+if [ ! -f "${output_dir_top}/${concatenated_trimmed_reads_fastq}" ]; then
   cat ${trimmed_fastqs_dir}/*.fastq.gz \
   > "${output_dir_top}/${concatenated_trimmed_reads_fastq}"
 fi
@@ -216,7 +221,7 @@ source .bashvars
 
 # Check for existence of collapsed FastA before running
 time \
-if [ ! -f "${output_dir_top}/${concatenated_reads_fasta}" ]; then
+if [ ! -f "${output_dir_top}/${collapsed_reads_fasta}" ]; then
   zcat ${output_dir_top}/${concatenated_trimmed_reads_fastq} \
   | ${fastx_collapser} \
   -Q30 \
