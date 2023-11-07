@@ -68,6 +68,8 @@ echo 'export blast_dbs_dir="${deep_dive_dir}/data/blast_dbs"'
 echo ""
 
 echo "# Input/Output files"
+echo 'export collapsed_reads_fasta="collapsed-reads-all.fasta"'
+echo 'export concatenated_trimmed_reads_fastq="concatenated-trimmed-reads-all.fastq.gz"'
 echo 'export mirbase_mature_fasta_name="mirbase-mature-v22.1.fa"'
 echo 'export mirbase_mature_fasta_no_U="mirbase-mature-v22.1-no_U.fa"'
 echo 'export mirgene_mature_fasta_name="mirgene-mature-all-v2.1.fa"'
@@ -82,7 +84,6 @@ echo "# Paths to programs"
 echo 'export ncbi_blast_dir="/home/shared/ncbi-blast-2.11.0+/bin/"'
 echo 'export ncbi_blastn="${ncbi_blast_dir}/blastn"'
 echo 'export ncbi_makeblast_db="${ncbi_blast_dir}/makeblastdb"'
-echo 'export fasta_u2t_converter="/home/shared/miRDeep-P2_pipeline/script/fasta_U2T.pl"'
 echo 'export fastx_collapser="/home/shared/fastx_toolkit_0.0.13_binaries_Linux_2.6_amd64/bin/fastx_collapser"'
 
 echo "# Set number of CPUs to use"
@@ -160,13 +161,15 @@ if [ ! -d "${blast_dbs_dir}" ]; then
   mkdir --parents "${blast_dbs_dir}"
 fi
 
-${ncbi_makeblast_db} \
--in ${deep_dive_data_dir}/${mirgene_mature_fasta_no_U} \
--title ${mirgene_mature_fasta_no_U%.*} \
--dbtype nucl \
--out ${blast_dbs_dir}/${mirgene_mature_fasta_no_U%.*} \
--logfile ${blast_dbs_dir}/${mirgene_mature_fasta_no_U%.*}.blastdb.log
-
+## Check for pre-exising database
+if [ ! -f "${blast_dbs_dir}/${mirgene_mature_fasta_no_U%.*}.blastdb.log" ]; then
+  ${ncbi_makeblast_db} \
+  -in ${deep_dive_data_dir}/${mirgene_mature_fasta_no_U} \
+  -title ${mirgene_mature_fasta_no_U%.*} \
+  -dbtype nucl \
+  -out ${blast_dbs_dir}/${mirgene_mature_fasta_no_U%.*} \
+  -logfile ${blast_dbs_dir}/${mirgene_mature_fasta_no_U%.*}.blastdb.log
+fi
 
 # miRBase BLAST DB
 ## Make sure output directory exists
@@ -174,12 +177,63 @@ if [ ! -d "${blast_dbs_dir}" ]; then
   mkdir --parents "${blast_dbs_dir}"
 fi
 
-${ncbi_makeblast_db} \
--in ${deep_dive_data_dir}/${mirbase_mature_fasta_no_U} \
--title ${mirbase_mature_fasta_no_U%.*} \
--dbtype nucl \
--out ${blast_dbs_dir}/${mirbase_mature_fasta_no_U%.*} \
--logfile ${blast_dbs_dir}/${mirbase_mature_fasta_no_U%.*}.blastdb.log
+## Check for pre-exising database
+if [ ! -f "${blast_dbs_dir}/${mirbase_mature_fasta_no_U%.*}.blastdb.log" ]; then
+  ${ncbi_makeblast_db} \
+  -in ${deep_dive_data_dir}/${mirbase_mature_fasta_no_U} \
+  -title ${mirbase_mature_fasta_no_U%.*} \
+  -dbtype nucl \
+  -out ${blast_dbs_dir}/${mirbase_mature_fasta_no_U%.*} \
+  -logfile ${blast_dbs_dir}/${mirbase_mature_fasta_no_U%.*}.blastdb.log
+fi
+```
+
+
+# Prepare reads for BLASTing
+
+## Concatenate all trimmed reads
+```{r concatenate-trimmed-reads, engine='bash', eval=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+# Check for existence of concatenated FastA before running
+if [ ! -f "${output_dir_top}/${concatenated_reads_fastq}" ]; then
+  cat ${trimmed_fastqs_dir}/*.fastq.gz \
+  > "${output_dir_top}/${concatenated_trimmed_reads_fastq}"
+fi
+
+ls -lh "${output_dir_top}/${concatenated_trimmed_reads_fastq}"
+```
+
+## Collapse reads to FastA
+
+Uses `fastx_collapser` to collapse to unique reads.
+
+Requires undocumented quality setting. Have selected `30` as cuttoff: `-Q30`.
+```{r collapse-reads-to-FastA, engine='bash', eval=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+# Check for existence of collapsed FastA before running
+time \
+if [ ! -f "${output_dir_top}/${concatenated_reads_fasta}" ]; then
+  zcat ${output_dir_top}/${concatenated_trimmed_reads_fastq} \
+  | ${fastx_collapser} \
+  -Q30 \
+  -o "${output_dir_top}/${collapsed_reads_fasta}"
+fi
+
+head "${output_dir_top}/${collapsed_reads_fasta}"
+```
+
+# Run BLASTn
+
+## miRBase BLASTn
+```{r engine='bash', eval=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+
 ```
 
 
