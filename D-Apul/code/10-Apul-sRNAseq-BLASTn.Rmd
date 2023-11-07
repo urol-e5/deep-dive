@@ -81,7 +81,7 @@ echo 'export mirgenedb_fasta_url="https://www.mirgenedb.org/fasta/ALL?mat=1"'
 echo ""
 
 echo "# Paths to programs"
-echo 'export ncbi_blast_dir="/home/shared/ncbi-blast-2.11.0+/bin/"'
+echo 'export ncbi_blast_dir="/home/shared/ncbi-blast-2.15.0+/bin/"'
 echo 'export ncbi_blastn="${ncbi_blast_dir}/blastn"'
 echo 'export ncbi_makeblast_db="${ncbi_blast_dir}/makeblastdb"'
 echo 'export fastx_collapser="/home/shared/fastx_toolkit_0.0.13_binaries_Linux_2.6_amd64/bin/fastx_collapser"'
@@ -226,16 +226,133 @@ fi
 head "${output_dir_top}/${collapsed_reads_fasta}"
 ```
 
-# Run BLASTn
+# Run BLASTn Default E-value
 
-## miRBase BLASTn
-```{r engine='bash', eval=TRUE}
+- 1000 for blastn-short
+
+Runs BLASTn using the `blastn-short` task for sequences < 30bp.
+
+Look for top match (`-max_hsps 1` & `-max_target_seqs 1`) for each query.
+
+  - Suppress subsequent warning `Examining 5 or more matches is recommended` by
+  redirecting stdout: `2> /dev/null`
+
+## miRBase BLASTn Default e-value
+```{r miRBase-BLASTn-default-eval, engine='bash', cache=TRUE}
 # Load bash variables into memory
 source .bashvars
 
-
+time \
+${ncbi_blastn} \
+-db ${blast_dbs_dir}/${mirbase_mature_fasta_no_U%.*} \
+-query ${output_dir_top}/${collapsed_reads_fasta} \
+-out ${output_dir_top}/miRBase-BLASTn-eval_1000.outfmt6 \
+-task blastn-short \
+-max_hsps 1 \
+-max_target_seqs 1 \
+-outfmt 6 \
+-num_threads ${threads} \
+2> /dev/null
 ```
 
+## MirGene BLASTn Default e-value
+
+```{r MirGene-BLASTn-default-eval, engine='bash', cache=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+time \
+${ncbi_blastn} \
+-db ${blast_dbs_dir}/${mirgene_mature_fasta_no_U%.*} \
+-query ${output_dir_top}/${collapsed_reads_fasta} \
+-out ${output_dir_top}/MirGene-BLASTn-eval_1000.outfmt6 \
+-task blastn-short \
+-max_hsps 1 \
+-max_target_seqs 1 \
+-outfmt 6 \
+-num_threads ${threads} \
+2> /dev/null
+```
+
+
+# BLASTn E-value = 10
+
+Running this for simple comparison to the defaul `blastn-short` value of 1000.
+
+## miRBase BLASTn e-value = 10
+```{r miRBase-BLASTn-10-eval, engine='bash', cache=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+time \
+${ncbi_blastn} \
+-db ${blast_dbs_dir}/${mirbase_mature_fasta_no_U%.*} \
+-query ${output_dir_top}/${collapsed_reads_fasta} \
+-out ${output_dir_top}/miRBase-BLASTn-eval_10.outfmt6 \
+-task blastn-short \
+-evalue 10 \
+-max_hsps 1 \
+-max_target_seqs 1 \
+-outfmt 6 \
+-num_threads ${threads} \
+2> /dev/null
+```
+
+## MirGene BLASTn e-value = 10
+
+```{r MirGene-BLASTn-10-eval, engine='bash', cache=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+time \
+${ncbi_blastn} \
+-db ${blast_dbs_dir}/${mirgene_mature_fasta_no_U%.*} \
+-query ${output_dir_top}/${collapsed_reads_fasta} \
+-out ${output_dir_top}/MirGene-BLASTn-eval_10.outfmt6 \
+-task blastn-short \
+-evalue 10 \
+-max_hsps 1 \
+-max_target_seqs 1 \
+-outfmt 6 \
+-num_threads ${threads} \
+2> /dev/null
+```
+
+# Results
+
+## Check BLASTn Default e-value results
+```{r blastn-default-eval-results, engine='bash', eval=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+head ${output_dir_top}/*eval_1000.outfmt6
+
+echo ""
+echo "-----------------------------------------"
+echo ""
+
+wc -l ${output_dir_top}/*eval_1000.outfmt6
+```
+
+## Check BLASTn e-value = 10 results
+```{r blastn-default-eval-results, engine='bash', eval=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+head ${output_dir_top}/*eval_10.outfmt6
+
+echo ""
+echo "-----------------------------------------"
+echo ""
+
+wc -l ${output_dir_top}/*eval_10.outfmt6
+```
+
+The default e-value results in alignments for all query sequences, which is likely not what we'd expect.
+
+Decreasing the e-value resulted in fewer queary alignments, as we'd expect.
+
+For further analysis, we should probably discuss a reasonable e-value to use for filtering.
 
 ------------------------------------------------------------------------
 
