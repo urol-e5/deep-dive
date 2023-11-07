@@ -42,10 +42,6 @@ This notebook performs a simple [NCBI BLASTn](https://www.ncbi.nlm.nih.gov/books
 - [MirGeneDB](https://www.mirgenedb.org/download)
 
 Relies on the following software:
-
-- [miRDeep-P2_pipeline](https://github.com/TF-Chan-Lab/miRDeep-P2_pipeline)
-
-  - `fasta_U2T.pl`: Converts `U` to `T` in miRNA databases.
   
 - [fastx_toolkit](http://hannonlab.cshl.edu/fastx_toolkit/)
 
@@ -72,7 +68,9 @@ echo ""
 
 echo "# Input/Output files"
 echo 'export mirbase_mature_fasta_name="mirbase-mature-v22.1.fa"'
+echo 'export mirbase_mature_fasta_no_U="mirbase-mature-v22.1-no_U.fa"'
 echo 'export mirgene_mature_fasta_name="mirgene-mature-all-v2.1.fa"'
+echo 'export mirgene_mature_fasta_no_U="mirgene-mature-all-v2.1-no_U.fa"'
 echo ""
 
 echo "# External data URLs"
@@ -136,7 +134,14 @@ This is needed because the sRNAseq sequences do _not_ have uracils (`U`) - they 
 source .bashvars
 
 # Convert miRBase FastA
-  sed '/^[^>]/s/U/T/g' "${deep_dive_data_dir}/${mirbase_mature_fasta_name}" | head
+sed '/^[^>]/s/U/T/g' "${deep_dive_data_dir}/${mirbase_mature_fasta_name}" \
+> "${deep_dive_data_dir}/${mirbase_mature_fasta_no_U}"
+
+# Convert MirGene FastA
+sed '/^[^>]/s/U/T/g' "${deep_dive_data_dir}/${mirgene_mature_fasta_name}" \
+> "${deep_dive_data_dir}/${mirgene_mature_fasta_no_U}"
+
+head ${deep_dive_data_dir}/*.fa
   
 ```
 
