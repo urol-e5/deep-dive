@@ -79,6 +79,13 @@ echo "# External data URLs"
 echo 'export mirgenedb_fasta_url="https://www.mirgenedb.org/fasta/ALL?mat=1"'
 echo ""
 
+echo "# Paths to programs"
+echo 'export ncbi_blast_dir="/home/shared/ncbi-blast-2.11.0+/bin/"'
+echo 'export ncbi_blastn="${ncbi_blast_dir}/blastn"'
+echo 'export ncbi_makeblast_db="${ncbi_blast_dir}/makeblastdb"'
+echo 'export fasta_u2t_converter="/home/shared/miRDeep-P2_pipeline/script/fasta_U2T.pl"'
+echo 'export fastx_collapser="/home/shared/fastx_toolkit_0.0.13_binaries_Linux_2.6_amd64/bin/fastx_collapser"'
+
 echo "# Set number of CPUs to use"
 echo 'export threads=46'
 echo ""
@@ -120,7 +127,18 @@ head "${deep_dive_data_dir}"/mir*.fa
 ```
 
 
+# Convert `U` to `T` in miRNA FastAs
 
+This is needed because the sRNAseq sequences do _not_ have uracils (`U`) - they have thymines (`T`).
+
+```{r convert-U-to-T, engine='bash', eval=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+# Convert miRBase FastA
+  sed '/^[^>]/s/U/T/g' "${deep_dive_data_dir}/${mirbase_mature_fasta_name}" | head
+  
+```
 
 
 ------------------------------------------------------------------------
