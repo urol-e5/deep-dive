@@ -71,6 +71,7 @@ echo 'export genome_fasta_name="GCF_013753865.1_Amil_v2.1_genomic.fna"'
 echo 'export genome_fasta_no_spaces="GCF_013753865.1_Amil_v2.1_genomic-no_spaces.fna"'
 echo 'export mirdeep2_mapping_file="Apul-mirdeep2-mapping.arf"'
 echo 'export mirbase_mature_fasta_name="mirbase-mature-v22.1.fa"'
+echo 'export mirbase_mature_fasta_no_spaces="mirbase-mature-v22.1-no_spaces.fa"'
 echo ""
 
 
@@ -147,6 +148,29 @@ grep "^>" ${genome_fasta_dir}/${genome_fasta_no_spaces} \
 | head
 ```
 
+# Reformat miRBase FastA description lines
+```{r remove-spaces-genome-FastA, eval=TRUE, engine='bash'}
+# Load bash variables into memory
+source .bashvars
+
+
+sed '/^>/ s/ /_/g' "${deep_dive_data_dir}/${mirbase_mature_fasta_name}" \
+| sed '/^>/ s/,//g' \
+> "${deep_dive_data_dir}/${mirbase_mature_fasta_no_spaces}"
+
+grep "^>" ${deep_dive_data_dir}/${mirbase_mature_fasta_name} \
+| head
+
+echo ""
+echo "--------------------------------------------------"
+echo ""
+
+grep "^>" ${deep_dive_data_dir}/${mirbase_mature_fasta_no_spaces} \
+| head
+```
+
+
+
 # Bowtie v1 genome index
 
 miRDeep2 requires a Bowtie v1 genome index - cannot use Bowtie2 index
@@ -178,7 +202,7 @@ export PERL5LIB=$PERL5LIB:/home/shared/mirdeep2/lib/perl5
 # Run miRDeep2 mapping
 time \
 ${mirdeep2_mapper} \
-${collapsed_reads_dir}/${collapsed_reads_fasta} \
+${collapsed_reads_dir}/${collapsed_reads_mirdeep2} \
 -c \
 -p ${genome_fasta_dir}/${genome_fasta_no_spaces%.*} \
 -t ${output_dir_top}/${mirdeep2_mapping_file} \
@@ -196,7 +220,7 @@ export PATH=$PATH:/home/shared/mirdeep2/bin
 export PERL5LIB=$PERL5LIB:/home/shared/mirdeep2/lib/perl5
 
 ${mirdeep2} \
-${collapsed_reads_dir}/${collapsed_reads_fasta} \
+${collapsed_reads_dir}/${collapsed_reads_mirdeep2} \
 ${genome_fasta_dir}/${genome_fasta_no_spaces} \
 ${output_dir_top}/${mirdeep2_mapping_file} \
 none \
