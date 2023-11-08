@@ -65,6 +65,7 @@ echo ""
 
 echo "# Input/Output files"
 echo 'export collapsed_reads_fasta="collapsed-reads-all.fasta"'
+echo 'export collapsed_reads_mirdeep2="collapsed-reads-all-mirdeep2.fasta"'
 echo 'export concatenated_trimmed_reads_fastq="concatenated-trimmed-reads-all.fastq.gz"'
 echo 'export genome_fasta_name="GCF_013753865.1_Amil_v2.1_genomic.fna"'
 echo 'export genome_fasta_no_spaces="GCF_013753865.1_Amil_v2.1_genomic-no_spaces.fna"'
@@ -90,6 +91,31 @@ echo 'export trimmed_fastqs_array=()'
 } > .bashvars
 
 cat .bashvars
+```
+
+# Reformat read IDs
+
+Per miRDeep2 documentation: 
+
+> The readID must end with _xNumber and is not allowed to contain whitespaces.
+
+```{r reformat-read-IDs, eval=TRUE, engine='bash'}
+# Load bash variables into memory
+source .bashvars
+
+
+sed '/^>/ s/-/_x/g' "${collapsed_reads_dir}/${collapsed_reads_fasta}" \
+> "${collapsed_reads_dir}/${collapsed_reads_mirdeep2}"
+
+grep "^>" ${collapsed_reads_dir}/${collapsed_reads_fasta} \
+| head
+
+echo ""
+echo "--------------------------------------------------"
+echo ""
+
+grep "^>" ${collapsed_reads_dir}/${collapsed_reads_mirdeep2} \
+| head
 ```
 
 # Reformat genome FastA description lines
@@ -154,7 +180,7 @@ time \
 ${mirdeep2_mapper} \
 ${collapsed_reads_dir}/${collapsed_reads_fasta} \
 -c \
--p ${genome_fasta_dir}/${genome_fasta_name} \
+-p ${genome_fasta_dir}/${genome_fasta_no_spaces%.*} \
 -t ${output_dir_top}/${mirdeep2_mapping_file} \
 -o ${threads}
 ```
@@ -171,7 +197,7 @@ export PERL5LIB=$PERL5LIB:/home/shared/mirdeep2/lib/perl5
 
 ${mirdeep2} \
 ${collapsed_reads_dir}/${collapsed_reads_fasta} \
-${genome_fasta_dir}/${genome_fasta_name} \
+${genome_fasta_dir}/${genome_fasta_no_spaces} \
 ${output_dir_top}/${mirdeep2_mapping_file} \
 none \
 ${deep_dive_data_dir}/${mirbase_mature_fasta_name} \
