@@ -1,7 +1,7 @@
 ---
 title: "11-Apul-sRNAseq-miRdeep2"
 author: "Sam White"
-date: "2023-11-02"
+date: "2023-11-08"
 output: 
   bookdown::html_document2:
     theme: cosmo
@@ -10,23 +10,112 @@ output:
     number_sections: true
     code_folding: show
     code_download: true
+  github_document:
+    toc: true
+    number_sections: true
+  html_document:
+    theme: cosmo
+    toc: true
+    toc_float: true
+    number_sections: true
+    code_folding: show
+    code_download: true
 bibliography: references.bib
+link-citations: true
 ---
 
 ```{r setup, include=FALSE}
 library(knitr)
 library(kableExtra)
 library(dplyr)
+library(reticulate)
 knitr::opts_chunk$set(
   echo = TRUE,         # Display code chunks
   eval = FALSE,        # Evaluate code chunks
   warning = FALSE,     # Hide warnings
   message = FALSE,     # Hide messages
-  comment = ""         # Prevents appending '##' to beginning of lines in code output
+  comment = "",        # Prevents appending '##' to beginning of lines in code output
+  width = 1000         # adds scroll bar
 )
 ```
 
 
 
+
+# Create a Bash variables file
+
+This allows usage of Bash variables across R Markdown chunks.
+
+```{r save-bash-variables-to-rvars-file, engine='bash', eval=TRUE}
+{
+echo "#### Assign Variables ####"
+echo ""
+
+echo "# Trimmed FastQ naming pattern"
+echo "export trimmed_fastqs_pattern='*flexbar_trim.25bp*.fastq.gz'"
+
+echo "# Data directories"
+echo 'export deep_dive_dir=/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive'
+echo 'export deep_dive_data_dir="${deep_dive_dir}/data"'
+echo 'export output_dir_top=${deep_dive_dir}/D-Apul/output/11-Apul-sRNAseq-miRdeep2'
+echo 'export genome_fasta_dir=${deep_dive_dir}/D-Apul/data/Amil/ncbi_dataset/data/GCF_013753865.1'
+echo 'export trimmed_fastqs_dir="${deep_dive_dir}/D-Apul/output/08-Apul-sRNAseq-trimming/trimmed-reads"'
+echo ""
+
+echo "# Input/Output files"
+echo 'export collapsed_reads_fasta="collapsed-reads-all.fasta"'
+echo 'export concatenated_trimmed_reads_fastq="concatenated-trimmed-reads-all.fastq.gz"'
+echo 'export genome_fasta_name="GCF_013753865.1_Amil_v2.1_genomic.fna"'
+echo 'export mirdeep_mapping_file="Apul-mirdeep2-mapping.arf"'
+echo ""
+
+
+echo "# Paths to programs"
+echo 'export mirdeep2_dir="/home/shared/mirdeep2"'
+echo 'export mirdeep2_mapper="${mirdeep2_dir}/bin/mapper.pl"'
+echo 'export mirdeep2="${mirdeep2_dir}/bin/miRDeep2.pl"'
+echo ""
+
+echo "# Set number of CPUs to use"
+echo 'export threads=46'
+echo ""
+
+echo "# Initialize arrays"
+echo 'export trimmed_fastqs_array=()'
+
+
+} > .bashvars
+
+cat .bashvars
+```
+
+
+# Map reads to genome
+
+Requires genome to be previously indexed with Bowtie.
+```{r map-read-genome, eval=TRUE, engine='bash'}
+# Load bash variables into memory
+source .bashvars
+
+cd ${mirdeep2_dir}
+
+time \
+${mirdeep2_mapper} \
+-c \
+-p ${genome_fasta_dir}/${genome_fasta_name%.*} \
+-t ${output_dir_top}/${mirdeep_mapping_file}\
+-o ${threads}
+```
+
+# Run miRDeep2
+
+```{r mirdeep2, eval=TRUE, engine='bash'}
+# Load bash variables into memory
+source .bashvars
+
+```
+
+
+---
 
 # Citations
