@@ -60,20 +60,20 @@ echo 'export deep_dive_data_dir="${deep_dive_dir}/data"'
 echo 'export output_dir_top=${deep_dive_dir}/D-Apul/output/11-Apul-sRNAseq-miRdeep2'
 echo 'export genome_fasta_dir=${deep_dive_dir}/D-Apul/data/Amil/ncbi_dataset/data/GCF_013753865.1'
 echo 'export trimmed_fastqs_dir="${deep_dive_dir}/D-Apul/output/08-Apul-sRNAseq-trimming/trimmed-reads"'
+echo 'export collapsed_reads_dir="${deep_dive_dir}/D-Apul/output/10-Apul-sRNAseq-BLASTn"'
 echo ""
 
 echo "# Input/Output files"
 echo 'export collapsed_reads_fasta="collapsed-reads-all.fasta"'
 echo 'export concatenated_trimmed_reads_fastq="concatenated-trimmed-reads-all.fastq.gz"'
-echo 'export genome_fasta_name="GCF_013753865.1_Amil_v2.1_genomic.fna"'
+echo 'export genome_fasta_name="GCF_013753865.1_Amil_v2.1_genomic.fa"'
 echo 'export mirdeep_mapping_file="Apul-mirdeep2-mapping.arf"'
 echo ""
 
 
 echo "# Paths to programs"
-echo 'export mirdeep2_dir="/home/shared/mirdeep2"'
-echo 'export mirdeep2_mapper="${mirdeep2_dir}/bin/mapper.pl"'
-echo 'export mirdeep2="${mirdeep2_dir}/bin/miRDeep2.pl"'
+echo 'export mirdeep2_mapper="mapper.pl"'
+echo 'export mirdeep2="miRDeep2.pl"'
 echo ""
 
 echo "# Set number of CPUs to use"
@@ -97,13 +97,17 @@ Requires genome to be previously indexed with Bowtie.
 # Load bash variables into memory
 source .bashvars
 
-cd ${mirdeep2_dir}
+# Append miRDeep2 to system PATH and set PERL5LIB
+export PATH=$PATH:/home/shared/mirdeep2/bin
+export PERL5LIB=$PERL5LIB:/home/shared/mirdeep2/lib/perl5
 
+# Run miRDeep2 mapping
 time \
 ${mirdeep2_mapper} \
+${collapsed_reads_dir}/${collapsed_reads_fasta} \
 -c \
--p ${genome_fasta_dir}/${genome_fasta_name%.*} \
--t ${output_dir_top}/${mirdeep_mapping_file}\
+-p ${genome_fasta_dir}/${genome_fasta_name} \
+-t ${output_dir_top}/${mirdeep_mapping_file} \
 -o ${threads}
 ```
 
@@ -112,6 +116,10 @@ ${mirdeep2_mapper} \
 ```{r mirdeep2, eval=TRUE, engine='bash'}
 # Load bash variables into memory
 source .bashvars
+
+# Append miRDeep2 to system PATH and set PERL5LIB
+export PATH=$PATH:/home/shared/mirdeep2/bin
+export PERL5LIB=$PERL5LIB:/home/shared/mirdeep2/lib/perl5
 
 ```
 
