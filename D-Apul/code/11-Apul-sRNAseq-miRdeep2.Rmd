@@ -121,11 +121,21 @@ grep "^>" ${genome_fasta_dir}/${genome_fasta_no_spaces} \
 | head
 ```
 
-# Create Bowtie v1 genome index
+# Bowtie v1 genome index
 
 miRDeep2 requires a Bowtie v1 genome index - cannot use Bowtie2 index
 ```{r bowtie1-index, eval=TRUE, engine='bash'}
+# Load bash variables into memory
+source .bashvars
 
+# Check for existence of genome index first
+if [ ! -f "${genome_fasta_no_spaces%.*}.ebwt" ]; then
+  ${bowtie_build} \
+  ${genome_fasta_dir}/${genome_fasta_no_spaces} \
+  ${genome_fasta_dir}/${genome_fasta_no_spaces%.*} \
+  --threads ${threads} \
+  --quiet
+fi
 ```
 
 # Map reads to genome
