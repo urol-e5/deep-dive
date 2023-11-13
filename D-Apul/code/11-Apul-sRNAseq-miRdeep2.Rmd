@@ -256,8 +256,20 @@ tail -n 6 ${output_dir_top}/miRDeep2-S.purpuratus-report.log
 MiRDeep2 outputs all files to the current working directly with no way to redirect
 so want to move to intended output directory.
 
-If you didn't realize this, like me, then you'll likely want to move them to a more
-appropriate location.
+## Move output files
+
+Output files will be in the format of `result_*` and `error_*`
+```{r identify-mirdeep2-output-files, eval=FALSE, engine='bash'}
+# Load bash variables into memory
+source .bashvars
+
+for file in result_* error_*
+do
+  mv "${file}" "${output_dir_top}/"
+done
+```
+
+
 
 ## Identify directories
 
