@@ -53,6 +53,10 @@ echo ""
 
 echo "# Trimmed FastQ naming pattern"
 echo "export trimmed_fastqs_pattern='*flexbar_trim.25bp*.fastq.gz'"
+echo ""
+
+echo "# miRTrace FastA naming pattern"
+echo "export mirtrace_fasta_pattern='*flexbar_trim.25bp*.fasta'"
 
 echo "# Data directories"
 echo 'export deep_dive_dir=/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive'
@@ -61,6 +65,7 @@ echo 'export output_dir_top=${deep_dive_dir}/D-Apul/output/11-Apul-sRNAseq-miRde
 echo 'export genome_fasta_dir=${deep_dive_dir}/D-Apul/data/Amil/ncbi_dataset/data/GCF_013753865.1'
 echo 'export trimmed_fastqs_dir="${deep_dive_dir}/D-Apul/output/08-Apul-sRNAseq-trimming/trimmed-reads"'
 echo 'export collapsed_reads_dir="${deep_dive_dir}/D-Apul/output/10-Apul-sRNAseq-BLASTn"'
+echo 'export mirtrace_reads_dir="${deep_dive_dir}/D-Apul/output/09-Apul-sRNAseq-miRTrace/qc_passed_reads.all.collapsed"'
 echo ""
 
 echo "# Input/Output files"
@@ -72,6 +77,7 @@ echo 'export genome_fasta_no_spaces="GCF_013753865.1_Amil_v2.1_genomic-no_spaces
 echo 'export mirdeep2_mapping_file="Apul-mirdeep2-mapping.arf"'
 echo 'export mirbase_mature_fasta_name="mirbase-mature-v22.1.fa"'
 echo 'export mirbase_mature_fasta_no_spaces="mirbase-mature-v22.1-no_spaces.fa"'
+echo 'export concatenated_mirtrace_reads_fasta="concatenated-mirtrace-reads.fasta"'
 echo ""
 
 
@@ -94,11 +100,13 @@ echo 'export trimmed_fastqs_array=()'
 cat .bashvars
 ```
 
-# Reformat read IDs
+# Prepare reads for miRDeep2
 
 Per miRDeep2 documentation: 
 
 > The readID must end with _xNumber and is not allowed to contain whitespaces.
+> has to have the format
+> name_uniqueNumber_xnumber
 
 ```{r reformat-read-IDs, eval=TRUE, engine='bash'}
 # Load bash variables into memory
@@ -106,7 +114,8 @@ source .bashvars
 
 
 sed '/^>/ s/-/_x/g' "${collapsed_reads_dir}/${collapsed_reads_fasta}" \
-> "${collapsed_reads_dir}/${collapsed_reads_mirdeep2}"
+| sed '/^>/ s/>/>seq_/' \
+> "${output_dir_top}/${collapsed_reads_mirdeep2}"
 
 grep "^>" ${collapsed_reads_dir}/${collapsed_reads_fasta} \
 | head
@@ -115,7 +124,7 @@ echo ""
 echo "--------------------------------------------------"
 echo ""
 
-grep "^>" ${collapsed_reads_dir}/${collapsed_reads_mirdeep2} \
+grep "^>" ${output_dir_top}/${collapsed_reads_mirdeep2} \
 | head
 ```
 
@@ -202,7 +211,7 @@ export PERL5LIB=$PERL5LIB:/home/shared/mirdeep2/lib/perl5
 # Run miRDeep2 mapping
 time \
 ${mirdeep2_mapper} \
-${collapsed_reads_dir}/${collapsed_reads_mirdeep2} \
+${output_dir_top}/${collapsed_reads_mirdeep2} \
 -c \
 -p ${genome_fasta_dir}/${genome_fasta_no_spaces%.*} \
 -t ${output_dir_top}/${mirdeep2_mapping_file} \
@@ -211,7 +220,7 @@ ${collapsed_reads_dir}/${collapsed_reads_mirdeep2} \
 
 # Run miRDeep2
 
-```{r mirdeep2, eval=TRUE, engine='bash'}
+```{r mirdeep2, eval=FALSE, engine='bash'}
 # Load bash variables into memory
 source .bashvars
 
@@ -219,18 +228,83 @@ source .bashvars
 export PATH=$PATH:/home/shared/mirdeep2/bin
 export PERL5LIB=$PERL5LIB:/home/shared/mirdeep2/lib/perl5
 
+time \
 ${mirdeep2} \
-${collapsed_reads_dir}/${collapsed_reads_mirdeep2} \
+${output_dir_top}/${collapsed_reads_mirdeep2} \
 ${genome_fasta_dir}/${genome_fasta_no_spaces} \
 ${output_dir_top}/${mirdeep2_mapping_file} \
 none \
-${deep_dive_data_dir}/${mirbase_mature_fasta_name} \
+${deep_dive_data_dir}/${mirbase_mature_fasta_no_spaces} \
 none \
 -t S.purpuratus \
 -P \
 -v \
+-g -1 \
 2>${output_dir_top}/miRDeep2-S.purpuratus-report.log
 ```
+
+# Move output files to output directory
+MiRDeep2 outputs all files to the current working directly with no way to redirect
+so want to move to intended output directory.
+
+If you didn't realize this, like me, then you'll likely want to move them to a more
+appropriate location.
+
+## Identify directories
+
+```{r identify-mirdeep2-output-dirs, eval=TRUE, engine='bash'}
+# Load bash variables into memory
+source .bashvars
+
+ls -l | grep "^d"
+```
+
+## Rsync directories
+
+```{r move-mirdeep2-output-files, eval=TRUE, engine='bash'}
+# Load bash variables into memory
+source .bashvars
+
+rsync -aP . --include='dir***' --exclude='*' --quiet "${output_dir_top}/"
+
+rsync -aP . --include='map***' --exclude='*' --quiet "${output_dir_top}/"
+
+rsync -aP . --exclude='mirgene*' --include='mir***' --exclude='*' --quiet "${output_dir_top}/"
+
+rsync -aP . --include='pdfs***' --exclude='*' --quiet "${output_dir_top}/"
+
+echo ""
+echo "Check new location:"
+echo ""
+
+ls -l "${output_dir_top}/" | grep "^d"
+
+
+```
+
+## Confirm deletion patterns work _before_ deletion!
+FYI - `eval=FALSE` is set because the following command will only work once...
+```{r test-deletion-patterns, eval=FALSE, engine='bash'}
+ls --directory dir_* mapper_logs mirdeep_runs mirna_results* pdfs_*
+```
+
+
+## Remove directores from code directory
+
+```{r remove-mirdeep2-output-dirs, eval=FALSE, engine='bash'}
+# Load bash variables into memory
+source .bashvars
+
+rm -rf dir_* mapper_logs mirdeep_runs mirna_results* pdfs_*
+
+```
+
+## Check to make sure they're gone
+```{r check-deletion-success, eval=TRUE, engine='bash'}
+ls -l | grep "^d"
+```
+
+
 
 
 ---
