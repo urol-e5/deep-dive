@@ -243,6 +243,15 @@ none \
 2>${output_dir_top}/miRDeep2-S.purpuratus-report.log
 ```
 
+## Check runtime
+```{r runtime-mirdeep2, eval=TRUE, engine='bash'}
+# Load bash variables into memory
+source .bashvars
+
+tail -n 6 ${output_dir_top}/miRDeep2-S.purpuratus-report.log
+```
+
+
 # Move output files to output directory
 MiRDeep2 outputs all files to the current working directly with no way to redirect
 so want to move to intended output directory.
@@ -301,7 +310,7 @@ rm -rf dir_* mapper_logs mirdeep_runs mirna_results* pdfs_*
 
 ## Check to make sure they're gone
 ```{r check-deletion-success, eval=TRUE, engine='bash'}
-ls -l | grep "^d"
+ls --directory dir_* mapper_logs mirdeep_runs mirna_results* pdfs_*
 ```
 
 
