@@ -24,6 +24,26 @@ bibliography: references.bib
 link-citations: true
 ---
 
+Use [miRDeep2](https://github.com/rajewsky-lab/mirdeep2) [@friedländer2011] to identify potential miRNAs using _A.pulchra_ sRNAseq reads. The *A.millepora* genome will be used as the reference genome for *A.pulchra*, as *A.pulchra* does not currently have a sequenced genome and *A.millepora* had highest alignment rates for standard RNAseq data compared to other published genomes tested. The mature miRBase miRNA database will also be used.
+
+------------------------------------------------------------------------
+
+Inputs:
+
+-   Requires collapsed reads (i.e. concatenated, unique reads) in FastA format. See [10-Apul-sRNAseq-BLASTn.Rmd](https://github.com/urol-e5/deep-dive/blob/main/D-Apul/code/10-Apul-sRNAseq-BLASTn.Rmd) for code.
+
+-   *A.millepora* genome FastA. See [12-Apul-sRNAseq-MirMachine.Rmd](https://github.com/urol-e5/deep-dive/blob/main/D-Apul/code/12-Apul-sRNAseq-MirMachine.Rmd) for download info if needed.
+
+- [miRBase](https://mirbase.org/download/) mature miRNAs FastA.
+
+Outputs:
+
+-   Primary outputs are a result table in BED, CSV (tab-delimited), and HTML formats.
+
+
+------------------------------------------------------------------------
+
+
 ```{r setup, include=FALSE}
 library(knitr)
 library(kableExtra)
@@ -38,9 +58,6 @@ knitr::opts_chunk$set(
   width = 1000         # adds scroll bar
 )
 ```
-
-
-
 
 # Create a Bash variables file
 
@@ -65,7 +82,6 @@ echo 'export output_dir_top=${deep_dive_dir}/D-Apul/output/11-Apul-sRNAseq-miRde
 echo 'export genome_fasta_dir=${deep_dive_dir}/D-Apul/data/Amil/ncbi_dataset/data/GCF_013753865.1'
 echo 'export trimmed_fastqs_dir="${deep_dive_dir}/D-Apul/output/08-Apul-sRNAseq-trimming/trimmed-reads"'
 echo 'export collapsed_reads_dir="${deep_dive_dir}/D-Apul/output/10-Apul-sRNAseq-BLASTn"'
-echo 'export mirtrace_reads_dir="${deep_dive_dir}/D-Apul/output/09-Apul-sRNAseq-miRTrace/qc_passed_reads.all.collapsed"'
 echo ""
 
 echo "# Input/Output files"
@@ -102,11 +118,10 @@ cat .bashvars
 
 # Prepare reads for miRDeep2
 
-Per miRDeep2 documentation: 
+Per miRDeep2 documentation:
 
-> The readID must end with _xNumber and is not allowed to contain whitespaces.
-> has to have the format
-> name_uniqueNumber_xnumber
+> The readID must end with \_xNumber and is not allowed to contain
+> whitespaces. has to have the format name_uniqueNumber_xnumber
 
 ```{r reformat-read-IDs, eval=TRUE, engine='bash'}
 # Load bash variables into memory
@@ -130,8 +145,8 @@ grep "^>" ${output_dir_top}/${collapsed_reads_mirdeep2} \
 
 # Reformat genome FastA description lines
 
-miRDeep2 can't process genome FastAs with spaces in
-the description lines.
+miRDeep2 can't process genome FastAs with spaces in the description
+lines.
 
 So, I'm replacing spaces with underscores.
 
@@ -158,6 +173,7 @@ grep "^>" ${genome_fasta_dir}/${genome_fasta_no_spaces} \
 ```
 
 # Reformat miRBase FastA description lines
+
 ```{r remove-spaces-genome-FastA, eval=TRUE, engine='bash'}
 # Load bash variables into memory
 source .bashvars
@@ -178,11 +194,10 @@ grep "^>" ${deep_dive_data_dir}/${mirbase_mature_fasta_no_spaces} \
 | head
 ```
 
-
-
 # Bowtie v1 genome index
 
 miRDeep2 requires a Bowtie v1 genome index - cannot use Bowtie2 index
+
 ```{r bowtie1-index, eval=TRUE, engine='bash'}
 # Load bash variables into memory
 source .bashvars
@@ -200,6 +215,10 @@ fi
 # Map reads to genome
 
 Requires genome to be previously indexed with Bowtie.
+
+Additionally, requires user to enter path to their `mirdeep2` directory as well
+as their `perl5` installation.
+
 ```{r map-read-genome, eval=TRUE, engine='bash'}
 # Load bash variables into memory
 source .bashvars
@@ -219,6 +238,24 @@ ${output_dir_top}/${collapsed_reads_mirdeep2} \
 ```
 
 # Run miRDeep2
+
+Recommendation is to use the closest related species in the miRDeep2 options, even
+if the species isn't very closely related. The documentation indicates that miRDeep2
+is always more accurate when at least a species is provided.
+
+The options provided to the command are as follows:
+
+- `none`: Known miRNAs of the species being analyzed.
+- `-t S.pupuratus`: Related species.
+- `none`: Known miRNA precursors in this species.
+- `-P`: Specifies miRBase version > 18.
+- `-v`: Remove temporary files after completion.
+- `-g -1`: Number of precursors to anlayze. A setting of `-1` will analyze all. Default is 50,000
+I set this to `-1` after multiple attempts to run using the default kept failing.
+
+NOTE: This will take an _extremely_ long time to run (days). Could possible by shortened by
+excluding `randfold` analysis.
+
 
 ```{r mirdeep2, eval=FALSE, engine='bash'}
 # Load bash variables into memory
@@ -244,6 +281,7 @@ none \
 ```
 
 ## Check runtime
+
 ```{r runtime-mirdeep2, eval=TRUE, engine='bash'}
 # Load bash variables into memory
 source .bashvars
@@ -251,14 +289,15 @@ source .bashvars
 tail -n 6 ${output_dir_top}/miRDeep2-S.purpuratus-report.log
 ```
 
-
 # Move output files to output directory
-MiRDeep2 outputs all files to the current working directly with no way to redirect
-so want to move to intended output directory.
+
+MiRDeep2 outputs all files to the current working directly with no way
+to redirect so want to move to intended output directory.
 
 ## Move output files
 
 Output files will be in the format of `result_*` and `error_*`
+
 ```{r identify-mirdeep2-output-files, eval=FALSE, engine='bash'}
 # Load bash variables into memory
 source .bashvars
@@ -268,8 +307,6 @@ do
   mv "${file}" "${output_dir_top}/"
 done
 ```
-
-
 
 ## Identify directories
 
@@ -303,12 +340,14 @@ ls -l "${output_dir_top}/" | grep "^d"
 
 ```
 
-## Confirm deletion patterns work _before_ deletion!
-FYI - `eval=FALSE` is set because the following command will only work once...
+## Confirm deletion patterns work *before* deletion!
+
+FYI - `eval=FALSE` is set because the following command will only work
+once...
+
 ```{r test-deletion-patterns, eval=FALSE, engine='bash'}
 ls --directory dir_* mapper_logs mirdeep_runs mirna_results* pdfs_*
 ```
-
 
 ## Remove directores from code directory
 
@@ -321,6 +360,7 @@ rm -rf dir_* mapper_logs mirdeep_runs mirna_results* pdfs_*
 ```
 
 ## Check to make sure they're gone
+
 ```{r check-deletion-success, eval=TRUE, engine='bash'}
 ls --directory dir_* mapper_logs mirdeep_runs mirna_results* pdfs_*
 ```
@@ -329,8 +369,10 @@ ls --directory dir_* mapper_logs mirdeep_runs mirna_results* pdfs_*
 
 ## Peep output file format
 
-The formatting of this CSV is terrible. It has a 3-column table on top of a
-17-column table. This makes parsing a bit of a pain in its raw format.
+The formatting of this CSV is terrible. It has a 3-column table on top
+of a 17-column table. This makes parsing a bit of a pain in its raw
+format.
+
 ```{r check-results-file, eval=TRUE, engine='bash'}
 # Load bash variables into memory
 source .bashvars
@@ -340,8 +382,10 @@ head -n 30 "${output_dir_top}/result_08_11_2023_t_14_47_36.csv"
 ```
 
 ## Create more easily parasable results file
-This will match the line beginning with `provisional id` and print to the
-end of the file (represented by the `$p`. `$` = end, `p` = print)
+
+This will match the line beginning with `provisional id` and print to
+the end of the file (represented by the `$p`. `$` = end, `p` = print)
+
 ```{r parsable-results-file, eval=TRUE, engine='bash'}
 # Load bash variables into memory
 source .bashvars
@@ -353,11 +397,11 @@ sed --quiet '/provisional id/,$p' "${output_dir_top}/result_08_11_2023_t_14_47_3
 head "${output_dir_top}/parsable-result_08_11_2023_t_14_47_36.csv"
 ```
 
-
-
 ## Read in output CSV
 
-This chunk provides a more convise overview of the data and it's columns.
+This chunk provides a more convise overview of the data and it's
+columns.
+
 ```{r read-in-result-csv, eval=TRUE}
 
 mirdeep_result.df <- read.csv("../output/11-Apul-sRNAseq-miRdeep2/parsable-result_08_11_2023_t_14_47_36.csv",
@@ -372,7 +416,9 @@ str(mirdeep_result.df)
 
 This provides some rudimentary numbers for the miRDeep2 output.
 
-Further analysis is possibly desired to evaluate score thresholds, miRNA families, etc.
+Further analysis is possibly desired to evaluate score thresholds, miRNA
+families, etc.
+
 ```{r results-counts, eval=TRUE, engine='bash'}
 # Load bash variables into memory
 source .bashvars
@@ -403,9 +449,6 @@ echo "Number of novel miRNAs: ${novel_miRNAs}"
 
 ```
 
-
-
-
----
+------------------------------------------------------------------------
 
 # Citations
