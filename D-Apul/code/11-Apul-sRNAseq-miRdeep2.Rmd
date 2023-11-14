@@ -355,7 +355,9 @@ head "${output_dir_top}/parsable-result_08_11_2023_t_14_47_36.csv"
 
 
 
-### Read in output CSV
+## Read in output CSV
+
+This chunk provides a more convise overview of the data and it's columns.
 ```{r read-in-result-csv, eval=TRUE}
 
 mirdeep_result.df <- read.csv("../output/11-Apul-sRNAseq-miRdeep2/parsable-result_08_11_2023_t_14_47_36.csv",
@@ -365,6 +367,42 @@ mirdeep_result.df <- read.csv("../output/11-Apul-sRNAseq-miRdeep2/parsable-resul
 str(mirdeep_result.df)
 
 ```
+
+## miRNAs count data
+
+This provides some rudimentary numbers for the miRDeep2 output.
+
+Further analysis is possibly desired to evaluate score thresholds, miRNA families, etc.
+```{r results-counts, eval=TRUE, engine='bash'}
+# Load bash variables into memory
+source .bashvars
+
+# Total predicted miRNAS
+total_miRNAs=$(awk 'NR > 1' ${output_dir_top}/parsable-result_08_11_2023_t_14_47_36.csv \
+| wc -l
+)
+
+echo "Total of predicted miRNAs: ${total_miRNAs}"
+echo ""
+
+# Matches to known mature miRNAs
+mature_miRNAs=$(awk -F'\t' '$11 != "-" && $11 != "" {print $11}' ${output_dir_top}/parsable-result_08_11_2023_t_14_47_36.csv \
+| wc -l
+)
+
+echo "Number of seed matches to known miRNAS: ${mature_miRNAs}"
+echo ""
+
+# Novel miRNAs
+novel_miRNAs=$(awk -F "\t" '$11 == "-" || $11 == "" {print $11}' ${output_dir_top}/parsable-result_08_11_2023_t_14_47_36.csv \
+| awk 'NR > 1' \
+| wc -l
+)
+
+echo "Number of novel miRNAs: ${novel_miRNAs}"
+
+```
+
 
 
 
