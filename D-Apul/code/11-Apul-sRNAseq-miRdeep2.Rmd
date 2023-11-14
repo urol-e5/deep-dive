@@ -180,7 +180,7 @@ grep "^>" ${genome_fasta_dir}/${genome_fasta_no_spaces} \
 
 # Reformat miRBase FastA description lines
 
-```{r remove-spaces-genome-FastA, eval=TRUE, engine='bash'}
+```{r remove-spaces-mirbase-FastA, eval=TRUE, engine='bash'}
 # Load bash variables into memory
 source .bashvars
 
@@ -204,7 +204,7 @@ grep "^>" ${deep_dive_data_dir}/${mirbase_mature_fasta_no_spaces} \
 
 miRDeep2 requires a Bowtie v1 genome index - cannot use Bowtie2 index
 
-```{r bowtie1-index, eval=TRUE, engine='bash'}
+```{r bowtie1-index, eval=FALSE, engine='bash'}
 # Load bash variables into memory
 source .bashvars
 
@@ -225,7 +225,7 @@ Requires genome to be previously indexed with Bowtie.
 Additionally, requires user to enter path to their `mirdeep2` directory as well
 as their `perl5` installation.
 
-```{r map-read-genome, eval=TRUE, engine='bash'}
+```{r map-read-genome, eval=FALSE, engine='bash'}
 # Load bash variables into memory
 source .bashvars
 
@@ -304,7 +304,7 @@ to redirect so want to move to intended output directory.
 
 Output files will be in the format of `result_*` and `error_*`
 
-```{r identify-mirdeep2-output-files, eval=FALSE, engine='bash'}
+```{r move-mirdeep2-output-files, eval=FALSE, engine='bash'}
 # Load bash variables into memory
 source .bashvars
 
@@ -325,7 +325,7 @@ ls -l | grep "^d"
 
 ## Rsync directories
 
-```{r move-mirdeep2-output-files, eval=TRUE, engine='bash'}
+```{r rsync-mirdeep2-output-files, eval=FALSE, engine='bash'}
 # Load bash variables into memory
 source .bashvars
 
@@ -367,7 +367,7 @@ rm -rf dir_* mapper_logs mirdeep_runs mirna_results* pdfs_*
 
 ## Check to make sure they're gone
 
-```{r check-deletion-success, eval=TRUE, engine='bash'}
+```{r check-deletion-success, eval=TRUE, engine='bash', error=TRUE}
 ls --directory dir_* mapper_logs mirdeep_runs mirna_results* pdfs_*
 ```
 
