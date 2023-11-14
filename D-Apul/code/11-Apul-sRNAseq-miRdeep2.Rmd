@@ -325,6 +325,46 @@ rm -rf dir_* mapper_logs mirdeep_runs mirna_results* pdfs_*
 ls --directory dir_* mapper_logs mirdeep_runs mirna_results* pdfs_*
 ```
 
+# Results
+
+## Peep output file format
+
+The formatting of this CSV is terrible. It has a 3-column table on top of a
+17-column table. This makes parsing a bit of a pain in its raw format.
+```{r check-results-file, eval=TRUE, engine='bash'}
+# Load bash variables into memory
+source .bashvars
+
+
+head -n 30 "${output_dir_top}/result_08_11_2023_t_14_47_36.csv"
+```
+
+## Create more easily parasable results file
+This will match the line beginning with `provisional id` and print to the
+end of the file (represented by the `$p`. `$` = end, `p` = print)
+```{r parsable-results-file, eval=TRUE, engine='bash'}
+# Load bash variables into memory
+source .bashvars
+
+
+sed --quiet '/provisional id/,$p' "${output_dir_top}/result_08_11_2023_t_14_47_36.csv" \
+> "${output_dir_top}/parsable-result_08_11_2023_t_14_47_36.csv"
+
+head "${output_dir_top}/parsable-result_08_11_2023_t_14_47_36.csv"
+```
+
+
+
+### Read in output CSV
+```{r read-in-result-csv, eval=TRUE}
+
+mirdeep_result.df <- read.csv("../output/11-Apul-sRNAseq-miRdeep2/parsable-result_08_11_2023_t_14_47_36.csv",
+                              header = TRUE,
+                              sep = "\t")
+
+str(mirdeep_result.df)
+
+```
 
 
 
