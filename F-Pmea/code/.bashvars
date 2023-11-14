@@ -1,19 +1,32 @@
 #### Assign Variables ####
 
+# Trimmed FastQ naming pattern
+export trimmed_fastqs_pattern='*flexbar_trim.25bp*.fastq.gz'
 # Data directories
 export deep_dive_dir=/home/shared/8TB_HDD_02/shedurkin/deep-dive
-export output_dir_top=${deep_dive_dir}/F-Pmea/output/09-Pmea-sRNAseq-miRTrace
-export trimmed_reads_dir=${deep_dive_dir}/F-Pmea/output/08-Pmea-sRNAseq-trimming/trimmed-reads
+export deep_dive_data_dir="${deep_dive_dir}/data"
+export output_dir_top=${deep_dive_dir}/F-Pmea/output/10-Pmea-sRNAseq-BLASTn
+export trimmed_fastqs_dir="${deep_dive_dir}/F-Pmea/output/08-Pmea-sRNAseq-trimming/trimmed-reads"
+export blast_dbs_dir="${deep_dive_dir}/data/blast_dbs"
+
+# Input/Output files
+export collapsed_reads_fasta="collapsed-reads-all.fasta"
+export concatenated_trimmed_reads_fastq="concatenated-trimmed-reads-all.fastq.gz"
+export mirbase_mature_fasta_name="mirbase-mature-v22.1.fa"
+export mirbase_mature_fasta_no_U="mirbase-mature-v22.1-no_U.fa"
+export mirgene_mature_fasta_name="mirgene-mature-all-v2.1.fa"
+export mirgene_mature_fasta_no_U="mirgene-mature-all-v2.1-no_U.fa"
+
+# External data URLs
+export mirgenedb_fasta_url="https://www.mirgenedb.org/fasta/ALL?mat=1"
 
 # Paths to programs
-export mirtrace=/home/sam/programs/mambaforge/envs/miRTrace_env/bin/mirtrace
-
+export ncbi_blast_dir="/home/shared/ncbi-blast-2.15.0+/bin/"
+export ncbi_blastn="${ncbi_blast_dir}/blastn"
+export ncbi_makeblast_db="${ncbi_blast_dir}/makeblastdb"
+export fastx_collapser="/home/shared/fastx_toolkit_0.0.13_binaries_Linux_2.6_amd64/bin/fastx_collapser"
 # Set number of CPUs to use
-export threads=40
+export threads=46
 
-export fastq_pattern='*flexbar_trim.25bp*.gz'
-# Programs associative array
-declare -A programs_array
-programs_array=(
-[mirtrace]="${mirtrace}"
-)
+# Initialize arrays
+export trimmed_fastqs_array=()
