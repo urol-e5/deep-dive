@@ -1,70 +1,66 @@
----
-title: "06-Peve-sRNAseq-trimming"
-author: "Sam White"
-date: "2023-11-15"
-output: 
-  bookdown::html_document2:
-    theme: cosmo
-    toc: true
-    toc_float: true
-    number_sections: true
-    code_folding: show
-    code_download: true
-  github_document:
-    toc: true
-    number_sections: true
-  html_document:
-    theme: cosmo
-    toc: true
-    toc_float: true
-    number_sections: true
-    code_folding: show
-    code_download: true
-bibliography: references.bib
-link-citations: true
----
+06-Peve-sRNAseq-trimming
+================
+Sam White
+2023-11-15
 
-```{r setup, include=FALSE}
-library(knitr)
-library(kableExtra)
-library(dplyr)
-library(reticulate)
-knitr::opts_chunk$set(
-  echo = TRUE,         # Display code chunks
-  eval = FALSE,        # Evaluate code chunks
-  warning = FALSE,     # Hide warnings
-  message = FALSE,     # Hide messages
-  comment = ""         # Prevents appending '##' to beginning of lines in code output
-)
-```
+- <a href="#1-create-a-bash-variables-file"
+  id="toc-1-create-a-bash-variables-file">1 Create a Bash variables
+  file</a>
+- <a href="#2-download-raw-srnaseq-reads"
+  id="toc-2-download-raw-srnaseq-reads">2 Download raw sRNAseq reads</a>
+  - <a href="#21-verify-raw-read-checksums"
+    id="toc-21-verify-raw-read-checksums">2.1 Verify raw read checksums</a>
+- <a href="#3-create-adapters-fasta-for-use-with-flexbar-trimming"
+  id="toc-3-create-adapters-fasta-for-use-with-flexbar-trimming">3 Create
+  adapters FastA for use with flexbar trimming</a>
+- <a href="#4-fastqcmultiqc-on-raw-reads"
+  id="toc-4-fastqcmultiqc-on-raw-reads">4 FastQC/MultiQC on raw reads</a>
+- <a href="#5-trimming-with-flexbar" id="toc-5-trimming-with-flexbar">5
+  Trimming with flexbar</a>
+- <a href="#6-fastqcmultiqc-on-trimmed-reads"
+  id="toc-6-fastqcmultiqc-on-trimmed-reads">6 FastQC/MultiQC on trimmed
+  reads</a>
+- <a href="#7-summary" id="toc-7-summary">7 Summary</a>
+- <a href="#8-citations" id="toc-8-citations">8 Citations</a>
 
-FastQC/MultiQC [@ewels2016; @Andrews_undated-nf] assessment of raw and [flexbar](https://github.com/seqan/flexbar)-trimmed [@Dodt2012-rt; @Roehr2017-dr] sequences of E5 *P.evermanni* sRNAseq data from [20230515](https://robertslab.github.io/sams-notebook/posts/2023/2023-05-17-Data-Management---E5-Coral-RNA-seq-and-sRNA-seq-Reorganizing-and-Renaming/).
+FastQC/MultiQC ([Ewels et al. 2016](#ref-ewels2016); [Andrews,
+n.d.](#ref-Andrews_undated-nf)) assessment of raw and
+[flexbar](https://github.com/seqan/flexbar)-trimmed ([Dodt et al.
+2012](#ref-Dodt2012-rt); [Roehr, Dieterich, and Reinert
+2017](#ref-Roehr2017-dr)) sequences of E5 *P.evermanni* sRNAseq data
+from
+[20230515](https://robertslab.github.io/sams-notebook/posts/2023/2023-05-17-Data-Management---E5-Coral-RNA-seq-and-sRNA-seq-Reorganizing-and-Renaming/).
 
 Inputs:
 
--   sRNAseq gzipped FastQs (e.g. `*.fastq.gz`)
+- sRNAseq gzipped FastQs (e.g. `*.fastq.gz`)
 
 Outputs:
 
--   [`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) HTML reports for raw and trimmed reads.
+- [`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/)
+  HTML reports for raw and trimmed reads.
 
--   [`MultiQC`](https://multiqc.info/) HTML summaries of [`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) for raw and trimmed reads.
+- [`MultiQC`](https://multiqc.info/) HTML summaries of
+  [`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/)
+  for raw and trimmed reads.
 
--   Trimmed reads with final length of 25bp: `*flexbar_trim.25bp.fastq.gz`
+- Trimmed reads with final length of 25bp: `*flexbar_trim.25bp.fastq.gz`
 
 Libraries were prepared and sequenced by Azenta:
 
--   Library prep: [NEB nebnext-small-rna-library-prep-set-for-illumina kit](https://www.neb.com/en-us/-/media/nebus/files/manuals/manuale7300_e7330_e7560_e7580.pdf?rev=d0964a2e637843b1afcb9f7d666d07b2&hash=7AC0B0EB012708EFAB0E4DBEEAF1446A) (PDF)
+- Library prep: [NEB nebnext-small-rna-library-prep-set-for-illumina
+  kit](https://www.neb.com/en-us/-/media/nebus/files/manuals/manuale7300_e7330_e7560_e7580.pdf?rev=d0964a2e637843b1afcb9f7d666d07b2&hash=7AC0B0EB012708EFAB0E4DBEEAF1446A)
+  (PDF)
 
--   Sequencing: Illumina HiSeq 4000, 150bp PE
+- Sequencing: Illumina HiSeq 4000, 150bp PE
 
 ------------------------------------------------------------------------
 
-# Create a Bash variables file
+# 1 Create a Bash variables file
 
 This allows usage of Bash variables across R Markdown chunks.
 
-```{r save-bash-variables-to-rvars-file, engine='bash', eval=TRUE}
+``` bash
 {
 echo "#### Assign Variables ####"
 echo ""
@@ -133,13 +129,68 @@ echo ")"
 cat .bashvars
 ```
 
-# Download raw sRNAseq reads
+    #### Assign Variables ####
 
-Reads are downloaded from <https://owl.fish.washington.edu/nightingales/P_evermanni/30-852430235/>
+    # Data directories
+    export deep_dive_dir=/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive
+    export output_dir_top=${deep_dive_dir}/E-Peve/output/06-Peve-sRNAseq-trimming
+    export raw_fastqc_dir=${deep_dive_dir}/E-Peve/output/06-Peve-sRNAseq-trimming/raw-fastqc
+    export raw_reads_dir=${deep_dive_dir}/E-Peve/data/06-Peve-sRNAseq-trimming/raw-reads
+    export raw_reads_url="https://owl.fish.washington.edu/nightingales/P_evermanni/30-852430235/"
+    export trimmed_fastqc_dir=${deep_dive_dir}/E-Peve/output/06-Peve-sRNAseq-trimming/trimmed-fastqc
+    export trimmed_reads_dir=${deep_dive_dir}/E-Peve/output/06-Peve-sRNAseq-trimming/trimmed-reads
 
-The `--cut-dirs 3` command cuts the preceding directory structure (i.e. `nightingales/P_evermanni/30-852430235/`) so that we just end up with the reads.
+    # Paths to programs
+    export fastqc=/home/shared/FastQC-0.12.1/fastqc
+    export flexbar=/home/shared/flexbar-3.5.0-linux/flexbar
+    export multiqc=/home/sam/programs/mambaforge/bin/multiqc
 
-```{bash download-raw-reads, engine='bash', eval=TRUE}
+    # Set FastQ filename patterns
+    export fastq_pattern='*.fastq.gz'
+    export R1_fastq_pattern='*_R1_*.fastq.gz'
+    export R2_fastq_pattern='*_R2_*.fastq.gz'
+
+    # Set number of CPUs to use
+    export threads=40
+
+    # Set maximum read length
+    export max_read_length=25
+
+    # Input/output files
+    export fastq_checksums=input_fastq_checksums.md5
+    export trimmed_checksums=trimmed_fastq_checksums.md5
+    export NEB_adapters_fasta=NEB-adapters.fasta
+
+    ## NEB nebnext-small-rna-library-prep-set-for-illumina adapters
+    export first_adapter="AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC"
+    export second_adapter="GATCGTCGGACTGTAGAACTCTGAACGTGTAGATCTCGGTGGTCGCCGTATCATT"
+
+    ## Inititalize arrays
+    export fastq_array_R1=()
+    export fastq_array_R2=()
+    export raw_fastqs_array=()
+    export R1_names_array=()
+    export R2_names_array=()
+    export trimmed_fastqs_array=()
+
+    # Programs associative array
+    declare -A programs_array
+    programs_array=(
+    [fastqc]="${fastqc}" \
+    [multiqc]="${multiqc}" \
+    [flexbar]="${flexbar}"
+    )
+
+# 2 Download raw sRNAseq reads
+
+Reads are downloaded from
+<https://owl.fish.washington.edu/nightingales/P_evermanni/30-852430235/>
+
+The `--cut-dirs 3` command cuts the preceding directory structure
+(i.e. `nightingales/P_evermanni/30-852430235/`) so that we just end up
+with the reads.
+
+``` bash
 # Load bash variables into memory
 source .bashvars
 
@@ -157,9 +208,18 @@ wget \
 ls -lh "${raw_reads_dir}"
 ```
 
-## Verify raw read checksums
+    total 5.6G
+    -rw-r--r-- 1 sam sam  798 May 17 11:23 checksums.md5
+    -rw-r--r-- 1 sam sam 953M May 17 10:46 sRNA-POR-73-S1-TP2_R1_001.fastq.gz
+    -rw-r--r-- 1 sam sam 1.1G May 17 10:47 sRNA-POR-73-S1-TP2_R2_001.fastq.gz
+    -rw-r--r-- 1 sam sam 899M May 17 10:48 sRNA-POR-79-S1-TP2_R1_001.fastq.gz
+    -rw-r--r-- 1 sam sam 916M May 17 10:49 sRNA-POR-79-S1-TP2_R2_001.fastq.gz
+    -rw-r--r-- 1 sam sam 934M May 17 10:51 sRNA-POR-82-S1-TP2_R1_001.fastq.gz
+    -rw-r--r-- 1 sam sam 959M May 17 10:52 sRNA-POR-82-S1-TP2_R2_001.fastq.gz
 
-```{bash verify-raw-read-checksums, engine='bash', eval=TRUE}
+## 2.1 Verify raw read checksums
+
+``` bash
 # Load bash variables into memory
 source .bashvars
 
@@ -169,9 +229,16 @@ cd "${raw_reads_dir}"
 grep "sRNA" checksums.md5 | md5sum --check
 ```
 
-# Create adapters FastA for use with [flexbar](https://github.com/seqan/flexbar) trimming
+    sRNA-POR-73-S1-TP2_R1_001.fastq.gz: OK
+    sRNA-POR-73-S1-TP2_R2_001.fastq.gz: OK
+    sRNA-POR-79-S1-TP2_R1_001.fastq.gz: OK
+    sRNA-POR-79-S1-TP2_R2_001.fastq.gz: OK
+    sRNA-POR-82-S1-TP2_R1_001.fastq.gz: OK
+    sRNA-POR-82-S1-TP2_R2_001.fastq.gz: OK
 
-```{bash create-FastA-of-adapters, engine='bash', eval=TRUE}
+# 3 Create adapters FastA for use with [flexbar](https://github.com/seqan/flexbar) trimming
+
+``` bash
 # Load bash variables into memory
 source .bashvars
 
@@ -198,9 +265,20 @@ cat "${output_dir_top}/${NEB_adapters_fasta}"
 echo ""
 ```
 
-# FastQC/MultiQC on raw reads
+    Creating adapters FastA.
 
-```{bash raw-fastqc-multiqc, engine='bash', eval=FALSE}
+    /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/E-Peve/output/06-Peve-sRNAseq-trimming/NEB-adapters.fasta already exists. Nothing to do.
+
+    Adapters FastA:
+
+    >adapter_1
+    AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC
+    >adapter_2
+    GATCGTCGGACTGTAGAACTCTGAACGTGTAGATCTCGGTGGTCGCCGTATCATT
+
+# 4 FastQC/MultiQC on raw reads
+
+``` bash
 # Load bash variables into memory
 source .bashvars
 
@@ -249,12 +327,11 @@ echo ""
 
 # View directory contents
 ls -lh ${raw_fastqc_dir}
-
 ```
 
-# Trimming with [flexbar](https://github.com/seqan/flexbar)
+# 5 Trimming with [flexbar](https://github.com/seqan/flexbar)
 
-```{bash flexbar-trimming, engine='bash', cache=TRUE}
+``` bash
 # Load bash variables into memory
 source .bashvars
 
@@ -342,12 +419,11 @@ echo ""
 cat "${trimmed_reads_dir}/${trimmed_checksums}"
 
 ############ END FLEXBAR ############
-
 ```
 
-# FastQC/MultiQC on trimmed reads
+# 6 FastQC/MultiQC on trimmed reads
 
-```{bash FastQC-MultiQC-trimmed-reads, engine='bash', eval=FALSE}
+``` bash
 # Load bash variables into memory
 source .bashvars
 
@@ -395,20 +471,54 @@ echo ""
 
 # View directory contents
 ls -lh ${trimmed_fastqc_dir}
-
 ```
 
-# Summary
+# 7 Summary
 
 A quick comparison of raw and trimmed reads to show trimming worked:
 
--   quality is improved
--   length is 25bp
--   adapters removed
+- quality is improved
+- length is 25bp
+- adapters removed
 
 | RAW                                                                                                                                                                                                | TRIMMED                                                                                                                                                                                                    |
-|-----------------------------------|-------------------------------------|
+|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | ![Raw MultiQC per base sequence quality plot](https://github.com/urol-e5/deep-dive/blob/main/E-Peve/output/06-Peve-sRNAseq-trimming/raw-fastqc/fastqc_per_base_sequence_quality_plot.png?raw=true) | ![Trimmed MultiQC per base sequence quality plot](https://github.com/urol-e5/deep-dive/blob/main/E-Peve/output/06-Peve-sRNAseq-trimming/trimmed-fastqc/fastqc_per_base_sequence_quality_plot.png?raw=true) |
 | ![Raw MultiQC adapter content plot](https://github.com/urol-e5/deep-dive/blob/main/E-Peve/output/06-Peve-sRNAseq-trimming/raw-fastqc/fastqc_adapter_content_plot.png?raw=true)                     | ![Trimmed MultiQC adapter content plot](https://github.com/urol-e5/deep-dive/blob/main/E-Peve/output/06-Peve-sRNAseq-trimming/trimmed-fastqc/fastqc_adapter_content_plot.png?raw=true)                     |
 
-# Citations
+# 8 Citations
+
+<div id="refs" class="references csl-bib-body hanging-indent">
+
+<div id="ref-Andrews_undated-nf" class="csl-entry">
+
+Andrews, Simon. n.d. “FastQC.” Github.
+
+</div>
+
+<div id="ref-Dodt2012-rt" class="csl-entry">
+
+Dodt, Matthias, Johannes T Roehr, Rina Ahmed, and Christoph Dieterich.
+2012. “FLEXBAR-Flexible Barcode and Adapter Processing for
+Next-Generation Sequencing Platforms.” *Biology* 1 (3): 895–905.
+
+</div>
+
+<div id="ref-ewels2016" class="csl-entry">
+
+Ewels, Philip, Måns Magnusson, Sverker Lundin, and Max Käller. 2016.
+“MultiQC: Summarize Analysis Results for Multiple Tools and Samples in a
+Single Report.” *Bioinformatics* 32 (19): 3047–48.
+<https://doi.org/10.1093/bioinformatics/btw354>.
+
+</div>
+
+<div id="ref-Roehr2017-dr" class="csl-entry">
+
+Roehr, Johannes T, Christoph Dieterich, and Knut Reinert. 2017. “Flexbar
+3.0 - SIMD and Multicore Parallelization.” *Bioinformatics* 33 (18):
+2941–42.
+
+</div>
+
+</div>
