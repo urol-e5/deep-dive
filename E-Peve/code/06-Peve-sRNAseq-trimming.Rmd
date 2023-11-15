@@ -31,7 +31,7 @@ knitr::opts_chunk$set(
 ```
 
 
-FastQC/MultiQC assessment of raw and [flexbar](https://github.com/seqan/flexbar)-trimmed sequences of E5 _A.pulchra_ sRNAseq data from [20230515](https://robertslab.github.io/sams-notebook/posts/2023/2023-05-17-Data-Management---E5-Coral-RNA-seq-and-sRNA-seq-Reorganizing-and-Renaming/).
+FastQC/MultiQC assessment of raw and [flexbar](https://github.com/seqan/flexbar)-trimmed sequences of E5 _P.evermanni_ sRNAseq data from [20230515](https://robertslab.github.io/sams-notebook/posts/2023/2023-05-17-Data-Management---E5-Coral-RNA-seq-and-sRNA-seq-Reorganizing-and-Renaming/).
 
 Inputs:
 
@@ -64,12 +64,12 @@ echo ""
 
 echo "# Data directories"
 echo 'export deep_dive_dir=/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive'
-echo 'export output_dir_top=${deep_dive_dir}/D-Apul/output/08-Apul-sRNAseq-trimming'
-echo 'export raw_fastqc_dir=${deep_dive_dir}/D-Apul/output/08-Apul-sRNAseq-trimming/raw-fastqc'
-echo 'export raw_reads_dir=${deep_dive_dir}/D-Apul/data/08-Apul-sRNAseq-trimming/raw-reads'
-echo 'export raw_reads_url="https://owl.fish.washington.edu/nightingales/A_pulchra/30-852430235/"'
-echo 'export trimmed_fastqc_dir=${deep_dive_dir}/D-Apul/output/08-Apul-sRNAseq-trimming/trimmed-fastqc'
-echo 'export trimmed_reads_dir=${deep_dive_dir}/D-Apul/output/08-Apul-sRNAseq-trimming/trimmed-reads'
+echo 'export output_dir_top=${deep_dive_dir}/E-Peve/output/06-Peve-sRNAseq-trimming'
+echo 'export raw_fastqc_dir=${deep_dive_dir}/E-Peve/output/06-Peve-sRNAseq-trimming/raw-fastqc'
+echo 'export raw_reads_dir=${deep_dive_dir}/E-Peve/data/06-Peve-sRNAseq-trimming/raw-reads'
+echo 'export raw_reads_url="https://owl.fish.washington.edu/nightingales/P_evermanni/30-852430235/"'
+echo 'export trimmed_fastqc_dir=${deep_dive_dir}/E-Peve/output/06-Peve-sRNAseq-trimming/trimmed-fastqc'
+echo 'export trimmed_reads_dir=${deep_dive_dir}/E-Peve/output/06-Peve-sRNAseq-trimming/trimmed-reads'
 echo ""
 
 echo "# Paths to programs"
@@ -130,9 +130,9 @@ cat .bashvars
 # Download raw sRNAseq reads
 
 Reads are downloaded from 
-https://owl.fish.washington.edu/nightingales/A_pulchra/30-852430235/
+https://owl.fish.washington.edu/nightingales/P_evermanni/30-852430235/
 
-The `--cut-dirs 3` command cuts the preceding directory structure (i.e. `nightingales/A_pulchra/30-852430235/`)
+The `--cut-dirs 3` command cuts the preceding directory structure (i.e. `nightingales/P_evermanni/30-852430235/`)
 so that we just end up with the reads.
 
 ```{bash download-raw-reads, engine='bash', eval=TRUE}
@@ -246,7 +246,7 @@ ls -lh ${raw_fastqc_dir}
 ```
 
 # Trimming with [flexbar](https://github.com/seqan/flexbar)
-```{bash flexbar-trimming, engine='bash', eval=TRUE}
+```{bash flexbar-trimming, engine='bash', cache=TRUE}
 # Load bash variables into memory
 source .bashvars
 
@@ -399,5 +399,5 @@ A quick comparison of raw and trimmed reads to show trimming worked:
 
 | RAW                                                                                                                                                                                                | TRIMMED                                                                                                                                                                                                    |
 |----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| ![Raw MultiQC per base sequence quality plot](https://github.com/urol-e5/deep-dive/blob/main/D-Apul/output/08-Apul-sRNAseq-trimming/raw-fastqc/fastqc_per_base_sequence_quality_plot.png?raw=true) | ![Trimmed MultiQC per base sequence quality plot](https://github.com/urol-e5/deep-dive/blob/main/D-Apul/output/08-Apul-sRNAseq-trimming/trimmed-fastqc/fastqc_per_base_sequence_quality_plot.png?raw=true) |
-| ![Raw MultiQC adapter content plot](https://github.com/urol-e5/deep-dive/blob/main/D-Apul/output/08-Apul-sRNAseq-trimming/raw-fastqc/fastqc_adapter_content_plot.png?raw=true)                     | ![Trimmed MultiQC adapter content plot](https://github.com/urol-e5/deep-dive/blob/main/D-Apul/output/08-Apul-sRNAseq-trimming/trimmed-fastqc/fastqc_adapter_content_plot.png?raw=true)                     |
+| ![Raw MultiQC per base sequence quality plot](https://github.com/urol-e5/deep-dive/blob/main/E-Peve/output/06-Peve-sRNAseq-trimming/raw-fastqc/fastqc_per_base_sequence_quality_plot.png?raw=true) | ![Trimmed MultiQC per base sequence quality plot](https://github.com/urol-e5/deep-dive/blob/main/E-Peve/output/06-Peve-sRNAseq-trimming/trimmed-fastqc/fastqc_per_base_sequence_quality_plot.png?raw=true) |
+| ![Raw MultiQC adapter content plot](https://github.com/urol-e5/deep-dive/blob/main/E-Peve/output/06-Peve-sRNAseq-trimming/raw-fastqc/fastqc_adapter_content_plot.png?raw=true)                     | ![Trimmed MultiQC adapter content plot](https://github.com/urol-e5/deep-dive/blob/main/E-Peve/output/06-Peve-sRNAseq-trimming/trimmed-fastqc/fastqc_adapter_content_plot.png?raw=true)                     |
