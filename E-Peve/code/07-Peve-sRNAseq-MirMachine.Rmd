@@ -3,6 +3,9 @@ title: "07-Peve-sRNAseq-MirMachine"
 author: "Sam White"
 date: "2023-11-15"
 output: 
+  github_document:
+    toc: true
+    number_sections: true
   bookdown::html_document2:
     theme: cosmo
     toc: true
@@ -10,9 +13,6 @@ output:
     number_sections: true
     code_folding: show
     code_download: true
-  github_document:
-    toc: true
-    number_sections: true
   html_document:
     theme: cosmo
     toc: true
@@ -38,34 +38,33 @@ knitr::opts_chunk$set(
 )
 ```
 
-Use [MirMachine](https://github.com/sinanugur/MirMachine) [@umu2022] to identify potential
-miRNA homologs in the _Pevermanni_ genome.
+Use [MirMachine](https://github.com/sinanugur/MirMachine) [@umu2022] to identify potential miRNA homologs in the *Pevermanni* genome.
 
-Genome FastA originally downloaded from https://www.genoscope.cns.fr/corals/genomes.html on 20230629.
+Genome FastA originally downloaded from <https://www.genoscope.cns.fr/corals/genomes.html> on 20230629.
 
----
+------------------------------------------------------------------------
 
 Inputs:
 
-- Genome FastA.
+-   Genome FastA.
 
 Outputs:
 
-- Confidence-filtered GFF of predicted miRNAs.
-- Unfiltered FastA of predicted miRNAs.
-- Unfiltered GFF of predicted miRNAs.
+-   Confidence-filtered GFF of predicted miRNAs.
+-   Unfiltered FastA of predicted miRNAs.
+-   Unfiltered GFF of predicted miRNAs.
 
 Software requirements:
 
-- Requires a [MirMachine](https://github.com/sinanugur/MirMachine) Conda/Mamba environment, per the installation instructions.
+-   Requires a [MirMachine](https://github.com/sinanugur/MirMachine) Conda/Mamba environment, per the installation instructions.
 
----
+------------------------------------------------------------------------
 
 # Set R variables
-Replace with name of your MirMachine environment and the path to the corresponding
-conda installation (find this _after_ you've activated the environment).
 
-E.g. 
+Replace with name of your MirMachine environment and the path to the corresponding conda installation (find this *after* you've activated the environment).
+
+E.g.
 
 ```{r conda-env-example, eval=FALSE}
 # Activate environment
@@ -75,13 +74,10 @@ conda activate mirmachine_env
 which conda
 ```
 
-
-
 ```{r R-variables, eval=TRUE}
 mirmachine_conda_env_name <- c("mirmachine_env")
 mirmachine_cond_path <- c("/home/sam/programs/mambaforge/condabin/conda")
 ```
-
 
 # Create a Bash variables file
 
@@ -120,12 +116,12 @@ cat .bashvars
 
 # Load [MirMachine](https://github.com/sinanugur/MirMachine) conda environment
 
-If this is successful, the first line of output should show that the Python being used
-is the one in your [MirMachine](https://github.com/sinanugur/MirMachine) conda environment path.
+If this is successful, the first line of output should show that the Python being used is the one in your [MirMachine](https://github.com/sinanugur/MirMachine) conda environment path.
 
 E.g.
 
 `python:         /home/sam/programs/mambaforge/envs/mirmachine_env/bin/python`
+
 ```{r load-mirmachine-conda-env, eval=TRUE}
 use_condaenv(condaenv = mirmachine_conda_env_name, conda = mirmachine_cond_path)
 
@@ -133,7 +129,8 @@ use_condaenv(condaenv = mirmachine_conda_env_name, conda = mirmachine_cond_path)
 py_config()
 ```
 
-# Download _P.evermanni_ genome from our server
+# Download *P.evermanni* genome from our server
+
 ```{r download-genome-fasta, engine='bash', eval=TRUE}
 # Load bash variables into memory
 source .bashvars
@@ -153,10 +150,10 @@ wget \
 ls -lh "${genome_fasta_dir}"
 ```
 
-
 # Run [MirMachine](https://github.com/sinanugur/MirMachine)
 
 The `--species` option specifies output naming structure
+
 ```{r mirmachine, engine='bash', cache=TRUE}
 # Load bash variables into memory
 source .bashvars
@@ -176,6 +173,7 @@ MirMachine.py \
 # Results
 
 ## View [MirMachine](https://github.com/sinanugur/MirMachine) output structure
+
 ```{r mirmachine-output-tree, eval=TRUE, engine='bash'}
 # Load bash variables into memory
 source .bashvars
@@ -184,6 +182,7 @@ tree -h ${output_dir_top}/results/predictions
 ```
 
 ## Check FastA
+
 ```{r check-mirmachine-fasta, eval=TRUE, engine='bash'}
 # Load bash variables into memory
 source .bashvars
@@ -196,12 +195,15 @@ echo ""
 
 head "${output_dir_top}/results/predictions/fasta/${mirmarchine_output_prefix}.PRE.fasta"
 ```
+
 ## Check filtered GFF
+
 Per [MirMachine](https://github.com/sinanugur/MirMachine) recommendations:
 
 > `filtered_gff/` High confidence miRNA family predictions after bitscore filtering. (This file is what you need in most cases)
 
 So, we'll stick with that.
+
 ```{r check-filtered-gff, eval=TRUE, engine='bash'}
 # Load bash variables into memory
 source .bashvars
@@ -217,6 +219,7 @@ grep "^[^#]" "${output_dir_top}/results/predictions/filtered_gff/${mirmarchine_o
 ```
 
 ## Counts of predicted high-confidence miRNAs
+
 ```{r count-predicted-hc-mirnas, eval=TRUE, engine='bash'}
 # Load bash variables into memory
 source .bashvars
@@ -233,6 +236,6 @@ grep "^[^#]" "${output_dir_top}/results/predictions/filtered_gff/${mirmarchine_o
 | wc -l
 ```
 
----
+------------------------------------------------------------------------
 
 # Citations
