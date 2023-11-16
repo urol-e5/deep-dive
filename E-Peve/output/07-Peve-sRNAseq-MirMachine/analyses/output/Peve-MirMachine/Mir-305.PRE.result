@@ -1,0 +1,65 @@
+# cmsearch :: search CM(s) against a sequence database
+# INFERNAL 1.1.2 (July 2016)
+# Copyright (C) 2016 Howard Hughes Medical Institute.
+# Freely distributed under a BSD open source license.
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# query CM file:                         /home/sam/programs/mambaforge/envs/mirmachine_env/lib/python3.10/site-packages/mirmachine/meta/cms/combined/Mir-305.PRE.CM
+# target sequence database:              /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/E-Peve/data/Porites_evermanni_v1.fa
+# number of worker threads:              15 [--cpu]
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+Query:       Mir-305.PRE  [CLEN=61]
+Hit scores:
+ rank     E-value  score  bias  sequence                        start    end   mdl trunc   gc  description
+ ----   --------- ------ -----  ------------------------------ ------ ------   --- ----- ----  -----------
+ ------ inclusion threshold ------
+  (1) ?       1.9   25.0   0.0  Porites_evermani_scaffold_20   425237 425174 -  cm    no 0.39  -
+  (2) ?       6.2   23.1   0.0  Porites_evermani_scaffold_5320   9122   9191 +  cm    no 0.36  -
+
+
+Hit alignments:
+>> Porites_evermani_scaffold_20  
+ rank     E-value  score  bias mdl mdl from   mdl to       seq from      seq to       acc trunc   gc
+ ----   --------- ------ ----- --- -------- --------    ----------- -----------      ---- ----- ----
+  (1) ?       1.9   25.0   0.0  cm        1       61 []      425237      425174 - .. 0.95    no 0.39
+
+                                           vv   v       v                           v      v   vv        NC
+                                      <<<<<<<<<<<.-<<<<<<<<--<<______....______>>->>>>>>>>->>>>>>>>>>>:: CS
+                   Mir-305.PRE      1 uUUGUACUucA.UcAGGUGCuCUGGUuauuu....uugaaaCCCgGCACCUguUggAGUGCAAaua 61    
+                                      UUUGU +U::  U:AGGU C:C G UUA++     +  A++ C :G ACCU:+ ::A  GCAAA+ 
+  Porites_evermani_scaffold_20 425237 UUUGUGAUUGAaUAAGGUACUCAGUUUAACAgaguACCAUUGCGAGAACCUUGGCAA--GCAAAAC 425174
+                                      **************************999998777777779****************..******* PP
+
+>> Porites_evermani_scaffold_5320  
+ rank     E-value  score  bias mdl mdl from   mdl to       seq from      seq to       acc trunc   gc
+ ----   --------- ------ ----- --- -------- --------    ----------- -----------      ---- ----- ----
+  (2) ?       6.2   23.1   0.0  cm        1       61 []        9122        9191 + .. 0.67    no 0.36
+
+                                              v   v v  v                                  v  v v    v           NC
+                                      <<<<<<<<<<<-<<<<<<<<--<<______..........._~~~~~>>->>>>>>>>.->>>>>>>>>>>:: CS
+                     Mir-305.PRE    1 uUUGUACUucAUcAGGUGCuCUGGUuauuu...........u*[5]*CCCgGCACCUg.uUggAGUGCAAaua 61  
+                                      UUUGUACU CAU   GU+CU  ::U A U            +     :: GG AC    +UG AGUGCAAA A
+  Porites_evermani_scaffold_5320 9122 UUUGUACUCCAUUUGGUUCU--GAUGACUCacuggauaauaA*[5]*UUUGG-ACAGCuGUGUAGUGCAAAGA 9191
+                                      ***********876776665..77744444444444443333..4..55444.6666779************* PP
+
+
+
+Internal CM pipeline statistics summary:
+----------------------------------------
+Query model(s):                                                  1  (61 consensus positions)
+Target sequences:                                             8186  (1207610776 residues searched)
+Target sequences re-searched for truncated hits:              8186  (4846112 residues re-searched)
+Windows   passing  local HMM SSV           filter:         1120319  (0.156); expected (0.15)
+Windows   passing  local HMM Viterbi       filter:          704185  (0.1015); expected (0.15)
+Windows   passing  local HMM Viterbi  bias filter:          600773  (0.08669); expected (0.15)
+Windows   passing  local HMM Forward       filter:           11028  (0.001656); expected (0.0008)
+Windows   passing  local HMM Forward  bias filter:            8522  (0.001283); expected (0.0008)
+Windows   passing glocal HMM Forward       filter:            6750  (0.001062); expected (0.0008)
+Windows   passing glocal HMM Forward  bias filter:            6586  (0.001029); expected (0.0008)
+Envelopes passing glocal HMM envelope defn filter:            6649  (0.0004448); expected (0.0008)
+Envelopes passing  local CM  CYK           filter:             460  (2.101e-05); expected (0.0001)
+Total CM hits reported:                                          2  (1.105e-07); includes 0 truncated hit(s)
+
+# CPU time: 115.27u 0.49s 00:01:55.76 Elapsed: 00:00:08.29
+//
+[ok]
