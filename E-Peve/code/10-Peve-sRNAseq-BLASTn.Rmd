@@ -4,11 +4,6 @@ author: "Sam White"
 date: "2023-11-16"
 always_allow_html: true
 output: 
-  github_document:
-    toc: true
-    toc_depth: 3
-    number_sections: true
-    html_preview: true  
   bookdown::html_document2:
     theme: cosmo
     toc: true
@@ -16,6 +11,11 @@ output:
     number_sections: true
     code_folding: show
     code_download: true
+  github_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+    html_preview: true  
 #bibliography: references.bib
 ---
 
@@ -222,6 +222,12 @@ if [ ! -f "${output_dir_top}/${collapsed_reads_fasta}" ]; then
 fi
 
 head "${output_dir_top}/${collapsed_reads_fasta}"
+
+echo ""
+echo ""
+
+total_reads=$(grep -c "^>" ${output_dir_top}/${collapsed_reads_fasta})
+echo "Total number of reads after collapse: ${total_reads}"
 ```
 
 # Run BLASTn Default E-value
@@ -275,7 +281,7 @@ ${ncbi_blastn} \
 
 # BLASTn E-value = 10
 
-Running this for simple comparison to the defaul `blastn-short` value of 1000.
+Running this for simple comparison to the default `blastn-short` value of 1000.
 
 ## miRBase BLASTn e-value = 10
 ```{r miRBase-BLASTn-10-eval, engine='bash', cache=TRUE}
