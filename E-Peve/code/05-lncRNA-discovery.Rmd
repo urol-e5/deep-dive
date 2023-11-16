@@ -335,7 +335,7 @@ head ../output/05-lncRNA-discovery/Peve_lncRNA.fasta
 ```{r, engine='python'}
 
 # Open the input file and the output file
-with open('../output/05.32-lncRNA-discovery/Apul_noncoding_transcripts_ids.txt', 'r') as infile, open('../output/05.32-lncRNA-discovery/Apul_lncRNA.bed', 'w') as outfile:
+with open('../output/05-lncRNA-discovery/Peve_noncoding_transcripts_ids.txt', 'r') as infile, open('../output/05-lncRNA-discovery/Peve_lncRNA.bed', 'w') as outfile:
     # Process each line in the input file
     for line in infile:
         # Remove 'transcript::' and then split the line by ':' to extract the relevant parts
@@ -357,6 +357,6 @@ with open('../output/05.32-lncRNA-discovery/Apul_noncoding_transcripts_ids.txt',
 ```
 
 ```{bash}
-head ../output/05.32-lncRNA-discovery/Apul_lncRNA.bed 
+head ../output/05-lncRNA-discovery/Peve_lncRNA.bed 
 ```
 
