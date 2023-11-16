@@ -1,7 +1,7 @@
 ---
-title: "11-Apul-sRNAseq-miRdeep2"
-author: "Sam White"
-date: "2023-11-08"
+title: "11-Pmea-sRNAseq-miRdeep2"
+author: "Sam White (modified by K Durkin for P. meandrina analysis)"
+date: "2023-11-14"
 output: 
   bookdown::html_document2:
     theme: cosmo
@@ -20,7 +20,7 @@ output:
     number_sections: true
     code_folding: show
     code_download: true
-bibliography: references.bib
+bibliography: /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/code/references.bib
 link-citations: true
 ---
 
@@ -30,9 +30,9 @@ Use [miRDeep2](https://github.com/rajewsky-lab/mirdeep2) [@friedländer2011] to 
 
 Inputs:
 
--   Requires collapsed reads (i.e. concatenated, unique reads) in FastA format. See [10-Apul-sRNAseq-BLASTn.Rmd](https://github.com/urol-e5/deep-dive/blob/main/D-Apul/code/10-Apul-sRNAseq-BLASTn.Rmd) for code.
+-   Requires collapsed reads (i.e. concatenated, unique reads) in FastA format. See [10-Pmea-sRNAseq-BLASTn.Rmd](https://github.com/urol-e5/deep-dive/blob/main/F-Pmea/code/10-Pmea-sRNAseq-BLASTn.Rmd) for code.
 
--   *A.millepora* genome FastA. See [12-Apul-sRNAseq-MirMachine.Rmd](https://github.com/urol-e5/deep-dive/blob/main/D-Apul/code/12-Apul-sRNAseq-MirMachine.Rmd) for download info if needed.
+-   *A.millepora* genome FastA. See [12-Apul-sRNAseq-MirMachine.Rmd](https://github.com/urol-e5/deep-dive/blob/main/F-Pmea/code/12-Apul-sRNAseq-MirMachine.Rmd) for download info if needed.
 
 - [miRBase](https://mirbase.org/download/) mature miRNAs FastA.
 
@@ -82,12 +82,12 @@ echo "# miRTrace FastA naming pattern"
 echo "export mirtrace_fasta_pattern='*flexbar_trim.25bp*.fasta'"
 
 echo "# Data directories"
-echo 'export deep_dive_dir=/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive'
+echo 'export deep_dive_dir=/home/shared/8TB_HDD_02/shedurkin/deep-dive'
 echo 'export deep_dive_data_dir="${deep_dive_dir}/data"'
-echo 'export output_dir_top=${deep_dive_dir}/D-Apul/output/11-Apul-sRNAseq-miRdeep2'
-echo 'export genome_fasta_dir=${deep_dive_dir}/D-Apul/data/Amil/ncbi_dataset/data/GCF_013753865.1'
-echo 'export trimmed_fastqs_dir="${deep_dive_dir}/D-Apul/output/08-Apul-sRNAseq-trimming/trimmed-reads"'
-echo 'export collapsed_reads_dir="${deep_dive_dir}/D-Apul/output/10-Apul-sRNAseq-BLASTn"'
+echo 'export output_dir_top=${deep_dive_dir}/F-Pmea/output/11-Pmea-sRNAseq-miRdeep2'
+echo 'export genome_fasta_dir=${deep_dive_dir}/F-Pmea/data/Amil/ncbi_dataset/data/GCF_013753865.1'
+echo 'export trimmed_fastqs_dir="${deep_dive_dir}/F-Pmea/output/08-Pmea-sRNAseq-trimming/trimmed-reads"'
+echo 'export collapsed_reads_dir="${deep_dive_dir}/F-Pmea/output/10-Pmea-sRNAseq-BLASTn"'
 echo ""
 
 echo "# Input/Output files"
@@ -96,7 +96,7 @@ echo 'export collapsed_reads_mirdeep2="collapsed-reads-all-mirdeep2.fasta"'
 echo 'export concatenated_trimmed_reads_fastq="concatenated-trimmed-reads-all.fastq.gz"'
 echo 'export genome_fasta_name="GCF_013753865.1_Amil_v2.1_genomic.fna"'
 echo 'export genome_fasta_no_spaces="GCF_013753865.1_Amil_v2.1_genomic-no_spaces.fna"'
-echo 'export mirdeep2_mapping_file="Apul-mirdeep2-mapping.arf"'
+echo 'export mirdeep2_mapping_file="Pmea-mirdeep2-mapping.arf"'
 echo 'export mirbase_mature_fasta_name="mirbase-mature-v22.1.fa"'
 echo 'export mirbase_mature_fasta_no_spaces="mirbase-mature-v22.1-no_spaces.fa"'
 echo 'export concatenated_mirtrace_reads_fasta="concatenated-mirtrace-reads.fasta"'
@@ -410,7 +410,7 @@ columns.
 
 ```{r read-in-result-csv, eval=TRUE}
 
-mirdeep_result.df <- read.csv("../output/11-Apul-sRNAseq-miRdeep2/parsable-result_08_11_2023_t_14_47_36.csv",
+mirdeep_result.df <- read.csv("../output/11-Pmea-sRNAseq-miRdeep2/parsable-result_08_11_2023_t_14_47_36.csv",
                               header = TRUE,
                               sep = "\t")
 
