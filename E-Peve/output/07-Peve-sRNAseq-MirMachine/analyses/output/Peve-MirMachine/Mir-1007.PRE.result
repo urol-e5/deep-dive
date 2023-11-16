@@ -1,0 +1,143 @@
+# cmsearch :: search CM(s) against a sequence database
+# INFERNAL 1.1.2 (July 2016)
+# Copyright (C) 2016 Howard Hughes Medical Institute.
+# Freely distributed under a BSD open source license.
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# query CM file:                         /home/sam/programs/mambaforge/envs/mirmachine_env/lib/python3.10/site-packages/mirmachine/meta/cms/combined/Mir-1007.PRE.CM
+# target sequence database:              /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/E-Peve/data/Porites_evermanni_v1.fa
+# number of worker threads:              15 [--cpu]
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+Query:       Mir-1007.PRE  [CLEN=65]
+Hit scores:
+ rank     E-value  score  bias  sequence                        start    end   mdl trunc   gc  description
+ ----   --------- ------ -----  ------------------------------ ------ ------   --- ----- ----  -----------
+ ------ inclusion threshold ------
+  (1) ?      0.38   27.6   0.0  Porites_evermani_scaffold_13   188372 188442 +  cm    no 0.37  -
+  (2) ?      0.95   26.2   0.0  Porites_evermani_scaffold_47   138322 138423 +  cm    no 0.41  -
+  (3) ?       1.8   25.2   0.0  Porites_evermani_scaffold_740  146006 145945 -  cm    no 0.47  -
+  (4) ?       2.6   24.6   0.0  Porites_evermani_scaffold_3362  34896  34830 -  cm    no 0.40  -
+  (5) ?       3.3   24.2   0.0  Porites_evermani_scaffold_17   300270 300201 -  cm    no 0.36  -
+  (6) ?         4   24.0   0.0  Porites_evermani_scaffold_4518   9450   9519 +  cm    no 0.40  -
+  (7) ?         4   23.9   0.0  Porites_evermani_scaffold_1011 117645 117709 +  cm    no 0.35  -
+  (8) ?       4.8   23.7   0.0  Porites_evermani_scaffold_215  306317 306415 +  cm    no 0.40  -
+
+
+Hit alignments:
+>> Porites_evermani_scaffold_13  
+ rank     E-value  score  bias mdl mdl from   mdl to       seq from      seq to       acc trunc   gc
+ ----   --------- ------ ----- --- -------- --------    ----------- -----------      ---- ----- ----
+  (1) ?      0.38   27.6   0.0  cm        1       65 []      188372      188442 + .. 0.89    no 0.37
+
+                                                      v                                 v                     NC
+                                      <<<<<<<<<--<<<<-<<--<<<--<<...__________>>-..>>>->>->>>>--->>>>.>>>>>:: CS
+                  Mir-1007.PRE      1 GuAAgCAGUGUUUGAACUCGAUCUUgG...uuuUUGaaCUCcu..GAUAAGCUCAAUUAACUG.uUUgCAG 65    
+                                      GUAAGCA UGUUU AA U  :UCUUGG    +UUU AACUCC+  GA:AA CU AA   A UG UUUGCA 
+  Porites_evermani_scaffold_13 188372 GUAAGCAUUGUUUUAAGUUUCUCUUGGggcCAUUUUAACUCCCaaGAGAAACUGAAAACAAUGcUUUGCAA 188442
+                                      ************************999555467888999977556******************5568**** PP
+
+>> Porites_evermani_scaffold_47  
+ rank     E-value  score  bias mdl mdl from   mdl to       seq from      seq to       acc trunc   gc
+ ----   --------- ------ ----- --- -------- --------    ----------- -----------      ---- ----- ----
+  (2) ?      0.95   26.2   0.0  cm        1       65 []      138322      138423 + .. 0.97    no 0.41
+
+                                       v           vv                                  vv            v    NC
+                                      <<<<<<<<<--<<<<-<<--<<<--<<______~~~~~~>>->>>->>->>>>--->>>>>>>>>:: CS
+                  Mir-1007.PRE      1 GuAAgCAGUGUUUGAACUCGAUCUUgGuuuUUG*[ 4]*CcuGAUAAGCUCAAUUAACUGuUUgCAG 65    
+                                      G  A:CAGUGUUU   :U G:U:  :GU+UU G      C:+:A:AA:C++AAUUAACUG:U  C G
+  Porites_evermani_scaffold_47 138322 GUGAACAGUGUUU---UUAGCUUGGGGUAUUAG*[44]*CUCAAGAAACAAAAUUAACUGUUUCCCG 138423
+                                      *************...777********999876...*..**************************** PP
+
+>> Porites_evermani_scaffold_740  
+ rank     E-value  score  bias mdl mdl from   mdl to       seq from      seq to       acc trunc   gc
+ ----   --------- ------ ----- --- -------- --------    ----------- -----------      ---- ----- ----
+  (3) ?       1.8   25.2   0.0  cm        1       65 []      146006      145945 - .. 0.89    no 0.47
+
+                                                   v             v          v           v                NC
+                                       <<<<<<<<<--<<<<-<<--<<<--<<__________>>->>>->>->>>>--->>>>>>>>>:: CS
+                   Mir-1007.PRE      1 GuAAgCAGUGUUUGAACUCGAUCUUgGuuuUUGaaCUCcuGAUAAGCUCAAUUAACUGuUUgCAG 65    
+                                        :AA:CAG: UU GAA UC  UCUU:+ ++  G+A   :UGA  A CUC A   :CUG:UU: AG
+  Porites_evermani_scaffold_740 146006 CCAAACAGG-UUUGAAUUCUGUCUUGACACAGGGAA--UUGAUCAGCUCCAGACCCUGUUUGGAG 145945
+                                       ********8.677************97777655554..59************************* PP
+
+>> Porites_evermani_scaffold_3362  
+ rank     E-value  score  bias mdl mdl from   mdl to       seq from      seq to       acc trunc   gc
+ ----   --------- ------ ----- --- -------- --------    ----------- -----------      ---- ----- ----
+  (4) ?       2.6   24.6   0.0  cm        1       65 []       34896       34830 - .. 0.80    no 0.40
+
+                                                       v           v          v         v                  NC
+                                       <<<<<<<<<..--<<<<-<<--<<<--<<__________>>->>>->>->>>>--->>>>>>>>>:: CS
+                    Mir-1007.PRE     1 GuAAgCAGU..GUUUGAACUCGAUCUUgGuuuUUGaaCUCcuGAUAAGCUCAAUUAACUGuUUgCAG 65   
+                                       G:AA:CAGU   UUU   :UC : C  :  U+U  +A U :+G :AA:C  AAUUAACUG:UU:C G
+  Porites_evermani_scaffold_3362 34896 GGAAACAGUuaAUUUUGCUUCCCUCGAAUCUCUGAGAUUCUCGGGAAACAAAAUUAACUGUUUCCCG 34830
+                                       *********655888888886666655544555555555678************************* PP
+
+>> Porites_evermani_scaffold_17  
+ rank     E-value  score  bias mdl mdl from   mdl to       seq from      seq to       acc trunc   gc
+ ----   --------- ------ ----- --- -------- --------    ----------- -----------      ---- ----- ----
+  (5) ?       3.3   24.2   0.0  cm        1       65 []      300270      300201 - .. 0.86    no 0.36
+
+                                       v            v v                                 v v             v    NC
+                                      <<<<<<<<<--<<<<-<<--<<<--<<...__________>>-..>>>->>->>>>--->>>>>>>>>:: CS
+                  Mir-1007.PRE      1 GuAAgCAGUGUUUGAACUCGAUCUUgG...uuuUUGaaCUCcu..GAUAAGCUCAAUUAACUGuUUgCAG 65    
+                                      : AAGCA UGUUU  A U  :UCUUGG    +UUU AACUCC+  GA:AA C  AA  AA UGUUU : G
+  Porites_evermani_scaffold_17 300270 AUAAGCAUUGUUUUCAGUUUCUCUUGGggcCAUUUUAACUCCCacGAGAAACUGAAGAAAAUGUUUUUUG 300201
+                                      **********9877777778*****99555567888888866444************************* PP
+
+>> Porites_evermani_scaffold_4518  
+ rank     E-value  score  bias mdl mdl from   mdl to       seq from      seq to       acc trunc   gc
+ ----   --------- ------ ----- --- -------- --------    ----------- -----------      ---- ----- ----
+  (6) ?         4   24.0   0.0  cm        1       65 []        9450        9519 + .. 0.89    no 0.40
+
+                                                    v v                                 v v                  NC
+                                      <<<<<<<<<--<<<<-<<--<<<--<<...__________>>-..>>>->>->>>>--->>>>>>>>>:: CS
+                    Mir-1007.PRE    1 GuAAgCAGUGUUUGAACUCGAUCUUgG...uuuUUGaaCUCcu..GAUAAGCUCAAUUAACUGuUUgCAG 65  
+                                      ::AA:CA UGUUU  A U G:UCUUGG    +UUU AACUCC+  GA:AA C  AA U A UG:UU::  
+  Porites_evermani_scaffold_4518 9450 AUAAGCAUUGUUUUCAGUUGCUCUUGGggcCAUUUUAACUCCCaaGAGAAACUGAAGUCAAUGCUUAUGC 9519
+                                      **********999888999*****999555467888999977556************************* PP
+
+>> Porites_evermani_scaffold_1011  
+ rank     E-value  score  bias mdl mdl from   mdl to       seq from      seq to       acc trunc   gc
+ ----   --------- ------ ----- --- -------- --------    ----------- -----------      ---- ----- ----
+  (7) ?         4   23.9   0.0  cm        1       65 []      117645      117709 + .. 0.91    no 0.35
+
+                                                   v  v       v  v               NC
+                                        <<<<<<<<<--<<<<-~~~~~~>>>>--->>>>>>>>>:: CS
+                    Mir-1007.PRE      1 GuAAgCAGUGUUUGAA*[31]*UCAAUUAACUGuUUgCAG 65    
+                                        GUAA:CAGU U+UG A       CA UUAACUG:UUGCAG
+  Porites_evermani_scaffold_1011 117645 GUAAACAGUCUAUGUA*[32]*UCA-UUAACUGUUUGCAG 117709
+                                        ***********88866...9..678.68************ PP
+
+>> Porites_evermani_scaffold_215  
+ rank     E-value  score  bias mdl mdl from   mdl to       seq from      seq to       acc trunc   gc
+ ----   --------- ------ ----- --- -------- --------    ----------- -----------      ---- ----- ----
+  (8) ?       4.8   23.7   0.0  cm        1       65 []      306317      306415 + .. 0.91    no 0.40
+
+                                                                                                          NC
+                                       <<<<<<<<<.--<<<<-<<--<<<--<<____~~~~~~>>->>>->>->>>>--->>>>>>>>>:: CS
+                   Mir-1007.PRE      1 GuAAgCAGU.GUUUGAACUCGAUCUUgGuuuU*[ 6]*CcuGAUAAGCUCAAUUAACUGuUUgCAG 65    
+                                       G:AA:CAGU   UU   :U   :C  :G++U       C:+G: AA:C  AAUUAACUG:UU:CAG
+  Porites_evermani_scaffold_215 306317 GGAAACAGUuAAUUUUGUU--UCCCGAGAAUC*[41]*CUCGGGAAACAAAAUUAACUGUUUCCAG 306415
+                                       ********94578888888..66667887765...9..8889999********************* PP
+
+
+
+Internal CM pipeline statistics summary:
+----------------------------------------
+Query model(s):                                                  1  (65 consensus positions)
+Target sequences:                                             8186  (1207610776 residues searched)
+Target sequences re-searched for truncated hits:              8186  (2652264 residues re-searched)
+Windows   passing  local HMM SSV           filter:         2960046  (0.245); expected (0.15)
+Windows   passing  local HMM Viterbi       filter:         1743538  (0.1488); expected (0.15)
+Windows   passing  local HMM Viterbi  bias filter:         1535946  (0.1317); expected (0.15)
+Windows   passing  local HMM Forward       filter:           22456  (0.002169); expected (0.0008)
+Windows   passing  local HMM Forward  bias filter:           18803  (0.001817); expected (0.0008)
+Windows   passing glocal HMM Forward       filter:           12491  (0.001258); expected (0.0008)
+Windows   passing glocal HMM Forward  bias filter:           12061  (0.00121); expected (0.0008)
+Envelopes passing glocal HMM envelope defn filter:           11729  (0.0007897); expected (0.0008)
+Envelopes passing  local CM  CYK           filter:             710  (3.24e-05); expected (0.0001)
+Total CM hits reported:                                          8  (5.007e-07); includes 0 truncated hit(s)
+
+# CPU time: 133.71u 0.46s 00:02:14.17 Elapsed: 00:00:08.69
+//
+[ok]
