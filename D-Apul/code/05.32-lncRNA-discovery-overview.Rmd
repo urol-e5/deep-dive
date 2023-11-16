@@ -1,5 +1,5 @@
 ---
-title: "05.3-Apul-lncRNA-discovery"
+title: "05.3-Apul-lncRNA-discovery - with splice"
 author: "Steven Roberts"
 date: "`r format(Sys.time(), '%d %B, %Y')`"  
 output: 
@@ -91,14 +91,18 @@ head ../output/05.32-lncRNA-discovery/m_splice_sites.tab
 ```{r, engine='bash'}
 /home/shared/hisat2-2.2.1/hisat2-build \
 ../data/GCF_013753865.1_Amil_v2.1_genomic.fna \
-../data/GCF_013753865.1_Amil_v2.1.index \
+../output/05.32-lncRNA-discovery/GCF_013753865.1_Amil_v2.1.index \
 --exon ../output/05.32-lncRNA-discovery/m_exon.tab \
 --ss ../output/05.32-lncRNA-discovery/m_splice_sites.tab \
--p 40 \
+-p 24 \
 ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gtf \
 2> ../output/05.32-lncRNA-discovery/hisat2-build_stats.txt
-
 ```
+
+```{r, engine='bash', eval=TRUE}
+cat ../output/05.32-lncRNA-discovery/hisat2-build_stats.txt
+```
+
 
 ```{r, engine='bash', eval=TRUE}
 find ../data/fastq/*gz
@@ -114,89 +118,16 @@ echo {}
 find ../data/fastq/*R2_001.fastp-trim.20230519.fastq.gz \
 | xargs basename -s -S1-TP2_R2_001.fastp-trim.20230519.fastq.gz | xargs -I{} \
 /home/shared/hisat2-2.2.1/hisat2 \
--x ../data/GCF_013753865.1_Amil_v2.1.index \
--p 20 \
+-x ../output/05.32-lncRNA-discovery/GCF_013753865.1_Amil_v2.1.index \
+-p 48 \
 -1 ../data/fastq/{}-S1-TP2_R1_001.fastp-trim.20230519.fastq.gz \
 -2 ../data/fastq/{}-S1-TP2_R2_001.fastp-trim.20230519.fastq.gz \
--S ../output/05.32-lncRNA-discovery/{}.sam
+-S ../output/05.32-lncRNA-discovery/{}.sam \
+2> ../output/05.32-lncRNA-discovery/hisat.out
 ```
 
-```
-47710408 reads; of these:
-  47710408 (100.00%) were paired; of these:
-    27056517 (56.71%) aligned concordantly 0 times
-    19229695 (40.31%) aligned concordantly exactly 1 time
-    1424196 (2.99%) aligned concordantly >1 times
-    ----
-    27056517 pairs aligned concordantly 0 times; of these:
-      1316579 (4.87%) aligned discordantly 1 time
-    ----
-    25739938 pairs aligned 0 times concordantly or discordantly; of these:
-      51479876 mates make up the pairs; of these:
-        41152624 (79.94%) aligned 0 times
-        9290398 (18.05%) aligned exactly 1 time
-        1036854 (2.01%) aligned >1 times
-56.87% overall alignment rate
-42864294 reads; of these:
-  42864294 (100.00%) were paired; of these:
-    23649791 (55.17%) aligned concordantly 0 times
-    17703533 (41.30%) aligned concordantly exactly 1 time
-    1510970 (3.53%) aligned concordantly >1 times
-    ----
-    23649791 pairs aligned concordantly 0 times; of these:
-      1250605 (5.29%) aligned discordantly 1 time
-    ----
-    22399186 pairs aligned 0 times concordantly or discordantly; of these:
-      44798372 mates make up the pairs; of these:
-        35369621 (78.95%) aligned 0 times
-        8218798 (18.35%) aligned exactly 1 time
-        1209953 (2.70%) aligned >1 times
-58.74% overall alignment rate
-43712298 reads; of these:
-  43712298 (100.00%) were paired; of these:
-    30355359 (69.44%) aligned concordantly 0 times
-    12131465 (27.75%) aligned concordantly exactly 1 time
-    1225474 (2.80%) aligned concordantly >1 times
-    ----
-    30355359 pairs aligned concordantly 0 times; of these:
-      848325 (2.79%) aligned discordantly 1 time
-    ----
-    29507034 pairs aligned 0 times concordantly or discordantly; of these:
-      59014068 mates make up the pairs; of these:
-        51031599 (86.47%) aligned 0 times
-        6695839 (11.35%) aligned exactly 1 time
-        1286630 (2.18%) aligned >1 times
-41.63% overall alignment rate
-47501524 reads; of these:
-  47501524 (100.00%) were paired; of these:
-    27827915 (58.58%) aligned concordantly 0 times
-    18298532 (38.52%) aligned concordantly exactly 1 time
-    1375077 (2.89%) aligned concordantly >1 times
-    ----
-    27827915 pairs aligned concordantly 0 times; of these:
-      1321896 (4.75%) aligned discordantly 1 time
-    ----
-    26506019 pairs aligned 0 times concordantly or discordantly; of these:
-      53012038 mates make up the pairs; of these:
-        42654805 (80.46%) aligned 0 times
-        9174277 (17.31%) aligned exactly 1 time
-        1182956 (2.23%) aligned >1 times
-55.10% overall alignment rate
-42677752 reads; of these:
-  42677752 (100.00%) were paired; of these:
-    25646587 (60.09%) aligned concordantly 0 times
-    15654238 (36.68%) aligned concordantly exactly 1 time
-    1376927 (3.23%) aligned concordantly >1 times
-    ----
-    25646587 pairs aligned concordantly 0 times; of these:
-      1105089 (4.31%) aligned discordantly 1 time
-    ----
-    24541498 pairs aligned 0 times concordantly or discordantly; of these:
-      49082996 mates make up the pairs; of these:
-        38229072 (77.89%) aligned 0 times
-        9393012 (19.14%) aligned exactly 1 time
-        1460912 (2.98%) aligned >1 times
-55.21% overall alignment rate
+```{r, engine='bash', eval=TRUE}
+cat ../output/05.32-lncRNA-discovery/hisat.out
 ```
 
 ## convert to bams
@@ -207,13 +138,13 @@ for samfile in ../output/05.32-lncRNA-discovery/*.sam; do
   sorted_bamfile="${samfile%.sam}.sorted.bam"
   
   # Convert SAM to BAM
-  /home/shared/samtools-1.12/samtools view -bS "$samfile" > "$bamfile"
+  /home/shared/samtools-1.12/samtools view -bS -@ 20 "$samfile" > "$bamfile"
   
   # Sort BAM
-  /home/shared/samtools-1.12/samtools sort "$bamfile" -o "$sorted_bamfile"
+  /home/shared/samtools-1.12/samtools sort -@ 20 "$bamfile" -o "$sorted_bamfile"
   
   # Index sorted BAM
-  /home/shared/samtools-1.12/samtools index "$sorted_bamfile"
+  /home/shared/samtools-1.12/samtools index -@ 20 "$sorted_bamfile"
 done
 ```
 
@@ -221,7 +152,7 @@ done
 
 ## Looking at Bams 
 
-![igv](http://gannet.fish.washington.edu/seashell/snaps/Monosnap_IGV_2023-11-05_09-57-16.png)
+![igv](https//gannet.fish.washington.edu/seashell/snaps/Monosnap_IGV_2023-11-05_09-57-16.png)
 
 
 ```{r, engine='bash', eval=TRUE}
@@ -237,7 +168,7 @@ StringTie uses the sorted BAM files to assemble transcripts for each sample, out
 find ../output/05.32-lncRNA-discovery/*sorted.bam \
 | xargs basename -s .sorted.bam | xargs -I{} \
 /home/shared/stringtie-2.2.1.Linux_x86_64/stringtie \
--p 8 \
+-p 16 \
 -G ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gff \
 -o ../output/05.32-lncRNA-discovery/{}.gtf \
 ../output/05.32-lncRNA-discovery/{}.sorted.bam
@@ -246,6 +177,7 @@ find ../output/05.32-lncRNA-discovery/*sorted.bam \
 ```{r, engine='bash', eval=TRUE}
 wc -l ../output/05.32-lncRNA-discovery/RNA*.gtf
 ls ../output/05.32-lncRNA-discovery/RNA*.gtf
+#head ../output/05.32-lncRNA-discovery/RNA*.gtf
 ```
 
 ![gtf](http://gannet.fish.washington.edu/seashell/snaps/Monosnap_IGV_-_Session_Userssr320DesktopApul_lncRNA_igv_session.xml_2023-11-05_10-11-31.png)
@@ -270,6 +202,9 @@ This is used to create a non-redundant set of transcripts after running StringTi
 ../output/05.32-lncRNA-discovery/*.gtf
 ```
 
+```{bash}
+tail ../output/05.32-lncRNA-discovery/stringtie_merged.gtf
+```
 
 
 ```{r, engine='bash', eval=TRUE}
@@ -298,39 +233,6 @@ https://ccb.jhu.edu/software/stringtie/gffcompare.shtml
 
 ```{r, engine='bash', eval=TRUE}
 ls ../output/05.32-lncRNA-discovery/gffcompare_merged*
-```
-
-```
-# gffcompare v0.12.6 | Command line was:
-#/home/shared/gffcompare-0.12.6.Linux_x86_64/gffcompare -r ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gff -o ../output/05.32-lncRNA-discovery/gffcompare_merged ../output/05.32-lncRNA-discovery/stringtie_merged.gtf
-#
-
-#= Summary for dataset: ../output/05.32-lncRNA-discovery/stringtie_merged.gtf 
-#     Query mRNAs :  113222 in   71018 loci  (75934 multi-exon transcripts)
-#            (15354 multi-transcript loci, ~1.6 transcripts per locus)
-# Reference mRNAs :   56768 in   42059 loci  (45231 multi-exon)
-# Super-loci w/ reference transcripts:    39560
-#-----------------| Sensitivity | Precision  |
-        Base level:   100.0     |    77.9    |
-        Exon level:    98.2     |    74.3    |
-      Intron level:    99.7     |    86.3    |
-Intron chain level:   100.0     |    59.6    |
-  Transcript level:    99.6     |    49.9    |
-       Locus level:    99.6     |    55.6    |
-
-     Matching intron chains:   45231
-       Matching transcripts:   56552
-              Matching loci:   41901
-
-          Missed exons:       0/255069	(  0.0%)
-           Novel exons:   52430/339451	( 15.4%)
-        Missed introns:     520/209271	(  0.2%)
-         Novel introns:   16647/241625	(  6.9%)
-           Missed loci:       0/42059	(  0.0%)
-            Novel loci:   31458/71018	( 44.3%)
-
- Total union super-loci across all input datasets: 71018 
-113222 out of 113222 consensus transcripts written in ../output/05.32-lncRNA-discovery/gffcompare_merged.annotated.gtf (0 discarded as redundant)
 ```
 
 
