@@ -93,9 +93,9 @@ mirtrace.detailed.df %>%
 
 ## MirMachine
 
-### _A.millepora_
+### _A.pulchra_ (_A.millepora_)
 
-```{r count-predicted-hc-mirnas}
+```{r apul-count-predicted-hc-mirnas}
 #| eval: true
 #| echo: false
 
@@ -117,3 +117,44 @@ unique_fams <- system(cmd_unique_fams, intern = TRUE)
 Predicted loci: `r predicted_loci`
 
 Unique familes: `r unique_fams`
+
+## miRDeep2
+
+### _A.pulchra_
+
+```{r apul-mirdeepcount-counts}
+#| eval: true
+#| echo: false
+
+
+# Store Bash command to use with system()
+cmd_mirdeep2_predicted_loci <- paste(c('awk \'NR > 1\' "../../D-Apul/output/11-Apul-sRNAseq-miRdeep2/parsable-result_08_11_2023_t_14_47_36.csv"',
+'wc -l'),
+collapse=" | ")
+
+
+# Store Bash command to use with system()
+cmd_mirdeep2_seed_miRNAs <- paste(c('awk -F"\t" \'$11 != "-" && $11 != "" {print $11}\' "../../D-Apul/output/11-Apul-sRNAseq-miRdeep2/parsable-result_08_11_2023_t_14_47_36.csv"',
+'wc -l'),
+collapse=" | ")
+
+cmd_mirdreep2_novel_miRNAS <- paste(c('awk -F"\t" \'$11 == "-" || $11 == "" {print $11}\' "../../D-Apul/output/11-Apul-sRNAseq-miRdeep2/parsable-result_08_11_2023_t_14_47_36.csv"',
+'awk \'NR > 1\'',
+'wc -l'),
+collapse=" | ")
+
+  
+
+mirdeep2_predicted_loci <- system(cmd_mirdeep2_predicted_loci, intern = TRUE)
+mirdeep2_seed_miRNAs <- system(cmd_mirdeep2_seed_miRNAs, intern = TRUE)
+mirdreep2_novel_miRNAS <- system(cmd_mirdreep2_novel_miRNAS, intern = TRUE)
+```
+
+
+Predicted loci: `r mirdeep2_predicted_loci`
+
+Matches to mature miRNAs (seeds): `r mirdeep2_seed_miRNAs`
+
+Novel miRNAs: `r mirdreep2_novel_miRNAS`
+
+Further analysis is possibly desired to evaluate score thresholds, miRNA families, etc.
