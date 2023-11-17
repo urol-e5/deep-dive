@@ -90,3 +90,30 @@ mirtrace.detailed.df %>%
   kable_styling("striped") %>% 
   scroll_box(width = "100%", height = "500px")
 ```
+
+## MirMachine
+
+### _A.millepora_
+
+```{r count-predicted-hc-mirnas}
+#| eval: true
+#| echo: false
+
+# Store Bash command to use with system()
+cmd_predicted_loci <- paste(c('grep -c "^[^#]" "../../D-Apul/output/12-Apul-sRNAseq-MirMachine/results/predictions/filtered_gff/Amil-MirMachine.PRE.gff"'))
+
+
+# Store Bash command to use with system()
+cmd_unique_fams <- paste(c('grep "^[^#]" "../../D-Apul/output/12-Apul-sRNAseq-MirMachine/results/predictions/filtered_gff/Amil-MirMachine.PRE.gff"',
+'awk -F"[\t=;]" \'{print $10}\'',
+'sort -u',
+'wc -l'),
+collapse=" | ")
+
+predicted_loci <- system(cmd_predicted_loci, intern = TRUE)
+unique_fams <- system(cmd_unique_fams, intern = TRUE)
+```
+
+Predicted loci: `r predicted_loci`
+
+Unique familes: `r unique_fams`
