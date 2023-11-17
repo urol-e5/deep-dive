@@ -4,20 +4,6 @@ This repository is focused on takeing molecular data from three experiments wher
 
 # Specific sub-efforts
 
-Short-hand for organsization of this repo and other repos
-
-**A**) https://github.com/hputnam/Becker_E5 (Pocillopora verrucosa genome)
-
-- https://gannet.fish.washington.edu/Atumefaciens/hputnam-Becker_E5/
-- [OSF](https://osf.io/uayvk/)
-- Nutrient exposure 
-
-
-**B**) https://github.com/hputnam/HI_Bleaching_Timeseries/tree/main/Dec-July-2019-analysis (Montipora capitata genome)
-
-**C**) https://github.com/emmastrand/Acclim_Dynamics_molecular (Pocillopora acuta genome)
-
-- This effort is somewhat comprimised as ploidy (unintended), overwhelm signals
 
 **D**) Acropora pulcra
 
@@ -62,10 +48,6 @@ Links to other data types (e.g. FastQs, BAMs) can be [found in the project wiki]
 
 ### Genomes of interest
 
-- *Pocillopora verrucosa* genome v1.0 : http://pver.reefgenomics.org : https://www.ncbi.nlm.nih.gov/data-hub/genome/GCA_014529365.1/
-- *Montipora capitata* v3 - http://cyanophora.rutgers.edu/montipora/ : https://www.ncbi.nlm.nih.gov/data-hub/genome/GCA_006542545.1/
-- *Pocillopora acuta* v2 - http://cyanophora.rutgers.edu/Pocillopora_acuta/ : 
-- _Pocillopora meandrina_ - http://cyanophora.rutgers.edu/Pocillopora_meandrina/ :
 
 ### Workflows
 
