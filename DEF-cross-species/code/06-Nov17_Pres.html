@@ -330,26 +330,9 @@
 </div>
 
 </section>
-<section id="quarto" class="slide level2">
-<h2>Quarto</h2>
-<p>Quarto enables you to weave together content and executable code into a finished presentation. To learn more about Quarto presentations see <a href="https://quarto.org/docs/presentations/" class="uri">https://quarto.org/docs/presentations/</a>.</p>
-</section>
-<section id="bullets" class="slide level2">
-<h2>Bullets</h2>
-<p>When you click the <strong>Render</strong> button a document will be generated that includes:</p>
-<ul>
-<li>Content authored with markdown</li>
-<li>Output from executable code</li>
-</ul>
-</section>
-<section id="code" class="slide level2">
-<h2>Code</h2>
-<p>When you click the <strong>Render</strong> button a presentation will be generated that includes both content and the output of embedded code. You can embed code like this:</p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 2</code></pre>
-</div>
-</div>
+<section id="non-coding-rna" class="slide level2">
+<h2>Non-coding RNA</h2>
+<p>Where things stand</p>
 </section>
 <section id="lncrna-discovery" class="slide level2">
 <h2>lncRNA Discovery</h2>
@@ -360,6 +343,20 @@
 <li>ID non-coding transcripts (GFFCompare, CPC2)</li>
 <li>Fasta and Bed file created for each species</li>
 </ul>
+</section>
+<section id="lncrna-by-the-numbers" class="slide level2">
+<h2>lncRNA by the numbers</h2>
+<ul>
+<li>Apul total transcripts / lncRNA = 106174 /</li>
+</ul>
+</section>
+<section id="test" class="slide level2">
+<h2>test</h2>
+<pre><code>/home/shared/stringtie-2.2.1.Linux_x86_64/stringtie \
+--merge \
+-G ../data/Pocillopora_meandrina_HIv1.genes.gff3 \
+-o ../output/02-lncRNA-discovery/stringtie_merged.gtf \
+../output/02-lncRNA-discovery/*.gtf</code></pre>
 <div class="footer footer-default">
 
 </div>
@@ -575,44 +572,6 @@
         ]
       });
     </script>
-    
-    <script>
-      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
-      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
-      // slide changes (different for each slide format).
-      (function () {
-        // dispatch for htmlwidgets
-        function fireSlideEnter() {
-          const event = window.document.createEvent("Event");
-          event.initEvent("slideenter", true, true);
-          window.document.dispatchEvent(event);
-        }
-
-        function fireSlideChanged(previousSlide, currentSlide) {
-          fireSlideEnter();
-
-          // dispatch for shiny
-          if (window.jQuery) {
-            if (previousSlide) {
-              window.jQuery(previousSlide).trigger("hidden");
-            }
-            if (currentSlide) {
-              window.jQuery(currentSlide).trigger("shown");
-            }
-          }
-        }
-
-        // hookup for slidy
-        if (window.w3c_slidy) {
-          window.w3c_slidy.add_observer(function (slide_num) {
-            // slide_num starts at position 1
-            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
-          });
-        }
-
-      })();
-    </script>
-
     <script id="quarto-html-after-body" type="application/javascript">
     window.document.addEventListener("DOMContentLoaded", function (event) {
       const toggleBodyColorMode = (bsSheetEl) => {
