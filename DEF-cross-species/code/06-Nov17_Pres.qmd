@@ -4,6 +4,21 @@ format: revealjs
 editor: visual
 ---
 
+
+```{r setup, include=FALSE}
+library(knitr)
+library(kableExtra)
+library(dplyr)
+knitr::opts_chunk$set(
+  echo = TRUE,         # Display code chunks
+  eval = FALSE,        # Evaluate code chunks
+  warning = FALSE,     # Hide warnings
+  message = FALSE,     # Hide messages
+  comment = ""          # Prevents appending '##' to beginning of lines in code output
+)
+
+```
+
 ## Quarto
 
 Quarto enables you to weave together content and executable code into a finished presentation. To learn more about Quarto presentations see <https://quarto.org/docs/presentations/>.
@@ -43,4 +58,21 @@ When you click the **Render** button a presentation will be generated that inclu
 - BLASTn
   - Align sRNAseq to miRNA databases (miRBase, MirGene)
 - miRDeep2
-  - Use sRNAse, genome, and miRNA database (miRBase)
+  - Use sRNAseq, genome, and miRNA database (miRBase)
+
+
+### MiRTrace
+
+#### _A.pulchra_
+
+miRNA Families: 5
+
+Clades: 3
+    - lophotrochozoa
+    - rodents
+    - primates
+
+Number of samples with matches: 3
+
+
+  
