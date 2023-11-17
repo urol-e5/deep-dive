@@ -1,4 +1,4 @@
-13-Apul-sRNAseq-ShortStack
+10-Apul-sRNAseq-BLASTn
 ================
 Sam White
 2023-11-03
@@ -168,12 +168,13 @@ wget \
  ls -lh ${deep_dive_data_dir}
 ```
 
-    total 8.9M
-    drwxr-xr-x 2 sam sam 4.0K Nov  7 09:15 blast_dbs
-    -rw-r--r-- 1 sam sam 3.7M Nov  6 12:54 mirbase-mature-v22.1.fa
-    -rw-r--r-- 1 sam sam 3.7M Nov  7 14:22 mirbase-mature-v22.1-no_U.fa
-    -rw-r--r-- 1 sam sam 726K Nov  6 16:10 mirgene-mature-all-v2.1.fa
-    -rw-r--r-- 1 sam sam 726K Nov  7 14:22 mirgene-mature-all-v2.1-no_U.fa
+    total 13M
+    drwxr-xr-x 2 sam sam 4.0K Nov  7 14:36 blast_dbs
+    -rw-r--r-- 1 sam sam 3.7M Nov 15 21:30 mirbase-mature-v22.1.fa
+    -rw-r--r-- 1 sam sam 3.7M Nov 14 09:39 mirbase-mature-v22.1-no_spaces.fa
+    -rw-r--r-- 1 sam sam 3.7M Nov 17 07:58 mirbase-mature-v22.1-no_U.fa
+    -rw-r--r-- 1 sam sam 726K Nov  7 14:36 mirgene-mature-all-v2.1.fa
+    -rw-r--r-- 1 sam sam 726K Nov 17 07:58 mirgene-mature-all-v2.1-no_U.fa
 
 ## 2.1 Inspect miRNA FastAs
 
@@ -194,6 +195,18 @@ head "${deep_dive_data_dir}"/mir*.fa
     >cel-lin-4-3p MIMAT0015092 Caenorhabditis elegans lin-4-3p
     ACACCUGGGCUCUCCGGGUACC
     >cel-miR-1-5p MIMAT0020301 Caenorhabditis elegans miR-1-5p
+    CAUACUUCCUUACAUGCCCAUA
+
+    ==> /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/data/mirbase-mature-v22.1-no_spaces.fa <==
+    >cel-let-7-5p_MIMAT0000001_Caenorhabditis_elegans_let-7-5p
+    UGAGGUAGUAGGUUGUAUAGUU
+    >cel-let-7-3p_MIMAT0015091_Caenorhabditis_elegans_let-7-3p
+    CUAUGCAAUUUUCUACCUUACC
+    >cel-lin-4-5p_MIMAT0000002_Caenorhabditis_elegans_lin-4-5p
+    UCCCUGAGACCUCAAGUGUGA
+    >cel-lin-4-3p_MIMAT0015092_Caenorhabditis_elegans_lin-4-3p
+    ACACCUGGGCUCUCCGGGUACC
+    >cel-miR-1-5p_MIMAT0020301_Caenorhabditis_elegans_miR-1-5p
     CAUACUUCCUUACAUGCCCAUA
 
     ==> /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/data/mirbase-mature-v22.1-no_U.fa <==
@@ -263,6 +276,18 @@ head ${deep_dive_data_dir}/*.fa
     >cel-lin-4-3p MIMAT0015092 Caenorhabditis elegans lin-4-3p
     ACACCUGGGCUCUCCGGGUACC
     >cel-miR-1-5p MIMAT0020301 Caenorhabditis elegans miR-1-5p
+    CAUACUUCCUUACAUGCCCAUA
+
+    ==> /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/data/mirbase-mature-v22.1-no_spaces.fa <==
+    >cel-let-7-5p_MIMAT0000001_Caenorhabditis_elegans_let-7-5p
+    UGAGGUAGUAGGUUGUAUAGUU
+    >cel-let-7-3p_MIMAT0015091_Caenorhabditis_elegans_let-7-3p
+    CUAUGCAAUUUUCUACCUUACC
+    >cel-lin-4-5p_MIMAT0000002_Caenorhabditis_elegans_lin-4-5p
+    UCCCUGAGACCUCAAGUGUGA
+    >cel-lin-4-3p_MIMAT0015092_Caenorhabditis_elegans_lin-4-3p
+    ACACCUGGGCUCUCCGGGUACC
+    >cel-miR-1-5p_MIMAT0020301_Caenorhabditis_elegans_miR-1-5p
     CAUACUUCCUUACAUGCCCAUA
 
     ==> /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/data/mirbase-mature-v22.1-no_U.fa <==
