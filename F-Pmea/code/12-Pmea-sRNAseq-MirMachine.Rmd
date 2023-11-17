@@ -85,7 +85,7 @@ echo 'export mirmarchine_output_prefix="Pmea-MirMachine"'
 
 echo "# Input/Output files"
 echo 'export genome_fasta_dir=${deep_dive_dir}/F-Pmea/data/Pmea/'
-echo 'export genome_fasta_name="Pocillopora_meandrina_HIv1.assembly.fasta.gz"'
+echo 'export genome_fasta_name="Pocillopora_meandrina_HIv1.assembly.fasta"'
 echo 'export genome_fasta="${genome_fasta_dir}/${genome_fasta_name}"'
 
 echo ""
@@ -139,7 +139,7 @@ ls -lh "${genome_fasta_dir}"
 
 
 ## Verify genome FastA MD5 checksum
-```{r verify-genome-fasta-checksum, engine='bash', eval=TRUE}
+```{r verify-genome-fasta-checksum, engine='bash', eval=FALSE}
 # Load bash variables into memory
 source .bashvars
 
