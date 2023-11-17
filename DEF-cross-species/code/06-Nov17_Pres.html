@@ -425,6 +425,10 @@
 <li><a href="#/shortstack" id="/toc-a.pulchra-3"><em>A.pulchra</em></a></li>
 </ul></li>
 <li><a href="#/mirtrace-1" id="/toc-mirtrace-1">MiRTrace</a></li>
+<li><a href="#/mirmachine-1" id="/toc-mirmachine-1">MirMachine</a>
+<ul>
+<li><a href="#/mirmachine-1" id="/toc-p.evermanni-1"><em>P.evermanni</em></a></li>
+</ul></li>
 </ul>
 </nav>
 </section>
@@ -445,13 +449,6 @@
 <section id="lncrna-by-the-numbers" class="slide level2">
 <h2>lncRNA by the numbers</h2>
 <ul>
-<<<<<<< HEAD
-<li>D Apul total transcripts / lncRNA = 106174 / 16206 (15%)</li>
-<li>E Peve total transcripts / lncRNA = 115492 / 7378 (63%)</li>
-<li>F Pmea total transcripts / lncRNA = 77592 / 14307 (18%)</li>
-</ul>
-<p>*total from merged gtf transcript count</p>
-=======
 <li>D Apul total transcripts / lncRNA = 115492 / 16206 (14%)</li>
 <li>E Peve total transcripts / lncRNA = 74686 / 7378 (10%)</li>
 <li>F Pmea total transcripts / lncRNA = 77592 / 14307 (18%)</li>
@@ -464,24 +461,21 @@
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">grep</span> <span class="at">-v</span> <span class="st">'^#'</span> ../../D-Apul/output/05.33-lncRNA-discovery/stringtie_merged.gtf <span class="kw">|</span> <span class="fu">cut</span> <span class="at">-f3</span> <span class="kw">|</span> <span class="fu">sort</span> <span class="kw">|</span> <span class="fu">uniq</span> <span class="at">-c</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code> 627332 exon
- 115492 transcript</code></pre>
+<pre><code>grep: ../../D-Apul/output/05.33-lncRNA-discovery/stringtie_merged.gtf: No such file or directory</code></pre>
 </div>
 </div>
 <p>Peve</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">grep</span> <span class="at">-v</span> <span class="st">'^#'</span> ../../E-Peve/output/05-lncRNA-discovery/stringtie_merged.gtf <span class="kw">|</span> <span class="fu">cut</span> <span class="at">-f3</span> <span class="kw">|</span> <span class="fu">sort</span> <span class="kw">|</span> <span class="fu">uniq</span> <span class="at">-c</span> </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code> 467494 exon
-  74686 transcript</code></pre>
+<pre><code>grep: ../../E-Peve/output/05-lncRNA-discovery/stringtie_merged.gtf: No such file or directory</code></pre>
 </div>
 </div>
 <p>Pmea</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1"></a><span class="fu">grep</span> <span class="at">-v</span> <span class="st">'^#'</span> ../../F-Pmea/output/02-lncRNA-discovery/stringtie_merged.gtf <span class="kw">|</span> <span class="fu">cut</span> <span class="at">-f3</span> <span class="kw">|</span> <span class="fu">sort</span> <span class="kw">|</span> <span class="fu">uniq</span> <span class="at">-c</span> </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code> 482050 exon
-  77592 transcript</code></pre>
+<pre><code>grep: ../../F-Pmea/output/02-lncRNA-discovery/stringtie_merged.gtf: No such file or directory</code></pre>
 </div>
 </div>
 </section>
@@ -491,20 +485,7 @@
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1"></a><span class="fu">grep</span> <span class="at">-v</span> <span class="st">'^#'</span> ../../D-Apul/data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gff <span class="kw">|</span> <span class="fu">cut</span> <span class="at">-f3</span> <span class="kw">|</span> <span class="fu">sort</span> <span class="kw">|</span> <span class="fu">uniq</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>cDNA_match
-CDS
-exon
-gene
-guide_RNA
-lnc_RNA
-mRNA
-pseudogene
-region
-rRNA
-snoRNA
-snRNA
-transcript
-tRNA</code></pre>
+<pre><code>grep: ../../D-Apul/data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gff: No such file or directory</code></pre>
 </div>
 </div>
 <p>Peve</p>
@@ -520,12 +501,9 @@ UTR</code></pre>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1"></a><span class="fu">grep</span> <span class="at">-v</span> <span class="st">'^#'</span> ../../F-Pmea/data/Pocillopora_meandrina_HIv1.genes.gff3 <span class="kw">|</span> <span class="fu">cut</span> <span class="at">-f3</span> <span class="kw">|</span> <span class="fu">sort</span> <span class="kw">|</span> <span class="fu">uniq</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>CDS
-exon
-transcript</code></pre>
+<pre><code>grep: ../../F-Pmea/data/Pocillopora_meandrina_HIv1.genes.gff3: No such file or directory</code></pre>
 </div>
 </div>
->>>>>>> fc933610c96ebd5681ee792f27cfeb1772003c75
 </section>
 <section id="srnaseq-analysis" class="slide level2 scrollable">
 <h2>sRNAseq Analysis</h2>
@@ -777,6 +755,12 @@ transcript</code></pre>
 
 </div>
 </div>
+</section>
+<section id="mirmachine-1" class="slide level2">
+<h2>MirMachine</h2>
+<h3 id="p.evermanni-1"><em>P.evermanni</em></h3>
+<p>Predicted loci: 83</p>
+<p>Unique familes: 15</p>
 <div class="footer footer-default">
 
 </div>
