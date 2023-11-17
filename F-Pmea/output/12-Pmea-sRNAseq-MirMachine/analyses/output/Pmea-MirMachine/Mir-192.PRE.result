@@ -1,0 +1,182 @@
+# cmsearch :: search CM(s) against a sequence database
+# INFERNAL 1.1.2 (July 2016)
+# Copyright (C) 2016 Howard Hughes Medical Institute.
+# Freely distributed under a BSD open source license.
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# query CM file:                         /home/sam/programs/mambaforge/envs/mirmachine_env/lib/python3.10/site-packages/mirmachine/meta/cms/combined/Mir-192.PRE.CM
+# target sequence database:              /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/data/Pmea//Pocillopora_meandrina_HIv1.assembly.fasta
+# number of worker threads:              15 [--cpu]
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+Query:       Mir-192.PRE  [CLEN=62]
+Hit scores:
+ rank     E-value  score  bias  sequence                                  start      end   mdl trunc   gc  description
+ ----   --------- ------ -----  -------------------------------------- -------- --------   --- ----- ----  -----------
+ ------ inclusion threshold ------
+  (1) ?     0.064   28.0   0.0  Pocillopora_meandrina_HIv1___Sc0000017  1204096  1204042 -  cm    no 0.25  -
+  (2) ?       1.2   23.6   0.0  Pocillopora_meandrina_HIv1___Sc0000026  4743502  4743458 -  cm    no 0.33  -
+  (3) ?       1.4   23.4   0.1  Pocillopora_meandrina_HIv1___Sc0000008  2461249  2461303 +  cm    no 0.24  -
+  (4) ?       1.5   23.2   0.0  Pocillopora_meandrina_HIv1___Sc0000023    26385    26442 +  cm    no 0.33  -
+  (5) ?       1.7   23.1   0.3  Pocillopora_meandrina_HIv1___Sc0000016  4689930  4689868 -  cm    no 0.24  -
+  (6) ?       2.6   22.4   0.0  Pocillopora_meandrina_HIv1___Sc0000002 16278906 16278959 +  cm    no 0.28  -
+  (7) ?       3.2   22.1   0.0  Pocillopora_meandrina_HIv1___Sc0000017  4716119  4716059 -  cm    no 0.31  -
+  (8) ?       3.8   21.9   0.0  Pocillopora_meandrina_HIv1___Sc0000010  8025499  8025443 -  cm    no 0.37  -
+  (9) ?         5   21.4   0.0  Pocillopora_meandrina_HIv1___Sc0000033  1906481  1906434 -  cm    no 0.31  -
+ (10) ?         6   21.2   0.0  Pocillopora_meandrina_HIv1___Sc0000009  5266160  5266207 +  cm    no 0.25  -
+ (11) ?        10   20.4   0.0  Pocillopora_meandrina_HIv1___Sc0000003  6188471  6188417 -  cm    no 0.35  -
+
+
+Hit alignments:
+>> Pocillopora_meandrina_HIv1___Sc0000017  
+ rank     E-value  score  bias mdl mdl from   mdl to       seq from      seq to       acc trunc   gc
+ ----   --------- ------ ----- --- -------- --------    ----------- -----------      ---- ----- ----
+  (1) ?     0.064   28.0   0.0  cm        1       62 []     1204096     1204042 - .. 0.90    no 0.25
+
+                                                          vv                                     vv             NC
+                                                 :<<-<<<<<<<<-<<<<<<-<<<_____________>>>->>>>>>->>>->>>>>->>::: CS
+                             Mir-192.PRE       1 AUGACCUAuGAAUUGACAGcCagUguuucuuuaaaucuGuCUGUCAgUUCUaUAGGcCAaua 62     
+                                                 AU A CUA:+AA UGACAG  A: +  U    A   :U UCUGUCA+U   :UAG   AAU 
+  Pocillopora_meandrina_HIv1___Sc0000017 1204096 AUGAACUAUAAACUGACAGUAAGAAACU----AUCAUUUUCUGUCAUU---GUAGUAUAAUU 1204042
+                                                 ********************99977664....4455899*******86...*********** PP
+
+>> Pocillopora_meandrina_HIv1___Sc0000026  
+ rank     E-value  score  bias mdl mdl from   mdl to       seq from      seq to       acc trunc   gc
+ ----   --------- ------ ----- --- -------- --------    ----------- -----------      ---- ----- ----
+  (2) ?       1.2   23.6   0.0  cm        1       62 []     4743502     4743458 - .. 0.93    no 0.33
+
+                                                                                                   NC
+                                                 :<<-<<<<<<<<-<<<<<<-~~~~~~->>>>>>->>>->>>>>->>::: CS
+                             Mir-192.PRE       1 AUGACCUAuGAAUUGACAGc*[19]*uCUGUCAgUUCUaUAGGcCAaua 62     
+                                                  : A CUA::AA UG:CA +      U UG:CA UU:U:UAG + :A+A
+  Pocillopora_meandrina_HIv1___Sc0000026 4743502 UCCAUCUACAAAAUGGCAAA*[ 3]*UUUGCCA-UUUUGUAGAUGGAAA 4743458
+                                                 ******************87...8..58*****.7778*********** PP
+
+>> Pocillopora_meandrina_HIv1___Sc0000008  
+ rank     E-value  score  bias mdl mdl from   mdl to       seq from      seq to       acc trunc   gc
+ ----   --------- ------ ----- --- -------- --------    ----------- -----------      ---- ----- ----
+  (3) ?       1.4   23.4   0.1  cm        1       62 []     2461249     2461303 + .. 0.95    no 0.24
+
+                                                        v              v             v               v          NC
+                                                 :<<-<<<<<<<<-<<<<<<-<<<_____________>>>->>>>>>->>>->>>>>->>::: CS
+                             Mir-192.PRE       1 AUGACCUAuGAAUUGACAGcCagUguuucuuuaaaucuGuCUGUCAgUUCUaUAGGcCAaua 62     
+                                                  UGA    U:AA UGA AG+:A UG +U+  + AAU U:+CU UCAGUU:UA    +CA  A
+  Pocillopora_meandrina_HIv1___Sc0000008 2461249 UUGA---UUAAACUGAUAGAUAUUGAAUUA-AUAAUUUACCUGUCAGUUUUAC---UCAUGA 2461303
+                                                 ****...59******************999.99999***************94...9***** PP
+
+>> Pocillopora_meandrina_HIv1___Sc0000023  
+ rank     E-value  score  bias mdl mdl from   mdl to       seq from      seq to       acc trunc   gc
+ ----   --------- ------ ----- --- -------- --------    ----------- -----------      ---- ----- ----
+  (4) ?       1.5   23.2   0.0  cm        1       62 []       26385       26442 + .. 0.97    no 0.33
+
+                                                 v                                                      v     NC
+                                               :<<-<<<<<<<<-<<<<<<-<<<_____________>>>->>>>>>->>>->>>>>->>::: CS
+                             Mir-192.PRE     1 AUGACCUAuGAAUUGACAGcCagUguuucuuuaaaucuGuCUGUCAgUUCUaUAGGcCAaua 62   
+                                               AU   CU U:AA UG: A CCA:U ++     AA  :UG  U :CA+UU: A AG ++AA A
+  Pocillopora_meandrina_HIv1___Sc0000023 26385 AU--UCUUUGAAGUGGUAGCCAAUUCAAAA--AACGUUGGUUGCCAUUUUCAAAGAUAAACA 26442
+                                               **..*********************99988..8888*********************9**** PP
+
+>> Pocillopora_meandrina_HIv1___Sc0000016  
+ rank     E-value  score  bias mdl mdl from   mdl to       seq from      seq to       acc trunc   gc
+ ----   --------- ------ ----- --- -------- --------    ----------- -----------      ---- ----- ----
+  (5) ?       1.7   23.1   0.3  cm        1       62 []     4689930     4689868 - .. 0.77    no 0.24
+
+                                                           v     vvv vvv             vvv vvv     v              NC
+                                                 :<<-<<<<<<<<-<<<<<<-<<<_______~~~~~~>>>->>>>>>->>>->>>>>->>::: CS
+                             Mir-192.PRE       1 AUGACCUAuGAAUUGACAGcCagUguuucu*[ 6]*cuGuCUGUCAgUUCUaUAGGcCAaua 62     
+                                                 AU ACCUA:G A U A+A+++A+U+ U +U         U   U A U CU:UAGG+ AA  
+  Pocillopora_meandrina_HIv1___Sc0000016 4689930 AUCACCUAUGAAAUGAAAUAUAUUAAUAUU*[13]*---U---UUAAUACUGUAGGUGAAGU 4689868
+                                                 **************9976666666666655...4.....3...99***************** PP
+
+>> Pocillopora_meandrina_HIv1___Sc0000002  
+ rank     E-value  score  bias mdl mdl from   mdl to       seq from      seq to       acc trunc   gc
+ ----   --------- ------ ----- --- -------- --------    ----------- -----------      ---- ----- ----
+  (6) ?       2.6   22.4   0.0  cm        1       62 []    16278906    16278959 + .. 0.92    no 0.28
+
+                                                    v       v       v                 v       v        v     NC
+                                                  :<<-<<<<<<<<-<<<<<<-<<<___~~~~~~>>>->>>>>>->>>->>>>>->>::: CS
+                             Mir-192.PRE        1 AUGACCUAuGAAUUGACAGcCagUgu*[10]*cuGuCUGUCAgUUCUaUAGGcCAaua 62      
+                                                  AU ACC AU: AUUGACA  :A:U        :U:U UGUCA+U :UAU GG+ A  A
+  Pocillopora_meandrina_HIv1___Sc0000002 16278906 AU-ACCAAUAAAUUGACAUUUAAUCA*[ 3]*UUGUUUGUCAUUCUUAUUGGUGAGGA 16278959
+                                                  **.***************99999864...4..99999****************9**** PP
+
+>> Pocillopora_meandrina_HIv1___Sc0000017  
+ rank     E-value  score  bias mdl mdl from   mdl to       seq from      seq to       acc trunc   gc
+ ----   --------- ------ ----- --- -------- --------    ----------- -----------      ---- ----- ----
+  (7) ?       3.2   22.1   0.0  cm        1       62 []     4716119     4716059 - .. 0.98    no 0.31
+
+                                                      vv      v       vv             vv       v        vv        NC
+                                                 :<<-<<<<<<<<-<<<<<<-<<<_____________>>>->>>>>>->>>.->>>>>->>::: CS
+                             Mir-192.PRE       1 AUGACCUAuGAAUUGACAGcCagUguuucuuuaaaucuGuCUGUCAgUUC.UaUAGGcCAaua 62     
+                                                 A  AC  A:GAAU GACAGC:  U +UU+  U  ++  :UCUGUC  UUC U:U++G+  AU 
+  Pocillopora_meandrina_HIv1___Sc0000017 4716119 AAAAC--AUGAAUUGACAGCUUCUUCUUUAAUCUUCAUGUCUGUCUAUUCgUGUUUGUUUAUC 4716059
+                                                 *****..*********************99999*****************999********** PP
+
+>> Pocillopora_meandrina_HIv1___Sc0000010  
+ rank     E-value  score  bias mdl mdl from   mdl to       seq from      seq to       acc trunc   gc
+ ----   --------- ------ ----- --- -------- --------    ----------- -----------      ---- ----- ----
+  (8) ?       3.8   21.9   0.0  cm        1       62 []     8025499     8025443 - .. 0.96    no 0.37
+
+                                                   v     v  v                                   v   v     v     NC
+                                                 :<<-<<<<<<<<-<<<<<<-<<<_____________>>>->>>>>>->>>->>>>>->>::: CS
+                             Mir-192.PRE       1 AUGACCUAuGAAUUGACAGcCagUguuucuuuaaaucuGuCUGUCAgUUCUaUAGGcCAaua 62     
+                                                 AU   CU  GA UUG: AGCCA:U +      AAA :UG CU :CA+ UC   AG C+AA A
+  Pocillopora_meandrina_HIv1___Sc0000010 8025499 AU--UCUUCGAUUUGGUAGCCAAUUCCAAA--AAAGUUGGCUGCCAUUUC-AAAGACAAACA 8025443
+                                                 **..*********************99988..9999**********9999.89****9**** PP
+
+>> Pocillopora_meandrina_HIv1___Sc0000033  
+ rank     E-value  score  bias mdl mdl from   mdl to       seq from      seq to       acc trunc   gc
+ ----   --------- ------ ----- --- -------- --------    ----------- -----------      ---- ----- ----
+  (9) ?         5   21.4   0.0  cm        1       62 []     1906481     1906434 - .. 0.96    no 0.31
+
+                                                     vvvv                                            vvvv       NC
+                                                 :<<-<<<<<<<<-<<<<<<-<<<_____________>>>->>>>>>->>>->>>>>->>::: CS
+                             Mir-192.PRE       1 AUGACCUAuGAAUUGACAGcCagUguuucuuuaaaucuGuCUGUCAgUUCUaUAGGcCAaua 62     
+                                                  UGA         UG CAG CA:UGU U+U++ AAU:UG CUG CA+     U++++CA UA
+  Pocillopora_meandrina_HIv1___Sc0000033 1906481 UUGA---------UGGCAGUCAGUGUCUUUCAUAAUUUGACUGUCAU-----UUUAUCAUUA 1906434
+                                                 ****.........*********************************7.....56679***** PP
+
+>> Pocillopora_meandrina_HIv1___Sc0000009  
+ rank     E-value  score  bias mdl mdl from   mdl to       seq from      seq to       acc trunc   gc
+ ----   --------- ------ ----- --- -------- --------    ----------- -----------      ---- ----- ----
+ (10) ?         6   21.2   0.0  cm        1       62 []     5266160     5266207 + .. 0.92    no 0.25
+
+                                                      vvv             v      v              vvv        NC
+                                                 :<<-<<<<<<<<-<<<<<<-<<~~~~~~>>->>>>>>->>>->>>>>->>::: CS
+                             Mir-192.PRE       1 AUGACCUAuGAAUUGACAGcCa*[15]*uGuCUGUCAgUUCUaUAGGcCAaua 62     
+                                                 AUGA    :GAAUUGA A +C        GU U UCA UUCU:  G  CAA+ 
+  Pocillopora_meandrina_HIv1___Sc0000009 5266160 AUGAU--AUGAAUUGAUAAACU*[ 3]*UGUUUAUCAAUUCUGAGGAACAAAU 5266207
+                                                 ****5..69***********96...5..699************9999****** PP
+
+>> Pocillopora_meandrina_HIv1___Sc0000003  
+ rank     E-value  score  bias mdl mdl from   mdl to       seq from      seq to       acc trunc   gc
+ ----   --------- ------ ----- --- -------- --------    ----------- -----------      ---- ----- ----
+ (11) ?        10   20.4   0.0  cm        1       62 []     6188471     6188417 - .. 0.95    no 0.35
+
+                                                     vvvv   v     v                       v     v    vvvv       NC
+                                                 :<<-<<<<<<<<-<<<<<<-<<<_____________>>>->>>>>>->>>->>>>>->>::: CS
+                             Mir-192.PRE       1 AUGACCUAuGAAUUGACAGcCagUguuucuuuaaaucuGuCUGUCAgUUCUaUAGGcCAaua 62     
+                                                 AUGA    UGA  UGAC GCCA:U    +U U+AA :UGUC GUCA UUCUA A++ CAA A
+  Pocillopora_meandrina_HIv1___Sc0000003 6188471 AUGA----UGA--UGACUGCCAUUUAGAUUGUGAAAAUGUCUGUCACUUCUACAAA-CAACA 6188417
+                                                 ***9....8**..*****************99**************99**998775.***** PP
+
+
+
+Internal CM pipeline statistics summary:
+----------------------------------------
+Query model(s):                                                  1  (62 consensus positions)
+Target sequences:                                              212  (753159828 residues searched)
+Target sequences re-searched for truncated hits:               212  (67840 residues re-searched)
+Windows   passing  local HMM SSV           filter:         1791033  (0.2353); expected (0.15)
+Windows   passing  local HMM Viterbi       filter:         1124590  (0.1515); expected (0.15)
+Windows   passing  local HMM Viterbi  bias filter:          923344  (0.1251); expected (0.15)
+Windows   passing  local HMM Forward       filter:           26644  (0.003867); expected (0.0008)
+Windows   passing  local HMM Forward  bias filter:           22447  (0.00327); expected (0.0008)
+Windows   passing glocal HMM Forward       filter:           13160  (0.002154); expected (0.0008)
+Windows   passing glocal HMM Forward  bias filter:           12554  (0.00205); expected (0.0008)
+Envelopes passing glocal HMM envelope defn filter:           12633  (0.001211); expected (0.0008)
+Envelopes passing  local CM  CYK           filter:             767  (5.468e-05); expected (0.0001)
+Total CM hits reported:                                         11  (7.952e-07); includes 0 truncated hit(s)
+
+# CPU time: 83.79u 0.21s 00:01:24.00 Elapsed: 00:00:05.48
+//
+[ok]

@@ -1,0 +1,65 @@
+# cmsearch :: search CM(s) against a sequence database
+# INFERNAL 1.1.2 (July 2016)
+# Copyright (C) 2016 Howard Hughes Medical Institute.
+# Freely distributed under a BSD open source license.
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# query CM file:                         /home/sam/programs/mambaforge/envs/mirmachine_env/lib/python3.10/site-packages/mirmachine/meta/cms/combined/Mir-450.PRE.CM
+# target sequence database:              /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/data/Pmea//Pocillopora_meandrina_HIv1.assembly.fasta
+# number of worker threads:              15 [--cpu]
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+Query:       Mir-450.PRE  [CLEN=57]
+Hit scores:
+ rank     E-value  score  bias  sequence                                 start     end   mdl trunc   gc  description
+ ----   --------- ------ -----  -------------------------------------- ------- -------   --- ----- ----  -----------
+ ------ inclusion threshold ------
+  (1) ?       2.3   27.5   0.0  Pocillopora_meandrina_HIv1___Sc0000014 1194272 1194230 -  cm    no 0.37  -
+  (2) ?         4   26.5   0.0  Pocillopora_meandrina_HIv1___Sc0000010   14136   14189 +  cm    no 0.41  -
+
+
+Hit alignments:
+>> Pocillopora_meandrina_HIv1___Sc0000014  
+ rank     E-value  score  bias mdl mdl from   mdl to       seq from      seq to       acc trunc   gc
+ ----   --------- ------ ----- --- -------- --------    ----------- -----------      ---- ----- ----
+  (1) ?       2.3   27.5   0.0  cm        1       57 []     1194272     1194230 - .. 0.93    no 0.37
+
+                                                              v        v                NC
+                                                 :::<<<<<-<<<<<<~~~~~~>>>>>>->>>>>::::: CS
+                             Mir-450.PRE       1 UUUUGCgAUgUGUUC*[25]*GAACAuUUuGCAUuCAU 57     
+                                                 UUUUGC:AUGU U C      G A AUUU:GCAU C U
+  Pocillopora_meandrina_HIv1___Sc0000014 1194272 UUUUGCAAUGUUUCC*[11]*GAAAAUUUUGCAUACGU 1194230
+                                                 ***********8865...9..6799************* PP
+
+>> Pocillopora_meandrina_HIv1___Sc0000010  
+ rank     E-value  score  bias mdl mdl from   mdl to       seq from      seq to       acc trunc   gc
+ ----   --------- ------ ----- --- -------- --------    ----------- -----------      ---- ----- ----
+  (2) ?         4   26.5   0.0  cm        1       57 []       14136       14189 + .. 0.89    no 0.41
+
+                                                        v           v           v           v            NC
+                                               :::<<<<<-<<<<<<<<<<<<<<_________>>>>>>>>>>>>>>->>>>>::::: CS
+                             Mir-450.PRE     1 UUUUGCgAUgUGUUCCUAAUAugUAaUAUAAguaUAUUGGGAACAuUUuGCAUuCAU 57   
+                                                 UU C:AU UGU CCUAAU: :UA  A  AG:A:AUUGGG ACA  U:G A   AU
+  Pocillopora_meandrina_HIv1___Sc0000010 14136 CGUUACAAUCUGUACCUAAUG-GUA--AAGAGCACAUUGGGUACAUGUUGUACGGAU 14189
+                                               ********************8.333..34555679********************** PP
+
+
+
+Internal CM pipeline statistics summary:
+----------------------------------------
+Query model(s):                                                  1  (57 consensus positions)
+Target sequences:                                              212  (753159828 residues searched)
+Target sequences re-searched for truncated hits:               212  (61904 residues re-searched)
+Windows   passing  local HMM SSV           filter:         2160003  (0.2604); expected (0.15)
+Windows   passing  local HMM Viterbi       filter:         1872202  (0.2284); expected (0.15)
+Windows   passing  local HMM Viterbi  bias filter:         1137337  (0.1405); expected (0.15)
+Windows   passing  local HMM Forward       filter:           39559  (0.005488); expected (0.0008)
+Windows   passing  local HMM Forward  bias filter:           16252  (0.002232); expected (0.0008)
+Windows   passing glocal HMM Forward       filter:           11487  (0.001673); expected (0.0008)
+Windows   passing glocal HMM Forward  bias filter:           10330  (0.001488); expected (0.0008)
+Envelopes passing glocal HMM envelope defn filter:           10432  (0.0009712); expected (0.0008)
+Envelopes passing  local CM  CYK           filter:            1016  (6.853e-05); expected (0.0001)
+Total CM hits reported:                                          2  (1.288e-07); includes 0 truncated hit(s)
+
+# CPU time: 82.05u 0.23s 00:01:22.28 Elapsed: 00:00:05.36
+//
+[ok]
