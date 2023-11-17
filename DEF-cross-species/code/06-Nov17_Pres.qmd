@@ -2,31 +2,210 @@
 title: "Nov17-update"
 format: revealjs
 editor: visual
+toc: true
+toc_float: true
+code_folding: show
 ---
 
-## Quarto
+## Non-coding RNA
 
-Quarto enables you to weave together content and executable code into a finished presentation. To learn more about Quarto presentations see <https://quarto.org/docs/presentations/>.
+```{r setup, include=FALSE}
+library(knitr)
+library(kableExtra)
+library(dplyr)
+knitr::opts_chunk$set(
+  echo = TRUE,         # Display code chunks
+  eval = FALSE,        # Evaluate code chunks
+  warning = FALSE,     # Hide warnings
+  message = FALSE,     # Hide messages
+  comment = ""          # Prevents appending '##' to beginning of lines in code output
+)
 
-## Bullets
-
-When you click the **Render** button a document will be generated that includes:
-
--   Content authored with markdown
--   Output from executable code
-
-## Code
-
-When you click the **Render** button a presentation will be generated that includes both content and the output of embedded code. You can embed code like this:
-
-```{r}
-1 + 1
 ```
+
+Where things stand
 
 ## lncRNA Discovery
 
-- Aligned RNA-seq reads to genome -> SAM files
-- SAM files converted to BAMS
-- BAMS converted to GTF (Stringtie), merged to single GTF
-- ID non-coding transcripts (GFFCompare, CPC2)
-- Fasta and Bed file created for each species
+-   Aligned RNA-seq reads to genome -\> SAM files
+-   SAM files converted to BAMS
+-   BAMS converted to GTF (Stringtie), merged to single GTF
+-   ID non-coding transcripts (GFFCompare, CPC2)
+-   Fasta and Bed file created for each species
+
+## lncRNA by the numbers
+
+-   D Apul total transcripts / lncRNA = 115492 / 16206 (14%)
+-   E Peve total transcripts / lncRNA = 74686 / 7378 (10%)
+-   F Pmea total transcripts / lncRNA = 77592 / 14307 (18%)
+
+\*total from merged gtf transcript count
+
+## lncRNA by the numbers
+
+Apul
+```{r, engine='bash', eval=TRUE, echo=TRUE}
+grep -v '^#' ../../D-Apul/output/05.33-lncRNA-discovery/stringtie_merged.gtf | cut -f3 | sort | uniq -c
+```
+Peve
+```{r, engine='bash', eval=TRUE, echo=TRUE}
+grep -v '^#' ../../E-Peve/output/05-lncRNA-discovery/stringtie_merged.gtf | cut -f3 | sort | uniq -c 
+```
+
+Pmea
+```{r, engine='bash', eval=TRUE, echo=TRUE}
+grep -v '^#' ../../F-Pmea/output/02-lncRNA-discovery/stringtie_merged.gtf | cut -f3 | sort | uniq -c 
+```
+
+## About the GFFs {.scrollable}
+Apul 
+```{r, engine='bash', eval=TRUE, echo=TRUE}
+grep -v '^#' ../../D-Apul/data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gff | cut -f3 | sort | uniq
+```
+Peve
+```{r, engine='bash', eval=TRUE, echo=TRUE}
+grep -v '^#' ../../E-Peve/data/Porites_evermanni_v1.annot.gff | cut -f3 | sort | uniq
+```
+Pmea
+```{r, engine='bash', eval=TRUE, echo=TRUE}
+grep -v '^#' ../../F-Pmea/data/Pocillopora_meandrina_HIv1.genes.gff3 | cut -f3 | sort | uniq
+```
+
+
+## sRNAseq Analysis {.scrollable}
+
+-   Trim reads to 25bp length
+-   miRTrace
+    -   Identify taxonomic origins (Clade-level) of sRNAseq data
+-   MirMachine
+    -   Identify potential miRNA homologs in genome (no sRNAseq analyses)
+-   ShortStack alignment of sRNAseq data and annotation of sRNA-producing genes.
+    -   Uses sRNAseq, genome, and miRNA database (miRBase).
+-   BLASTn
+    -   Align sRNAseq to miRNA databases (miRBase, MirGene)
+-   miRDeep2
+    -   Use sRNAseq, genome, and miRNA database (miRBase)
+
+## MiRTrace
+
+#### *A.pulchra*
+
+```{r read-apul-mirtrace-table, eval=TRUE, echo=FALSE}
+mirtrace.detailed.df <- read.csv("../../D-Apul/output/09-Apul-sRNAseq-miRTrace/mirtrace-stats-contamination_detailed.tsv", sep = "\t", header = TRUE)
+```
+
+```{r mirtrace-output-table, eval=TRUE, echo=FALSE}
+
+mirtrace.detailed.df %>%
+  mutate(
+    across(
+      starts_with("sRNA"),
+      ~cell_spec(
+        .,
+        background = ifelse(
+          . > 0,
+          "lightgreen",
+          "white"
+          )
+        )
+      )
+    ) %>%
+  kable(escape = F, caption = "Clades identified as having sRNAseq matches.") %>%
+  kable_styling("striped") %>% 
+  scroll_box(width = "100%", height = "500px")
+```
+
+## MirMachine
+
+### *A.millepora*
+
+```{r count-predicted-hc-mirnas}
+#| eval: true
+#| echo: false
+
+# Store Bash command to use with system()
+cmd_predicted_loci <- paste(c('grep -c "^[^#]" "../../D-Apul/output/12-Apul-sRNAseq-MirMachine/results/predictions/filtered_gff/Amil-MirMachine.PRE.gff"'))
+
+
+# Store Bash command to use with system()
+cmd_unique_fams <- paste(c('grep "^[^#]" "../../D-Apul/output/12-Apul-sRNAseq-MirMachine/results/predictions/filtered_gff/Amil-MirMachine.PRE.gff"',
+'awk -F"[\t=;]" \'{print $10}\'',
+'sort -u',
+'wc -l'),
+collapse=" | ")
+
+predicted_loci <- system(cmd_predicted_loci, intern = TRUE)
+unique_fams <- system(cmd_unique_fams, intern = TRUE)
+```
+
+Predicted loci: `r predicted_loci`
+
+Unique familes: `r unique_fams`
+
+## miRDeep2
+
+### *A.pulchra*
+
+```{r apul-mirdeepcount-counts}
+#| eval: true
+#| echo: false
+
+
+# Store Bash command to use with system()
+cmd_mirdeep2_predicted_loci <- paste(c('awk \'NR > 1\' "../../D-Apul/output/11-Apul-sRNAseq-miRdeep2/parsable-result_08_11_2023_t_14_47_36.csv"',
+'wc -l'),
+collapse=" | ")
+
+
+# Store Bash command to use with system()
+cmd_mirdeep2_seed_miRNAs <- paste(c('awk -F"\t" \'$11 != "-" && $11 != "" {print $11}\' "../../D-Apul/output/11-Apul-sRNAseq-miRdeep2/parsable-result_08_11_2023_t_14_47_36.csv"',
+'wc -l'),
+collapse=" | ")
+
+cmd_mirdreep2_novel_miRNAS <- paste(c('awk -F"\t" \'$11 == "-" || $11 == "" {print $11}\' "../../D-Apul/output/11-Apul-sRNAseq-miRdeep2/parsable-result_08_11_2023_t_14_47_36.csv"',
+'awk \'NR > 1\'',
+'wc -l'),
+collapse=" | ")
+
+  
+
+mirdeep2_predicted_loci <- system(cmd_mirdeep2_predicted_loci, intern = TRUE)
+mirdeep2_seed_miRNAs <- system(cmd_mirdeep2_seed_miRNAs, intern = TRUE)
+mirdreep2_novel_miRNAS <- system(cmd_mirdreep2_novel_miRNAS, intern = TRUE)
+```
+
+Predicted loci: `r mirdeep2_predicted_loci`
+
+Matches to mature miRNAs (seeds): `r mirdeep2_seed_miRNAs`
+
+Novel miRNAs: `r mirdreep2_novel_miRNAS`
+
+Further analysis is possibly desired to evaluate score thresholds, miRNA families, etc.
+
+## BLASTn
+
+`-task blastn_short`
+
+### *A.pulchra*
+
+Total query seqs: 19,185,356
+
+E-value = 1000 (default)
+
+-   miRBase: 19,185,356
+-   MirGene: 19,185,356
+
+E-value = 10
+
+-   mirBase: 19,120,159
+-   MirGene: 19,037,617
+
+## ShortStack
+
+### *A.pulchra*
+
+Potential loci: 18,772
+
+miRBase matches: 46
+
+Number of loci characterized as miRNA: 0

@@ -62,6 +62,30 @@ curl -O http://gannet.fish.washington.edu/seashell/snaps/GCF_013753865.1_Amil_v2
 ```
 
 
+```{r, engine='bash'}
+head ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gtf
+
+wc -l ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gtf
+
+grep -v '^#' ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gtf | cut -f3 | sort | uniq
+
+grep -c "transcript" ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gtf
+
+grep -c "gene" ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gtf
+```
+
+```{r, engine='bash'}
+head ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gff
+
+wc -l ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gff
+
+grep -v '^#' ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gff | cut -f3 | sort | uniq
+
+grep -c "transcript" ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gff
+
+grep -c "gene" ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gff
+```
+
 ## HiSat
 
 
@@ -190,7 +214,7 @@ head ../output/05.33-lncRNA-discovery/stringtie_merged.gtf
 
 echo "what is possible"
 
-grep -v '^#' ../output/05.33-lncRNA-discovery/stringtie_merged.gtf | cut -f3 | sort | uniq
+grep -v '^#' ../output/05.33-lncRNA-discovery/stringtie_merged.gtf | cut -f3 | sort | uniq -c
 
 
 ```
