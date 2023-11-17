@@ -2,8 +2,10 @@
 title: "Nov17-update"
 format: revealjs
 editor: visual
+toc: true
+toc_float: true
+code_folding: show
 ---
-
 
 ```{r setup, include=FALSE}
 library(knitr)
@@ -40,39 +42,51 @@ When you click the **Render** button a presentation will be generated that inclu
 
 ## lncRNA Discovery
 
-- Aligned RNA-seq reads to genome -> SAM files
-- SAM files converted to BAMS
-- BAMS converted to GTF (Stringtie), merged to single GTF
-- ID non-coding transcripts (GFFCompare, CPC2)
-- Fasta and Bed file created for each species
+-   Aligned RNA-seq reads to genome -\> SAM files
+-   SAM files converted to BAMS
+-   BAMS converted to GTF (Stringtie), merged to single GTF
+-   ID non-coding transcripts (GFFCompare, CPC2)
+-   Fasta and Bed file created for each species
 
-## sRNAseq Analysis
+## sRNAseq Analysis {.scrollable}
 
-- Trim reads to 25bp length
-- miRTrace
-  - Identify taxonomic origins (Clade-level) of sRNAseq data
-- MirMachine
-  - Identify potential miRNA homologs in genome (no sRNAseq analyses)
-- ShortStack alignment of sRNAseq data and annotation of sRNA-producing genes.
-  - Uses sRNAseq, genome, and miRNA database (miRBase).
-- BLASTn
-  - Align sRNAseq to miRNA databases (miRBase, MirGene)
-- miRDeep2
-  - Use sRNAseq, genome, and miRNA database (miRBase)
+-   Trim reads to 25bp length
+-   miRTrace
+    -   Identify taxonomic origins (Clade-level) of sRNAseq data
+-   MirMachine
+    -   Identify potential miRNA homologs in genome (no sRNAseq analyses)
+-   ShortStack alignment of sRNAseq data and annotation of sRNA-producing genes.
+    -   Uses sRNAseq, genome, and miRNA database (miRBase).
+-   BLASTn
+    -   Align sRNAseq to miRNA databases (miRBase, MirGene)
+-   miRDeep2
+    -   Use sRNAseq, genome, and miRNA database (miRBase)
 
+## MiRTrace
 
-### MiRTrace
+#### *A.pulchra*
 
-#### _A.pulchra_
+```{r read-apul-mirtrace-table, eval=TRUE, echo=FALSE}
+mirtrace.detailed.df <- read.csv("../../D-Apul/output/09-Apul-sRNAseq-miRTrace/mirtrace-stats-contamination_detailed.tsv", sep = "\t", header = TRUE)
+```
 
-miRNA Families: 5
+```{r mirtrace-output-table, eval=TRUE, echo=FALSE}
 
-Clades: 3
-    - lophotrochozoa
-    - rodents
-    - primates
-
-Number of samples with matches: 3
-
-
-  
+mirtrace.detailed.df %>%
+  mutate(
+    across(
+      starts_with("sRNA"),
+      ~cell_spec(
+        .,
+        background = ifelse(
+          . > 0,
+          "lightgreen",
+          "white"
+          )
+        )
+      )
+    ) %>%
+  kable(escape = F, caption = "Clades identified as having sRNAseq matches.") %>%
+  kable_styling("striped") %>% 
+  scroll_box(width = "100%", height = "500px")
+```
