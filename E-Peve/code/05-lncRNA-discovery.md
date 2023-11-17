@@ -1,7 +1,7 @@
 05-Peve-lncRNA-discovery
 ================
 Steven Roberts
-06 November, 2023
+17 November, 2023
 
 - <a href="#1-run-hisat-on-rna-seq" id="toc-1-run-hisat-on-rna-seq">1 Run
   HiSat on RNA-seq</a>
@@ -66,6 +66,14 @@ curl -O https://gannet.fish.washington.edu/seashell/snaps/Porites_evermanni_v1.f
 cd ../data
 
 curl -O https://gannet.fish.washington.edu/seashell/snaps/Porites_evermanni_v1.annot.gff
+```
+
+``` bash
+head -3 ../data/Porites_evermanni_v1.annot.gff
+
+grep -v '^#' ../data/Porites_evermanni_v1.annot.gff | cut -f3 | sort | uniq
+
+grep -c "transcript" ../data/Porites_evermanni_v1.annot.gff
 ```
 
 ## 1.3 HiSat
@@ -311,7 +319,7 @@ head ../output/05-lncRNA-discovery/stringtie_merged.gtf
 
 echo "what is possible"
 
-grep -v '^#' ../output/05-lncRNA-discovery/stringtie_merged.gtf | cut -f3 | sort | uniq
+grep -v '^#' ../output/05-lncRNA-discovery/stringtie_merged.gtf | cut -f3 | sort | uniq -c 
 ```
 
     542182 ../output/05-lncRNA-discovery/stringtie_merged.gtf
@@ -326,8 +334,8 @@ grep -v '^#' ../output/05-lncRNA-discovery/stringtie_merged.gtf | cut -f3 | sort
     Porites_evermani_scaffold_1 StringTie   transcript  2566    6331    1000    -   .   gene_id "MSTRG.1"; transcript_id "MSTRG.1.2"; 
     Porites_evermani_scaffold_1 StringTie   exon    2566    3444    1000    -   .   gene_id "MSTRG.1"; transcript_id "MSTRG.1.2"; exon_number "1"; 
     what is possible
-    exon
-    transcript
+     467494 exon
+      74686 transcript
 
 # 3 GFFcompare
 
@@ -508,29 +516,31 @@ head ../output/05-lncRNA-discovery/Peve_noncoding_transcripts_ids.txt
 ```
 
 ``` bash
-head ../output/05-lncRNA-discovery/Apul_lncRNA_candidates.fasta
-fgrep -c ">" ../output/05-lncRNA-discovery/Apul_lncRNA_candidates.fasta
+head ../output/05-lncRNA-discovery/Peve_lncRNA_candidates.fasta
+fgrep -c ">" ../output/05-lncRNA-discovery/Peve_lncRNA_candidates.fasta
 ```
 
 # 7 subsetting fasta
 
 ``` bash
-/home/shared/samtools-1.12/samtools faidx ../output/05.32-lncRNA-discovery/Apul_lncRNA_candidates.fasta \
--r ../output/05.32-lncRNA-discovery/Apul_noncoding_transcripts_ids.txt > ../output/05.32-lncRNA-discovery/Apul_lncRNA.fasta
+/home/shared/samtools-1.12/samtools faidx ../output/05-lncRNA-discovery/Peve_lncRNA_candidates.fasta \
+-r ../output/05-lncRNA-discovery/Peve_noncoding_transcripts_ids.txt > ../output/05-lncRNA-discovery/Peve_lncRNA.fasta
 ```
 
-``` bash
-fgrep -c ">" ../output/05.32-lncRNA-discovery/Apul_lncRNA.fasta
-fgrep ">" ../output/05.32-lncRNA-discovery/Apul_lncRNA.fasta | head -5
+ddd
 
-head ../output/05.32-lncRNA-discovery/Apul_lncRNA.fasta
+``` bash
+fgrep -c ">" ../output/05-lncRNA-discovery/Peve_lncRNA.fasta
+fgrep ">" ../output/05-lncRNA-discovery/Peve_lncRNA.fasta | head -5
+
+head ../output/05-lncRNA-discovery/Peve_lncRNA.fasta
 ```
 
 # 8 Getting genome feature track
 
 ``` python
 # Open the input file and the output file
-with open('../output/05.32-lncRNA-discovery/Apul_noncoding_transcripts_ids.txt', 'r') as infile, open('../output/05.32-lncRNA-discovery/Apul_lncRNA.bed', 'w') as outfile:
+with open('../output/05-lncRNA-discovery/Peve_noncoding_transcripts_ids.txt', 'r') as infile, open('../output/05-lncRNA-discovery/Peve_lncRNA.bed', 'w') as outfile:
     # Process each line in the input file
     for line in infile:
         # Remove 'transcript::' and then split the line by ':' to extract the relevant parts
@@ -551,5 +561,16 @@ with open('../output/05.32-lncRNA-discovery/Apul_noncoding_transcripts_ids.txt',
 ```
 
 ``` bash
-head ../output/05.32-lncRNA-discovery/Apul_lncRNA.bed 
+head ../output/05-lncRNA-discovery/Peve_lncRNA.bed 
 ```
+
+    Porites_evermani_scaffold_1 422642  423512
+    Porites_evermani_scaffold_1 1084866 1089422
+    Porites_evermani_scaffold_1 372244  372449
+    Porites_evermani_scaffold_1 683877  684280
+    Porites_evermani_scaffold_1 1202043 1202328
+    Porites_evermani_scaffold_1 1477780 1478077
+    Porites_evermani_scaffold_10    260426  263111
+    Porites_evermani_scaffold_10    260439  263111
+    Porites_evermani_scaffold_10    890032  892111
+    Porites_evermani_scaffold_10    1071611 1085055

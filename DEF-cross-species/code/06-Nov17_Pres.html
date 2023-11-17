@@ -401,11 +401,11 @@
 <nav role="doc-toc"> 
 <h2 id="toc-title">Table of contents</h2>
 <ul>
-<li><a href="#/non-coding-rna" id="/toc-non-coding-rna">Non-coding RNA</a></li>
 <li><a href="#/lncrna-discovery" id="/toc-lncrna-discovery">lncRNA Discovery</a></li>
 <li><a href="#/lncrna-by-the-numbers" id="/toc-lncrna-by-the-numbers">lncRNA by the numbers</a></li>
 <li><a href="#/lncrna-by-the-numbers-1" id="/toc-lncrna-by-the-numbers-1">lncRNA by the numbers</a></li>
 <li><a href="#/about-the-gffs" id="/toc-about-the-gffs">About the GFFs</a></li>
+<li><a href="#/what-about-this" id="/toc-what-about-this">What about this?</a></li>
 <li><a href="#/srnaseq-analysis" id="/toc-srnaseq-analysis">sRNAseq Analysis</a></li>
 <li><a href="#/mirtrace" id="/toc-mirtrace">MiRTrace</a></li>
 <li><a href="#/mirmachine" id="/toc-mirmachine">MirMachine</a>
@@ -424,12 +424,21 @@
 <ul>
 <li><a href="#/shortstack" id="/toc-a.pulchra-3"><em>A.pulchra</em></a></li>
 </ul></li>
+<li><a href="#/mirtrace-1" id="/toc-mirtrace-1">MiRTrace</a></li>
+<li><a href="#/mirmachine-1" id="/toc-mirmachine-1">MirMachine</a>
+<ul>
+<li><a href="#/mirmachine-1" id="/toc-p.evermanni-1"><em>P.evermanni</em></a></li>
+</ul></li>
+<li><a href="#/blastn-1" id="/toc-blastn-1">BLASTn</a>
+<ul>
+<li><a href="#/blastn-1" id="/toc-p.evermanni-2"><em>P.evermanni</em></a></li>
+</ul></li>
+<li><a href="#/shortstack-1" id="/toc-shortstack-1">ShortStack</a>
+<ul>
+<li><a href="#/shortstack-1" id="/toc-p.evermanni-3"><em>P.evermanni</em></a></li>
+</ul></li>
 </ul>
 </nav>
-</section>
-<section id="non-coding-rna" class="slide level2">
-<h2>Non-coding RNA</h2>
-<p>Where things stand</p>
 </section>
 <section id="lncrna-discovery" class="slide level2">
 <h2>lncRNA Discovery</h2>
@@ -515,6 +524,29 @@ UTR</code></pre>
 <pre><code>CDS
 exon
 transcript</code></pre>
+</div>
+</div>
+</section>
+<section id="what-about-this" class="slide level2">
+<h2>What about this?</h2>
+<p>Apul</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1"></a><span class="fu">grep</span> <span class="at">-v</span> <span class="st">'^#'</span> ../../D-Apul/data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gff <span class="kw">|</span> <span class="fu">cut</span> <span class="at">-f3</span> <span class="kw">|</span> <span class="fu">sort</span> <span class="kw">|</span> <span class="fu">uniq</span> <span class="at">-c</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  22387 cDNA_match
+ 317969 CDS
+ 390533 exon
+  36904 gene
+      1 guide_RNA
+   6128 lnc_RNA
+  41860 mRNA
+   5871 pseudogene
+    854 region
+    283 rRNA
+     62 snoRNA
+    170 snRNA
+   2066 transcript
+   1413 tRNA</code></pre>
 </div>
 </div>
 </section>
@@ -725,6 +757,77 @@ transcript</code></pre>
 <h3 id="a.pulchra-3"><em>A.pulchra</em></h3>
 <p>Potential loci: 18,772</p>
 <p>miRBase matches: 46</p>
+<p>Number of loci characterized as miRNA: 0</p>
+</section>
+<section id="mirtrace-1" class="slide level2">
+<h2>MiRTrace</h2>
+<h4 id="p.evermanni"><em>P.evermanni</em></h4>
+<div class="cell">
+<div class="cell-output-display">
+<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:500px; overflow-x: scroll; width:100%; ">
+<table class="table table-striped" data-quarto-postprocess="true" style="margin-left: auto; margin-right: auto;">
+<caption>Clades identified as having sRNAseq matches.</caption>
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" style="text-align: left; position: sticky; top: 0; background-color: #FFFFFF;">CLADE</th>
+<th data-quarto-table-cell-role="th" style="text-align: right; position: sticky; top: 0; background-color: #FFFFFF;">FAMILY_ID</th>
+<th data-quarto-table-cell-role="th" style="text-align: left; position: sticky; top: 0; background-color: #FFFFFF;">MIRBASE_IDS</th>
+<th data-quarto-table-cell-role="th" style="text-align: left; position: sticky; top: 0; background-color: #FFFFFF;">SEQ</th>
+<th data-quarto-table-cell-role="th" style="text-align: left; position: sticky; top: 0; background-color: #FFFFFF;">sRNA.POR.73_1</th>
+<th data-quarto-table-cell-role="th" style="text-align: left; position: sticky; top: 0; background-color: #FFFFFF;">sRNA.POR.73_2</th>
+<th data-quarto-table-cell-role="th" style="text-align: left; position: sticky; top: 0; background-color: #FFFFFF;">sRNA.POR.79_1</th>
+<th data-quarto-table-cell-role="th" style="text-align: left; position: sticky; top: 0; background-color: #FFFFFF;">sRNA.POR.79_2</th>
+<th data-quarto-table-cell-role="th" style="text-align: left; position: sticky; top: 0; background-color: #FFFFFF;">sRNA.POR.82_1</th>
+<th data-quarto-table-cell-role="th" style="text-align: left; position: sticky; top: 0; background-color: #FFFFFF;">sRNA.POR.82_2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">insects</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: left;">aae-miR-14,aga-miR-14,ame-miR-14,api-miR-14,bmo-miR-14,cqu-miR-14,dan-miR-14,der-miR-14,dgr-miR-14,dme-miR-14,dmo-miR-14,dpe-miR-14,dps-miR-14,dse-miR-14,dsi-miR-14,dvi-miR-14,dwi-miR-14,dya-miR-14,hme-miR-14,mse-miR-14,ngi-miR-14,nvi-miR-14,tca-miR-14</td>
+<td style="text-align: left;">TCAGTCTTTTTCTCTCTCCT</td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: lightgreen !important;">1</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+</div>
+</div>
+</section>
+<section id="mirmachine-1" class="slide level2">
+<h2>MirMachine</h2>
+<h3 id="p.evermanni-1"><em>P.evermanni</em></h3>
+<p>Predicted loci: 83</p>
+<p>Unique familes: 15</p>
+</section>
+<section id="blastn-1" class="slide level2">
+<h2>BLASTn</h2>
+<p><code>-task blastn_short</code></p>
+<h3 id="p.evermanni-2"><em>P.evermanni</em></h3>
+<p>Total query seqs: 8,870,343</p>
+<p>E-value = 1000 (default)</p>
+<ul>
+<li>miRBase: 8,870,343</li>
+<li>MirGene: 8,870,343</li>
+</ul>
+<p>E-value = 10</p>
+<ul>
+<li>mirBase: 8,824,359</li>
+<li>MirGene: 8,783,</li>
+</ul>
+</section>
+<section id="shortstack-1" class="slide level2">
+<h2>ShortStack</h2>
+<h3 id="p.evermanni-3"><em>P.evermanni</em></h3>
+<p>Potential loci: 15,040</p>
+<p>miRBase matches: 25</p>
 <p>Number of loci characterized as miRNA: 0</p>
 <div class="footer footer-default">
 
