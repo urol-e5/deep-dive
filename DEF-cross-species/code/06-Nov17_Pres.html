@@ -405,6 +405,7 @@
 <li><a href="#/lncrna-discovery" id="/toc-lncrna-discovery">lncRNA Discovery</a></li>
 <li><a href="#/lncrna-by-the-numbers" id="/toc-lncrna-by-the-numbers">lncRNA by the numbers</a></li>
 <li><a href="#/lncrna-by-the-numbers-1" id="/toc-lncrna-by-the-numbers-1">lncRNA by the numbers</a></li>
+<li><a href="#/about-the-gffs" id="/toc-about-the-gffs">About the GFFs</a></li>
 <li><a href="#/srnaseq-analysis" id="/toc-srnaseq-analysis">sRNAseq Analysis</a></li>
 <li><a href="#/mirtrace" id="/toc-mirtrace">MiRTrace</a></li>
 <li><a href="#/mirmachine" id="/toc-mirmachine">MirMachine</a>
@@ -443,7 +444,7 @@
 <section id="lncrna-by-the-numbers" class="slide level2">
 <h2>lncRNA by the numbers</h2>
 <ul>
-<li>D Apul total transcripts / lncRNA = 106174 / 16206 (15%)</li>
+<li>D Apul total transcripts / lncRNA = 115492 / 16206 (14%)</li>
 <li>E Peve total transcripts / lncRNA = 74686 / 7378 (10%)</li>
 <li>F Pmea total transcripts / lncRNA = 77592 / 14307 (18%)</li>
 </ul>
@@ -473,6 +474,47 @@
 <div class="cell-output cell-output-stdout">
 <pre><code> 482050 exon
   77592 transcript</code></pre>
+</div>
+</div>
+</section>
+<section id="about-the-gffs" class="slide level2 scrollable">
+<h2>About the GFFs</h2>
+<p>Apul</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1"></a><span class="fu">grep</span> <span class="at">-v</span> <span class="st">'^#'</span> ../../D-Apul/data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gff <span class="kw">|</span> <span class="fu">cut</span> <span class="at">-f3</span> <span class="kw">|</span> <span class="fu">sort</span> <span class="kw">|</span> <span class="fu">uniq</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>cDNA_match
+CDS
+exon
+gene
+guide_RNA
+lnc_RNA
+mRNA
+pseudogene
+region
+rRNA
+snoRNA
+snRNA
+transcript
+tRNA</code></pre>
+</div>
+</div>
+<p>Peve</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1"></a><span class="fu">grep</span> <span class="at">-v</span> <span class="st">'^#'</span> ../../E-Peve/data/Porites_evermanni_v1.annot.gff <span class="kw">|</span> <span class="fu">cut</span> <span class="at">-f3</span> <span class="kw">|</span> <span class="fu">sort</span> <span class="kw">|</span> <span class="fu">uniq</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>CDS
+mRNA
+UTR</code></pre>
+</div>
+</div>
+<p>Pmea</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1"></a><span class="fu">grep</span> <span class="at">-v</span> <span class="st">'^#'</span> ../../F-Pmea/data/Pocillopora_meandrina_HIv1.genes.gff3 <span class="kw">|</span> <span class="fu">cut</span> <span class="at">-f3</span> <span class="kw">|</span> <span class="fu">sort</span> <span class="kw">|</span> <span class="fu">uniq</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>CDS
+exon
+transcript</code></pre>
 </div>
 </div>
 </section>
