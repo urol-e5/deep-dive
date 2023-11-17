@@ -189,3 +189,31 @@ miRBase matches: 46
 
 Number of loci characterized as miRNA: 0
 
+## MiRTrace
+
+#### _P.evermanni_
+
+```{r read-peve-mirtrace-table, eval=TRUE, echo=FALSE}
+mirtrace.detailed.df <- read.csv("../../E-Peve/output/09-Peve-sRNAseq-miRTrace/mirtrace-stats-contamination_detailed.tsv", sep = "\t", header = TRUE)
+```
+
+```{r peve-mirtrace-output-table, eval=TRUE, echo=FALSE}
+
+mirtrace.detailed.df %>%
+  mutate(
+    across(
+      starts_with("sRNA"),
+      ~cell_spec(
+        .,
+        background = ifelse(
+          . > 0,
+          "lightgreen",
+          "white"
+          )
+        )
+      )
+    ) %>%
+  kable(escape = F, caption = "Clades identified as having sRNAseq matches.") %>%
+  kable_styling("striped") %>% 
+  scroll_box(width = "100%", height = "500px")
+```
