@@ -406,6 +406,7 @@
 <li><a href="#/lncrna-by-the-numbers" id="/toc-lncrna-by-the-numbers">lncRNA by the numbers</a></li>
 <li><a href="#/lncrna-by-the-numbers-1" id="/toc-lncrna-by-the-numbers-1">lncRNA by the numbers</a></li>
 <li><a href="#/about-the-gffs" id="/toc-about-the-gffs">About the GFFs</a></li>
+<li><a href="#/what-about-this" id="/toc-what-about-this">What about this?</a></li>
 <li><a href="#/srnaseq-analysis" id="/toc-srnaseq-analysis">sRNAseq Analysis</a></li>
 <li><a href="#/mirtrace" id="/toc-mirtrace">MiRTrace</a></li>
 <li><a href="#/mirmachine" id="/toc-mirmachine">MirMachine</a>
@@ -515,6 +516,29 @@ UTR</code></pre>
 <pre><code>CDS
 exon
 transcript</code></pre>
+</div>
+</div>
+</section>
+<section id="what-about-this" class="slide level2">
+<h2>What about this?</h2>
+<p>Apul</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1"></a><span class="fu">grep</span> <span class="at">-v</span> <span class="st">'^#'</span> ../../D-Apul/data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gff <span class="kw">|</span> <span class="fu">cut</span> <span class="at">-f3</span> <span class="kw">|</span> <span class="fu">sort</span> <span class="kw">|</span> <span class="fu">uniq</span> <span class="at">-c</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  22387 cDNA_match
+ 317969 CDS
+ 390533 exon
+  36904 gene
+      1 guide_RNA
+   6128 lnc_RNA
+  41860 mRNA
+   5871 pseudogene
+    854 region
+    283 rRNA
+     62 snoRNA
+    170 snRNA
+   2066 transcript
+   1413 tRNA</code></pre>
 </div>
 </div>
 </section>
