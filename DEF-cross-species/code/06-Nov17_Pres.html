@@ -318,6 +318,9 @@
       margin-right: 0; 
     }
   </style>
+  
+  <script src="06-Nov17_Pres_files/libs/kePrint-0.0.1/kePrint.js"></script>
+  <link href="06-Nov17_Pres_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet">
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -329,14 +332,38 @@
 <div class="quarto-title-authors">
 </div>
 
+</section><section id="TOC">
+<nav role="doc-toc"> 
+<h2 id="toc-title">Table of contents</h2>
+<ul>
+<li><a href="#/non-coding-rna" id="/toc-non-coding-rna">## Non-coding RNA</a>
+<ul>
+<li><a href="#/lncrna-discovery" id="/toc-lncrna-discovery">lncRNA Discovery</a></li>
+<li><a href="#/lncrna-by-the-numbers" id="/toc-lncrna-by-the-numbers">lncRNA by the numbers</a></li>
+<li><a href="#/srnaseq-analysis" id="/toc-srnaseq-analysis">sRNAseq Analysis</a></li>
+<li><a href="#/mirtrace" id="/toc-mirtrace">MiRTrace</a></li>
+<li><a href="#/mirmachine" id="/toc-mirmachine">MirMachine</a>
+<ul>
+<li><a href="#/mirmachine" id="/toc-a.millepora"><em>A.millepora</em></a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
 </section>
-<section id="non-coding-rna" class="slide level2">
-<h2>Non-coding RNA</h2>
+<section>
+<section id="non-coding-rna" class="title-slide slide level1 center">
+<h1>## Non-coding RNA</h1>
 <p>Where things stand</p>
 </section>
 <section id="lncrna-discovery" class="slide level2">
 <h2>lncRNA Discovery</h2>
+<p>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD - Aligned RNA-seq reads to genome -&gt; SAM files - SAM files converted to BAMS - BAMS converted to GTF (Stringtie), merged to single GTF - ID non-coding transcripts (GFFCompare, CPC2) - Fasta and Bed file created for each species</p>
+</section>
+<section id="lncrna-by-the-numbers" class="slide level2">
+<h2>lncRNA by the numbers</h2>
 <ul>
+<li>Apul total transcripts / lncRNA = 106174 /</li>
+<li>=======</li>
 <li>Aligned RNA-seq reads to genome -&gt; SAM files</li>
 <li>SAM files converted to BAMS</li>
 <li>BAMS converted to GTF (Stringtie), merged to single GTF</li>
@@ -344,23 +371,187 @@
 <li>Fasta and Bed file created for each species</li>
 </ul>
 </section>
-<section id="lncrna-by-the-numbers" class="slide level2">
-<h2>lncRNA by the numbers</h2>
+<section id="srnaseq-analysis" class="slide level2 scrollable">
+<h2>sRNAseq Analysis</h2>
 <ul>
-<li>Apul total transcripts / lncRNA = 106174 /</li>
+<li>Trim reads to 25bp length</li>
+<li>miRTrace
+<ul>
+<li>Identify taxonomic origins (Clade-level) of sRNAseq data</li>
+</ul></li>
+<li>MirMachine
+<ul>
+<li>Identify potential miRNA homologs in genome (no sRNAseq analyses)</li>
+</ul></li>
+<li>ShortStack alignment of sRNAseq data and annotation of sRNA-producing genes.
+<ul>
+<li>Uses sRNAseq, genome, and miRNA database (miRBase).</li>
+</ul></li>
+<li>BLASTn
+<ul>
+<li>Align sRNAseq to miRNA databases (miRBase, MirGene)</li>
+</ul></li>
+<li>miRDeep2
+<ul>
+<li>Use sRNAseq, genome, and miRNA database (miRBase)</li>
+</ul></li>
 </ul>
 </section>
-<section id="test" class="slide level2">
-<h2>test</h2>
-<pre><code>/home/shared/stringtie-2.2.1.Linux_x86_64/stringtie \
---merge \
--G ../data/Pocillopora_meandrina_HIv1.genes.gff3 \
--o ../output/02-lncRNA-discovery/stringtie_merged.gtf \
-../output/02-lncRNA-discovery/*.gtf</code></pre>
+<section id="mirtrace" class="slide level2">
+<h2>MiRTrace</h2>
+<h4 id="a.pulchra"><em>A.pulchra</em></h4>
+<div class="cell">
+<div class="cell-output-display">
+<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:500px; overflow-x: scroll; width:100%; ">
+<table class="table table-striped" data-quarto-postprocess="true" style="margin-left: auto; margin-right: auto;">
+<caption>Clades identified as having sRNAseq matches.</caption>
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" style="text-align: left; position: sticky; top: 0; background-color: #FFFFFF;">CLADE</th>
+<th data-quarto-table-cell-role="th" style="text-align: right; position: sticky; top: 0; background-color: #FFFFFF;">FAMILY_ID</th>
+<th data-quarto-table-cell-role="th" style="text-align: left; position: sticky; top: 0; background-color: #FFFFFF;">MIRBASE_IDS</th>
+<th data-quarto-table-cell-role="th" style="text-align: left; position: sticky; top: 0; background-color: #FFFFFF;">SEQ</th>
+<th data-quarto-table-cell-role="th" style="text-align: left; position: sticky; top: 0; background-color: #FFFFFF;">sRNA.ACR.140_1</th>
+<th data-quarto-table-cell-role="th" style="text-align: left; position: sticky; top: 0; background-color: #FFFFFF;">sRNA.ACR.140_2</th>
+<th data-quarto-table-cell-role="th" style="text-align: left; position: sticky; top: 0; background-color: #FFFFFF;">sRNA.ACR.145_1</th>
+<th data-quarto-table-cell-role="th" style="text-align: left; position: sticky; top: 0; background-color: #FFFFFF;">sRNA.ACR.145_2</th>
+<th data-quarto-table-cell-role="th" style="text-align: left; position: sticky; top: 0; background-color: #FFFFFF;">sRNA.ACR.150_1</th>
+<th data-quarto-table-cell-role="th" style="text-align: left; position: sticky; top: 0; background-color: #FFFFFF;">sRNA.ACR.150_2</th>
+<th data-quarto-table-cell-role="th" style="text-align: left; position: sticky; top: 0; background-color: #FFFFFF;">sRNA.ACR.173_1</th>
+<th data-quarto-table-cell-role="th" style="text-align: left; position: sticky; top: 0; background-color: #FFFFFF;">sRNA.ACR.173_2</th>
+<th data-quarto-table-cell-role="th" style="text-align: left; position: sticky; top: 0; background-color: #FFFFFF;">sRNA.ACR.178_1</th>
+<th data-quarto-table-cell-role="th" style="text-align: left; position: sticky; top: 0; background-color: #FFFFFF;">sRNA.ACR.178_2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">lophotrochozoa</td>
+<td style="text-align: right;">1994</td>
+<td style="text-align: left;">cla-miR-1994,cte-miR-1994,lgi-miR-1994a,lgi-miR-1994b</td>
+<td style="text-align: left;">TGAGACAGTGTGTCCTCCCT</td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: lightgreen !important;">1</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: lightgreen !important;">3</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">lophotrochozoa</td>
+<td style="text-align: right;">1985</td>
+<td style="text-align: left;">hru-miR-1985,lgi-miR-1985</td>
+<td style="text-align: left;">TGCCATTTTTATCAGTCACT</td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: lightgreen !important;">11</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: lightgreen !important;">15</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">lophotrochozoa</td>
+<td style="text-align: right;">1984</td>
+<td style="text-align: left;">hru-miR-1984,lgi-miR-1984</td>
+<td style="text-align: left;">TGCCCTATCCGTCAGGAACT</td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: lightgreen !important;">10</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: lightgreen !important;">16</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">rodents</td>
+<td style="text-align: right;">351</td>
+<td style="text-align: left;">mmu-miR-351,rno-miR-351</td>
+<td style="text-align: left;">TCCCTGAGGAGCCCTTTGAG</td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: lightgreen !important;">2</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">primates</td>
+<td style="text-align: right;">618</td>
+<td style="text-align: left;">hsa-miR-618,mml-miR-618,ppy-miR-618,ptr-miR-618</td>
+<td style="text-align: left;">AAACTCTACTTGTCCTTCTG</td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: lightgreen !important;">1</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">primates</td>
+<td style="text-align: right;">576</td>
+<td style="text-align: left;">hsa-miR-576,mml-miR-576,ppy-miR-576,ptr-miR-576</td>
+<td style="text-align: left;">AAGATGTGGAAAAATTGGAA</td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: lightgreen !important;">1</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">primates</td>
+<td style="text-align: right;">576</td>
+<td style="text-align: left;">hsa-miR-576</td>
+<td style="text-align: left;">ATTCTAATTTCTCCACGTCT</td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: lightgreen !important;">1</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">0</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+</div>
+</div>
+</section>
+<section id="mirmachine" class="slide level2">
+<h2>MirMachine</h2>
+<h3 id="a.millepora"><em>A.millepora</em></h3>
+<p>Predicted loci: 109</p>
+<p>Unique familes: 11</p>
 <div class="footer footer-default">
 
 </div>
-</section>
+</section></section>
     </div>
   </div>
 
@@ -572,6 +763,44 @@
         ]
       });
     </script>
+    
+    <script>
+      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
+      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
+      // slide changes (different for each slide format).
+      (function () {
+        // dispatch for htmlwidgets
+        function fireSlideEnter() {
+          const event = window.document.createEvent("Event");
+          event.initEvent("slideenter", true, true);
+          window.document.dispatchEvent(event);
+        }
+
+        function fireSlideChanged(previousSlide, currentSlide) {
+          fireSlideEnter();
+
+          // dispatch for shiny
+          if (window.jQuery) {
+            if (previousSlide) {
+              window.jQuery(previousSlide).trigger("hidden");
+            }
+            if (currentSlide) {
+              window.jQuery(currentSlide).trigger("shown");
+            }
+          }
+        }
+
+        // hookup for slidy
+        if (window.w3c_slidy) {
+          window.w3c_slidy.add_observer(function (slide_num) {
+            // slide_num starts at position 1
+            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
+          });
+        }
+
+      })();
+    </script>
+
     <script id="quarto-html-after-body" type="application/javascript">
     window.document.addEventListener("DOMContentLoaded", function (event) {
       const toggleBodyColorMode = (bsSheetEl) => {
