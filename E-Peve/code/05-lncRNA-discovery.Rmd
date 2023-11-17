@@ -73,6 +73,14 @@ curl -O https://gannet.fish.washington.edu/seashell/snaps/Porites_evermanni_v1.a
 ```
 
 
+```{r, engine='bash'}
+head -3 ../data/Porites_evermanni_v1.annot.gff
+
+grep -v '^#' ../data/Porites_evermanni_v1.annot.gff | cut -f3 | sort | uniq
+
+grep -c "transcript" ../data/Porites_evermanni_v1.annot.gff
+```
+
 
 ## HiSat
 
@@ -216,7 +224,7 @@ head ../output/05-lncRNA-discovery/stringtie_merged.gtf
 
 echo "what is possible"
 
-grep -v '^#' ../output/05-lncRNA-discovery/stringtie_merged.gtf | cut -f3 | sort | uniq
+grep -v '^#' ../output/05-lncRNA-discovery/stringtie_merged.gtf | cut -f3 | sort | uniq -c 
 
 
 ```
@@ -356,7 +364,7 @@ with open('../output/05-lncRNA-discovery/Peve_noncoding_transcripts_ids.txt', 'r
 
 ```
 
-```{bash}
+```{r, engine='bash', eval=TRUE}
 head ../output/05-lncRNA-discovery/Peve_lncRNA.bed 
 ```
 

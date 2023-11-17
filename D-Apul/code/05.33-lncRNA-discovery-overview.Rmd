@@ -62,6 +62,30 @@ curl -O http://gannet.fish.washington.edu/seashell/snaps/GCF_013753865.1_Amil_v2
 ```
 
 
+```{r, engine='bash'}
+head ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gtf
+
+wc -l ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gtf
+
+grep -v '^#' ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gtf | cut -f3 | sort | uniq
+
+grep -c "transcript" ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gtf
+
+grep -c "gene" ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gtf
+```
+
+```{r, engine='bash'}
+head ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gff
+
+wc -l ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gff
+
+grep -v '^#' ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gff | cut -f3 | sort | uniq
+
+grep -c "transcript" ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gff
+
+grep -c "gene" ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gff
+```
+
 ## HiSat
 
 
@@ -127,12 +151,8 @@ done
 
 ## Looking at Bams 
 
-![igv](https//gannet.fish.washington.edu/seashell/snaps/Monosnap_IGV_2023-11-05_09-57-16.png)
+![igv](http//gannet.fish.washington.edu/seashell/snaps/Monosnap_IGV_2023-11-05_09-57-16.png)
 
-
-```{r, engine='bash', eval=TRUE}
-ls ../output/05.33-lncRNA-discovery/*xml
-```
 
 # StringTie
 StringTie uses the sorted BAM files to assemble transcripts for each sample, outputting them as GTF (Gene Transfer Format) files. And then merges all individual GTF assemblies into a single merged GTF file. This step extracts transcript information and merges GTFs from all samples--an important step in creating a canonical list of lncRNAs across all samples included in the pipeline.
@@ -160,9 +180,7 @@ ls ../output/05.33-lncRNA-discovery/RNA*.gtf
 
 ![igv2](http://gannet.fish.washington.edu/seashell/snaps/Monosnap_IGV_-_Session_Userssr320DesktopApul_lncRNA_igv_session.xml_2023-11-05_12-33-58.png)
 
-```{r, engine='bash', eval=TRUE}
-ls ../output/05.33-lncRNA-discovery/*xml
-```
+
 
 
 Merges all individual GTF assemblies into a single merged GTF file.
@@ -190,7 +208,7 @@ head ../output/05.33-lncRNA-discovery/stringtie_merged.gtf
 
 echo "what is possible"
 
-grep -v '^#' ../output/05.33-lncRNA-discovery/stringtie_merged.gtf | cut -f3 | sort | uniq
+grep -v '^#' ../output/05.33-lncRNA-discovery/stringtie_merged.gtf | cut -f3 | sort | uniq -c
 
 
 ```
@@ -331,7 +349,7 @@ with open('../output/05.33-lncRNA-discovery/Apul_noncoding_transcripts_ids.txt',
 
 ```
 
-```{bash}
+```{r, engine='bash', eval=TRUE}
 head ../output/05.33-lncRNA-discovery/Apul_lncRNA.bed 
 ```
 

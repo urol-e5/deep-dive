@@ -24,7 +24,7 @@ bibliography: /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/code/references
 link-citations: true
 ---
 
-Use [miRDeep2](https://github.com/rajewsky-lab/mirdeep2) [@friedländer2011] to identify potential miRNAs using _A.pulchra_ sRNAseq reads. The *A.millepora* genome will be used as the reference genome for *A.pulchra*, as *A.pulchra* does not currently have a sequenced genome and *A.millepora* had highest alignment rates for standard RNAseq data compared to other published genomes tested. The mature miRBase miRNA database will also be used.
+Use [miRDeep2](https://github.com/rajewsky-lab/mirdeep2) [@friedländer2011] to identify potential miRNAs using _P.meandrina_ sRNAseq reads. The *P.meandrina* genome will be used as the reference genome. The mature miRBase miRNA database will also be used.
 
 ------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@ Inputs:
 
 -   Requires collapsed reads (i.e. concatenated, unique reads) in FastA format. See [10-Pmea-sRNAseq-BLASTn.Rmd](https://github.com/urol-e5/deep-dive/blob/main/F-Pmea/code/10-Pmea-sRNAseq-BLASTn.Rmd) for code.
 
--   *A.millepora* genome FastA. See [12-Apul-sRNAseq-MirMachine.Rmd](https://github.com/urol-e5/deep-dive/blob/main/F-Pmea/code/12-Apul-sRNAseq-MirMachine.Rmd) for download info if needed.
+-   *P.meandrina* genome FastA. See [12-Pmea-sRNAseq-MirMachine.Rmd](https://github.com/urol-e5/deep-dive/blob/main/F-Pmea/code/12-Pmea-sRNAseq-MirMachine.Rmd) for download info if needed.
 
 - [miRBase](https://mirbase.org/download/) mature miRNAs FastA.
 
@@ -44,7 +44,7 @@ Outputs:
   
 - Other output files are too large for GitHub (and some (all?) are not needed for this analysis). Please find a full backup here:
 
-https://gannet.fish.washington.edu/Atumefaciens/gitrepos/deep-dive/D-Apul/output/11-Apul-sRNAseq-miRdeep2/
+https://gannet.fish.washington.edu/Atumefaciens/gitrepos/deep-dive/F-Pmea/output/11-Pmea-sRNAseq-miRdeep2/
 
 
 ------------------------------------------------------------------------
@@ -85,7 +85,7 @@ echo "# Data directories"
 echo 'export deep_dive_dir=/home/shared/8TB_HDD_02/shedurkin/deep-dive'
 echo 'export deep_dive_data_dir="${deep_dive_dir}/data"'
 echo 'export output_dir_top=${deep_dive_dir}/F-Pmea/output/11-Pmea-sRNAseq-miRdeep2'
-echo 'export genome_fasta_dir=${deep_dive_dir}/F-Pmea/data/Amil/ncbi_dataset/data/GCF_013753865.1'
+echo 'export genome_fasta_dir=${deep_dive_dir}/F-Pmea/data/Pmea'
 echo 'export trimmed_fastqs_dir="${deep_dive_dir}/F-Pmea/output/08-Pmea-sRNAseq-trimming/trimmed-reads"'
 echo 'export collapsed_reads_dir="${deep_dive_dir}/F-Pmea/output/10-Pmea-sRNAseq-BLASTn"'
 echo ""
@@ -94,8 +94,8 @@ echo "# Input/Output files"
 echo 'export collapsed_reads_fasta="collapsed-reads-all.fasta"'
 echo 'export collapsed_reads_mirdeep2="collapsed-reads-all-mirdeep2.fasta"'
 echo 'export concatenated_trimmed_reads_fastq="concatenated-trimmed-reads-all.fastq.gz"'
-echo 'export genome_fasta_name="GCF_013753865.1_Amil_v2.1_genomic.fna"'
-echo 'export genome_fasta_no_spaces="GCF_013753865.1_Amil_v2.1_genomic-no_spaces.fna"'
+echo 'export genome_fasta_name="Pocillopora_meandrina_HIv1.assembly.fna"'
+echo 'export genome_fasta_no_spaces="Pocillopora_meandrina_HIv1.assembly.fna"'
 echo 'export mirdeep2_mapping_file="Pmea-mirdeep2-mapping.arf"'
 echo 'export mirbase_mature_fasta_name="mirbase-mature-v22.1.fa"'
 echo 'export mirbase_mature_fasta_no_spaces="mirbase-mature-v22.1-no_spaces.fa"'

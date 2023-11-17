@@ -73,6 +73,14 @@ curl -O https://owl.fish.washington.edu/halfshell/genomic-databank/Pocillopora_m
 ```
 
 
+```{r, engine='bash'}
+head -3 ../data/Pocillopora_meandrina_HIv1.genes.gff3
+
+grep -v '^#' ../data/Pocillopora_meandrina_HIv1.genes.gff3 | cut -f3 | sort | uniq -c
+
+
+```
+
 
 ## HiSat
 
@@ -109,7 +117,7 @@ find ../data/fastq/*R2_001.fastp-trim.20230519.fastq.gz \
 ```
 
 
-```{r, engine='bash', eval=TRUE}
+```{r, engine='bash'}
 cat ../output/02-lncRNA-discovery/hisat.out
 
 ```
@@ -162,10 +170,12 @@ find ../output/02-lncRNA-discovery/*sorted.bam \
 
 ```{r, engine='bash', eval=TRUE}
 wc -l ../output/02-lncRNA-discovery/RNA*.gtf
-ls ../output/02-lncRNA-discovery/RNA*.gtf
+head ../output/02-lncRNA-discovery/RNA*.gtf
+```
+```{bash}
+head ../data/Pocillopora_meandrina_HIv1.genes.gff3
 ```
 
-![gtf](http://gannet.fish.washington.edu/seashell/snaps/Monosnap_IGV_-_Session_Userssr320DesktopPmea_lncRNA_igv_session.xml_2023-11-05_10-11-31.png)
 
 Merges all individual GTF assemblies into a single merged GTF file.
 
@@ -189,7 +199,7 @@ head ../output/02-lncRNA-discovery/stringtie_merged.gtf
 
 echo "what is possible"
 
-grep -v '^#' ../output/02-lncRNA-discovery/stringtie_merged.gtf | cut -f3 | sort | uniq
+grep -v '^#' ../output/02-lncRNA-discovery/stringtie_merged.gtf | cut -f3 | sort | uniq -c
 
 
 ```
@@ -329,7 +339,7 @@ with open('../output/02-lncRNA-discovery/Pmea_noncoding_transcripts_ids.txt', 'r
 
 ```
 
-```{bash}
+```{r, engine='bash', eval=TRUE}
 head ../output/02-lncRNA-discovery/Pmea_lncRNA.bed 
 ```
 

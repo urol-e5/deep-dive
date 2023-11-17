@@ -7,9 +7,6 @@ toc_float: true
 code_folding: show
 ---
 
-
-## Non-coding RNA 
-
 ```{r setup, include=FALSE}
 library(knitr)
 library(kableExtra)
@@ -25,24 +22,57 @@ knitr::opts_chunk$set(
 ```
 
 
-
-Where things stand
-
 ## lncRNA Discovery
 
-
-- Aligned RNA-seq reads to genome -> SAM files
-- SAM files converted to BAMS
-- BAMS converted to GTF (Stringtie), merged to single GTF
-- ID non-coding transcripts (GFFCompare, CPC2)
-- Fasta and Bed file created for each species
-
+-   Aligned RNA-seq reads to genome -\> SAM files
+-   SAM files converted to BAMS
+-   BAMS converted to GTF (Stringtie), merged to single GTF
+-   ID non-coding transcripts (GFFCompare, CPC2)
+-   Fasta and Bed file created for each species
 
 ## lncRNA by the numbers
 
-- Apul total transcripts / lncRNA = 106174 / 
-- 
+-   D Apul total transcripts / lncRNA = 115492 / 16206 (14%)
+-   E Peve total transcripts / lncRNA = 74686 / 7378 (10%)
+-   F Pmea total transcripts / lncRNA = 77592 / 14307 (18%)
 
+\*total from merged gtf transcript count
+
+## lncRNA by the numbers
+
+Apul
+```{r, engine='bash', eval=TRUE, echo=TRUE}
+grep -v '^#' ../../D-Apul/output/05.33-lncRNA-discovery/stringtie_merged.gtf | cut -f3 | sort | uniq -c
+```
+Peve
+```{r, engine='bash', eval=TRUE, echo=TRUE}
+grep -v '^#' ../../E-Peve/output/05-lncRNA-discovery/stringtie_merged.gtf | cut -f3 | sort | uniq -c 
+```
+
+Pmea
+```{r, engine='bash', eval=TRUE, echo=TRUE}
+grep -v '^#' ../../F-Pmea/output/02-lncRNA-discovery/stringtie_merged.gtf | cut -f3 | sort | uniq -c 
+```
+
+## About the GFFs {.scrollable}
+Apul 
+```{r, engine='bash', eval=TRUE, echo=TRUE}
+grep -v '^#' ../../D-Apul/data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gff | cut -f3 | sort | uniq
+```
+Peve
+```{r, engine='bash', eval=TRUE, echo=TRUE}
+grep -v '^#' ../../E-Peve/data/Porites_evermanni_v1.annot.gff | cut -f3 | sort | uniq
+```
+Pmea
+```{r, engine='bash', eval=TRUE, echo=TRUE}
+grep -v '^#' ../../F-Pmea/data/Pocillopora_meandrina_HIv1.genes.gff3 | cut -f3 | sort | uniq
+```
+
+## What about this?
+Apul 
+```{r, engine='bash', eval=TRUE, echo=TRUE}
+grep -v '^#' ../../D-Apul/data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gff | cut -f3 | sort | uniq -c
+```
 
 ## sRNAseq Analysis {.scrollable}
 
@@ -89,9 +119,9 @@ mirtrace.detailed.df %>%
 
 ## MirMachine
 
-### _A.pulchra_ (_A.millepora_)
+### *A.millepora*
 
-```{r apul-count-predicted-hc-mirnas}
+```{r count-predicted-hc-mirnas}
 #| eval: true
 #| echo: false
 
@@ -114,10 +144,9 @@ Predicted loci: `r predicted_loci`
 
 Unique familes: `r unique_fams`
 
-
 ## miRDeep2
 
-### _A.pulchra_
+### *A.pulchra*
 
 ```{r apul-mirdeepcount-counts}
 #| eval: true
@@ -147,7 +176,6 @@ mirdeep2_seed_miRNAs <- system(cmd_mirdeep2_seed_miRNAs, intern = TRUE)
 mirdreep2_novel_miRNAS <- system(cmd_mirdreep2_novel_miRNAS, intern = TRUE)
 ```
 
-
 Predicted loci: `r mirdeep2_predicted_loci`
 
 Matches to mature miRNAs (seeds): `r mirdeep2_seed_miRNAs`
@@ -158,4 +186,94 @@ Further analysis is possibly desired to evaluate score thresholds, miRNA familie
 
 ## BLASTn
 
-### _A.pulchra_
+`-task blastn_short`
+
+### *A.pulchra*
+
+Total query seqs: 19,185,356
+
+E-value = 1000 (default)
+
+-   miRBase: 19,185,356
+-   MirGene: 19,185,356
+
+E-value = 10
+
+-   mirBase: 19,120,159
+-   MirGene: 19,037,617
+
+## ShortStack
+
+### *A.pulchra*
+
+Potential loci: 18,772
+
+miRBase matches: 46
+
+Number of loci characterized as miRNA: 0
+
+
+## MiRTrace
+
+#### _P.evermanni_
+
+```{r read-peve-mirtrace-table, eval=TRUE, echo=FALSE}
+mirtrace.detailed.df <- read.csv("../../E-Peve/output/09-Peve-sRNAseq-miRTrace/mirtrace-stats-contamination_detailed.tsv", sep = "\t", header = TRUE)
+```
+
+```{r peve-mirtrace-output-table, eval=TRUE, echo=FALSE}
+
+mirtrace.detailed.df %>%
+  mutate(
+    across(
+      starts_with("sRNA"),
+      ~cell_spec(
+        .,
+        background = ifelse(
+          . > 0,
+          "lightgreen",
+          "white"
+          )
+        )
+      )
+    ) %>%
+  kable(escape = F, caption = "Clades identified as having sRNAseq matches.") %>%
+  kable_styling("striped") %>% 
+  scroll_box(width = "100%", height = "500px")
+```
+
+## MirMachine
+
+### *P.evermanni*
+
+Predicted loci: 83
+
+Unique familes: 15
+
+## BLASTn
+
+`-task blastn_short`
+
+### *P.evermanni*
+
+Total query seqs: 8,870,343
+
+E-value = 1000 (default)
+
+-   miRBase: 8,870,343
+-   MirGene: 8,870,343
+
+E-value = 10
+
+-   mirBase: 8,824,359
+-   MirGene: 8,783,
+
+## ShortStack
+
+### *P.evermanni*
+
+Potential loci: 15,040
+
+miRBase matches: 25
+
+Number of loci characterized as miRNA: 0
