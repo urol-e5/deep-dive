@@ -425,6 +425,18 @@
 <li><a href="#/shortstack" id="/toc-a.pulchra-3"><em>A.pulchra</em></a></li>
 </ul></li>
 <li><a href="#/mirtrace-1" id="/toc-mirtrace-1">MiRTrace</a></li>
+<li><a href="#/mirmachine-1" id="/toc-mirmachine-1">MirMachine</a>
+<ul>
+<li><a href="#/mirmachine-1" id="/toc-p.evermanni-1"><em>P.evermanni</em></a></li>
+</ul></li>
+<li><a href="#/blastn-1" id="/toc-blastn-1">BLASTn</a>
+<ul>
+<li><a href="#/blastn-1" id="/toc-p.evermanni-2"><em>P.evermanni</em></a></li>
+</ul></li>
+<li><a href="#/shortstack-1" id="/toc-shortstack-1">ShortStack</a>
+<ul>
+<li><a href="#/shortstack-1" id="/toc-p.evermanni-3"><em>P.evermanni</em></a></li>
+</ul></li>
 </ul>
 </nav>
 </section>
@@ -453,24 +465,21 @@
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">grep</span> <span class="at">-v</span> <span class="st">'^#'</span> ../../D-Apul/output/05.33-lncRNA-discovery/stringtie_merged.gtf <span class="kw">|</span> <span class="fu">cut</span> <span class="at">-f3</span> <span class="kw">|</span> <span class="fu">sort</span> <span class="kw">|</span> <span class="fu">uniq</span> <span class="at">-c</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code> 627332 exon
- 115492 transcript</code></pre>
+<pre><code>grep: ../../D-Apul/output/05.33-lncRNA-discovery/stringtie_merged.gtf: No such file or directory</code></pre>
 </div>
 </div>
 <p>Peve</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">grep</span> <span class="at">-v</span> <span class="st">'^#'</span> ../../E-Peve/output/05-lncRNA-discovery/stringtie_merged.gtf <span class="kw">|</span> <span class="fu">cut</span> <span class="at">-f3</span> <span class="kw">|</span> <span class="fu">sort</span> <span class="kw">|</span> <span class="fu">uniq</span> <span class="at">-c</span> </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code> 467494 exon
-  74686 transcript</code></pre>
+<pre><code>grep: ../../E-Peve/output/05-lncRNA-discovery/stringtie_merged.gtf: No such file or directory</code></pre>
 </div>
 </div>
 <p>Pmea</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1"></a><span class="fu">grep</span> <span class="at">-v</span> <span class="st">'^#'</span> ../../F-Pmea/output/02-lncRNA-discovery/stringtie_merged.gtf <span class="kw">|</span> <span class="fu">cut</span> <span class="at">-f3</span> <span class="kw">|</span> <span class="fu">sort</span> <span class="kw">|</span> <span class="fu">uniq</span> <span class="at">-c</span> </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code> 482050 exon
-  77592 transcript</code></pre>
+<pre><code>grep: ../../F-Pmea/output/02-lncRNA-discovery/stringtie_merged.gtf: No such file or directory</code></pre>
 </div>
 </div>
 </section>
@@ -480,20 +489,7 @@
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1"></a><span class="fu">grep</span> <span class="at">-v</span> <span class="st">'^#'</span> ../../D-Apul/data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gff <span class="kw">|</span> <span class="fu">cut</span> <span class="at">-f3</span> <span class="kw">|</span> <span class="fu">sort</span> <span class="kw">|</span> <span class="fu">uniq</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>cDNA_match
-CDS
-exon
-gene
-guide_RNA
-lnc_RNA
-mRNA
-pseudogene
-region
-rRNA
-snoRNA
-snRNA
-transcript
-tRNA</code></pre>
+<pre><code>grep: ../../D-Apul/data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gff: No such file or directory</code></pre>
 </div>
 </div>
 <p>Peve</p>
@@ -509,9 +505,7 @@ UTR</code></pre>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1"></a><span class="fu">grep</span> <span class="at">-v</span> <span class="st">'^#'</span> ../../F-Pmea/data/Pocillopora_meandrina_HIv1.genes.gff3 <span class="kw">|</span> <span class="fu">cut</span> <span class="at">-f3</span> <span class="kw">|</span> <span class="fu">sort</span> <span class="kw">|</span> <span class="fu">uniq</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>CDS
-exon
-transcript</code></pre>
+<pre><code>grep: ../../F-Pmea/data/Pocillopora_meandrina_HIv1.genes.gff3: No such file or directory</code></pre>
 </div>
 </div>
 </section>
@@ -521,20 +515,7 @@ transcript</code></pre>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1"></a><span class="fu">grep</span> <span class="at">-v</span> <span class="st">'^#'</span> ../../D-Apul/data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gff <span class="kw">|</span> <span class="fu">cut</span> <span class="at">-f3</span> <span class="kw">|</span> <span class="fu">sort</span> <span class="kw">|</span> <span class="fu">uniq</span> <span class="at">-c</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>  22387 cDNA_match
- 317969 CDS
- 390533 exon
-  36904 gene
-      1 guide_RNA
-   6128 lnc_RNA
-  41860 mRNA
-   5871 pseudogene
-    854 region
-    283 rRNA
-     62 snoRNA
-    170 snRNA
-   2066 transcript
-   1413 tRNA</code></pre>
+<pre><code>grep: ../../D-Apul/data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gff: No such file or directory</code></pre>
 </div>
 </div>
 </section>
@@ -788,6 +769,35 @@ transcript</code></pre>
 
 </div>
 </div>
+</section>
+<section id="mirmachine-1" class="slide level2">
+<h2>MirMachine</h2>
+<h3 id="p.evermanni-1"><em>P.evermanni</em></h3>
+<p>Predicted loci: 83</p>
+<p>Unique familes: 15</p>
+</section>
+<section id="blastn-1" class="slide level2">
+<h2>BLASTn</h2>
+<p><code>-task blastn_short</code></p>
+<h3 id="p.evermanni-2"><em>P.evermanni</em></h3>
+<p>Total query seqs: 8,870,343</p>
+<p>E-value = 1000 (default)</p>
+<ul>
+<li>miRBase: 8,870,343</li>
+<li>MirGene: 8,870,343</li>
+</ul>
+<p>E-value = 10</p>
+<ul>
+<li>mirBase: 8,824,359</li>
+<li>MirGene: 8,783,</li>
+</ul>
+</section>
+<section id="shortstack-1" class="slide level2">
+<h2>ShortStack</h2>
+<h3 id="p.evermanni-3"><em>P.evermanni</em></h3>
+<p>Potential loci: 15,040</p>
+<p>miRBase matches: 25</p>
+<p>Number of loci characterized as miRNA: 0</p>
 <div class="footer footer-default">
 
 </div>
