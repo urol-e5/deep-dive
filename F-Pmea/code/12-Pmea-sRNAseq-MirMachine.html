@@ -1738,7 +1738,8 @@ wget \
 --accept &quot;${genome_fasta_name}.gz,md5checksums.txt&quot; ${genome_fasta_url}
 
 ls -lh &quot;${genome_fasta_dir}&quot;</code></pre>
-<pre><code>total 460M
+<pre><code>total 819M
+-rw-r--r-- 1 shedurkin labmembers 360M Nov 30 07:59 Pocillopora_meandrina_HIv1.assembly.fa
 -rw-r--r-- 1 shedurkin labmembers 360M May 23  2022 Pocillopora_meandrina_HIv1.assembly.fasta
 -rw-r--r-- 1 shedurkin labmembers 101M May 23  2022 Pocillopora_meandrina_HIv1.assembly.fasta.gz</code></pre>
 <div id="verify-genome-fasta-md5-checksum" class="section level2" number="4.1">
@@ -1762,7 +1763,8 @@ gunzip --keep &quot;${genome_fasta_name}.gz&quot;
 
 ls -lth</code></pre>
 <pre><code>gzip: Pocillopora_meandrina_HIv1.assembly.fasta already exists; not overwritten
-total 460M
+total 819M
+-rw-r--r-- 1 shedurkin labmembers 360M Nov 30 07:59 Pocillopora_meandrina_HIv1.assembly.fa
 -rw-r--r-- 1 shedurkin labmembers 360M May 23  2022 Pocillopora_meandrina_HIv1.assembly.fasta
 -rw-r--r-- 1 shedurkin labmembers 101M May 23  2022 Pocillopora_meandrina_HIv1.assembly.fasta.gz</code></pre>
 </div>
@@ -1784,9 +1786,9 @@ MirMachine.py \
 --add-all-nodes \
 &amp;&gt; mirmachine.log</code></pre>
 <pre><code>
-real    0m2.356s
-user    0m1.859s
-sys 0m0.523s</code></pre>
+real    0m2.359s
+user    0m1.902s
+sys 0m0.483s</code></pre>
 </div>
 <div id="results" class="section level1" number="6">
 <h1><span class="header-section-number">6</span> Results</h1>
@@ -1873,8 +1875,7 @@ Pocillopora_meandrina_HIv1___Sc0000003  cmsearch    ncRNA   15185321    15185383
 Pocillopora_meandrina_HIv1___Sc0000000  cmsearch    ncRNA   3084744 3084853 35.4    +   .   gene_id=Mir-9388.PRE;E-value=0.0088;sequence_with_30nt=ATAAGTACGTACGCATTCGTGCGGACTTACGTGCGTGCGTGCGTACATGCGTGCGTGTGTGCGTACATGCGTACGTGCGTGCGTGCGTACGCACGGATGTACGCACCTACGTACGCACGAATGTACGCACGTACGCATGCACGTGCGTACGTACGCATGTTTGTACGTAC
 Pocillopora_meandrina_HIv1___Sc0000000  cmsearch    ncRNA   19092618    19092677    41.6    +   .   gene_id=Mir-9388.PRE;E-value=0.00021;sequence_with_30nt=GTATATATATACATGTATATGTATATATATGTGTGTGTATATATATATATATATATATATGTATGCATATGTATATATATACACACACACACACACACATATATATATACACCTGTTCAA
 Pocillopora_meandrina_HIv1___Sc0000002  cmsearch    ncRNA   645851  645914  38.5    -   .   gene_id=Mir-9388.PRE;E-value=0.0014;sequence_with_30nt=ATATATATATATATATATACATATATACATATACATATACATATACATATATATACATATACATATGTATATATATGTATATGTATATGTATGTATATATATATATATATATATACATCTATGA
-Pocillopora_meandrina_HIv1___Sc0000003  cmsearch    ncRNA   4966110 4966167 40.3    +   .   gene_id=Mir-9388.PRE;E-value=0.00048;sequence_with_30nt=TTCGCTCAATTCTATGACGAATTATGGGTGGTACGTACGTGCGTACGTATGCACGTACGTACGTGCGTACGTATGCACGTACGTACATGCGTTGTTTTTAGAGATCCGTTGTTACTTA
-grep: write error: Broken pipe</code></pre>
+Pocillopora_meandrina_HIv1___Sc0000003  cmsearch    ncRNA   4966110 4966167 40.3    +   .   gene_id=Mir-9388.PRE;E-value=0.00048;sequence_with_30nt=TTCGCTCAATTCTATGACGAATTATGGGTGGTACGTACGTGCGTACGTATGCACGTACGTACGTGCGTACGTATGCACGTACGTACATGCGTTGTTTTTAGAGATCCGTTGTTACTTA</code></pre>
 </div>
 <div id="counts-of-predicted-high-confidence-mirnas" class="section level2" number="6.4">
 <h2><span class="header-section-number">6.4</span> Counts of predicted high-confidence miRNAs</h2>
