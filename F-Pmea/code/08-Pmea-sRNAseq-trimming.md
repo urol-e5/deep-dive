@@ -186,17 +186,17 @@ ls -lh "${raw_reads_dir}"
 ```
 
     total 11G
-    -rw-r--r-- 1 shedurkin labmembers 1.3K May 17 11:03 checksums.md5
-    -rw-r--r-- 1 shedurkin labmembers 1.2G May 17 10:35 sRNA-POC-47-S1-TP2_R1_001.fastq.gz
-    -rw-r--r-- 1 shedurkin labmembers 1.3G May 17 10:37 sRNA-POC-47-S1-TP2_R2_001.fastq.gz
-    -rw-r--r-- 1 shedurkin labmembers 903M May 17 10:38 sRNA-POC-48-S1-TP2_R1_001.fastq.gz
-    -rw-r--r-- 1 shedurkin labmembers 1.1G May 17 10:39 sRNA-POC-48-S1-TP2_R2_001.fastq.gz
-    -rw-r--r-- 1 shedurkin labmembers 1.1G May 17 10:40 sRNA-POC-50-S1-TP2_R1_001.fastq.gz
-    -rw-r--r-- 1 shedurkin labmembers 1.2G May 17 10:41 sRNA-POC-50-S1-TP2_R2_001.fastq.gz
-    -rw-r--r-- 1 shedurkin labmembers 1.1G May 17 10:41 sRNA-POC-53-S1-TP2_R1_001.fastq.gz
-    -rw-r--r-- 1 shedurkin labmembers 1.2G May 17 10:42 sRNA-POC-53-S1-TP2_R2_001.fastq.gz
-    -rw-r--r-- 1 shedurkin labmembers 1.1G May 17 10:43 sRNA-POC-57-S1-TP2_R1_001.fastq.gz
-    -rw-r--r-- 1 shedurkin labmembers 1.2G May 17 10:43 sRNA-POC-57-S1-TP2_R2_001.fastq.gz
+    -rw-r--r-- 1 shedurkin labmembers 1.3K May 17  2023 checksums.md5
+    -rw-r--r-- 1 shedurkin labmembers 1.2G May 17  2023 sRNA-POC-47-S1-TP2_R1_001.fastq.gz
+    -rw-r--r-- 1 shedurkin labmembers 1.3G May 17  2023 sRNA-POC-47-S1-TP2_R2_001.fastq.gz
+    -rw-r--r-- 1 shedurkin labmembers 903M May 17  2023 sRNA-POC-48-S1-TP2_R1_001.fastq.gz
+    -rw-r--r-- 1 shedurkin labmembers 1.1G May 17  2023 sRNA-POC-48-S1-TP2_R2_001.fastq.gz
+    -rw-r--r-- 1 shedurkin labmembers 1.1G May 17  2023 sRNA-POC-50-S1-TP2_R1_001.fastq.gz
+    -rw-r--r-- 1 shedurkin labmembers 1.2G May 17  2023 sRNA-POC-50-S1-TP2_R2_001.fastq.gz
+    -rw-r--r-- 1 shedurkin labmembers 1.1G May 17  2023 sRNA-POC-53-S1-TP2_R1_001.fastq.gz
+    -rw-r--r-- 1 shedurkin labmembers 1.2G May 17  2023 sRNA-POC-53-S1-TP2_R2_001.fastq.gz
+    -rw-r--r-- 1 shedurkin labmembers 1.1G May 17  2023 sRNA-POC-57-S1-TP2_R1_001.fastq.gz
+    -rw-r--r-- 1 shedurkin labmembers 1.2G May 17  2023 sRNA-POC-57-S1-TP2_R2_001.fastq.gz
 
 ## Verify raw read checksums
 
@@ -335,13 +335,13 @@ ls -lh ${raw_fastqc_dir}
 
     |           multiqc | MultiQC Version v1.17 now available!
     |           multiqc | Search path : /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/08-Pmea-sRNAseq-trimming/raw-fastqc
-    |         searching | ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 35/35  
+    |         searching | ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 42/42  
     |            fastqc | Found 10 reports
     |           multiqc | Compressing plot data
     |           multiqc | Previous MultiQC output found! Adjusting filenames..
     |           multiqc | Use -f or --force to overwrite existing reports instead
-    |           multiqc | Report      : ../output/08-Pmea-sRNAseq-trimming/raw-fastqc/multiqc_report_3.html
-    |           multiqc | Data        : ../output/08-Pmea-sRNAseq-trimming/raw-fastqc/multiqc_data_3
+    |           multiqc | Report      : ../output/08-Pmea-sRNAseq-trimming/raw-fastqc/multiqc_report_4.html
+    |           multiqc | Data        : ../output/08-Pmea-sRNAseq-trimming/raw-fastqc/multiqc_data_4
     |           multiqc | MultiQC complete
 
     MultiQC on raw FastQs complete.
@@ -350,25 +350,27 @@ ls -lh ${raw_fastqc_dir}
 
     FastQC zip files removed.
 
-    total 12M
+    total 13M
     drwxr-xr-x 2 shedurkin labmembers 4.0K Nov  8 15:06 multiqc_data
     drwxr-xr-x 2 shedurkin labmembers 4.0K Nov  8 15:48 multiqc_data_1
     drwxr-xr-x 2 shedurkin labmembers 4.0K Nov  8 18:27 multiqc_data_2
     drwxr-xr-x 2 shedurkin labmembers 4.0K Nov 14 09:51 multiqc_data_3
+    drwxr-xr-x 2 shedurkin labmembers 4.0K Nov 17 09:20 multiqc_data_4
     -rw-r--r-- 1 shedurkin labmembers 1.3M Nov  8 15:48 multiqc_report_1.html
     -rw-r--r-- 1 shedurkin labmembers 1.3M Nov  8 18:27 multiqc_report_2.html
     -rw-r--r-- 1 shedurkin labmembers 1.3M Nov 14 09:51 multiqc_report_3.html
+    -rw-r--r-- 1 shedurkin labmembers 1.3M Nov 17 09:20 multiqc_report_4.html
     -rw-r--r-- 1 shedurkin labmembers 1.3M Nov  8 15:06 multiqc_report.html
-    -rw-r--r-- 1 shedurkin labmembers 700K Nov 14 09:51 sRNA-POC-47-S1-TP2_R1_001_fastqc.html
-    -rw-r--r-- 1 shedurkin labmembers 710K Nov 14 09:51 sRNA-POC-47-S1-TP2_R2_001_fastqc.html
-    -rw-r--r-- 1 shedurkin labmembers 682K Nov 14 09:50 sRNA-POC-48-S1-TP2_R1_001_fastqc.html
-    -rw-r--r-- 1 shedurkin labmembers 700K Nov 14 09:50 sRNA-POC-48-S1-TP2_R2_001_fastqc.html
-    -rw-r--r-- 1 shedurkin labmembers 688K Nov 14 09:50 sRNA-POC-50-S1-TP2_R1_001_fastqc.html
-    -rw-r--r-- 1 shedurkin labmembers 708K Nov 14 09:51 sRNA-POC-50-S1-TP2_R2_001_fastqc.html
-    -rw-r--r-- 1 shedurkin labmembers 679K Nov 14 09:51 sRNA-POC-53-S1-TP2_R1_001_fastqc.html
-    -rw-r--r-- 1 shedurkin labmembers 689K Nov 14 09:51 sRNA-POC-53-S1-TP2_R2_001_fastqc.html
-    -rw-r--r-- 1 shedurkin labmembers 670K Nov 14 09:51 sRNA-POC-57-S1-TP2_R1_001_fastqc.html
-    -rw-r--r-- 1 shedurkin labmembers 687K Nov 14 09:51 sRNA-POC-57-S1-TP2_R2_001_fastqc.html
+    -rw-r--r-- 1 shedurkin labmembers 700K Nov 17 09:20 sRNA-POC-47-S1-TP2_R1_001_fastqc.html
+    -rw-r--r-- 1 shedurkin labmembers 710K Nov 17 09:20 sRNA-POC-47-S1-TP2_R2_001_fastqc.html
+    -rw-r--r-- 1 shedurkin labmembers 682K Nov 17 09:20 sRNA-POC-48-S1-TP2_R1_001_fastqc.html
+    -rw-r--r-- 1 shedurkin labmembers 700K Nov 17 09:20 sRNA-POC-48-S1-TP2_R2_001_fastqc.html
+    -rw-r--r-- 1 shedurkin labmembers 688K Nov 17 09:20 sRNA-POC-50-S1-TP2_R1_001_fastqc.html
+    -rw-r--r-- 1 shedurkin labmembers 708K Nov 17 09:20 sRNA-POC-50-S1-TP2_R2_001_fastqc.html
+    -rw-r--r-- 1 shedurkin labmembers 679K Nov 17 09:20 sRNA-POC-53-S1-TP2_R1_001_fastqc.html
+    -rw-r--r-- 1 shedurkin labmembers 689K Nov 17 09:20 sRNA-POC-53-S1-TP2_R2_001_fastqc.html
+    -rw-r--r-- 1 shedurkin labmembers 670K Nov 17 09:20 sRNA-POC-57-S1-TP2_R1_001_fastqc.html
+    -rw-r--r-- 1 shedurkin labmembers 687K Nov 17 09:20 sRNA-POC-57-S1-TP2_R2_001_fastqc.html
 
 # Trimming with [flexbar](https://github.com/seqan/flexbar)
 
@@ -465,14 +467,24 @@ cat "${trimmed_reads_dir}/${trimmed_checksums}"
     Beginning flexbar trimming.
 
 
-    real    24m5.187s
-    user    379m8.986s
-    sys 28m26.923s
+    real    24m5.380s
+    user    379m20.444s
+    sys 28m17.791s
 
     flexbar trimming complete.
 
     Trimmed FastQs MD5 checksums:
 
+    8d2a64038befbfc7f7f2f6139525f8dd  sRNA-POC-47-S1-TP2.flexbar_trim.25bp_1.fastq.gz
+    d56dcc19cd848f4fa0a36aefc0864c55  sRNA-POC-47-S1-TP2.flexbar_trim.25bp_2.fastq.gz
+    dbe0edb9c6ae0aff47235371f634da89  sRNA-POC-48-S1-TP2.flexbar_trim.25bp_1.fastq.gz
+    436a29f6a40518372b2abc959848e6fa  sRNA-POC-48-S1-TP2.flexbar_trim.25bp_2.fastq.gz
+    dff3aee83ffb60a146eb978a463d0447  sRNA-POC-50-S1-TP2.flexbar_trim.25bp_1.fastq.gz
+    46eec37918be4a5778500e00c4c55ad4  sRNA-POC-50-S1-TP2.flexbar_trim.25bp_2.fastq.gz
+    a31f04dca5c16f067da3b0404e2c4562  sRNA-POC-53-S1-TP2.flexbar_trim.25bp_1.fastq.gz
+    3bee51d77f2604b835d169e8c0bf835e  sRNA-POC-53-S1-TP2.flexbar_trim.25bp_2.fastq.gz
+    98b57b8cebc175e0185a67188db8a984  sRNA-POC-57-S1-TP2.flexbar_trim.25bp_1.fastq.gz
+    064b7868a3a17cbd51b32dc339c79b94  sRNA-POC-57-S1-TP2.flexbar_trim.25bp_2.fastq.gz
     8d2a64038befbfc7f7f2f6139525f8dd  sRNA-POC-47-S1-TP2.flexbar_trim.25bp_1.fastq.gz
     d56dcc19cd848f4fa0a36aefc0864c55  sRNA-POC-47-S1-TP2.flexbar_trim.25bp_2.fastq.gz
     dbe0edb9c6ae0aff47235371f634da89  sRNA-POC-48-S1-TP2.flexbar_trim.25bp_1.fastq.gz
@@ -587,13 +599,13 @@ ls -lh ${trimmed_fastqc_dir}
 
     |           multiqc | MultiQC Version v1.17 now available!
     |           multiqc | Search path : /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/08-Pmea-sRNAseq-trimming/trimmed-fastqc
-    |         searching | ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 35/35  
+    |         searching | ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 42/42  
     |            fastqc | Found 10 reports
     |           multiqc | Compressing plot data
     |           multiqc | Previous MultiQC output found! Adjusting filenames..
     |           multiqc | Use -f or --force to overwrite existing reports instead
-    |           multiqc | Report      : ../output/08-Pmea-sRNAseq-trimming/trimmed-fastqc/multiqc_report_3.html
-    |           multiqc | Data        : ../output/08-Pmea-sRNAseq-trimming/trimmed-fastqc/multiqc_data_3
+    |           multiqc | Report      : ../output/08-Pmea-sRNAseq-trimming/trimmed-fastqc/multiqc_report_4.html
+    |           multiqc | Data        : ../output/08-Pmea-sRNAseq-trimming/trimmed-fastqc/multiqc_data_4
     |           multiqc | MultiQC complete
 
     MultiQC on trimmed FastQs complete.
@@ -602,25 +614,27 @@ ls -lh ${trimmed_fastqc_dir}
 
     FastQC zip files removed.
 
-    total 11M
+    total 12M
     drwxr-xr-x 2 shedurkin labmembers 4.0K Nov  8 15:43 multiqc_data
     drwxr-xr-x 2 shedurkin labmembers 4.0K Nov  8 16:12 multiqc_data_1
     drwxr-xr-x 2 shedurkin labmembers 4.0K Nov  8 18:52 multiqc_data_2
     drwxr-xr-x 2 shedurkin labmembers 4.0K Nov 14 10:16 multiqc_data_3
+    drwxr-xr-x 2 shedurkin labmembers 4.0K Nov 17 09:45 multiqc_data_4
     -rw-r--r-- 1 shedurkin labmembers 1.2M Nov  8 16:12 multiqc_report_1.html
     -rw-r--r-- 1 shedurkin labmembers 1.2M Nov  8 18:52 multiqc_report_2.html
     -rw-r--r-- 1 shedurkin labmembers 1.2M Nov 14 10:16 multiqc_report_3.html
+    -rw-r--r-- 1 shedurkin labmembers 1.2M Nov 17 09:45 multiqc_report_4.html
     -rw-r--r-- 1 shedurkin labmembers 1.2M Nov  8 15:43 multiqc_report.html
-    -rw-r--r-- 1 shedurkin labmembers 551K Nov 14 10:15 sRNA-POC-47-S1-TP2.flexbar_trim.25bp_1_fastqc.html
-    -rw-r--r-- 1 shedurkin labmembers 561K Nov 14 10:16 sRNA-POC-47-S1-TP2.flexbar_trim.25bp_2_fastqc.html
-    -rw-r--r-- 1 shedurkin labmembers 565K Nov 14 10:16 sRNA-POC-48-S1-TP2.flexbar_trim.25bp_1_fastqc.html
-    -rw-r--r-- 1 shedurkin labmembers 569K Nov 14 10:16 sRNA-POC-48-S1-TP2.flexbar_trim.25bp_2_fastqc.html
-    -rw-r--r-- 1 shedurkin labmembers 556K Nov 14 10:16 sRNA-POC-50-S1-TP2.flexbar_trim.25bp_1_fastqc.html
-    -rw-r--r-- 1 shedurkin labmembers 566K Nov 14 10:16 sRNA-POC-50-S1-TP2.flexbar_trim.25bp_2_fastqc.html
-    -rw-r--r-- 1 shedurkin labmembers 549K Nov 14 10:16 sRNA-POC-53-S1-TP2.flexbar_trim.25bp_1_fastqc.html
-    -rw-r--r-- 1 shedurkin labmembers 553K Nov 14 10:16 sRNA-POC-53-S1-TP2.flexbar_trim.25bp_2_fastqc.html
-    -rw-r--r-- 1 shedurkin labmembers 551K Nov 14 10:16 sRNA-POC-57-S1-TP2.flexbar_trim.25bp_1_fastqc.html
-    -rw-r--r-- 1 shedurkin labmembers 550K Nov 14 10:16 sRNA-POC-57-S1-TP2.flexbar_trim.25bp_2_fastqc.html
+    -rw-r--r-- 1 shedurkin labmembers 551K Nov 17 09:45 sRNA-POC-47-S1-TP2.flexbar_trim.25bp_1_fastqc.html
+    -rw-r--r-- 1 shedurkin labmembers 561K Nov 17 09:45 sRNA-POC-47-S1-TP2.flexbar_trim.25bp_2_fastqc.html
+    -rw-r--r-- 1 shedurkin labmembers 565K Nov 17 09:45 sRNA-POC-48-S1-TP2.flexbar_trim.25bp_1_fastqc.html
+    -rw-r--r-- 1 shedurkin labmembers 569K Nov 17 09:45 sRNA-POC-48-S1-TP2.flexbar_trim.25bp_2_fastqc.html
+    -rw-r--r-- 1 shedurkin labmembers 556K Nov 17 09:45 sRNA-POC-50-S1-TP2.flexbar_trim.25bp_1_fastqc.html
+    -rw-r--r-- 1 shedurkin labmembers 566K Nov 17 09:45 sRNA-POC-50-S1-TP2.flexbar_trim.25bp_2_fastqc.html
+    -rw-r--r-- 1 shedurkin labmembers 549K Nov 17 09:45 sRNA-POC-53-S1-TP2.flexbar_trim.25bp_1_fastqc.html
+    -rw-r--r-- 1 shedurkin labmembers 553K Nov 17 09:45 sRNA-POC-53-S1-TP2.flexbar_trim.25bp_2_fastqc.html
+    -rw-r--r-- 1 shedurkin labmembers 551K Nov 17 09:45 sRNA-POC-57-S1-TP2.flexbar_trim.25bp_1_fastqc.html
+    -rw-r--r-- 1 shedurkin labmembers 550K Nov 17 09:45 sRNA-POC-57-S1-TP2.flexbar_trim.25bp_2_fastqc.html
 
 # Summary
 
