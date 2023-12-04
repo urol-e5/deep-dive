@@ -2,7 +2,7 @@
 
 ## Directory of code used for analysis.
 
-Each code file should have a matching directory in [`deep-dive/D-Apul/output`](https://github.com/urol-e5/deep-dive/tree/main/D-Apul/output/09-Apul-sRNAseq-miRTrace).
+Each code file should have a matching directory in [`deep-dive/D-Apul/output`](https://github.com/urol-e5/deep-dive/tree/main/D-Apul/output/).
 
 ---
 
