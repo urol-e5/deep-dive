@@ -357,7 +357,7 @@ once...
 ls --directory dir_* mapper_logs mirdeep_runs mirna_results* pdfs_*
 ```
 
-## Remove directores from code directory
+## Remove directories from code directory
 
 ```{r remove-mirdeep2-output-dirs, eval=FALSE, engine='bash'}
 # Load bash variables into memory
@@ -386,7 +386,7 @@ format.
 source .bashvars
 
 
-head -n 30 "${output_dir_top}/result_08_11_2023_t_14_47_36.csv"
+head -n 30 "${output_dir_top}/result_30_11_2023_t_09_23_06.csv"
 ```
 
 ## Create more easily parasable results file
@@ -399,10 +399,10 @@ the end of the file (represented by the `$p`. `$` = end, `p` = print)
 source .bashvars
 
 
-sed --quiet '/provisional id/,$p' "${output_dir_top}/result_08_11_2023_t_14_47_36.csv" \
-> "${output_dir_top}/parsable-result_08_11_2023_t_14_47_36.csv"
+sed --quiet '/provisional id/,$p' "${output_dir_top}/result_30_11_2023_t_09_23_06.csv" \
+> "${output_dir_top}/parsable-result_30_11_2023_t_09_23_06.csv"
 
-head "${output_dir_top}/parsable-result_08_11_2023_t_14_47_36.csv"
+head "${output_dir_top}/parsable-result_30_11_2023_t_09_23_06.csv"
 ```
 
 ## Read in output CSV
@@ -412,7 +412,7 @@ columns.
 
 ```{r read-in-result-csv, eval=TRUE}
 
-mirdeep_result.df <- read.csv("../output/11-Pmea-sRNAseq-miRdeep2/parsable-result_08_11_2023_t_14_47_36.csv",
+mirdeep_result.df <- read.csv("../output/11-Pmea-sRNAseq-miRdeep2/parsable-result_30_11_2023_t_09_23_06.csv",
                               header = TRUE,
                               sep = "\t")
 
@@ -432,7 +432,7 @@ families, etc.
 source .bashvars
 
 # Total predicted miRNAS
-total_miRNAs=$(awk 'NR > 1' ${output_dir_top}/parsable-result_08_11_2023_t_14_47_36.csv \
+total_miRNAs=$(awk 'NR > 1' ${output_dir_top}/parsable-result_30_11_2023_t_09_23_06.csv \
 | wc -l
 )
 
@@ -440,7 +440,7 @@ echo "Total of predicted miRNAs: ${total_miRNAs}"
 echo ""
 
 # Matches to known mature miRNAs
-mature_miRNAs=$(awk -F'\t' '$11 != "-" && $11 != "" {print $11}' ${output_dir_top}/parsable-result_08_11_2023_t_14_47_36.csv \
+mature_miRNAs=$(awk -F'\t' '$11 != "-" && $11 != "" {print $11}' ${output_dir_top}/parsable-result_30_11_2023_t_09_23_06.csv \
 | wc -l
 )
 
@@ -448,7 +448,7 @@ echo "Number of seed matches to known miRNAS: ${mature_miRNAs}"
 echo ""
 
 # Novel miRNAs
-novel_miRNAs=$(awk -F "\t" '$11 == "-" || $11 == "" {print $11}' ${output_dir_top}/parsable-result_08_11_2023_t_14_47_36.csv \
+novel_miRNAs=$(awk -F "\t" '$11 == "-" || $11 == "" {print $11}' ${output_dir_top}/parsable-result_30_11_2023_t_09_23_06.csv \
 | awk 'NR > 1' \
 | wc -l
 )
