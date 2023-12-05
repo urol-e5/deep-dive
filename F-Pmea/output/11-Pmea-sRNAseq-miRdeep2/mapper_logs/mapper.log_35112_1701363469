@@ -1,0 +1,19 @@
+current dir:	/home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/code
+mapper command:	/home/shared/mirdeep2/bin/mapper.pl /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/11-Pmea-sRNAseq-miRdeep2/collapsed-reads-all-mirdeep2.fasta -c -p /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/data/Pmea/Pocillopora_meandrina_HIv1_nospaces.assembly -t /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/11-Pmea-sRNAseq-miRdeep2/Pmea-mirdeep2-mapping.arf -o 46
+
+timestamp:	30_11_2023_t_08_57_49
+
+discarding short reads
+fastaparse.pl /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/11-Pmea-sRNAseq-miRdeep2/collapsed-reads-all-mirdeep2.fasta -a 18 > dir_mapper_seq_collapsed-reads-all-mirdeep2.fasta_2750439856_30_11_2023_t_08_57_49/reads_no_short.fa 2>dir_mapper_seq_collapsed-reads-all-mirdeep2.fasta_2750439856_30_11_2023_t_08_57_49/reads_too_short
+mapping reads to genome index
+bowtie -p 46 -f -n 0 -e 80 -l 18 -a -m 5 --best --strata  /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/data/Pmea/Pocillopora_meandrina_HIv1_nospaces.assembly  --al dir_mapper_seq_collapsed-reads-all-mirdeep2.fasta_2750439856_30_11_2023_t_08_57_49/collapsed-reads-all-mirdeep2.fasta_mapped --un dir_mapper_seq_collapsed-reads-all-mirdeep2.fasta_2750439856_30_11_2023_t_08_57_49/collapsed-reads-all-mirdeep2.fasta_not_mapped  dir_mapper_seq_collapsed-reads-all-mirdeep2.fasta_2750439856_30_11_2023_t_08_57_49/reads_no_short.fa dir_mapper_seq_collapsed-reads-all-mirdeep2.fasta_2750439856_30_11_2023_t_08_57_49/mappings.bwt 2>bowtie.log
+
+convert_bowtie_output.pl dir_mapper_seq_collapsed-reads-all-mirdeep2.fasta_2750439856_30_11_2023_t_08_57_49/mappings.bwt > dir_mapper_seq_collapsed-reads-all-mirdeep2.fasta_2750439856_30_11_2023_t_08_57_49/mappings.arf
+trimming unmapped nts in the 3' ends
+parse_mappings.pl dir_mapper_seq_collapsed-reads-all-mirdeep2.fasta_2750439856_30_11_2023_t_08_57_49/mappings.arf -j > dir_mapper_seq_collapsed-reads-all-mirdeep2.fasta_2750439856_30_11_2023_t_08_57_49/mappings_trim.arf
+
+remove tmp dir
+rmtree(dir_mapper_seq_collapsed-reads-all-mirdeep2.fasta_2750439856_30_11_2023_t_08_57_49)
+
+############################################################
+
