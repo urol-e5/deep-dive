@@ -1,0 +1,100 @@
+---
+title: "05.42-lncRNA-discovery-CPC2"
+author: "Zach Bengtsson"
+date: "2023-12-13"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(tidyverse)
+library(kableExtra)
+library(DT)
+library(Biostrings)
+library(tm)
+knitr::opts_chunk$set(
+  echo = TRUE,         # Display code chunks
+  eval = FALSE,         # Evaluate code chunks
+  warning = FALSE,     # Hide warnings
+  message = FALSE,     # Hide messages
+  fig.width = 6,       # Set plot width in inches
+  fig.height = 4,      # Set plot height in inches
+  fig.align = "center", # Align plots to the center
+  comment = ""         # Prevents appending '##' to beginning of lines in code output
+)
+```
+
+# Bedtools
+Extracts the sequence data from the `$FASTA` reference file based on the coordinates from the filtered GTF. The resulting sequences represent potential lncRNA candidates.
+
+```{r, engine='bash'}
+awk '$3 == "transcript" && $1 !~ /^#/' \
+/home/shared/8TB_HDD_01/sr320/github/deep-dive/D-Apul/output/05.33-lncRNA-discovery/gffcompare_merged.annotated.gtf > ../output/05.33-lncRNA-discovery/formatted-gffcompare_merged.annotated.gtf
+```
+
+```{r, engine='bash'}
+head ../output/05.33-lncRNA-discovery/formatted-gffcompare_merged.annotated.gtf
+```
+
+```{r, engine='bash'}
+/home/shared/bedtools2/bin/fastaFromBed \
+-fi ../data/GCF_013753865.1_Amil_v2.1_genomic.fna \
+-bed ../output/05.33-lncRNA-discovery/formatted-gffcompare_merged.annotated.gtf \
+-fo ../output/05.33-lncRNA-discovery/CPC2_FIRST_Apul_lncRNA_candidates.fasta \
+-name -split
+```
+
+``````{r, engine='bash'}
+head ../output/05.33-lncRNA-discovery/CPC2_FIRST_Apul_lncRNA_candidates.fasta
+```
+
+
+```{r, engine='bash'}
+head ../output/05.33-lncRNA-discovery/CPC2_FIRST_Apul_lncRNA_candidates.fasta
+fgrep -c ">" ../output/05.33-lncRNA-discovery/CPC2_FIRST_Apul_lncRNA_candidates.fasta
+```
+
+# CPC2
+Initializes a conda environment (Anaconda) and runs CPC2, a software to predict whether a transcript is coding or non-coding. The results are saved to the $OUTPUT_DIR. CPC2 uses ORF (Open Reading Frame) Analysis, Isometric Feature Mapping (Isomap), Sequence Homology, RNA Sequence Features, and Quality of Translation to assess coding potential and flag any transcripts we would want to exclude using the FASTA generated in the previous step.
+
+```{r, engine='bash'}
+eval "$(/opt/anaconda/anaconda3/bin/conda shell.bash hook)"
+python /home/shared/CPC2_standalone-1.0.1/bin/CPC2.py \
+-i ../output/05.33-lncRNA-discovery/CPC2_FIRST_Apul_lncRNA_candidates.fasta \
+-o ../output/05.33-lncRNA-discovery/CPC2_FIRST_Apul
+```
+
+#Filter
+Filters the CPC2 results to get only noncoding transcripts (using the class "noncoding" from the CPC2 results) and extracts their IDs and matches these IDs with the sequences from the previous step to generate a GTF of long noncoding transcripts.
+
+Matches these IDs with the sequences from the previous step to generate a GTF of noncoding transcripts.
+
+```{r, engine='bash'}
+awk '$8 == "noncoding" {print $1}' ../output/05.33-lncRNA-discovery/CPC2_FIRST_Apul.txt > ../output/05.33-lncRNA-discovery/CPC2_FIRST_Apul_noncoding_transcripts_ids.txt
+```
+
+```{r, engine='bash'}
+wc -l ../output/05.33-lncRNA-discovery/CPC2_FIRST_Apul_noncoding_transcripts_ids.txt
+head ../output/05.33-lncRNA-discovery/CPC2_FIRST_Apul_noncoding_transcripts_ids.txt
+```
+
+
+```{r, engine='bash', eval=TRUE}
+head ../output/05.33-lncRNA-discovery/Apul_lncRNA_candidates.fasta
+fgrep -c ">" ../output/05.33-lncRNA-discovery/Apul_lncRNA_candidates.fasta
+```
+
+# subsetting fasta
+```{r, engine='bash'}
+/home/shared/samtools-1.12/samtools faidx ../output/05.33-lncRNA-discovery/CPC2_FIRST_Apul_lncRNA_candidates.fasta \
+-r ../output/05.33-lncRNA-discovery/CPC2_FIRST_Apul_noncoding_transcripts_ids.txt > ../output/05.33-lncRNA-discovery/CPC2_FIRST_Apul_lncRNA_filtered.fasta
+
+```
+
+
+```{r, engine='bash', eval=TRUE}
+fgrep -c ">" ../output/05.33-lncRNA-discovery/CPC2_FIRST_Apul_lncRNA_filtered.fasta
+#fgrep ">" ../output/05.33-lncRNA-discovery/CPC2_FIRST_Apul_lncRNA.fasta | head -5
+
+#head ../output/05.33-lncRNA-discovery/Apul_lncRNA.fasta
+```
