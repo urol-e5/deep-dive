@@ -1,0 +1,364 @@
+# reads processed: 15063975
+# reads with at least one alignment: 9782238 (64.94%)
+# reads that failed to align: 5281737 (35.06%)
+Reported 55290048 alignments
+
+ShortStack version 4.0.2
+
+Beginning run
+Options:
+{   'adapter': None,
+    'align_only': False,
+    'autotrim': False,
+    'autotrim_key': 'TCGGACCAGGCTTCATTCCCC',
+    'bamfile': None,
+    'dicermax': 24,
+    'dicermin': 21,
+    'dn_mirna': True,
+    'genomefile': '/home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/data/Pmea/Pocillopora_meandrina_HIv1.assembly.fa',
+    'known_miRNAs': '/home/shared/8TB_HDD_02/shedurkin/deep-dive/data/mirbase-mature-v22.1.fa',
+    'locifile': None,
+    'locus': None,
+    'mincov': 1,
+    'mmap': 'u',
+    'nohp': False,
+    'outdir': '/home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out',
+    'pad': 200,
+    'readfile': [   '/home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/08-Pmea-sRNAseq-trimming/trimmed-reads/sRNA-POC-47-S1-TP2.flexbar_trim.25bp_1.fastq.gz',
+                    '/home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/08-Pmea-sRNAseq-trimming/trimmed-reads/sRNA-POC-47-S1-TP2.flexbar_trim.25bp_2.fastq.gz',
+                    '/home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/08-Pmea-sRNAseq-trimming/trimmed-reads/sRNA-POC-48-S1-TP2.flexbar_trim.25bp_1.fastq.gz',
+                    '/home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/08-Pmea-sRNAseq-trimming/trimmed-reads/sRNA-POC-48-S1-TP2.flexbar_trim.25bp_2.fastq.gz',
+                    '/home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/08-Pmea-sRNAseq-trimming/trimmed-reads/sRNA-POC-50-S1-TP2.flexbar_trim.25bp_1.fastq.gz',
+                    '/home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/08-Pmea-sRNAseq-trimming/trimmed-reads/sRNA-POC-50-S1-TP2.flexbar_trim.25bp_2.fastq.gz',
+                    '/home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/08-Pmea-sRNAseq-trimming/trimmed-reads/sRNA-POC-53-S1-TP2.flexbar_trim.25bp_1.fastq.gz',
+                    '/home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/08-Pmea-sRNAseq-trimming/trimmed-reads/sRNA-POC-53-S1-TP2.flexbar_trim.25bp_2.fastq.gz',
+                    '/home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/08-Pmea-sRNAseq-trimming/trimmed-reads/sRNA-POC-57-S1-TP2.flexbar_trim.25bp_1.fastq.gz',
+                    '/home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/08-Pmea-sRNAseq-trimming/trimmed-reads/sRNA-POC-57-S1-TP2.flexbar_trim.25bp_2.fastq.gz'],
+    'show_secondaries': False,
+    'strand_cutoff': 0.8,
+    'threads': 46}
+Required executable RNAfold : /home/sam/programs/mambaforge/envs/ShortStack4_env/bin/RNAfold
+Required executable strucVis : /home/sam/programs/mambaforge/envs/ShortStack4_env/bin/strucVis
+Required executable bowtie : /home/sam/programs/mambaforge/envs/ShortStack4_env/bin/bowtie
+Required executable bowtie-build : /home/sam/programs/mambaforge/envs/ShortStack4_env/bin/bowtie-build
+Required executable ShortTracks : /home/sam/programs/mambaforge/envs/ShortStack4_env/bin/ShortTracks
+Required executable wigToBigWig : /home/sam/programs/mambaforge/envs/ShortStack4_env/bin/wigToBigWig
+Required executable samtools : /home/sam/programs/mambaforge/envs/ShortStack4_env/bin/samtools
+
+Thu 30 Nov 2023 15:50:29 -0800 PST
+Required bowtie indices not found. Building them ...
+
+
+    Completed
+
+Beginning alignment phase
+
+Thu 30 Nov 2023 15:54:22 -0800 PST
+Aligning /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/08-Pmea-sRNAseq-trimming/trimmed-reads/sRNA-POC-47-S1-TP2.flexbar_trim.25bp_1.fastq.gz
+First pass alignment with bowtie using 46 threads
+Second pass - placing multimappers using 46 threads to process 16 chunks
+[bam_sort_core] merging from 0 files and 46 in-memory blocks...
+# reads processed: 15063975
+# reads with at least one alignment: 9604039 (63.76%)
+# reads that failed to align: 5459936 (36.24%)
+Reported 51217763 alignments
+
+Converting to sorted bam format
+Uniquely mapped (U) reads: 2277004/15063975 (15.1%)
+Multi-mapped reads placed (P) with guidance: 5027929/15063975 (33.4%)
+Multi-mapped reads randomly (R) placed: 2197291/15063975 (14.6%)
+Very highly (H) multi-mapped reads (>=50 hits): 280014/15063975 (1.9%)
+Not mapped (N) reads (no hits): 5281737/15063975 (35.1%)
+
+Thu 30 Nov 2023 16:01:00 -0800 PST
+Aligning /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/08-Pmea-sRNAseq-trimming/trimmed-reads/sRNA-POC-47-S1-TP2.flexbar_trim.25bp_2.fastq.gz
+First pass alignment with bowtie using 46 threads
+Second pass - placing multimappers using 46 threads to process 16 chunks
+[bam_sort_core] merging from 0 files and 46 in-memory blocks...
+# reads processed: 16574535
+# reads with at least one alignment: 10703744 (64.58%)
+# reads that failed to align: 5870791 (35.42%)
+Reported 49150938 alignments
+
+Converting to sorted bam format
+Uniquely mapped (U) reads: 2321579/15063975 (15.4%)
+Multi-mapped reads placed (P) with guidance: 5163916/15063975 (34.3%)
+Multi-mapped reads randomly (R) placed: 1949275/15063975 (12.9%)
+Very highly (H) multi-mapped reads (>=50 hits): 169269/15063975 (1.1%)
+Not mapped (N) reads (no hits): 5459936/15063975 (36.2%)
+
+Thu 30 Nov 2023 16:07:03 -0800 PST
+Aligning /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/08-Pmea-sRNAseq-trimming/trimmed-reads/sRNA-POC-48-S1-TP2.flexbar_trim.25bp_1.fastq.gz
+First pass alignment with bowtie using 46 threads
+Second pass - placing multimappers using 46 threads to process 17 chunks
+[bam_sort_core] merging from 0 files and 46 in-memory blocks...
+# reads processed: 16574535
+# reads with at least one alignment: 10587953 (63.88%)
+# reads that failed to align: 5986582 (36.12%)
+Reported 48347223 alignments
+
+Converting to sorted bam format
+Uniquely mapped (U) reads: 1999451/16574535 (12.1%)
+Multi-mapped reads placed (P) with guidance: 5904484/16574535 (35.6%)
+Multi-mapped reads randomly (R) placed: 2680885/16574535 (16.2%)
+Very highly (H) multi-mapped reads (>=50 hits): 118924/16574535 (0.7%)
+Not mapped (N) reads (no hits): 5870791/16574535 (35.4%)
+
+Thu 30 Nov 2023 16:12:52 -0800 PST
+Aligning /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/08-Pmea-sRNAseq-trimming/trimmed-reads/sRNA-POC-48-S1-TP2.flexbar_trim.25bp_2.fastq.gz
+First pass alignment with bowtie using 46 threads
+Second pass - placing multimappers using 46 threads to process 17 chunks
+[bam_sort_core] merging from 0 files and 46 in-memory blocks...
+# reads processed: 14858812
+# reads with at least one alignment: 8787387 (59.14%)
+# reads that failed to align: 6071425 (40.86%)
+Reported 44785573 alignments
+
+Converting to sorted bam format
+Uniquely mapped (U) reads: 2001792/16574535 (12.1%)
+Multi-mapped reads placed (P) with guidance: 5949715/16574535 (35.9%)
+Multi-mapped reads randomly (R) placed: 2487570/16574535 (15.0%)
+Very highly (H) multi-mapped reads (>=50 hits): 148876/16574535 (0.9%)
+Not mapped (N) reads (no hits): 5986582/16574535 (36.1%)
+
+Thu 30 Nov 2023 16:18:21 -0800 PST
+Aligning /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/08-Pmea-sRNAseq-trimming/trimmed-reads/sRNA-POC-50-S1-TP2.flexbar_trim.25bp_1.fastq.gz
+First pass alignment with bowtie using 46 threads
+Second pass - placing multimappers using 46 threads to process 15 chunks
+[bam_sort_core] merging from 0 files and 46 in-memory blocks...
+# reads processed: 14858812
+# reads with at least one alignment: 8686601 (58.46%)
+# reads that failed to align: 6172211 (41.54%)
+Reported 44595699 alignments
+
+Converting to sorted bam format
+Uniquely mapped (U) reads: 2112577/14858812 (14.2%)
+Multi-mapped reads placed (P) with guidance: 4733749/14858812 (31.9%)
+Multi-mapped reads randomly (R) placed: 1787501/14858812 (12.0%)
+Very highly (H) multi-mapped reads (>=50 hits): 153560/14858812 (1.0%)
+Not mapped (N) reads (no hits): 6071425/14858812 (40.9%)
+
+Thu 30 Nov 2023 16:23:28 -0800 PST
+Aligning /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/08-Pmea-sRNAseq-trimming/trimmed-reads/sRNA-POC-50-S1-TP2.flexbar_trim.25bp_2.fastq.gz
+First pass alignment with bowtie using 46 threads
+Second pass - placing multimappers using 46 threads to process 15 chunks
+[bam_sort_core] merging from 0 files and 46 in-memory blocks...
+# reads processed: 18481608
+# reads with at least one alignment: 14404188 (77.94%)
+# reads that failed to align: 4077420 (22.06%)
+Reported 58140266 alignments
+
+Converting to sorted bam format
+Uniquely mapped (U) reads: 2140008/14858812 (14.4%)
+Multi-mapped reads placed (P) with guidance: 4715818/14858812 (31.7%)
+Multi-mapped reads randomly (R) placed: 1658138/14858812 (11.2%)
+Very highly (H) multi-mapped reads (>=50 hits): 172637/14858812 (1.2%)
+Not mapped (N) reads (no hits): 6172211/14858812 (41.5%)
+
+Thu 30 Nov 2023 16:28:34 -0800 PST
+Aligning /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/08-Pmea-sRNAseq-trimming/trimmed-reads/sRNA-POC-53-S1-TP2.flexbar_trim.25bp_1.fastq.gz
+First pass alignment with bowtie using 46 threads
+Second pass - placing multimappers using 46 threads to process 19 chunks
+[bam_sort_core] merging from 0 files and 46 in-memory blocks...
+# reads processed: 18481608
+# reads with at least one alignment: 14111815 (76.36%)
+# reads that failed to align: 4369793 (23.64%)
+Reported 56895198 alignments
+
+Converting to sorted bam format
+Uniquely mapped (U) reads: 3272135/18481608 (17.7%)
+Multi-mapped reads placed (P) with guidance: 6276510/18481608 (34.0%)
+Multi-mapped reads randomly (R) placed: 4691391/18481608 (25.4%)
+Very highly (H) multi-mapped reads (>=50 hits): 164152/18481608 (0.9%)
+Not mapped (N) reads (no hits): 4077420/18481608 (22.1%)
+
+Thu 30 Nov 2023 16:34:54 -0800 PST
+Aligning /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/08-Pmea-sRNAseq-trimming/trimmed-reads/sRNA-POC-53-S1-TP2.flexbar_trim.25bp_2.fastq.gz
+First pass alignment with bowtie using 46 threads
+Second pass - placing multimappers using 46 threads to process 19 chunks
+[bam_sort_core] merging from 0 files and 46 in-memory blocks...
+# reads processed: 16574698
+# reads with at least one alignment: 13792666 (83.22%)
+# reads that failed to align: 2782032 (16.78%)
+Reported 49700739 alignments
+
+Converting to sorted bam format
+Uniquely mapped (U) reads: 3222983/18481608 (17.4%)
+Multi-mapped reads placed (P) with guidance: 6189165/18481608 (33.5%)
+Multi-mapped reads randomly (R) placed: 4518740/18481608 (24.4%)
+Very highly (H) multi-mapped reads (>=50 hits): 180927/18481608 (1.0%)
+Not mapped (N) reads (no hits): 4369793/18481608 (23.6%)
+
+Thu 30 Nov 2023 16:41:18 -0800 PST
+Aligning /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/08-Pmea-sRNAseq-trimming/trimmed-reads/sRNA-POC-57-S1-TP2.flexbar_trim.25bp_1.fastq.gz
+First pass alignment with bowtie using 46 threads
+Second pass - placing multimappers using 46 threads to process 17 chunks
+[bam_sort_core] merging from 0 files and 46 in-memory blocks...
+# reads processed: 16574698
+# reads with at least one alignment: 13637176 (82.28%)
+# reads that failed to align: 2937522 (17.72%)
+Reported 50261555 alignments
+
+Converting to sorted bam format
+Uniquely mapped (U) reads: 2712534/16574698 (16.4%)
+Multi-mapped reads placed (P) with guidance: 6640321/16574698 (40.1%)
+Multi-mapped reads randomly (R) placed: 4298012/16574698 (25.9%)
+Very highly (H) multi-mapped reads (>=50 hits): 141799/16574698 (0.9%)
+Not mapped (N) reads (no hits): 2782032/16574698 (16.8%)
+
+Thu 30 Nov 2023 16:46:58 -0800 PST
+Aligning /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/08-Pmea-sRNAseq-trimming/trimmed-reads/sRNA-POC-57-S1-TP2.flexbar_trim.25bp_2.fastq.gz
+First pass alignment with bowtie using 46 threads
+Second pass - placing multimappers using 46 threads to process 17 chunks
+[bam_sort_core] merging from 0 files and 46 in-memory blocks...
+ShortTracks version 1.1
+
+Required executable samtools : /home/sam/programs/mambaforge/envs/ShortStack4_env/bin/samtools
+Required executable wigToBigWig : /home/sam/programs/mambaforge/envs/ShortStack4_env/bin/wigToBigWig
+
+Preparing commands, counting overall reads
+
+Getting raw depths
+samtools view -F 256 -r sRNA-POC-47-S1-TP2.flexbar_trim.25bp_1 -h /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments.bam | samtools depth - > /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_sRNA-POC-47-S1-TP2.flexbar_trim.25bp_1_depths.txt
+
+samtools view -F 256 -r sRNA-POC-47-S1-TP2.flexbar_trim.25bp_2 -h /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments.bam | samtools depth - > /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_sRNA-POC-47-S1-TP2.flexbar_trim.25bp_2_depths.txt
+
+samtools view -F 256 -r sRNA-POC-48-S1-TP2.flexbar_trim.25bp_1 -h /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments.bam | samtools depth - > /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_sRNA-POC-48-S1-TP2.flexbar_trim.25bp_1_depths.txt
+
+samtools view -F 256 -r sRNA-POC-48-S1-TP2.flexbar_trim.25bp_2 -h /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments.bam | samtools depth - > /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_sRNA-POC-48-S1-TP2.flexbar_trim.25bp_2_depths.txt
+
+samtools view -F 256 -r sRNA-POC-50-S1-TP2.flexbar_trim.25bp_1 -h /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments.bam | samtools depth - > /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_sRNA-POC-50-S1-TP2.flexbar_trim.25bp_1_depths.txt
+
+samtools view -F 256 -r sRNA-POC-50-S1-TP2.flexbar_trim.25bp_2 -h /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments.bam | samtools depth - > /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_sRNA-POC-50-S1-TP2.flexbar_trim.25bp_2_depths.txt
+
+samtools view -F 256 -r sRNA-POC-53-S1-TP2.flexbar_trim.25bp_1 -h /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments.bam | samtools depth - > /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_sRNA-POC-53-S1-TP2.flexbar_trim.25bp_1_depths.txt
+
+samtools view -F 256 -r sRNA-POC-53-S1-TP2.flexbar_trim.25bp_2 -h /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments.bam | samtools depth - > /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_sRNA-POC-53-S1-TP2.flexbar_trim.25bp_2_depths.txt
+
+samtools view -F 256 -r sRNA-POC-57-S1-TP2.flexbar_trim.25bp_1 -h /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments.bam | samtools depth - > /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_sRNA-POC-57-S1-TP2.flexbar_trim.25bp_1_depths.txt
+
+samtools view -F 256 -r sRNA-POC-57-S1-TP2.flexbar_trim.25bp_2 -h /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments.bam | samtools depth - > /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_sRNA-POC-57-S1-TP2.flexbar_trim.25bp_2_depths.txt
+
+
+Writing wiggle files
+/home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_sRNA-POC-47-S1-TP2.flexbar_trim.25bp_1.wig
+/home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_sRNA-POC-47-S1-TP2.flexbar_trim.25bp_2.wig
+/home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_sRNA-POC-48-S1-TP2.flexbar_trim.25bp_1.wig
+/home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_sRNA-POC-48-S1-TP2.flexbar_trim.25bp_2.wig
+/home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_sRNA-POC-50-S1-TP2.flexbar_trim.25bp_1.wig
+/home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_sRNA-POC-50-S1-TP2.flexbar_trim.25bp_2.wig
+/home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_sRNA-POC-53-S1-TP2.flexbar_trim.25bp_1.wig
+/home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_sRNA-POC-53-S1-TP2.flexbar_trim.25bp_2.wig
+/home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_sRNA-POC-57-S1-TP2.flexbar_trim.25bp_1.wig
+/home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_sRNA-POC-57-S1-TP2.flexbar_trim.25bp_2.wig
+
+Writing bigwig files
+wigToBigWig /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_sRNA-POC-47-S1-TP2.flexbar_trim.25bp_1.wig chromSizes.txt /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_sRNA-POC-47-S1-TP2.flexbar_trim.25bp_1.bw
+wigToBigWig /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_sRNA-POC-47-S1-TP2.flexbar_trim.25bp_2.wig chromSizes.txt /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_sRNA-POC-47-S1-TP2.flexbar_trim.25bp_2.bw
+wigToBigWig /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_sRNA-POC-48-S1-TP2.flexbar_trim.25bp_1.wig chromSizes.txt /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_sRNA-POC-48-S1-TP2.flexbar_trim.25bp_1.bw
+wigToBigWig /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_sRNA-POC-48-S1-TP2.flexbar_trim.25bp_2.wig chromSizes.txt /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_sRNA-POC-48-S1-TP2.flexbar_trim.25bp_2.bw
+wigToBigWig /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_sRNA-POC-50-S1-TP2.flexbar_trim.25bp_1.wig chromSizes.txt /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_sRNA-POC-50-S1-TP2.flexbar_trim.25bp_1.bw
+wigToBigWig /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_sRNA-POC-50-S1-TP2.flexbar_trim.25bp_2.wig chromSizes.txt /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_sRNA-POC-50-S1-TP2.flexbar_trim.25bp_2.bw
+wigToBigWig /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_sRNA-POC-53-S1-TP2.flexbar_trim.25bp_1.wig chromSizes.txt /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_sRNA-POC-53-S1-TP2.flexbar_trim.25bp_1.bw
+wigToBigWig /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_sRNA-POC-53-S1-TP2.flexbar_trim.25bp_2.wig chromSizes.txt /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_sRNA-POC-53-S1-TP2.flexbar_trim.25bp_2.bw
+wigToBigWig /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_sRNA-POC-57-S1-TP2.flexbar_trim.25bp_1.wig chromSizes.txt /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_sRNA-POC-57-S1-TP2.flexbar_trim.25bp_1.bw
+wigToBigWig /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_sRNA-POC-57-S1-TP2.flexbar_trim.25bp_2.wig chromSizes.txt /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_sRNA-POC-57-S1-TP2.flexbar_trim.25bp_2.bw
+ShortTracks version 1.1
+
+Required executable samtools : /home/sam/programs/mambaforge/envs/ShortStack4_env/bin/samtools
+Required executable wigToBigWig : /home/sam/programs/mambaforge/envs/ShortStack4_env/bin/wigToBigWig
+
+Preparing commands, counting overall reads
+
+Getting raw depths
+samtools view -F 272 -e "qlen==21" -h /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments.bam | samtools depth - > /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_21_p_depths.txt
+
+samtools view -F 256 -f 16 -e "qlen==21" -h /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments.bam | samtools depth - > /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_21_m_depths.txt
+
+samtools view -F 272 -e "qlen==22" -h /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments.bam | samtools depth - > /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_22_p_depths.txt
+
+samtools view -F 256 -f 16 -e "qlen==22" -h /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments.bam | samtools depth - > /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_22_m_depths.txt
+
+samtools view -F 272 -e "qlen==23 || qlen==24" -h /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments.bam | samtools depth - > /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_23-24_p_depths.txt
+
+samtools view -F 256 -f 16 -e "qlen==23 || qlen==24" -h /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments.bam | samtools depth - > /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_23-24_m_depths.txt
+
+samtools view -F 272 -e "qlen < 21 || qlen > 24" -h /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments.bam | samtools depth - > /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_other_p_depths.txt
+
+samtools view -F 256 -f 16 -e "qlen < 21 || qlen > 24" -h /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments.bam | samtools depth - > /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_other_m_depths.txt
+
+
+Writing wiggle files
+/home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_21_p.wig
+/home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_21_m.wig
+/home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_22_p.wig
+/home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_22_m.wig
+/home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_23-24_p.wig
+/home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_23-24_m.wig
+/home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_other_p.wig
+/home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_other_m.wig
+
+Writing bigwig files
+wigToBigWig /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_21_p.wig chromSizes.txt /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_21_p.bw
+wigToBigWig /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_21_m.wig chromSizes.txt /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_21_m.bw
+wigToBigWig /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_22_p.wig chromSizes.txt /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_22_p.bw
+wigToBigWig /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_22_m.wig chromSizes.txt /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_22_m.bw
+wigToBigWig /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_23-24_p.wig chromSizes.txt /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_23-24_p.bw
+wigToBigWig /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_23-24_m.wig chromSizes.txt /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_23-24_m.bw
+wigToBigWig /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_other_p.wig chromSizes.txt /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_other_p.bw
+wigToBigWig /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_other_m.wig chromSizes.txt /home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea/output/13-Pmea-sRNAseq-ShortStack/ShortStack_out/merged_alignments_other_m.bw
+
+Converting to sorted bam format
+Uniquely mapped (U) reads: 2665025/16574698 (16.1%)
+Multi-mapped reads placed (P) with guidance: 6625937/16574698 (40.0%)
+Multi-mapped reads randomly (R) placed: 4170549/16574698 (25.2%)
+Very highly (H) multi-mapped reads (>=50 hits): 175665/16574698 (1.1%)
+Not mapped (N) reads (no hits): 2937522/16574698 (17.7%)
+
+Thu 30 Nov 2023 16:52:38 -0800 PST
+Merging and indexing alignments
+
+Creating browser tracks by readgroup using ShortTracks
+
+Creating browser tracks by readlength and strand using ShortTracks
+
+Thu 30 Nov 2023 17:26:57 -0800 PST
+Defining small RNA clusters de novo
+With 163107256 total reads and mincov of 1 reads per million, the min read depth is 163
+
+Thu 30 Nov 2023 17:27:17 -0800 PST
+Analyzing cluster properties using 46 threads
+# reads processed: 48885
+# reads with at least one alignment: 111 (0.23%)
+# reads that failed to align: 48774 (99.77%)
+Reported 1714 alignments
+[bam_sort_core] merging from 0 files and 46 in-memory blocks...
+
+Thu 30 Nov 2023 17:30:26 -0800 PST
+ Completed
+
+Thu 30 Nov 2023 17:30:26 -0800 PST
+Searching for valid microRNA loci
+Aligning known_miRNAs sequences to genome
+
+Screening of possible microRNAs from user provided known_miRNAs
+
+Screening of possible de novo microRNAs
+
+No microRNA loci were found!
+
+Writing final files
+
+Non-MIRNA loci by DicerCall:
+N 7191
+23 45
+22 39
+21 18
+24 13
+
+Thu 30 Nov 2023 17:31:28 -0800 PST
+Run Completed!
+
+real	101m1.563s
+user	1946m43.958s
+sys	621m8.203s
