@@ -1,0 +1,157 @@
+---
+title: "08-comparative-BLASTs"
+author: "Zach Bengtsson"
+date: "2023-12-29"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(tidyverse)
+library(kableExtra)
+library(DT)
+library(Biostrings)
+library(tm)
+knitr::opts_chunk$set(
+  echo = TRUE,         # Display code chunks
+  eval = FALSE,         # Evaluate code chunks
+  warning = FALSE,     # Hide warnings
+  message = FALSE,     # Hide messages
+  fig.width = 6,       # Set plot width in inches
+  fig.height = 4,      # Set plot height in inches
+  fig.align = "center", # Align plots to the center
+  comment = ""         # Prevents appending '##' to beginning of lines in code output
+)
+```
+
+# Download FASTAS
+
+# Data Download
+Grab 3 FASTAs (currently messing around with my old ones while I wait for the new ones to finish)
+
+```{r, engine='bash'}
+cd ~/github/deep-dive/DEF-cross-species/data/08-comparative-BLASTs
+
+#Apul
+curl -O https://raw.githubusercontent.com/urol-e5/deep-dive/main/D-Apul/output/05.33-lncRNA-discovery/Apul_lncRNA.fasta
+#Peve
+curl -O https://raw.githubusercontent.com/urol-e5/deep-dive/main/E-Peve/output/Peve_lncRNA.fasta
+#Pmea
+curl -O https://raw.githubusercontent.com/urol-e5/deep-dive/main/F-Pmea/output/02-lncRNA-discovery/Pmea_lncRNA.fasta
+
+head ~/github/deep-dive/DEF-cross-species/data/08-comparative-BLASTs/*fasta
+```
+
+# Merge FASTAs
+```{bash}
+cd ~/github/deep-dive/DEF-cross-species/data/08-comparative-BLASTs
+
+cat Apul_lncRNA.fasta Peve_lncRNA.fasta Pmea_lncRNA.fasta > merged_lncRNAs.fasta
+
+head merged_lncRNAs.fasta
+```
+
+# BLASTs
+
+Make database for each species
+Apul
+```{r, engine='bash'}
+/home/shared/ncbi-blast-2.11.0+/bin/makeblastdb \
+-in ~/github/deep-dive/DEF-cross-species/data/08-comparative-BLASTs/Apul_lncRNA.fasta \
+-dbtype nucl \
+-out ~/github/deep-dive/DEF-cross-species/output/08-comparative-BLASTs/blasts/Apul-db/Apul_lncRNA
+```
+
+Peve
+```{r, engine='bash'}
+/home/shared/ncbi-blast-2.11.0+/bin/makeblastdb \
+-in ~/github/deep-dive/DEF-cross-species/data/08-comparative-BLASTs/Peve_lncRNA.fasta \
+-dbtype nucl \
+-out ~/github/deep-dive/DEF-cross-species/output/08-comparative-BLASTs/blasts/Peve-db/Peve_lncRNA
+```
+
+Pmea
+```{r, engine='bash'}
+/home/shared/ncbi-blast-2.11.0+/bin/makeblastdb \
+-in ~/github/deep-dive/DEF-cross-species/data/08-comparative-BLASTs/Pmea_lncRNA.fasta \
+-dbtype nucl \
+-out ~/github/deep-dive/DEF-cross-species/output/08-comparative-BLASTs/blasts/Pmea-db/Pmea_lncRNA
+```
+
+A pul to all
+```{r, engine='bash'}
+cd /home/shared/8TB_HDD_02/zbengt
+
+/home/shared/ncbi-blast-2.11.0+/bin/blastn \
+-task blastn \
+-query ~/github/deep-dive/DEF-cross-species/data/08-comparative-BLASTs/merged_lncRNAs.fasta \
+-db ~/github/deep-dive/DEF-cross-species/output/08-comparative-BLASTs/blasts/Apul-db/Apul_lncRNA \
+-out ~/github/deep-dive/DEF-cross-species/output/08-comparative-BLASTs/Apul.tab \
+-evalue 1E-40 \
+-num_threads 40 \
+-max_target_seqs 1 \
+-max_hsps 1 \
+-outfmt 6
+
+wc -l ~/github/deep-dive/DEF-cross-species/output/08-comparative-BLASTs/Apul.tab
+```
+
+Peve to all
+```{r, engine='bash'}
+cd /home/shared/8TB_HDD_02/zbengt
+
+/home/shared/ncbi-blast-2.11.0+/bin/blastn \
+-task blastn \
+-query ~/github/deep-dive/DEF-cross-species/data/08-comparative-BLASTs/merged_lncRNAs.fasta \
+-db ~/github/deep-dive/DEF-cross-species/output/08-comparative-BLASTs/blasts/Peve-db/Peve_lncRNA \
+-out ~/github/deep-dive/DEF-cross-species/output/08-comparative-BLASTs/Peve.tab \
+-evalue 1E-40 \
+-num_threads 40 \
+-max_target_seqs 1 \
+-max_hsps 1 \
+-outfmt 6
+
+wc -l ~/github/deep-dive/DEF-cross-species/output/08-comparative-BLASTs/Peve.tab
+```
+
+Pmea to all
+```{r, engine='bash'}
+cd /home/shared/8TB_HDD_02/zbengt
+
+/home/shared/ncbi-blast-2.11.0+/bin/blastn \
+-task blastn \
+-query ~/github/deep-dive/DEF-cross-species/data/08-comparative-BLASTs/merged_lncRNAs.fasta \
+-db ~/github/deep-dive/DEF-cross-species/output/08-comparative-BLASTs/blasts/Pmea-db/Pmea_lncRNA \
+-out ~/github/deep-dive/DEF-cross-species/output/08-comparative-BLASTs/Pmea.tab \
+-evalue 1E-40 \
+-num_threads 40 \
+-max_target_seqs 1 \
+-max_hsps 1 \
+-outfmt 6
+
+wc -l ~/github/deep-dive/DEF-cross-species/output/08-comparative-BLASTs/Apul.tab
+```
+
+# Join BLAST tables
+```{r}
+apul <- read.table("~/github/deep-dive/DEF-cross-species/output/08-comparative-BLASTs/Apul.tab", sep="\t", header=FALSE)
+peve <- read.table("~/github/deep-dive/DEF-cross-species/output/08-comparative-BLASTs/Peve.tab", sep="\t", header=FALSE)
+pmea <- read.table("~/github/deep-dive/DEF-cross-species/output/08-comparative-BLASTs/Pmea.tab", sep="\t", header=FALSE)
+```
+
+```{r}
+combined_blast <- rbind(apul, peve, pmea)
+```
+
+```{r}
+write.table(combined_blast, "~/github/deep-dive/DEF-cross-species/output/08-comparative-BLASTs/combined_blast.tab", sep="\t", row.names=FALSE, quote=FALSE)
+```
+
+
+
+Hits...
+```{r, engine='bash'}
+wc -l ~/github/deep-dive/DEF-cross-species/output/08-comparative-BLASTs/combined_blast.tab
+head ~/github/deep-dive/DEF-cross-species/output/08-comparative-BLASTs/combined_blast.tab
+```
+
