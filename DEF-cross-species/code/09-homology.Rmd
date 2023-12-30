@@ -1,0 +1,78 @@
+---
+title: "08-homology"
+author: "Steven Roberts"
+date: "2023-12-29"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(tidyverse)
+library(kableExtra)
+library(DT)
+library(Biostrings)
+library(tm)
+knitr::opts_chunk$set(
+  echo = TRUE,         # Display code chunks
+  eval = FALSE,         # Evaluate code chunks
+  warning = FALSE,     # Hide warnings
+  message = FALSE,     # Hide messages
+  fig.width = 6,       # Set plot width in inches
+  fig.height = 4,      # Set plot height in inches
+  fig.align = "center", # Align plots to the center
+  comment = ""         # Prevents appending '##' to beginning of lines in code output
+)
+```
+
+
+
+```{r, engine='bash', eval=TRUE}
+grep ">" -c ../../D-Apul/output/05.33-lncRNA-discovery/Apul_lncRNA.fasta
+
+head -2 ../../D-Apul/output/05.33-lncRNA-discovery/Apul_lncRNA.fasta 
+```
+
+```{r, engine='bash', eval=TRUE}
+grep ">" -c ../../E-Peve/output/05-lncRNA-discovery/Peve_lncRNA.fasta
+
+head -2 ../../E-Peve/output/05-lncRNA-discovery/Peve_lncRNA.fasta 
+```
+
+```{r, engine='bash', eval=TRUE}
+grep ">" -c ../../E-Peve/output/Peve_lncRNA.fasta
+
+head -2 ../../E-Peve/output/Peve_lncRNA.fasta 
+```
+
+
+
+```{r, engine='bash', eval=TRUE}
+grep ">" -c ../../F-Pmea/output/02-lncRNA-discovery/Pmea_lncRNA.fasta
+
+head -2 ../../F-Pmea/output/02-lncRNA-discovery/Pmea_lncRNA.fasta 
+```
+
+
+```{r, engine='bash'}
+cat \
+../../D-Apul/output/05.33-lncRNA-discovery/Apul_lncRNA.fasta \
+../../E-Peve/output/05-lncRNA-discovery/Peve_lncRNA.fasta \
+../../F-Pmea/output/02-lncRNA-discovery/Pmea_lncRNA.fasta \
+> ../output/09-homology/merged.fasta
+```
+
+
+```{r, engine='bash', eval=TRUE}
+grep ">" -c ../output/09-homology/merged.fasta
+
+head -2 ../output/09-homology/merged.fasta
+```
+
+
+
+
+```{r, engine='bash', eval=TRUE}
+wc -l ../output/08-comparative-BLASTs/*tab
+
+head -2 ../output/08-comparative-BLASTs/*tab
+```
