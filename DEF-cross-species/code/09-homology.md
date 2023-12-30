@@ -112,3 +112,33 @@ peve <- read.csv("../output/08-comparative-BLASTs/Peve.tab", sep = '\t', header 
 ``` r
 pmea <- read.csv("../output/08-comparative-BLASTs/Pmea.tab", sep = '\t', header = FALSE, row.names=NULL)
 ```
+
+``` r
+comp <- left_join(query, apul, by = "V1") %>%
+  left_join(peve, by = "V1") %>%
+  left_join(pmea, by = "V1") %>%
+  select(V1, apul_hit = V2.y, apul_evalue = V11.x, peve_hit = V2.x.x, peve_evalue = V11.y, pmea_hit = V2.y.y, pmea_evalue = V11) %>%
+   rowwise() %>%
+  mutate(Hits = sum(!is.na(c_across(c(apul_hit, peve_hit, pmea_hit)))))
+```
+
+``` r
+datatable(comp)
+```
+
+``` r
+count_table <- table(comp$Hits)
+print(count_table)
+```
+
+
+        0     1     2     3 
+       16 32266  5216  1967 
+
+Based on this
+
+1967 sequences are found in all species and 5216 sequences are present
+in 2 species
+
+It is worth doing some taxonomy comparisons to see relatedness of
+species,etc
