@@ -65,10 +65,8 @@ cat \
 ```{r, engine='bash', eval=TRUE}
 grep ">" -c ../output/09-homology/merged.fasta
 
-head -2 ../output/09-homology/merged.fasta
+head -4 ../output/09-homology/merged.fasta
 ```
-
-
 
 
 ```{r, engine='bash', eval=TRUE}
@@ -76,3 +74,45 @@ wc -l ../output/08-comparative-BLASTs/*tab
 
 head -2 ../output/08-comparative-BLASTs/*tab
 ```
+
+
+
+Joining table in R. 
+
+
+
+```{r, engine='bash'}
+perl -e '$count=0; $len=0; while(<>) {s/\r?\n//; s/\t/ /g; if (s/^>//) { if ($. != 1) {print "\n"} s/ |$/\t/; $count++; $_ .= "\t";} else {s/ //g; $len += length($_)} print $_;} print "\n"; warn "\nConverted $count FASTA records in $. lines to tabular format\nTotal sequence length: $len\n\n";' \
+../output/09-homology/merged.fasta > ../output/09-homology/merged.tab
+```
+
+```{r, eval=TRUE}
+query <- read.csv("../output/09-homology/merged.tab", sep = '\t', header = FALSE, row.names=NULL)
+```
+
+```{r, eval=TRUE}
+apul <- read.csv("../output/08-comparative-BLASTs/Apul.tab", sep = '\t', header = FALSE, row.names=NULL)
+```
+
+```{r, eval=TRUE}
+peve <- read.csv("../output/08-comparative-BLASTs/Peve.tab", sep = '\t', header = FALSE, row.names=NULL)
+```
+
+```{r, eval=TRUE}
+pmea <- read.csv("../output/08-comparative-BLASTs/Pmea.tab", sep = '\t', header = FALSE, row.names=NULL)
+```
+
+
+
+
+```{r, eval=TRUE}
+comp <- left_join(query, apul, by = "V1") %>%
+  left_join(peve, by = "V1") %>%
+  left_join(pmea, by = "V1") %>%
+  select(V1, apul_hit = V2.y, apul_evalue = V11.x, peve_hit = V2.x.x, peve_evalue = V11.y, pmea_hit = V2.y.y, pmea_evalue = V11)
+```
+
+
+
+
+
