@@ -1,46 +1,25 @@
----
-title: "14-Apul-RNAseq-kallisto"
-author: "Kathleen Durkin"
-date: "2024-01-24"
-output:
-  github_document:
-  html_document:
-    theme: cosmo
-    toc: true
-    toc_float: true
-    number_sections: true
-    code_folding: show
-    code_download: true
----
-
-```{r setup, include=FALSE}
-library(knitr)
-knitr::opts_chunk$set(
-  echo = TRUE,         # Display code chunks
-  eval = FALSE,        # Evaluate code chunks
-  warning = FALSE,     # Hide warnings
-  message = FALSE,     # Hide messages
-  comment = ""         # Prevents appending '##' to beginning of lines in code output
-)
-```
+14-Apul-RNAseq-kallisto
+================
+Kathleen Durkin
+2024-01-24
 
 Description
 
 Inputs:
 
-trimmed RNAseq reads
-transcripts FASTA (note using transcripts from A.millepora, not A.pulchra)
+trimmed RNAseq reads transcripts FASTA (note using transcripts from
+A.millepora, not A.pulchra)
 
 Outputs:
 
-
----
-
+------------------------------------------------------------------------
 
 # Create a Bash variables file
 
-This allows usage of Bash variables (e.g. paths to common directories) across R Markdown chunks.
-```{r save-bash-variables-to-rvars-file, engine='bash', eval=TRUE}
+This allows usage of Bash variables (e.g. paths to common directories)
+across R Markdown chunks.
+
+``` bash
 {
 echo "#### Assign Variables ####"
 echo ""
@@ -92,14 +71,54 @@ echo ")"
 cat .bashvars
 ```
 
+    #### Assign Variables ####
+
+    # Data directories
+    export Apul_dir=/home/shared/8TB_HDD_02/shedurkin/deep-dive/D-Apul
+    export output_dir_top=${Apul_dir}/output/14-Apul-RNAseq-kallisto
+    export trimmed_reads_dir=${output_dir_top}/trimmed-reads
+    export kallisto_output_dir=${output_dir_top}/kallisto
+
+    # Input/Output files
+    export Amil_ncbi_downloads_dir=${Apul_dir}/data/Amil
+    export transcriptome_fasta_dir=${Amil_ncbi_downloads_dir}/ncbi_dataset/data/GCF_013753865.1
+    export transcriptome_fasta_name="rna.fna"
+    export transcriptome_fasta="${transcriptome_fasta_dir}/${transcriptome_fasta_name}"
+    export kallisto_index_name="Amil_kallisto_index.idx"
+    # External data URLs
+    export trimmed_reads_url="https://gannet.fish.washington.edu/Atumefaciens/20230519-E5_coral-fastqc-fastp-multiqc-RNAseq/A_pulchra/trimmed/"
+    export transcriptome_fasta_url="https://api.ncbi.nlm.nih.gov/datasets/v2alpha/genome/accession/GCF_013753865.1/download?include_annotation_type=GENOME_FASTA,GENOME_GFF,RNA_FASTA,CDS_FASTA,PROT_FASTA,SEQUENCE_REPORT&filename=GCF_013753865.1.zip"
+
+    # Set filename patterns
+    export ncbi_accession='GCF_013753865.1'
+    export fastq_pattern='*.fastq.gz'
+    export R1_fastq_pattern='*_R1.fastq.gz'
+    export R2_fastq_pattern='*_R2.fastq.gz'
+
+    # Paths to programs
+    export kallisto=/home/shared/kallisto_linux-v0.50.1/kallisto
+    export trinity_abund_to_matrix=/home/shared/trinityrnaseq-v2.12.0/util/abundance_estimates_to_matrix.pl
+
+    # Set number of CPUs to use
+    export threads=20
+
+    # Programs associative array
+    declare -A programs_array
+    programs_array=(
+    [kallisto]="${kallisto}" \
+    [trinity_abund_to_matrix]="${trinity_abund_to_matrix}" \
+    )
 
 # Download trimmed RNAseq reads
 
-Reads are downloaded from: https://gannet.fish.washington.edu/Atumefaciens/20230519-E5_coral-fastqc-fastp-multiqc-RNAseq/A_pulchra/trimmed/
+Reads are downloaded from:
+<https://gannet.fish.washington.edu/Atumefaciens/20230519-E5_coral-fastqc-fastp-multiqc-RNAseq/A_pulchra/trimmed/>
 
-The `--cut-dirs 4` command cuts the preceding directory structure (i.e. `Atumefaciens/20230519-E5_coral-fastqc-fastp-multiqc-RNAseq/A_pulchra/trimmed/`) so that we just end up with the reads.
+The `--cut-dirs 4` command cuts the preceding directory structure
+(i.e. `Atumefaciens/20230519-E5_coral-fastqc-fastp-multiqc-RNAseq/A_pulchra/trimmed/`)
+so that we just end up with the reads.
 
-```{bash download-raw-reads, engine='bash', eval=FALSE}
+``` bash
 # Load bash variables into memory
 source .bashvars
 
@@ -119,11 +138,12 @@ ls -lh "${trimmed_reads_dir}"
 
 # FastQC/MultiQC on trimmed reads
 
-Already performed, can view multiqc report at https://gannet.fish.washington.edu/Atumefaciens/20230519-E5_coral-fastqc-fastp-multiqc-RNAseq/A_pulchra/trimmed/multiqc_report.html
+Already performed, can view multiqc report at
+<https://gannet.fish.washington.edu/Atumefaciens/20230519-E5_coral-fastqc-fastp-multiqc-RNAseq/A_pulchra/trimmed/multiqc_report.html>
 
 # Retrieve the reference transcriptome
 
-```{r download-transcriptome-fasta-ncbi, engine='bash', eval=FALSE}
+``` bash
 # Load bash variables into memory
 source .bashvars
 
@@ -135,7 +155,6 @@ curl \
 unzip ${Amil_ncbi_downloads_dir}/${ncbi_accession}.zip -d ${Amil_ncbi_downloads_dir}
 
 rm ${Amil_ncbi_downloads_dir}/${ncbi_accession}.zip
-
 ```
 
 ## Verify transcriptome FastA MD5 checksum
@@ -146,7 +165,7 @@ No checksum file(s) provided with ncbi download, so skippping this step
 
 ## Building Index
 
-```{r kallisto-indexing, engine='bash', eval=FALSE}
+``` bash
 # Load bash variables into memory
 source .bashvars
 
@@ -156,19 +175,25 @@ ${programs_array[kallisto]} index \
 --threads=${threads} \
 --index="${kallisto_index_name}" \
 "${transcriptome_fasta}"
-
 ```
-
 
 ## Sample Quantification
 
-Kallisto can run quantification on either single- or paired-end reads. The default option is paired-end, which requires the input of an even number of paired fastq files (e.g., pairA_R1.fastq, pairA_R2.fastq). 
-To use single-end mode, include the --single flag, as well as -l (--fragment-length=DOUBLE, estimated avg. fragment length) and -s (--sd=DOUBLE, estimates stand. dev. of fragment length), and a number of fastq files.
-Again, gzipped files are acceptable.
+Kallisto can run quantification on either single- or paired-end reads.
+The default option is paired-end, which requires the input of an even
+number of paired fastq files (e.g., pairA_R1.fastq, pairA_R2.fastq). To
+use single-end mode, include the –single flag, as well as -l
+(–fragment-length=DOUBLE, estimated avg. fragment length) and -s
+(–sd=DOUBLE, estimates stand. dev. of fragment length), and a number of
+fastq files. Again, gzipped files are acceptable.
 
-Kallisto quant is rather finicky about how you input sets of paired reads, and you can only input a single pair at a time. To circumvent, I'll create symlinks to each of the input files with simplified names, create a quantification function, and apply it iteratively to each pair using a loop.
+Kallisto quant is rather finicky about how you input sets of paired
+reads, and you can only input a single pair at a time. To circumvent,
+I’ll create symlinks to each of the input files with simplified names,
+create a quantification function, and apply it iteratively to each pair
+using a loop.
 
-```{r rename-trimmed-reads, engine='bash', eval=FALSE}
+``` bash
 # Load bash variables into memory
 source .bashvars
 
@@ -189,7 +214,7 @@ for file in "${trimmed_reads_dir}"/*.fastp-trim.20230519.fastq.gz; do
 done
 ```
 
-```{r kallisto-quantification, engine='bash', eval=FALSE}
+``` bash
 # Load bash variables into memory
 source .bashvars
 
@@ -238,10 +263,9 @@ for file_r1 in "${trimmed_reads_dir}"/*_R1.fastq.gz; do
 done
 ```
 
-
 ## Trinity Matrix with Kallisto Output
 
-```{r kallisto-trinity-matrix, engine='bash', eval=FALSE}
+``` bash
 # Load bash variables into memory
 source .bashvars
 
@@ -252,9 +276,6 @@ ${programs_array[trinity_abund_to_matrix]} \
 --gene_trans_map 'none' \
 --out_prefix 'kallisto' \
 --name_sample_by_basedir ${kallisto_output_dir}/kallisto_quant_*/abundance.tsv
-
 ```
 
-
 # Summary
-
