@@ -197,11 +197,6 @@ ${programs_array[bedtools]} getfasta -fi ${genome_fasta} -bed ${transcriptome_gf
 head -n 6 ${transcriptome_fasta}
 ```
 
-```{bash}
-source .bashvars
-head -n 1000 ${transcriptome_fasta} | tail -n 25
-```
-
 # Align to reference transcriptome (Kallisto pseudoalignment)
 
 ## Building Index
@@ -218,7 +213,7 @@ ${programs_array[kallisto]} index \
 "${transcriptome_fasta}"
 
 ```
-
+Note that, when building an index, kallisto warns us that it "replaced 10722052 non-ACGUT characters in the input sequence with pseudorandom nucleotides." This high number of identified "non-ACGUT" characters is related to the type of reference sequences we used to build the index. We obtained a coding sequence (CDS) gff file for P.evermanni and the associated scaffold genome fasta, filtered the gff to retain only mRNAs, and then used bedtools to extract the fasta sequences of every mRNA from the scaffold fasta. Notably, scaffolds are basically fragments of known DNA sequences "stitched" together by stretches of Ns to approximate the full sequence structure without complete sequence data. This means some of our mRNA sequences contain long, relatively-meaningless stretches of Ns. This shouldn't interfere with the kallisto pseudoalignment process, so we will continue.
 
 ## Sample Quantification
 
@@ -236,7 +231,7 @@ source .bashvars
 
 for file in "${trimmed_reads_dir}"/*.fastp-trim.20230519.fastq.gz; do
     # Extract sample ID and read number from the file name
-    sample_id=$(echo "$file" | grep -oP 'RNA-ACR-\K\d+')
+    sample_id=$(echo "$file" | grep -oP 'RNA-POR-\K\d+')
     read_number=$(echo "$file" | grep -oP '_R\K\d+')
 
     # Create the shortened name
@@ -245,11 +240,12 @@ for file in "${trimmed_reads_dir}"/*.fastp-trim.20230519.fastq.gz; do
     # Create symbolic link
     ln -s "$file" "${trimmed_reads_dir}/${shortened_name}"
 
-    echo "Created link: ${shortened_name}"
 done
+
+ls -lh ${trimmed_reads_dir}
 ```
 
-```{r kallisto-quantification, engine='bash', eval=FALSE}
+```{r kallisto-quantification, engine='bash', eval=TRUE}
 # Load bash variables into memory
 source .bashvars
 
