@@ -7,10 +7,16 @@ Description
 
 Inputs:
 
-trimmed RNAseq reads transcripts FASTA (note using transcripts from
-A.millepora, not A.pulchra)
+Trimmed *A. pulchra RNAseq* reads (found
+[here](https://gannet.fish.washington.edu/Atumefaciens/20230519-E5_coral-fastqc-fastp-multiqc-RNAseq/A_pulchra/trimmed/)
+
+Transcripts FASTA (note we are using transcripts from A.millepora, not
+A.pulchra). Downloaded from
+[NCBI](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_013753865.1/)
 
 Outputs:
+
+Counts matrix
 
 ------------------------------------------------------------------------
 
@@ -147,14 +153,19 @@ Already performed, can view multiqc report at
 # Load bash variables into memory
 source .bashvars
 
+# Download NCBI data zip file
 curl \
 -JX GET ${transcriptome_fasta_url} \
 -H "Accept: application/zip" \
 -o ${Amil_ncbi_downloads_dir}/${ncbi_accession}.zip
 
+# Unzip
 unzip ${Amil_ncbi_downloads_dir}/${ncbi_accession}.zip -d ${Amil_ncbi_downloads_dir}
 
+# Delete the (now superfluous) zip file
 rm ${Amil_ncbi_downloads_dir}/${ncbi_accession}.zip
+
+ls -lh ${Amil_ncbi_downloads_dir}
 ```
 
 ## Verify transcriptome FastA MD5 checksum
@@ -175,7 +186,56 @@ ${programs_array[kallisto]} index \
 --threads=${threads} \
 --index="${kallisto_index_name}" \
 "${transcriptome_fasta}"
+
+ls -lh ${kallisto_output_dir}
 ```
+
+
+    [build] loading fasta file /home/shared/8TB_HDD_02/shedurkin/deep-dive/D-Apul/data/Amil/ncbi_dataset/data/GCF_013753865.1/rna.fna
+    [build] k-mer length: 31
+    [build] warning: clipped off poly-A tail (longer than 10)
+            from 49 target sequences
+    [build] warning: replaced 806 non-ACGUT characters in the input sequence
+            with pseudorandom nucleotides
+    KmerStream::KmerStream(): Start computing k-mer cardinality estimations (1/2)
+    KmerStream::KmerStream(): Start computing k-mer cardinality estimations (1/2)
+    KmerStream::KmerStream(): Finished
+    CompactedDBG::build(): Estimated number of k-mers occurring at least once: 63409924
+    CompactedDBG::build(): Estimated number of minimizer occurring at least once: 15547313
+    CompactedDBG::filter(): Processed 110666638 k-mers in 50570 reads
+    CompactedDBG::filter(): Found 63496055 unique k-mers
+    CompactedDBG::filter(): Number of blocks in Bloom filter is 433468
+    CompactedDBG::construct(): Extract approximate unitigs (1/2)
+    CompactedDBG::construct(): Extract approximate unitigs (2/2)
+    CompactedDBG::construct(): Closed all input files
+
+    CompactedDBG::construct(): Splitting unitigs (1/2)
+
+    CompactedDBG::construct(): Splitting unitigs (2/2)
+    CompactedDBG::construct(): Before split: 626884 unitigs
+    CompactedDBG::construct(): After split (1/1): 626884 unitigs
+    CompactedDBG::construct(): Unitigs split: 912
+    CompactedDBG::construct(): Unitigs deleted: 0
+
+    CompactedDBG::construct(): Joining unitigs
+    CompactedDBG::construct(): After join: 596827 unitigs
+    CompactedDBG::construct(): Joined 30378 unitigs
+    [build] building MPHF
+    [build] creating equivalence classes ... 
+    [build] target de Bruijn graph has k-mer length 31 and minimizer length 23
+    [build] target de Bruijn graph has 596827 contigs and contains 63551545 k-mers 
+
+    total 123M
+    -rw-r--r-- 1 shedurkin labmembers 118M Jan 30 19:01 Amil_kallisto_index.idx
+    -rw-r--r-- 1 shedurkin labmembers 2.0M Jan 25 13:49 kallisto.isoform.counts.matrix
+    -rw-r--r-- 1 shedurkin labmembers    0 Jan 25 13:49 kallisto.isoform.TMM.EXPR.matrix
+    -rw-r--r-- 1 shedurkin labmembers 2.4M Jan 25 13:49 kallisto.isoform.TPM.not_cross_norm
+    -rw-r--r-- 1 shedurkin labmembers  532 Jan 25 13:49 kallisto.isoform.TPM.not_cross_norm.runTMM.R
+    drwxr-xr-x 2 shedurkin labmembers 4.0K Jan 25 13:26 kallisto_quant_sample140
+    drwxr-xr-x 2 shedurkin labmembers 4.0K Jan 25 13:29 kallisto_quant_sample145
+    drwxr-xr-x 2 shedurkin labmembers 4.0K Jan 25 13:33 kallisto_quant_sample150
+    drwxr-xr-x 2 shedurkin labmembers 4.0K Jan 25 13:36 kallisto_quant_sample173
+    drwxr-xr-x 2 shedurkin labmembers 4.0K Jan 25 13:39 kallisto_quant_sample178
 
 ## Sample Quantification
 
@@ -212,7 +272,52 @@ for file in "${trimmed_reads_dir}"/*.fastp-trim.20230519.fastq.gz; do
 
     echo "Created link: ${shortened_name}"
 done
+
+ls -lh ${trimmed_reads_dir}
 ```
+
+    ln: failed to create symbolic link '/home/shared/8TB_HDD_02/shedurkin/deep-dive/D-Apul/output/14-Apul-RNAseq-kallisto/trimmed-reads/sample140_R1.fastq.gz': File exists
+    Created link: sample140_R1.fastq.gz
+    ln: failed to create symbolic link '/home/shared/8TB_HDD_02/shedurkin/deep-dive/D-Apul/output/14-Apul-RNAseq-kallisto/trimmed-reads/sample140_R2.fastq.gz': File exists
+    Created link: sample140_R2.fastq.gz
+    ln: failed to create symbolic link '/home/shared/8TB_HDD_02/shedurkin/deep-dive/D-Apul/output/14-Apul-RNAseq-kallisto/trimmed-reads/sample145_R1.fastq.gz': File exists
+    Created link: sample145_R1.fastq.gz
+    ln: failed to create symbolic link '/home/shared/8TB_HDD_02/shedurkin/deep-dive/D-Apul/output/14-Apul-RNAseq-kallisto/trimmed-reads/sample145_R2.fastq.gz': File exists
+    Created link: sample145_R2.fastq.gz
+    ln: failed to create symbolic link '/home/shared/8TB_HDD_02/shedurkin/deep-dive/D-Apul/output/14-Apul-RNAseq-kallisto/trimmed-reads/sample150_R1.fastq.gz': File exists
+    Created link: sample150_R1.fastq.gz
+    ln: failed to create symbolic link '/home/shared/8TB_HDD_02/shedurkin/deep-dive/D-Apul/output/14-Apul-RNAseq-kallisto/trimmed-reads/sample150_R2.fastq.gz': File exists
+    Created link: sample150_R2.fastq.gz
+    ln: failed to create symbolic link '/home/shared/8TB_HDD_02/shedurkin/deep-dive/D-Apul/output/14-Apul-RNAseq-kallisto/trimmed-reads/sample173_R1.fastq.gz': File exists
+    Created link: sample173_R1.fastq.gz
+    ln: failed to create symbolic link '/home/shared/8TB_HDD_02/shedurkin/deep-dive/D-Apul/output/14-Apul-RNAseq-kallisto/trimmed-reads/sample173_R2.fastq.gz': File exists
+    Created link: sample173_R2.fastq.gz
+    ln: failed to create symbolic link '/home/shared/8TB_HDD_02/shedurkin/deep-dive/D-Apul/output/14-Apul-RNAseq-kallisto/trimmed-reads/sample178_R1.fastq.gz': File exists
+    Created link: sample178_R1.fastq.gz
+    ln: failed to create symbolic link '/home/shared/8TB_HDD_02/shedurkin/deep-dive/D-Apul/output/14-Apul-RNAseq-kallisto/trimmed-reads/sample178_R2.fastq.gz': File exists
+    Created link: sample178_R2.fastq.gz
+    total 27G
+    drwxr-xr-x 2 shedurkin labmembers 4.0K Jan 30 18:09 multiqc_data
+    -rw-r--r-- 1 shedurkin labmembers 2.9G May 19  2023 RNA-ACR-140-S1-TP2_R1_001.fastp-trim.20230519.fastq.gz
+    -rw-r--r-- 1 shedurkin labmembers 3.0G May 19  2023 RNA-ACR-140-S1-TP2_R2_001.fastp-trim.20230519.fastq.gz
+    -rw-r--r-- 1 shedurkin labmembers 2.6G May 19  2023 RNA-ACR-145-S1-TP2_R1_001.fastp-trim.20230519.fastq.gz
+    -rw-r--r-- 1 shedurkin labmembers 2.6G May 19  2023 RNA-ACR-145-S1-TP2_R2_001.fastp-trim.20230519.fastq.gz
+    -rw-r--r-- 1 shedurkin labmembers 2.6G May 19  2023 RNA-ACR-150-S1-TP2_R1_001.fastp-trim.20230519.fastq.gz
+    -rw-r--r-- 1 shedurkin labmembers 2.7G May 19  2023 RNA-ACR-150-S1-TP2_R2_001.fastp-trim.20230519.fastq.gz
+    -rw-r--r-- 1 shedurkin labmembers 2.9G May 19  2023 RNA-ACR-173-S1-TP2_R1_001.fastp-trim.20230519.fastq.gz
+    -rw-r--r-- 1 shedurkin labmembers 3.0G May 19  2023 RNA-ACR-173-S1-TP2_R2_001.fastp-trim.20230519.fastq.gz
+    -rw-r--r-- 1 shedurkin labmembers 2.6G May 19  2023 RNA-ACR-178-S1-TP2_R1_001.fastp-trim.20230519.fastq.gz
+    -rw-r--r-- 1 shedurkin labmembers 2.7G May 19  2023 RNA-ACR-178-S1-TP2_R2_001.fastp-trim.20230519.fastq.gz
+    lrwxrwxrwx 1 shedurkin labmembers  150 Jan 25 11:46 sample140_R1.fastq.gz -> /home/shared/8TB_HDD_02/shedurkin/deep-dive/D-Apul/output/14-Apul-RNAseq-kallisto/trimmed-reads/RNA-ACR-140-S1-TP2_R1_001.fastp-trim.20230519.fastq.gz
+    lrwxrwxrwx 1 shedurkin labmembers  150 Jan 25 11:46 sample140_R2.fastq.gz -> /home/shared/8TB_HDD_02/shedurkin/deep-dive/D-Apul/output/14-Apul-RNAseq-kallisto/trimmed-reads/RNA-ACR-140-S1-TP2_R2_001.fastp-trim.20230519.fastq.gz
+    lrwxrwxrwx 1 shedurkin labmembers  150 Jan 25 11:46 sample145_R1.fastq.gz -> /home/shared/8TB_HDD_02/shedurkin/deep-dive/D-Apul/output/14-Apul-RNAseq-kallisto/trimmed-reads/RNA-ACR-145-S1-TP2_R1_001.fastp-trim.20230519.fastq.gz
+    lrwxrwxrwx 1 shedurkin labmembers  150 Jan 25 11:46 sample145_R2.fastq.gz -> /home/shared/8TB_HDD_02/shedurkin/deep-dive/D-Apul/output/14-Apul-RNAseq-kallisto/trimmed-reads/RNA-ACR-145-S1-TP2_R2_001.fastp-trim.20230519.fastq.gz
+    lrwxrwxrwx 1 shedurkin labmembers  150 Jan 25 11:46 sample150_R1.fastq.gz -> /home/shared/8TB_HDD_02/shedurkin/deep-dive/D-Apul/output/14-Apul-RNAseq-kallisto/trimmed-reads/RNA-ACR-150-S1-TP2_R1_001.fastp-trim.20230519.fastq.gz
+    lrwxrwxrwx 1 shedurkin labmembers  150 Jan 25 11:46 sample150_R2.fastq.gz -> /home/shared/8TB_HDD_02/shedurkin/deep-dive/D-Apul/output/14-Apul-RNAseq-kallisto/trimmed-reads/RNA-ACR-150-S1-TP2_R2_001.fastp-trim.20230519.fastq.gz
+    lrwxrwxrwx 1 shedurkin labmembers  150 Jan 25 11:46 sample173_R1.fastq.gz -> /home/shared/8TB_HDD_02/shedurkin/deep-dive/D-Apul/output/14-Apul-RNAseq-kallisto/trimmed-reads/RNA-ACR-173-S1-TP2_R1_001.fastp-trim.20230519.fastq.gz
+    lrwxrwxrwx 1 shedurkin labmembers  150 Jan 25 11:46 sample173_R2.fastq.gz -> /home/shared/8TB_HDD_02/shedurkin/deep-dive/D-Apul/output/14-Apul-RNAseq-kallisto/trimmed-reads/RNA-ACR-173-S1-TP2_R2_001.fastp-trim.20230519.fastq.gz
+    lrwxrwxrwx 1 shedurkin labmembers  150 Jan 25 11:46 sample178_R1.fastq.gz -> /home/shared/8TB_HDD_02/shedurkin/deep-dive/D-Apul/output/14-Apul-RNAseq-kallisto/trimmed-reads/RNA-ACR-178-S1-TP2_R1_001.fastp-trim.20230519.fastq.gz
+    lrwxrwxrwx 1 shedurkin labmembers  150 Jan 25 11:46 sample178_R2.fastq.gz -> /home/shared/8TB_HDD_02/shedurkin/deep-dive/D-Apul/output/14-Apul-RNAseq-kallisto/trimmed-reads/RNA-ACR-178-S1-TP2_R2_001.fastp-trim.20230519.fastq.gz
 
 ``` bash
 # Load bash variables into memory
@@ -276,6 +381,33 @@ ${programs_array[trinity_abund_to_matrix]} \
 --gene_trans_map 'none' \
 --out_prefix 'kallisto' \
 --name_sample_by_basedir ${kallisto_output_dir}/kallisto_quant_*/abundance.tsv
+
+ls -lh ${kallisto_output_dir}
 ```
+
+    -reading file: /home/shared/8TB_HDD_02/shedurkin/deep-dive/D-Apul/output/14-Apul-RNAseq-kallisto/kallisto/kallisto_quant_sample140/abundance.tsv
+    -reading file: /home/shared/8TB_HDD_02/shedurkin/deep-dive/D-Apul/output/14-Apul-RNAseq-kallisto/kallisto/kallisto_quant_sample145/abundance.tsv
+    -reading file: /home/shared/8TB_HDD_02/shedurkin/deep-dive/D-Apul/output/14-Apul-RNAseq-kallisto/kallisto/kallisto_quant_sample150/abundance.tsv
+    -reading file: /home/shared/8TB_HDD_02/shedurkin/deep-dive/D-Apul/output/14-Apul-RNAseq-kallisto/kallisto/kallisto_quant_sample173/abundance.tsv
+    -reading file: /home/shared/8TB_HDD_02/shedurkin/deep-dive/D-Apul/output/14-Apul-RNAseq-kallisto/kallisto/kallisto_quant_sample178/abundance.tsv
+
+
+    * Outputting combined matrix.
+
+    /home/shared/trinityrnaseq-v2.12.0/util/support_scripts/run_TMM_scale_matrix.pl --matrix kallisto.isoform.TPM.not_cross_norm > kallisto.isoform.TMM.EXPR.matrixCMD: R --no-save --no-restore --no-site-file --no-init-file -q < kallisto.isoform.TPM.not_cross_norm.runTMM.R 1>&2 
+    sh: 1: R: not found
+    Error, cmd: R --no-save --no-restore --no-site-file --no-init-file -q < kallisto.isoform.TPM.not_cross_norm.runTMM.R 1>&2  died with ret (32512)  at /home/shared/trinityrnaseq-v2.12.0/util/support_scripts/run_TMM_scale_matrix.pl line 105.
+    Error, CMD: /home/shared/trinityrnaseq-v2.12.0/util/support_scripts/run_TMM_scale_matrix.pl --matrix kallisto.isoform.TPM.not_cross_norm > kallisto.isoform.TMM.EXPR.matrix died with ret 6400 at /home/shared/trinityrnaseq-v2.12.0/util/abundance_estimates_to_matrix.pl line 385.
+    total 123M
+    -rw-r--r-- 1 shedurkin labmembers 118M Jan 30 19:01 Amil_kallisto_index.idx
+    -rw-r--r-- 1 shedurkin labmembers 2.0M Jan 30 19:01 kallisto.isoform.counts.matrix
+    -rw-r--r-- 1 shedurkin labmembers    0 Jan 30 19:01 kallisto.isoform.TMM.EXPR.matrix
+    -rw-r--r-- 1 shedurkin labmembers 2.4M Jan 30 19:01 kallisto.isoform.TPM.not_cross_norm
+    -rw-r--r-- 1 shedurkin labmembers  532 Jan 30 19:01 kallisto.isoform.TPM.not_cross_norm.runTMM.R
+    drwxr-xr-x 2 shedurkin labmembers 4.0K Jan 25 13:26 kallisto_quant_sample140
+    drwxr-xr-x 2 shedurkin labmembers 4.0K Jan 25 13:29 kallisto_quant_sample145
+    drwxr-xr-x 2 shedurkin labmembers 4.0K Jan 25 13:33 kallisto_quant_sample150
+    drwxr-xr-x 2 shedurkin labmembers 4.0K Jan 25 13:36 kallisto_quant_sample173
+    drwxr-xr-x 2 shedurkin labmembers 4.0K Jan 25 13:39 kallisto_quant_sample178
 
 # Summary

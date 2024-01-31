@@ -1,19 +1,37 @@
 #### Assign Variables ####
 
 # Data directories
-export deep_dive_dir=/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive
-export output_dir_top=${deep_dive_dir}/D-Apul/output/09-Apul-sRNAseq-miRTrace
-export trimmed_reads_dir=${deep_dive_dir}/D-Apul/output/08-Apul-sRNAseq-trimming/trimmed-reads
+export Apul_dir=/home/shared/8TB_HDD_02/shedurkin/deep-dive/D-Apul
+export output_dir_top=${Apul_dir}/output/14-Apul-RNAseq-kallisto
+export trimmed_reads_dir=${output_dir_top}/trimmed-reads
+export kallisto_output_dir=${output_dir_top}/kallisto
+
+# Input/Output files
+export Amil_ncbi_downloads_dir=${Apul_dir}/data/Amil
+export transcriptome_fasta_dir=${Amil_ncbi_downloads_dir}/ncbi_dataset/data/GCF_013753865.1
+export transcriptome_fasta_name="rna.fna"
+export transcriptome_fasta="${transcriptome_fasta_dir}/${transcriptome_fasta_name}"
+export kallisto_index_name="Amil_kallisto_index.idx"
+# External data URLs
+export trimmed_reads_url="https://gannet.fish.washington.edu/Atumefaciens/20230519-E5_coral-fastqc-fastp-multiqc-RNAseq/A_pulchra/trimmed/"
+export transcriptome_fasta_url="https://api.ncbi.nlm.nih.gov/datasets/v2alpha/genome/accession/GCF_013753865.1/download?include_annotation_type=GENOME_FASTA,GENOME_GFF,RNA_FASTA,CDS_FASTA,PROT_FASTA,SEQUENCE_REPORT&filename=GCF_013753865.1.zip"
+
+# Set filename patterns
+export ncbi_accession='GCF_013753865.1'
+export fastq_pattern='*.fastq.gz'
+export R1_fastq_pattern='*_R1.fastq.gz'
+export R2_fastq_pattern='*_R2.fastq.gz'
 
 # Paths to programs
-export mirtrace=/home/sam/programs/mambaforge/envs/miRTrace_env/bin/mirtrace
+export kallisto=/home/shared/kallisto_linux-v0.50.1/kallisto
+export trinity_abund_to_matrix=/home/shared/trinityrnaseq-v2.12.0/util/abundance_estimates_to_matrix.pl
 
 # Set number of CPUs to use
-export threads=40
+export threads=20
 
-export fastq_pattern='*flexbar_trim.25bp*.gz'
 # Programs associative array
 declare -A programs_array
 programs_array=(
-[mirtrace]="${mirtrace}"
+[kallisto]="${kallisto}" \
+[trinity_abund_to_matrix]="${trinity_abund_to_matrix}" \
 )
