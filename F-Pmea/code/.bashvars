@@ -1,36 +1,35 @@
 #### Assign Variables ####
 
-# Trimmed FastQ naming pattern
-export trimmed_fastqs_pattern='*flexbar_trim.25bp*.fastq.gz'
-
-# miRTrace FastA naming pattern
-export mirtrace_fasta_pattern='*flexbar_trim.25bp*.fasta'
 # Data directories
-export deep_dive_dir=/home/shared/8TB_HDD_02/shedurkin/deep-dive
-export deep_dive_data_dir="${deep_dive_dir}/data"
-export output_dir_top=${deep_dive_dir}/F-Pmea/output/11-Pmea-sRNAseq-miRdeep2
-export genome_fasta_dir=${deep_dive_dir}/F-Pmea/data/Pmea
-export trimmed_fastqs_dir="${deep_dive_dir}/F-Pmea/output/08-Pmea-sRNAseq-trimming/trimmed-reads"
-export collapsed_reads_dir="${deep_dive_dir}/F-Pmea/output/10-Pmea-sRNAseq-BLASTn"
+export Pmea_dir=/home/shared/8TB_HDD_02/shedurkin/deep-dive/F-Pmea
+export output_dir_top=${Pmea_dir}/output/14-Pmea-RNAseq-kallisto
+export transcriptome_fasta_dir=${Pmea_dir}/data/Pmea
+export trimmed_reads_dir=${output_dir_top}/trimmed-reads
+export kallisto_output_dir=${output_dir_top}/kallisto
 
 # Input/Output files
-export collapsed_reads_fasta="collapsed-reads-all.fasta"
-export collapsed_reads_mirdeep2="collapsed-reads-all-mirdeep2.fasta"
-export concatenated_trimmed_reads_fastq="concatenated-trimmed-reads-all.fastq.gz"
-export genome_fasta_name="Pocillopora_meandrina_HIv1.assembly.fasta"
-export genome_fasta_no_spaces="Pocillopora_meandrina_HIv1_nospaces.assembly.fasta"
-export mirdeep2_mapping_file="Pmea-mirdeep2-mapping.arf"
-export mirbase_mature_fasta_name="mirbase-mature-v22.1.fa"
-export mirbase_mature_fasta_no_spaces="mirbase-mature-v22.1-no_spaces.fa"
-export concatenated_mirtrace_reads_fasta="concatenated-mirtrace-reads.fasta"
+export transcriptome_fasta_name="Pocillopora_meandrina_HIv1.genes.cds.fna.gz"
+export transcriptome_fasta="${transcriptome_fasta_dir}/${transcriptome_fasta_name}"
+export kallisto_index_name="Pmea_kallisto_index.idx"
+# External data URLs
+export trimmed_reads_url="https://gannet.fish.washington.edu/Atumefaciens/20230519-E5_coral-fastqc-fastp-multiqc-RNAseq/P_meandrina/trimmed/"
+export transcriptome_fasta_url="http://cyanophora.rutgers.edu/Pocillopora_meandrina/Pocillopora_meandrina_HIv1.genes.cds.fna.gz"
+
+# Set filename patterns
+export fastq_pattern='*.fastq.gz'
+export R1_fastq_pattern='*_R1.fastq.gz'
+export R2_fastq_pattern='*_R2.fastq.gz'
 
 # Paths to programs
-export mirdeep2_mapper="mapper.pl"
-export mirdeep2="miRDeep2.pl"
-export bowtie_build="/home/shared/bowtie-1.3.1-linux-x86_64/bowtie-build"
+export kallisto=/home/shared/kallisto_linux-v0.50.1/kallisto
+export trinity_abund_to_matrix=/home/shared/trinityrnaseq-v2.12.0/util/abundance_estimates_to_matrix.pl
 
 # Set number of CPUs to use
-export threads=46
+export threads=20
 
-# Initialize arrays
-export trimmed_fastqs_array=()
+# Programs associative array
+declare -A programs_array
+programs_array=(
+[kallisto]="${kallisto}" \
+[trinity_abund_to_matrix]="${trinity_abund_to_matrix}" \
+)
