@@ -56,11 +56,13 @@ echo "# Input/Output files"
 echo 'export transcriptome_dir=${Peve_dir}/data'
 echo 'export transcriptome_gff_name="Porites_evermanni_v1.annot.gff"'
 echo 'export transcriptome_gff=${transcriptome_dir}/${transcriptome_gff_name}'
+echo 'export transcriptome_gff_filtered_name="Porites_evermanni_v1_mRNA.annot.gff"'
+echo 'export transcriptome_gff_filtered=${transcriptome_dir}/${transcriptome_gff_filtered_name}'
 echo 'export genome_fasta_name="Porites_evermanni_v1.fa"'
 echo 'export genome_fasta=${transcriptome_dir}/${genome_fasta_name}'
-echo 'export transcriptome_fasta_name="Porites_evermanni_CDS.fasta"'
+echo 'export transcriptome_fasta_name="Porites_evermanni_mRNA.fasta"'
 echo 'export transcriptome_fasta=${transcriptome_dir}/${transcriptome_fasta_name}'
-echo 'export transcriptome_fasta_collapsed_name="Porites_evermanni_CDS_collapsed.fasta"'
+echo 'export transcriptome_fasta_collapsed_name="Porites_evermanni_mRNA_collapsed.fasta"'
 echo 'export transcriptome_fasta_collapsed=${transcriptome_dir}/${transcriptome_fasta_collapsed_name}'
 echo 'export kallisto_index_name="Peve_kallisto_index.idx"'
 
@@ -108,7 +110,7 @@ Reads are downloaded from: https://gannet.fish.washington.edu/Atumefaciens/20230
 
 The `--cut-dirs 4` command cuts the preceding directory structure (i.e. `Atumefaciens/20230519-E5_coral-fastqc-fastp-multiqc-RNAseq/P_evermanni/trimmed/`) so that we just end up with the reads.
 
-```{bash download-raw-reads, engine='bash', eval=FALSE}
+```{bash download-trimmed-reads, engine='bash', eval=FALSE}
 # Load bash variables into memory
 source .bashvars
 
@@ -183,69 +185,28 @@ No checksum file(s) provided with download, so skipping this step
 # Load bash variables into memory
 source .bashvars
 
-${programs_array[bedtools]} getfasta -fi ${genome_fasta} -bed ${transcriptome_gff} -fo ${transcriptome_fasta}
+# The CDS gff we downloaded includes many different sequence types (CDS, UTR, mRNA, etc.). 
+# We only want to the mRNA, so we first need to extract only the mRNA feature-type lines.
+grep -w 'mRNA' ${transcriptome_gff} > ${transcriptome_gff_filtered}
 
-head ${transcriptome_fasta}
+head -n 3 ${transcriptome_gff_filtered}
+
+# Now we can use bedtools to extract the fasta sequences for each feature listed in the gff
+${programs_array[bedtools]} getfasta -fi ${genome_fasta} -bed ${transcriptome_gff_filtered} -fo ${transcriptome_fasta}
+
+head -n 6 ${transcriptome_fasta}
 ```
 
-```{r format-transcriptome-fasta, engine='bash', eval=TRUE}
-# Load bash variables into memory
+```{bash}
 source .bashvars
-
-# Reformat the transcriptome fasta from a multi-line to a single-line FASTA
-${programs_array[fastx_toolkit]}/fasta_formatter \
--i ${transcriptome_fasta} \
--o ${transcriptome_dir}/Peve_1line.fasta
-
-# Look at lines 149 and 150 to confirm they're formatted appropriately
-head -n 150 ${transcriptome_dir}/Peve_1line.fasta | tail -n 2
+head -n 1000 ${transcriptome_fasta} | tail -n 25
 ```
-
-```{r format-transcriptome-fasta, engine='bash', eval=TRUE}
-# Load bash variables into memory
-source .bashvars
-
-${programs_array[fastx_toolkit]}/fastx_collapser \
--Q30 \
--i ${transcriptome_dir}/Peve_1line.fasta \
--o ${transcriptome_dir}/Peve_1line_collapsed.fasta
-
-head ${transcriptome_dir}/Peve_1line_collapsed.fasta
-```
-
-
-```{r format-transcriptome-fasta, engine='bash', eval=TRUE}
-# Load bash variables into memory
-source .bashvars
-
-# Reformat the transcriptome fasta from a multi-line to a single-line FASTA
-${programs_array[fastx_toolkit]}/fasta_formatter \
--i ${transcriptome_fasta} \
-| ${programs_array[fastx_toolkit]}/fastx_collapser \
--o ${transcriptome_fasta_collapsed}
-
-head ${transcriptome_fasta_collapsed}
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 # Align to reference transcriptome (Kallisto pseudoalignment)
 
 ## Building Index
 
-```{r kallisto-indexing, engine='bash', eval=FALSE}
+```{r kallisto-indexing, engine='bash', eval=TRUE}
 # Load bash variables into memory
 source .bashvars
 
