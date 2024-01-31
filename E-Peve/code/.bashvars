@@ -1,51 +1,46 @@
 #### Assign Variables ####
 
 # Data directories
-export deep_dive_dir=/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive
-export output_dir_top=${deep_dive_dir}/E-Peve/output/06-Peve-sRNAseq-trimming
-export raw_fastqc_dir=${deep_dive_dir}/E-Peve/output/06-Peve-sRNAseq-trimming/raw-fastqc
-export raw_reads_dir=${deep_dive_dir}/E-Peve/data/06-Peve-sRNAseq-trimming/raw-reads
-export raw_reads_url="https://owl.fish.washington.edu/nightingales/P_evermanni/30-852430235/"
-export trimmed_fastqc_dir=${deep_dive_dir}/E-Peve/output/06-Peve-sRNAseq-trimming/trimmed-fastqc
-export trimmed_reads_dir=${deep_dive_dir}/E-Peve/output/06-Peve-sRNAseq-trimming/trimmed-reads
+export Peve_dir=/home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve
+export output_dir_top=${Peve_dir}/output/12-Peve-RNAseq-kallisto
+export trimmed_reads_dir=${output_dir_top}/trimmed-reads
+export kallisto_output_dir=${output_dir_top}/kallisto
+
+# Input/Output files
+export transcriptome_dir=${Peve_dir}/data
+export transcriptome_gff_name="Porites_evermanni_v1.annot.gff"
+export transcriptome_gff=${transcriptome_dir}/${transcriptome_gff_name}
+export genome_fasta_name="Porites_evermanni_v1.fa"
+export genome_fasta=${transcriptome_dir}/${genome_fasta_name}
+export transcriptome_fasta_name="Porites_evermanni_CDS.fasta"
+export transcriptome_fasta=${transcriptome_dir}/${transcriptome_fasta_name}
+export transcriptome_fasta_collapsed_name="Porites_evermanni_CDS_collapsed.fasta"
+export transcriptome_fasta_collapsed=${transcriptome_dir}/${transcriptome_fasta_collapsed_name}
+export kallisto_index_name="Peve_kallisto_index.idx"
+# External data URLs
+export trimmed_reads_url="https://gannet.fish.washington.edu/Atumefaciens/20230519-E5_coral-fastqc-fastp-multiqc-RNAseq/P_evermanni/trimmed/"
+export transcriptome_url="https://www.genoscope.cns.fr/corals/data/Porites_evermanni_v1.annot.gff"
+export genome_url="https://www.genoscope.cns.fr/corals/data/Porites_evermanni_v1.fa"
+
+# Set filename patterns
+export fastq_pattern='*.fastq.gz'
+export R1_fastq_pattern='*_R1.fastq.gz'
+export R2_fastq_pattern='*_R2.fastq.gz'
 
 # Paths to programs
-export fastqc=/home/shared/FastQC-0.12.1/fastqc
-export flexbar=/home/shared/flexbar-3.5.0-linux/flexbar
-export multiqc=/home/sam/programs/mambaforge/bin/multiqc
-
-# Set FastQ filename patterns
-export fastq_pattern='*.fastq.gz'
-export R1_fastq_pattern='*_R1_*.fastq.gz'
-export R2_fastq_pattern='*_R2_*.fastq.gz'
+export kallisto=/home/shared/kallisto_linux-v0.50.1/kallisto
+export trinity_abund_to_matrix=/home/shared/trinityrnaseq-v2.12.0/util/abundance_estimates_to_matrix.pl
+export bedtools=/home/shared/bedtools2/bin/bedtools
+export fastx_toolkit="/home/shared/fastx_toolkit_0.0.13_binaries_Linux_2.6_amd64/bin"
 
 # Set number of CPUs to use
-export threads=40
-
-# Set maximum read length
-export max_read_length=25
-
-# Input/output files
-export fastq_checksums=input_fastq_checksums.md5
-export trimmed_checksums=trimmed_fastq_checksums.md5
-export NEB_adapters_fasta=NEB-adapters.fasta
-
-## NEB nebnext-small-rna-library-prep-set-for-illumina adapters
-export first_adapter="AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC"
-export second_adapter="GATCGTCGGACTGTAGAACTCTGAACGTGTAGATCTCGGTGGTCGCCGTATCATT"
-
-## Inititalize arrays
-export fastq_array_R1=()
-export fastq_array_R2=()
-export raw_fastqs_array=()
-export R1_names_array=()
-export R2_names_array=()
-export trimmed_fastqs_array=()
+export threads=20
 
 # Programs associative array
 declare -A programs_array
 programs_array=(
-[fastqc]="${fastqc}" \
-[multiqc]="${multiqc}" \
-[flexbar]="${flexbar}"
+[kallisto]="${kallisto}" \
+[trinity_abund_to_matrix]="${trinity_abund_to_matrix}" \
+[bedtools]="${bedtools}" \
+[fastx_toolkit]="${fastx_toolkit}" \
 )
