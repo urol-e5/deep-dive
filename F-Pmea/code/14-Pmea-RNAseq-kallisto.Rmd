@@ -2,15 +2,20 @@
 title: "14-Pmea-RNAseq-kallisto"
 author: "Kathleen Durkin"
 date: "2024-01-30"
-output:
-  github_document:
-  html_document:
+always_allow_html: true
+output: 
+  bookdown::html_document2:
     theme: cosmo
     toc: true
     toc_float: true
     number_sections: true
     code_folding: show
     code_download: true
+  github_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+    html_preview: true 
 ---
 
 ```{r setup, include=FALSE}
@@ -24,17 +29,18 @@ knitr::opts_chunk$set(
 )
 ```
 
-Description
+**Description:**
+Use kallisto to quantify *P. meandrina* RNAseq transcript abundances
 
-Inputs:
+**Inputs:**
 
-Trimmed *P. meandrina RNAseq* reads (found [here](https://gannet.fish.washington.edu/Atumefaciens/20230519-E5_coral-fastqc-fastp-multiqc-RNAseq/P_meandrina/trimmed/))
+Trimmed RNAseq reads (e.g. `*.fastq.gz`).  *P. meandrina* reads found [here](https://gannet.fish.washington.edu/Atumefaciens/20230519-E5_coral-fastqc-fastp-multiqc-RNAseq/P_meandrina/trimmed/).
 
-Transcripts FASTA (found [here](http://cyanophora.rutgers.edu/Pocillopora_meandrina/))
+Transcripts FASTA (e.g. `*.fna.gz`), found [here](http://cyanophora.rutgers.edu/Pocillopora_meandrina/).
 
-Outputs:
+**Outputs:**
 
-Counts matrix 
+kalisto counts matrix (`kallisto.isoform.counts.matrix`)
 
 ---
 
@@ -99,7 +105,7 @@ Reads are downloaded from: https://gannet.fish.washington.edu/Atumefaciens/20230
 
 The `--cut-dirs 4` command cuts the preceding directory structure (i.e. `Atumefaciens/20230519-E5_coral-fastqc-fastp-multiqc-RNAseq/P_meandrina/trimmed/`) so that we just end up with the reads.
 
-```{bash download-trimmed-reads, engine='bash', eval=TRUE}
+```{bash download-trimmed-reads, engine='bash', eval=FALSE}
 # Load bash variables into memory
 source .bashvars
 
@@ -123,7 +129,7 @@ Already performed, can view multiqc report at https://gannet.fish.washington.edu
 
 # Retrieve the reference transcriptome
 
-```{r download-transcriptome, engine='bash', eval=TRUE}
+```{r download-transcriptome, engine='bash', eval=FALSE}
 # Load bash variables into memory
 source .bashvars
 
@@ -143,7 +149,7 @@ ls -lh "${transcriptome_fasta_dir}"
 
 ## Verify transcriptome FastA MD5 checksum
 
-No checksum file(s) provided with ncbi download, so skippping this step
+No checksum file(s) provided with download, so skippping this step
 
 # Align to reference transcriptome (Kallisto pseudoalignment)
 
