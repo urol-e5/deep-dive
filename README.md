@@ -1,6 +1,8 @@
 ## deep-dive
 
-This repository is focused on takeing molecular data from three experiments where integrated epigenetic analysis has already been performed, and doing a _deeper dive_ into datasets to extract and analyze remaining points of excitement. 
+This repository is focused on takeing molecular data from three experiments where integrated epigenetic analysis has already been performed, and doing a _deeper dive_ into datasets to extract and analyze remaining points of excitement.
+
+## [OSF Project Link](https://osf.io/aw53f/)
 
 # Specific sub-efforts
 
