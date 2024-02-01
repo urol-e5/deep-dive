@@ -2,15 +2,20 @@
 title: "14-Apul-RNAseq-kallisto"
 author: "Kathleen Durkin"
 date: "2024-01-24"
-output:
-  github_document:
-  html_document:
+always_allow_html: true
+output: 
+  bookdown::html_document2:
     theme: cosmo
     toc: true
     toc_float: true
     number_sections: true
     code_folding: show
     code_download: true
+  github_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+    html_preview: true 
 ---
 
 ```{r setup, include=FALSE}
@@ -24,17 +29,18 @@ knitr::opts_chunk$set(
 )
 ```
 
-Description
+**Description:**
+Use kallisto to quantify *A. pulchra* RNAseq transcript abundances
 
-Inputs:
+**Inputs:**
 
-Trimmed *A. pulchra RNAseq* reads (found [here](https://gannet.fish.washington.edu/Atumefaciens/20230519-E5_coral-fastqc-fastp-multiqc-RNAseq/A_pulchra/trimmed/)
+Trimmed RNAseq reads (e.g. `*.fastq.gz`).  *A. pulchra* reads found [here](https://gannet.fish.washington.edu/Atumefaciens/20230519-E5_coral-fastqc-fastp-multiqc-RNAseq/A_pulchra/trimmed/).
 
-Transcripts FASTA (note we are using transcripts from A.millepora, not A.pulchra).  Downloaded from [NCBI](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_013753865.1/)
+Transcripts FASTA (e.g. `rna.fna`) -- note we are using transcripts from *A. millepora*, not *A. pulchra*. Downloaded from [NCBI](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_013753865.1/). Kallisto will also accept a gzipped reference fasta (e.g. `*.fna.gz`)
 
-Outputs:
+**Outputs:**
 
-Counts matrix 
+kalisto counts matrix (`kallisto.isoform.counts.matrix`)
 
 ---
 

@@ -3,20 +3,22 @@
 Kathleen Durkin
 2024-01-24
 
-Description
+**Description:** Uses kallisto to quantify *A.pulchra* RNAseq transcript
+abundances
 
-Inputs:
+**Inputs:**
 
-Trimmed *A. pulchra RNAseq* reads (found
-[here](https://gannet.fish.washington.edu/Atumefaciens/20230519-E5_coral-fastqc-fastp-multiqc-RNAseq/A_pulchra/trimmed/)
+Trimmed RNAseq reads (e.g. `*.fastq.gz`). *A. pulchra* reads found
+[here](https://gannet.fish.washington.edu/Atumefaciens/20230519-E5_coral-fastqc-fastp-multiqc-RNAseq/A_pulchra/trimmed/).
 
-Transcripts FASTA (note we are using transcripts from A.millepora, not
-A.pulchra). Downloaded from
-[NCBI](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_013753865.1/)
+Transcripts FASTA (e.g. `rna.fna`) – note we are using transcripts from
+*A.millepora*, not *A.pulchra*. Downloaded from
+[NCBI](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_013753865.1/).
+Kallisto will also accept a gzipped reference fasta (e.g. `*.fna.gz`)
 
 Outputs:
 
-Counts matrix
+kalisto counts matrix (`kallisto.isoform.counts.matrix`)
 
 ------------------------------------------------------------------------
 
@@ -203,7 +205,7 @@ ls -lh ${kallisto_output_dir}
     CompactedDBG::build(): Estimated number of k-mers occurring at least once: 63409924
     CompactedDBG::build(): Estimated number of minimizer occurring at least once: 15547313
     CompactedDBG::filter(): Processed 110666638 k-mers in 50570 reads
-    CompactedDBG::filter(): Found 63496055 unique k-mers
+    CompactedDBG::filter(): Found 63495940 unique k-mers
     CompactedDBG::filter(): Number of blocks in Bloom filter is 433468
     CompactedDBG::construct(): Extract approximate unitigs (1/2)
     CompactedDBG::construct(): Extract approximate unitigs (2/2)
@@ -212,25 +214,25 @@ ls -lh ${kallisto_output_dir}
     CompactedDBG::construct(): Splitting unitigs (1/2)
 
     CompactedDBG::construct(): Splitting unitigs (2/2)
-    CompactedDBG::construct(): Before split: 626884 unitigs
-    CompactedDBG::construct(): After split (1/1): 626884 unitigs
-    CompactedDBG::construct(): Unitigs split: 912
+    CompactedDBG::construct(): Before split: 626248 unitigs
+    CompactedDBG::construct(): After split (1/1): 626248 unitigs
+    CompactedDBG::construct(): Unitigs split: 935
     CompactedDBG::construct(): Unitigs deleted: 0
 
     CompactedDBG::construct(): Joining unitigs
     CompactedDBG::construct(): After join: 596827 unitigs
-    CompactedDBG::construct(): Joined 30378 unitigs
+    CompactedDBG::construct(): Joined 29743 unitigs
     [build] building MPHF
     [build] creating equivalence classes ... 
     [build] target de Bruijn graph has k-mer length 31 and minimizer length 23
     [build] target de Bruijn graph has 596827 contigs and contains 63551545 k-mers 
 
     total 123M
-    -rw-r--r-- 1 shedurkin labmembers 118M Jan 30 19:01 Amil_kallisto_index.idx
-    -rw-r--r-- 1 shedurkin labmembers 2.0M Jan 25 13:49 kallisto.isoform.counts.matrix
-    -rw-r--r-- 1 shedurkin labmembers    0 Jan 25 13:49 kallisto.isoform.TMM.EXPR.matrix
-    -rw-r--r-- 1 shedurkin labmembers 2.4M Jan 25 13:49 kallisto.isoform.TPM.not_cross_norm
-    -rw-r--r-- 1 shedurkin labmembers  532 Jan 25 13:49 kallisto.isoform.TPM.not_cross_norm.runTMM.R
+    -rw-r--r-- 1 shedurkin labmembers 118M Jan 31 16:13 Amil_kallisto_index.idx
+    -rw-r--r-- 1 shedurkin labmembers 2.0M Jan 30 19:01 kallisto.isoform.counts.matrix
+    -rw-r--r-- 1 shedurkin labmembers    0 Jan 30 19:01 kallisto.isoform.TMM.EXPR.matrix
+    -rw-r--r-- 1 shedurkin labmembers 2.4M Jan 30 19:01 kallisto.isoform.TPM.not_cross_norm
+    -rw-r--r-- 1 shedurkin labmembers  532 Jan 30 19:01 kallisto.isoform.TPM.not_cross_norm.runTMM.R
     drwxr-xr-x 2 shedurkin labmembers 4.0K Jan 25 13:26 kallisto_quant_sample140
     drwxr-xr-x 2 shedurkin labmembers 4.0K Jan 25 13:29 kallisto_quant_sample145
     drwxr-xr-x 2 shedurkin labmembers 4.0K Jan 25 13:33 kallisto_quant_sample150
@@ -399,11 +401,11 @@ ls -lh ${kallisto_output_dir}
     Error, cmd: R --no-save --no-restore --no-site-file --no-init-file -q < kallisto.isoform.TPM.not_cross_norm.runTMM.R 1>&2  died with ret (32512)  at /home/shared/trinityrnaseq-v2.12.0/util/support_scripts/run_TMM_scale_matrix.pl line 105.
     Error, CMD: /home/shared/trinityrnaseq-v2.12.0/util/support_scripts/run_TMM_scale_matrix.pl --matrix kallisto.isoform.TPM.not_cross_norm > kallisto.isoform.TMM.EXPR.matrix died with ret 6400 at /home/shared/trinityrnaseq-v2.12.0/util/abundance_estimates_to_matrix.pl line 385.
     total 123M
-    -rw-r--r-- 1 shedurkin labmembers 118M Jan 30 19:01 Amil_kallisto_index.idx
-    -rw-r--r-- 1 shedurkin labmembers 2.0M Jan 30 19:01 kallisto.isoform.counts.matrix
-    -rw-r--r-- 1 shedurkin labmembers    0 Jan 30 19:01 kallisto.isoform.TMM.EXPR.matrix
-    -rw-r--r-- 1 shedurkin labmembers 2.4M Jan 30 19:01 kallisto.isoform.TPM.not_cross_norm
-    -rw-r--r-- 1 shedurkin labmembers  532 Jan 30 19:01 kallisto.isoform.TPM.not_cross_norm.runTMM.R
+    -rw-r--r-- 1 shedurkin labmembers 118M Jan 31 16:13 Amil_kallisto_index.idx
+    -rw-r--r-- 1 shedurkin labmembers 2.0M Jan 31 16:13 kallisto.isoform.counts.matrix
+    -rw-r--r-- 1 shedurkin labmembers    0 Jan 31 16:13 kallisto.isoform.TMM.EXPR.matrix
+    -rw-r--r-- 1 shedurkin labmembers 2.4M Jan 31 16:13 kallisto.isoform.TPM.not_cross_norm
+    -rw-r--r-- 1 shedurkin labmembers  532 Jan 31 16:13 kallisto.isoform.TPM.not_cross_norm.runTMM.R
     drwxr-xr-x 2 shedurkin labmembers 4.0K Jan 25 13:26 kallisto_quant_sample140
     drwxr-xr-x 2 shedurkin labmembers 4.0K Jan 25 13:29 kallisto_quant_sample145
     drwxr-xr-x 2 shedurkin labmembers 4.0K Jan 25 13:33 kallisto_quant_sample150
