@@ -1,4 +1,4 @@
-## deep-dive
+ ## deep-dive
 
 This repository is focused on taking molecular data from three experiments where integrated epigenetic analysis has already been performed, and doing a _deeper dive_ into datasets to extract and analyze remaining points of excitement.
 
@@ -19,8 +19,9 @@ This repository is focused on taking molecular data from three experiments where
 # How to work in this repo
 ### (_file structure_)
 
-Top level directories are associated with each sub-effort 
-For instance.
+Top level directories are associated with each sub-effort categorized by species.
+
+For instance:
 
 ```
 A-Pver
@@ -31,14 +32,15 @@ E-Peve
 F-Pmea
 ```
 
-Within each top level directory there should be 3 directories
+Within each top level directory there should be 3 directories: 
+
 ```
 data
 code
 output
 ```
 
-For any document code it should start with a 2 number prefix (eg `01-methylation-explore.Rmd`). All output from that code should be in a sub-directory of `output` named the same as the code. For example the output of `01-methylation-explore.Rmd` would be in `A-pver/output/01-methylation-explore/`
+- For any document code it should start with a 2 number prefix (eg `01-methylation-explore.Rmd`). All output from that code should be in a sub-directory of `output` named the same as the code. For example the output of `01-methylation-explore.Rmd` would be in `A-pver/output/01-methylation-explore/`
 
 Please use **Relative Paths**. Commit and Push often. 
 
