@@ -50,6 +50,7 @@ Links to other data types (e.g. FastQs, BAMs) can be [found in the project wiki]
 
 ### Genomes of interest
 
+All genomes of interest can be found in our [species descriptions and genomic resources wiki page](https://github.com/urol-e5/deep-dive/wiki/Species-Characteristics-and-Genomic-Resources).
 
 ### Workflows
 
