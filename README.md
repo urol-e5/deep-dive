@@ -7,11 +7,11 @@ This repository is focused on taking molecular data from three experiments where
 # Specific sub-efforts
 
 
-**D**) Acropora pulcra
+**D**) Acropora pulchra
 
 **E**) Porites evermanni
 
-**F**) Pocillopora meandrina
+**F**) Pocillopora tuahiniensis
 
 ---
 
@@ -29,7 +29,7 @@ B-Mcap
 C-Pacu
 D-Apul
 E-Peve
-F-Pmea
+F-Ptua
 ```
 
 Within each top level directory there should be 3 directories: 
