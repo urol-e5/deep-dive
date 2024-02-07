@@ -1795,16 +1795,15 @@ wget \
 source .bashvars
 
 ls -lh &quot;${transcriptome_dir}&quot;</code></pre>
-<pre><code>total 1.5G
+<pre><code>total 699M
 -rw------- 1 shedurkin labmembers 3.2K Jan 25 15:46 index.html.tmp
 -rw-r--r-- 1 shedurkin labmembers  15M Nov  2 08:39 peve_bedtools_lncRNAs.fasta
 -rw-r--r-- 1 shedurkin labmembers  57M Feb  6 17:32 Porites_evermanni_CDS.fasta
 -rw-r--r-- 1 shedurkin labmembers  24M Mar 11  2022 Porites_evermanni_v1.annot.gff
--rw-r--r-- 1 shedurkin labmembers  18M Feb  7 13:22 Porites_evermanni_v1_CDS.annot.gff
+-rw-r--r-- 1 shedurkin labmembers  18M Feb  7 14:31 Porites_evermanni_v1_CDS.annot.gff
 -rw-r--r-- 1 shedurkin labmembers 586M Mar 11  2022 Porites_evermanni_v1.fa
 -rw-r--r-- 1 shedurkin labmembers 422K Jan 29 16:55 Porites_evermanni_v1.fa.fai
--rw-r--r-- 1 shedurkin labmembers    0 Nov  2 08:39 README.md
--rw-r--r-- 1 shedurkin labmembers 776M Feb  5 08:00 test_output.fasta</code></pre>
+-rw-r--r-- 1 shedurkin labmembers    0 Nov  2 08:39 README.md</code></pre>
 <div id="verify-transcriptomegenome-fasta-md5-checksum" class="section level2" number="4.1">
 <h2><span class="header-section-number">4.1</span> Verify transcriptome/genome FastA MD5 checksum</h2>
 <p>No checksum file(s) provided with download, so skipping this step</p>
@@ -2024,7 +2023,7 @@ KmerStream::KmerStream(): Finished
 CompactedDBG::build(): Estimated number of k-mers occurring at least once: 46039676
 CompactedDBG::build(): Estimated number of minimizer occurring at least once: 11275045
 CompactedDBG::filter(): Processed 52809246 k-mers in 40389 reads
-CompactedDBG::filter(): Found 46115565 unique k-mers
+CompactedDBG::filter(): Found 46115431 unique k-mers
 CompactedDBG::filter(): Number of blocks in Bloom filter is 314726
 CompactedDBG::construct(): Extract approximate unitigs (1/2)
 CompactedDBG::construct(): Extract approximate unitigs (2/2)
@@ -2033,30 +2032,30 @@ CompactedDBG::construct(): Closed all input files
 CompactedDBG::construct(): Splitting unitigs (1/2)
 
 CompactedDBG::construct(): Splitting unitigs (2/2)
-CompactedDBG::construct(): Before split: 489268 unitigs
-CompactedDBG::construct(): After split (1/1): 489268 unitigs
-CompactedDBG::construct(): Unitigs split: 1009
+CompactedDBG::construct(): Before split: 489421 unitigs
+CompactedDBG::construct(): After split (1/1): 489421 unitigs
+CompactedDBG::construct(): Unitigs split: 1030
 CompactedDBG::construct(): Unitigs deleted: 0
 
 CompactedDBG::construct(): Joining unitigs
 CompactedDBG::construct(): After join: 467413 unitigs
-CompactedDBG::construct(): Joined 22185 unitigs
+CompactedDBG::construct(): Joined 22334 unitigs
 [build] building MPHF
 [build] creating equivalence classes ... 
 [build] target de Bruijn graph has k-mer length 31 and minimizer length 23
 [build] target de Bruijn graph has 467413 contigs and contains 46155696 k-mers 
 
 total 83M
--rw-r--r-- 1 shedurkin labmembers 1.5M Feb  7 13:23 kallisto.isoform.counts.matrix
--rw-r--r-- 1 shedurkin labmembers    0 Feb  7 13:23 kallisto.isoform.TMM.EXPR.matrix
--rw-r--r-- 1 shedurkin labmembers 2.2M Feb  7 13:23 kallisto.isoform.TPM.not_cross_norm
--rw-r--r-- 1 shedurkin labmembers  532 Feb  7 13:23 kallisto.isoform.TPM.not_cross_norm.runTMM.R
+-rw-r--r-- 1 shedurkin labmembers 1.5M Feb  7 14:32 kallisto.isoform.counts.matrix
+-rw-r--r-- 1 shedurkin labmembers    0 Feb  7 14:32 kallisto.isoform.TMM.EXPR.matrix
+-rw-r--r-- 1 shedurkin labmembers 2.2M Feb  7 14:32 kallisto.isoform.TPM.not_cross_norm
+-rw-r--r-- 1 shedurkin labmembers  532 Feb  7 14:32 kallisto.isoform.TPM.not_cross_norm.runTMM.R
 drwxr-xr-x 2 shedurkin labmembers 4.0K Feb  7 13:01 kallisto_quant_sample71
 drwxr-xr-x 2 shedurkin labmembers 4.0K Feb  7 13:05 kallisto_quant_sample73
 drwxr-xr-x 2 shedurkin labmembers 4.0K Feb  7 13:09 kallisto_quant_sample76
 drwxr-xr-x 2 shedurkin labmembers 4.0K Feb  7 13:13 kallisto_quant_sample79
 drwxr-xr-x 2 shedurkin labmembers 4.0K Feb  7 13:16 kallisto_quant_sample82
--rw-r--r-- 1 shedurkin labmembers  80M Feb  7 13:25 Peve_kallisto_index.idx</code></pre>
+-rw-r--r-- 1 shedurkin labmembers  80M Feb  7 14:34 Peve_kallisto_index.idx</code></pre>
 <p>Note that, when building an index, kallisto warns us that it “replaced 43264 non-ACGUT characters in the input sequence with pseudorandom nucleotides.” This high number of identified “non-ACGUT” characters is related to the type of reference sequences we used to build the index. We obtained a coding sequence (CDS) gff file for P.evermanni and the associated scaffold genome fasta, filtered the gff to retain only coding sequences, and then used bedtools to extract the fasta sequences of every CDS from the scaffold fasta. Notably, scaffolds are basically fragments of known DNA sequences “stitched” together by stretches of Ns to approximate the full sequence structure without complete sequence data. This means some of our mRNA sequences contain long, relatively-meaningless stretches of Ns. I’m not sure how/to what extent this will interfere with the kallisto pseudoallignment process, since it differs from standard alignment of a full read to reference, but we’ll continue for now</p>
 </div>
 <div id="sample-quantification" class="section level2" number="6.2">
@@ -2161,16 +2160,16 @@ sh: 1: R: not found
 Error, cmd: R --no-save --no-restore --no-site-file --no-init-file -q &lt; kallisto.isoform.TPM.not_cross_norm.runTMM.R 1&gt;&amp;2  died with ret (32512)  at /home/shared/trinityrnaseq-v2.12.0/util/support_scripts/run_TMM_scale_matrix.pl line 105.
 Error, CMD: /home/shared/trinityrnaseq-v2.12.0/util/support_scripts/run_TMM_scale_matrix.pl --matrix kallisto.isoform.TPM.not_cross_norm &gt; kallisto.isoform.TMM.EXPR.matrix died with ret 6400 at /home/shared/trinityrnaseq-v2.12.0/util/abundance_estimates_to_matrix.pl line 385.
 total 83M
--rw-r--r-- 1 shedurkin labmembers 1.5M Feb  7 13:25 kallisto.isoform.counts.matrix
--rw-r--r-- 1 shedurkin labmembers    0 Feb  7 13:25 kallisto.isoform.TMM.EXPR.matrix
--rw-r--r-- 1 shedurkin labmembers 2.2M Feb  7 13:25 kallisto.isoform.TPM.not_cross_norm
--rw-r--r-- 1 shedurkin labmembers  532 Feb  7 13:25 kallisto.isoform.TPM.not_cross_norm.runTMM.R
+-rw-r--r-- 1 shedurkin labmembers 1.5M Feb  7 14:34 kallisto.isoform.counts.matrix
+-rw-r--r-- 1 shedurkin labmembers    0 Feb  7 14:34 kallisto.isoform.TMM.EXPR.matrix
+-rw-r--r-- 1 shedurkin labmembers 2.2M Feb  7 14:34 kallisto.isoform.TPM.not_cross_norm
+-rw-r--r-- 1 shedurkin labmembers  532 Feb  7 14:34 kallisto.isoform.TPM.not_cross_norm.runTMM.R
 drwxr-xr-x 2 shedurkin labmembers 4.0K Feb  7 13:01 kallisto_quant_sample71
 drwxr-xr-x 2 shedurkin labmembers 4.0K Feb  7 13:05 kallisto_quant_sample73
 drwxr-xr-x 2 shedurkin labmembers 4.0K Feb  7 13:09 kallisto_quant_sample76
 drwxr-xr-x 2 shedurkin labmembers 4.0K Feb  7 13:13 kallisto_quant_sample79
 drwxr-xr-x 2 shedurkin labmembers 4.0K Feb  7 13:16 kallisto_quant_sample82
--rw-r--r-- 1 shedurkin labmembers  80M Feb  7 13:25 Peve_kallisto_index.idx</code></pre>
+-rw-r--r-- 1 shedurkin labmembers  80M Feb  7 14:34 Peve_kallisto_index.idx</code></pre>
 </div>
 </div>
 <div id="summary" class="section level1" number="7">

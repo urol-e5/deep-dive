@@ -3,17 +3,62 @@
 Kathleen Durkin
 2024-01-25
 
-Description
+- <a href="#1-create-a-bash-variables-file"
+  id="toc-1-create-a-bash-variables-file">1 Create a Bash variables
+  file</a>
+- <a href="#2-download-trimmed-rnaseq-reads"
+  id="toc-2-download-trimmed-rnaseq-reads">2 Download trimmed RNAseq
+  reads</a>
+- <a href="#3-fastqcmultiqc-on-trimmed-reads"
+  id="toc-3-fastqcmultiqc-on-trimmed-reads">3 FastQC/MultiQC on trimmed
+  reads</a>
+- <a href="#4-retrieve-the-reference-transcriptome-and-genome"
+  id="toc-4-retrieve-the-reference-transcriptome-and-genome">4 Retrieve
+  the reference transcriptome and genome</a>
+  - <a href="#41-verify-transcriptomegenome-fasta-md5-checksum"
+    id="toc-41-verify-transcriptomegenome-fasta-md5-checksum">4.1 Verify
+    transcriptome/genome FastA MD5 checksum</a>
+- <a href="#5-convert-gff-to-a-genes-fasta"
+  id="toc-5-convert-gff-to-a-genes-fasta">5 Convert gff to a genes
+  FASTA</a>
+  - <a href="#51-extract-only-cds-from-gff"
+    id="toc-51-extract-only-cds-from-gff">5.1 Extract only CDS from gff</a>
+  - <a href="#52-generate-transcriptome-fasta"
+    id="toc-52-generate-transcriptome-fasta">5.2 Generate transcriptome
+    fasta</a>
+  - <a href="#53-check-transcriptome-fasta"
+    id="toc-53-check-transcriptome-fasta">5.3 Check transcriptome fasta</a>
+- <a href="#6-align-to-reference-transcriptome-kallisto-pseudoalignment"
+  id="toc-6-align-to-reference-transcriptome-kallisto-pseudoalignment">6
+  Align to reference transcriptome (Kallisto pseudoalignment)</a>
+  - <a href="#61-building-index" id="toc-61-building-index">6.1 Building
+    Index</a>
+  - <a href="#62-sample-quantification"
+    id="toc-62-sample-quantification">6.2 Sample Quantification</a>
+  - <a href="#63-trinity-matrix-with-kallisto-output"
+    id="toc-63-trinity-matrix-with-kallisto-output">6.3 Trinity Matrix with
+    Kallisto Output</a>
+- <a href="#7-summary" id="toc-7-summary">7 Summary</a>
 
-Inputs:
+**Description:**
 
-trimmed RNAseq reads CDS gff
+Use kallisto to quantify *P. evermanni* RNAseq transcript abundances
 
-Outputs:
+**Inputs:**
+
+Trimmed RNAseq reads (e.g. `*.fastq.gz`). *P. evermanni* reads found
+[here](https://gannet.fish.washington.edu/Atumefaciens/20230519-E5_coral-fastqc-fastp-multiqc-RNAseq/P_evermanni/trimmed/).
+
+Coding sequence gff file (e.g. `*.gff`) and scaffold genome
+(e.g. ‘\*.fa’), found [here](https://www.genoscope.cns.fr/corals/data/).
+
+**Outputs:**
+
+kalisto counts matrix (`kallisto.isoform.counts.matrix`)
 
 ------------------------------------------------------------------------
 
-# Create a Bash variables file
+# 1 Create a Bash variables file
 
 This allows usage of Bash variables (e.g. paths to common directories)
 across R Markdown chunks.
@@ -34,14 +79,12 @@ echo "# Input/Output files"
 echo 'export transcriptome_dir=${Peve_dir}/data'
 echo 'export transcriptome_gff_name="Porites_evermanni_v1.annot.gff"'
 echo 'export transcriptome_gff=${transcriptome_dir}/${transcriptome_gff_name}'
-echo 'export transcriptome_gff_filtered_name="Porites_evermanni_v1_mRNA.annot.gff"'
+echo 'export transcriptome_gff_filtered_name="Porites_evermanni_v1_CDS.annot.gff"'
 echo 'export transcriptome_gff_filtered=${transcriptome_dir}/${transcriptome_gff_filtered_name}'
 echo 'export genome_fasta_name="Porites_evermanni_v1.fa"'
 echo 'export genome_fasta=${transcriptome_dir}/${genome_fasta_name}'
-echo 'export transcriptome_fasta_name="Porites_evermanni_mRNA.fasta"'
+echo 'export transcriptome_fasta_name="Porites_evermanni_CDS.fasta"'
 echo 'export transcriptome_fasta=${transcriptome_dir}/${transcriptome_fasta_name}'
-echo 'export transcriptome_fasta_collapsed_name="Porites_evermanni_mRNA_collapsed.fasta"'
-echo 'export transcriptome_fasta_collapsed=${transcriptome_dir}/${transcriptome_fasta_collapsed_name}'
 echo 'export kallisto_index_name="Peve_kallisto_index.idx"'
 
 echo "# External data URLs"
@@ -60,7 +103,6 @@ echo "# Paths to programs"
 echo 'export kallisto=/home/shared/kallisto_linux-v0.50.1/kallisto'
 echo 'export trinity_abund_to_matrix=/home/shared/trinityrnaseq-v2.12.0/util/abundance_estimates_to_matrix.pl'
 echo 'export bedtools=/home/shared/bedtools2/bin/bedtools'
-echo 'export fastx_toolkit="/home/shared/fastx_toolkit_0.0.13_binaries_Linux_2.6_amd64/bin"'
 echo ""
 
 echo "# Set number of CPUs to use"
@@ -73,7 +115,6 @@ echo "programs_array=("
 echo '[kallisto]="${kallisto}" \'
 echo '[trinity_abund_to_matrix]="${trinity_abund_to_matrix}" \'
 echo '[bedtools]="${bedtools}" \'
-echo '[fastx_toolkit]="${fastx_toolkit}" \'
 echo ")"
 
 } > .bashvars
@@ -93,14 +134,12 @@ cat .bashvars
     export transcriptome_dir=${Peve_dir}/data
     export transcriptome_gff_name="Porites_evermanni_v1.annot.gff"
     export transcriptome_gff=${transcriptome_dir}/${transcriptome_gff_name}
-    export transcriptome_gff_filtered_name="Porites_evermanni_v1_mRNA.annot.gff"
+    export transcriptome_gff_filtered_name="Porites_evermanni_v1_CDS.annot.gff"
     export transcriptome_gff_filtered=${transcriptome_dir}/${transcriptome_gff_filtered_name}
     export genome_fasta_name="Porites_evermanni_v1.fa"
     export genome_fasta=${transcriptome_dir}/${genome_fasta_name}
-    export transcriptome_fasta_name="Porites_evermanni_mRNA.fasta"
+    export transcriptome_fasta_name="Porites_evermanni_CDS.fasta"
     export transcriptome_fasta=${transcriptome_dir}/${transcriptome_fasta_name}
-    export transcriptome_fasta_collapsed_name="Porites_evermanni_mRNA_collapsed.fasta"
-    export transcriptome_fasta_collapsed=${transcriptome_dir}/${transcriptome_fasta_collapsed_name}
     export kallisto_index_name="Peve_kallisto_index.idx"
     # External data URLs
     export trimmed_reads_url="https://gannet.fish.washington.edu/Atumefaciens/20230519-E5_coral-fastqc-fastp-multiqc-RNAseq/P_evermanni/trimmed/"
@@ -116,7 +155,6 @@ cat .bashvars
     export kallisto=/home/shared/kallisto_linux-v0.50.1/kallisto
     export trinity_abund_to_matrix=/home/shared/trinityrnaseq-v2.12.0/util/abundance_estimates_to_matrix.pl
     export bedtools=/home/shared/bedtools2/bin/bedtools
-    export fastx_toolkit="/home/shared/fastx_toolkit_0.0.13_binaries_Linux_2.6_amd64/bin"
 
     # Set number of CPUs to use
     export threads=20
@@ -127,10 +165,9 @@ cat .bashvars
     [kallisto]="${kallisto}" \
     [trinity_abund_to_matrix]="${trinity_abund_to_matrix}" \
     [bedtools]="${bedtools}" \
-    [fastx_toolkit]="${fastx_toolkit}" \
     )
 
-# Download trimmed RNAseq reads
+# 2 Download trimmed RNAseq reads
 
 Reads are downloaded from:
 <https://gannet.fish.washington.edu/Atumefaciens/20230519-E5_coral-fastqc-fastp-multiqc-RNAseq/P_evermanni/trimmed/>
@@ -153,16 +190,44 @@ wget \
 --no-parent \
 --quiet \
 --accept "RNA-*.fastq.gz" ${trimmed_reads_url}
+```
+
+``` bash
+# Load bash variables into memory
+source .bashvars
 
 ls -lh "${trimmed_reads_dir}"
 ```
 
-# FastQC/MultiQC on trimmed reads
+    total 24G
+    drwxr-xr-x 2 shedurkin labmembers 4.0K Jan 25 15:20 multiqc_data
+    -rw-r--r-- 1 shedurkin labmembers 2.5G May 19  2023 RNA-POR-71-S1-TP2_R1_001.fastp-trim.20230519.fastq.gz
+    -rw-r--r-- 1 shedurkin labmembers 2.6G May 19  2023 RNA-POR-71-S1-TP2_R2_001.fastp-trim.20230519.fastq.gz
+    -rw-r--r-- 1 shedurkin labmembers 2.2G May 19  2023 RNA-POR-73-S1-TP2_R1_001.fastp-trim.20230519.fastq.gz
+    -rw-r--r-- 1 shedurkin labmembers 2.4G May 19  2023 RNA-POR-73-S1-TP2_R2_001.fastp-trim.20230519.fastq.gz
+    -rw-r--r-- 1 shedurkin labmembers 2.4G May 19  2023 RNA-POR-76-S1-TP2_R1_001.fastp-trim.20230519.fastq.gz
+    -rw-r--r-- 1 shedurkin labmembers 2.5G May 19  2023 RNA-POR-76-S1-TP2_R2_001.fastp-trim.20230519.fastq.gz
+    -rw-r--r-- 1 shedurkin labmembers 2.1G May 19  2023 RNA-POR-79-S1-TP2_R1_001.fastp-trim.20230519.fastq.gz
+    -rw-r--r-- 1 shedurkin labmembers 2.3G May 19  2023 RNA-POR-79-S1-TP2_R2_001.fastp-trim.20230519.fastq.gz
+    -rw-r--r-- 1 shedurkin labmembers 2.6G May 19  2023 RNA-POR-82-S1-TP2_R1_001.fastp-trim.20230519.fastq.gz
+    -rw-r--r-- 1 shedurkin labmembers 2.7G May 19  2023 RNA-POR-82-S1-TP2_R2_001.fastp-trim.20230519.fastq.gz
+    lrwxrwxrwx 1 shedurkin labmembers  149 Feb  7 12:58 sample71_R1.fastq.gz -> /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/output/12-Peve-RNAseq-kallisto/trimmed-reads/RNA-POR-71-S1-TP2_R1_001.fastp-trim.20230519.fastq.gz
+    lrwxrwxrwx 1 shedurkin labmembers  149 Feb  7 12:58 sample71_R2.fastq.gz -> /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/output/12-Peve-RNAseq-kallisto/trimmed-reads/RNA-POR-71-S1-TP2_R2_001.fastp-trim.20230519.fastq.gz
+    lrwxrwxrwx 1 shedurkin labmembers  149 Feb  7 12:58 sample73_R1.fastq.gz -> /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/output/12-Peve-RNAseq-kallisto/trimmed-reads/RNA-POR-73-S1-TP2_R1_001.fastp-trim.20230519.fastq.gz
+    lrwxrwxrwx 1 shedurkin labmembers  149 Feb  7 12:58 sample73_R2.fastq.gz -> /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/output/12-Peve-RNAseq-kallisto/trimmed-reads/RNA-POR-73-S1-TP2_R2_001.fastp-trim.20230519.fastq.gz
+    lrwxrwxrwx 1 shedurkin labmembers  149 Feb  7 12:58 sample76_R1.fastq.gz -> /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/output/12-Peve-RNAseq-kallisto/trimmed-reads/RNA-POR-76-S1-TP2_R1_001.fastp-trim.20230519.fastq.gz
+    lrwxrwxrwx 1 shedurkin labmembers  149 Feb  7 12:58 sample76_R2.fastq.gz -> /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/output/12-Peve-RNAseq-kallisto/trimmed-reads/RNA-POR-76-S1-TP2_R2_001.fastp-trim.20230519.fastq.gz
+    lrwxrwxrwx 1 shedurkin labmembers  149 Feb  7 12:58 sample79_R1.fastq.gz -> /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/output/12-Peve-RNAseq-kallisto/trimmed-reads/RNA-POR-79-S1-TP2_R1_001.fastp-trim.20230519.fastq.gz
+    lrwxrwxrwx 1 shedurkin labmembers  149 Feb  7 12:58 sample79_R2.fastq.gz -> /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/output/12-Peve-RNAseq-kallisto/trimmed-reads/RNA-POR-79-S1-TP2_R2_001.fastp-trim.20230519.fastq.gz
+    lrwxrwxrwx 1 shedurkin labmembers  149 Feb  7 12:58 sample82_R1.fastq.gz -> /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/output/12-Peve-RNAseq-kallisto/trimmed-reads/RNA-POR-82-S1-TP2_R1_001.fastp-trim.20230519.fastq.gz
+    lrwxrwxrwx 1 shedurkin labmembers  149 Feb  7 12:58 sample82_R2.fastq.gz -> /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/output/12-Peve-RNAseq-kallisto/trimmed-reads/RNA-POR-82-S1-TP2_R2_001.fastp-trim.20230519.fastq.gz
+
+# 3 FastQC/MultiQC on trimmed reads
 
 Already performed, can view multiqc report at
 <https://gannet.fish.washington.edu/Atumefaciens/20230519-E5_coral-fastqc-fastp-multiqc-RNAseq/P_evermanni/trimmed/multiqc_report.html>
 
-# Retrieve the reference transcriptome and genome
+# 4 Retrieve the reference transcriptome and genome
 
 Provided by <https://www.genoscope.cns.fr/corals/genomes.html>
 
@@ -182,8 +247,6 @@ wget \
 --quiet \
 --execute robots=off \
 --accept "${transcriptome_gff_name}" ${transcriptome_url}
-
-ls -lh "${transcriptome_dir}"
 ```
 
 Note that this is a CDS (coding sequence) gff file, not a FASTA, so
@@ -206,45 +269,236 @@ wget \
 --quiet \
 --execute robots=off \
 --accept "${genome_fasta_name}" ${genome_url}
-
-ls -lh "${transcriptome_dir}"
 ```
-
-## Verify transcriptome/genome FastA MD5 checksum
-
-No checksum file(s) provided with download, so skipping this step
-
-# Convert gff to FASTA format
 
 ``` bash
 # Load bash variables into memory
 source .bashvars
 
-# The CDS gff we downloaded includes many different sequence types (CDS, UTR, mRNA, etc.). 
-# We only want to the mRNA, so we first need to extract only the mRNA feature-type lines.
-grep -w 'mRNA' ${transcriptome_gff} > ${transcriptome_gff_filtered}
-
-head -n 3 ${transcriptome_gff_filtered}
-
-# Now we can use bedtools to extract the fasta sequences for each feature listed in the gff
-${programs_array[bedtools]} getfasta -fi ${genome_fasta} -bed ${transcriptome_gff_filtered} -fo ${transcriptome_fasta}
-
-head -n 6 ${transcriptome_fasta}
+ls -lh "${transcriptome_dir}"
 ```
 
-    Porites_evermani_scaffold_1 Gmove   mRNA    3107    4488    543 -   .   ID=Peve_00000001;Name=Peve_00000001;start=0;stop=1;cds_size=543
-    Porites_evermani_scaffold_1 Gmove   mRNA    424479  429034  2439.63 -   .   ID=Peve_00000002;Name=Peve_00000002;start=1;stop=1;cds_size=2019
-    Porites_evermani_scaffold_1 Gmove   mRNA    429394  438909  1570.66 +   .   ID=Peve_00000003;Name=Peve_00000003;start=1;stop=1;cds_size=1458
-    >Porites_evermani_scaffold_1:3106-4488
-    TTACTGCTTCAGTATGTGAATTTCGATGGTGGCTTGACCGGAGTTAGACATGGCCCCCCTTGCTCGGAGTCCCGATCCCAAATCTCTCTCGTGCCAGTAGTTATCTCCTTTGAAGGGATTATCGTAATACATCCGGTACCAAAGATTGTAGTTGGCGCGTCTTTTACCACTGTAAAGCCAAACATCAAACCAGTTGCTGTACCAGTTGTAGTCAAATGGAACGGAATACATAACAGCAAGTGTTTTATCGATGTGTGGGATGTAGTATGTTAATACTCCTACTGCGCCTCTCGCAACGGGCCCCGCAGTTTTTCGTGCGCCGTAAAGCAAAGCTGTGCCTAGAAATAAGCAAACAAATTAGCAATTAAACAAAAATCATAAACATGATCATTCGTCACAATGATACATGGCAAACNTTGTGTCAGGTTAGTGATTGCTTATCTTTTCCCCAAATATTACACGCAAAGGGATTCTCATTCTGAACATGAATACTAAGTTTAGTTGGTTTAAGAAGCTCTTTCAACCCTGAAGTCATTTTGCCGTTCTGACAAAGCAAAACATAAACCTGTTGTCTGCAAAATTTCAAGAATGGGCAAATCCTCTAATACAGTTTCTTTACTCTTTAGGGTAAGTGGTCGCTGAGTTCGTCCTTGGTTTCATACGGTAATAGGCCCTTTGCACGCGATGAACTCATTTTACTACTACTACTACTACCAGAATCACTCGGGGTTTTGCTTTCTTGGACAAACGAGGGCTTTATTTTTCAAACCTCGCATAACCTGTGATCAGGCCCCCAAAACAAAAAGGGAAGAAGGACCGCCTGATTGCAGGTTAAATTCTTCGCAGAGATTAGCTAGAAAAATTAAATATGACAAGAAAACCAAAATGGATTCTATAGCAATAGATCAGACCTTTTTAGCTTGTATGGTTTGTTTACCCATTTCAGACCAAGTGATGGTACCCCAGAGAACTGTTTCTTTCAATGTCGTCTTTTGCACGTGCACCCACATGTTATGTATGCATAATTATATAAAAGACAAATTCCCCCAAGAACATCACGTGGTCTGAATTGGGAAAACAAAACAAACAAGCTAATGACACCATCCTGCATACTGGCCTTAGTGTTATTACTAAAAGAAAGGATTTTAAACTTTTATGTTATTAATATTAATTTTACCTGAAGAAACATCATGAGGCAAAACACGATTTGACGTCCCTGAATAAAAATATATGTTGACTGCTCTCCATTTATATCCACTTTCGTTATCAACACCAATGGCGACCTTGCGGCTTATGCTACCAAGGGTGTTTAAAATTGTTGTGAGAATGCCCAAGCCAAGTTGAGCACCGCTGATGACAGCACCAGCGTCAGCTAAAATTTT
-    >Porites_evermani_scaffold_1:424478-429034
-    TTACTGTTCAGCTAATTTGTAAAATAGCAAGTATGGCGAAGTGAATGATGACTCAGCTGAAGACAGCATTGCTGTTAAATCTGATTCCTCTAATATCATGACTTCAGCATCATCAAAGTGAATCCATTGAGATTTCTCAAGCTGTAAACTCTGTTCAACGGAATTTGATGATTCCTTAATAGAAACAGTGTTCTGTAATTTATTATCTTGTTTATTCTCTTGAAAGTTTAGCTGCCGAATTGCACTTCTGTTGGATTTTGCACCTCGATACCCAAAACTCTGGATTTTCTTTAAGCTGTGGGTTGGTGTAATATGATGTGCTTGTTTCTTGCCACCTACTGGTAAATCAACATTTTGATCCAGCTGTTCATTGGTTTCTTTTACAGGGTGCTTTCTTGATCTCTGAAAGTATCTTGAGATCCCAGACATACATGTTGTTGTACCTTTCCCTGCAGGACTCTCCAAAGCATGGATGTCATTTTCAGGATTGGTCATGTCCATGTTTTCCACTAATTTTCTGTCACTAGCCAAAGTGTCACAACCATCTGAAGTTCTATTGACTTCACTTGCAGGCATCTGACTCCAGTCAAACTCCCCAGAAGATACCATGTTTCTATGTACATGTCCATCTTTAACATGGTGCTTGTTGTCAGGATGGATGGGCTGCCCTTTGTTGTTATTTACATCGGCATTTGTGGGTGTGGTTACCTTAACGTAAGCCTGGTAATGTCCACTACATGAGGTCATACCACTGTGCATCACAATGCCAAATAAATGATACGTTGGATTGGCAATTGAACAAGTCTTTGAACACCATTCCTTGACTGACAGCTCCATTGGTGTCTCGAGATTTGAAGTGATCTTGGAGACCATTCCAGAAAATCTGCCAATTTAAAATATACACATCACTCATGTTTCCCCTTACTAATCTCTCAATGATTATACTGATTTGTCTCGAAGTGAATCATTGATCAGGGTAAAGTTATTGATGTATTGCACCATTGGTCAATGGAAGGACAAGAAACAGGTAACTACTCGTACTCATGTGAATCCATGAGAAAGACGTTAATCAATCAGAGGCATAAGTGGTTCAGAAGAAAAAATCTGAGTGTTTGCAATAGGAGTCGAACCTATGGCCTTTTGTTTACTAGTCCAAATGCTCTACCACTAAACTACCGGGGACTGGTGGGAGGTAAGAACACTAAACCACTGTAAATGCCTTTCAGGGCCCTGGGTTTAATTTGCAGCTGGTGCAGCTACAGTACAGGTGTGACTGATGGTGTTAGTATGAGGGTTCGAGTTTCATGACATTTAAGTTAGTCACACCTGTGCACCTGCAAATTAAACCCTCCAATTTTTGGGCCTGTTCCAGGTGTATGTATAGTAAGGATGGTGCAAAAAGGAGAGTAGAGCAAAAAAGGTGAGGGGTAACTTATTGCAACCTCTCTTCTCCGCCTGATGTGCAACTTCTATTAAATGCTGTTCTCTAAGTCCCAGAAGCGATCATTACTATCATTCTCTTTAATTTCTAATAAATGTGTAATTGATTAAAATCAGCCTCTGCAGGCAGGTTATGAGAATTGGGAACATGATCATAAGATCTATACATTTGCACAACTTATCTCTAAAAAGACTTGTGAGGGTACAAGAAAGGTCCTTCTTTTTTGACCTCAGGAAAGAAAAGGGTGCACAAAATCCTTACCCTGAAAGTGCGTTTGCAGTAAACCTCTTGAGGTGGATTGTGAGTATTCTTGGCAGCTTATCAAAGCTCGCTGAAATCTCAGCTTCAGTAAGAGTAAGGCAGTTCTCACAGAAATACTTGTTCTCTCCACTCAAATGTTCTACTGTTGCAAACTGCGACAGGGCCCAAGCTAAGCTCTGTGTGTCTCGGCCTTTCTTCGGTGTTGGTGAGAAAGCCTTCAGATCGCGCACTTTAGGCTCATCTTGAACTGGCACACTAATGTCTAGAAAGCTCTCAAAACGTTTCTTTGCATCTTCACAAGTCATACACTTGGTCTGGTGTAGAAGGCATCCTTGAAATAAATCTACAAAACTACTATGGCATTGGTTTGTGTTGCTGGTGAAGGAGTTCGCAGAAGGAGAATTTTTCACGTGCCTATCACCAATGTACATTTTTCGTGGATCTTCTCTCTTCTTTTTTATTTCTGTTTCTGTGTCTTGAAGATCTACTAGCAAACTGCACAGGAATTCTTGTGCATCATGTTGGAGATTGTCTTCAAACAATGGGTTTTTACCCCTATGTGTAAAAGAAAGGAAAATTTTTAAAAATTTTATGGCAATTTTTTGATGTGTTTGATGAGACAATAGCCATGTGACTGTGTGATTAACGGAGGTGTCAAACAAAAATGAGCTGATAGTCAACACGAAAATTATCGGCACATTTGTGGTGTGTCATTTATGTTGTAAGTATAATGGTGTTACTTTGTAACTGTATTAAGTAAACATGTATAATGAATTTCAAAAAACAACCAATTTTCACTACCAATAACCATGATACATGTATAAGCATCTACCTGAAGGTTTGCATGAAATCCAAAGGTTTTGCAGCAAGAACTAAAGTGTTTCTCCTTTGAACAAGATGTTCACAGTTCTCTTTATTGTCATTGTAGTCCTGTTCAAGCTCTTCCATCTGACTGAAAAGCTAGAAGGAAAAAGGATGCACTATTTAGTATATAAGTGATACATTCAAGTCAAAAATAGGCTAATACCCACCACTGAAATTGAAATTTGCTCCAAAAGCCACATGTAGATGGGTTACTAACTCAAACTCAGTTAAAAGGCATCAACAAAACCTGGATCTGTCCGGATCAGATACACTCCCTGTAATTCCTTAAACTTTTGTCACTACAAAAAAAACTCCAACTCGATTTTTATCTCAAAAACAAACTTCGCACAAAAATCCACAAGTAGCAAAGGCAATTCAAGGCAGTTTGTAAAATTTTAAAAAAATGTTACCGAAAACAGTGATACATGTAGTAAGACAAAAGATTAGGATTAAGGTTAGGGAAAAAAGGTTACAGATAGGCCCATTAAAAGAATTGATCTGACCTGGTTCAATCCAAGTTTTGCAAATGGCCCTCCCTTGAGTTTGAGTGGGAATCCATAAAATAAGGCTAATCCTGTGACTGCTTAGCCTTACTAGTTGTAAGTGTTATTTTTTCTTACCTCTCTTAGTTCACAAACAACATGTTTTTGATCACAACAATTTTCCAAATCCTCTGAACCCTGGCAAAAATAAAGACAAAATTACAGCATCATTGGTGTTAGATCCTAGTTTAAACCACTCAATATGGTATACATGTATTAAGCTATGTACATTAATGGAACGAAAAAAAGACATGCAAAACTATACAAAAAAAATTAGATAAGCTGCAGATATGCTAGCATTTCATACACAGTTAGACAAAATGTGGCAGCAGTTGGAGAAATACCAGTGATGACAATGATAATGTTAATAGTGTTAACAGCAATAACAATAAAATATTACCATTGGCACAATAGGCATTCACCTTGGTGTAAGGTTAATTCTGACAAAAAGCCAAATTGCCTAGACTTTCTAAATGTCCTTTTTTTCCTGGCTGGTTATGCCATTTTAAAGTTCTTTTTGTACCCATTTGGTGCAAAATTCACTGGTCAAAACTTCCACCAGTGACATTTTGACAATTAACCAATAGGAGAGTGAGTGATATTTGATGCCACTGCCGACACAGCATAAGCCAATAATTTTTCCCACATGAATTTATAGTGTGATTCAAATCCATTCAGGCAAAACAAGTTGACCTCGCGACTTGCTCAGTCACTGTGAGACTTCATTGGAGCTCACATTTAAGAACTAATGAGAGGTCAACTTATGGCAAGTCTACAAATTGCCCACCTCCTCACACAACCTTCTGCTAAGTGCCCCCCCTCCCCTACAATGAGACCACTTTACATCACCACCCTACCCTCCCATCCATAATTGTGGTGTATCTACCCTTTACGGAAACTTAGAGGGAAGGGGATGGAGATTTATCTTAAAGAGTAACACGTACGAAAAATGTATTGAATTACACCCACGTCCCCTTACGCACTCAAACTTCACTTTCCATCGCAAATAAGCCTAATCTTGTAATGCAACACTGAACCTAAGCTCCACTGCTTACGTTTTCTTTCCCGTCTGTTCTCGTGTCGAATGATTTCCCCTCTGTCGCACAATAGTTTTTTTCTTTGACAAGTGAATCGAGTTCATCAACAGACTCTAATATTCCCGGGCAATGCCGCAAAACTTGCACAACAGCGTTTGCGTAGCAAATATTTCCATGATTCCTTAATCCTGCGTAAGGTGGTGGTGGCTTTGGGGGCTCACATGTCTCATCGTCACTCGCATTTTGGGCTGTTGGAGGGCTGAAGATAGGATACAACTTCTCTCTCTTGTCAGGATCGCTTTCGCTCGAAGCTTTCTTTTTGCTTTTGAGCTTTAACGAGAATCTTGTTTTCTTACGTGGTGGGCTCATGGGACTCGACGGCGGTGAAGCTGACCTAGAAACTGATGGCAT
-    >Porites_evermani_scaffold_1:429393-438909
-    AAGTTATCCGGGAAAAAAGAAAATGGCGACGGCTAGTTCGCTGGTCAAATGTTATTGAGTCGTCTTTTAGCCTACACCTTGGGGTAACAGAATAATTTTAAAGAACATGTTCAGTGCAGAGGAGCTGGATGTAAAGACTACCCAGCTCAAAGCCCAAGGGCTGCTCTCTGAACCTTCAAATCACGAGGAGGAAGAAGTAGAGAGAATTGAAAGAGCGACTTGTTCTTATTCATATGAATCTGAACGGTTTTTATTGAAGGAGAGGAGCTTTTCAAGGCAGTATGCTCAGATTTATGCAGTACGTATTATGGCAATGAGGAAGAAGTTGGCTGCAGCCGCCAGGAGAAAATGGGGTTTGTGTAACATTCTCTTTGTATCATATATAAAATATTTAAGCCTTCATTGTTTTAATCATAAATGACCGGACTGTCACATCGATTGCGTTGAGAAGAGAAGGTTGTATTTAATTTAAGATTATCTTGTTTTTCACGGTTGCTGCTTACAAGCTGTAGTACTTAGCCGCAGCTGATGTACAAAAGGGTTAATTTTTCGCTTTCAGGTTGGTTGGGGGGGGGGGGGGGGGGGAGGGGGGGGGGGGGGGGGGGAACCAAAACTTGGGGCCGCTTTTTTTTTTCCGAAAGAACAAAAAGCAAAAATATTGGTTCCTTTTTACAAAATTTATATTTTAAAACAGAAAACAGATGAGTATCTATCAAGAATGTTGTTGTATTTGTAGGATTATTGTTTTTTGGTATGTTCTTCCGAATCAGATGAGGTCTTTCGCGGGGGGTGTAGGGAAAGGGGGGTTTGTTTTGGGTGGGGGGGGGGGTGGGGGGGGGGGGGGGGGGCGAGGGGAGGGGGGTAGTGGGATACCAATACTGGGACCCGATTTCTTTGTCCTGAAATACCAAACTGCAAAATTACTGGTACCTTTTACCAAAATTTATATTCTAACGCAGAATACAGTAGTGTATACCTGAAAATTTGGCAACAAAGTACAATTCAGTTGAACTTCCATGTGCGACCACCTCTCGTTAGCAGCCACCTTCCATAGGTGACCACCTATCCAAAACACTTAAGTTTTCCCAGTCAAAGCTTTACAGTTGAAACCTCTCAGAAACAACCACCTCCTGTAAGCGCCCACTACCACATATCATGGCTGACTTTCCATAATTTTCCTCTGTTTTTCACCTCTTGTAAGCAACCACTTGACAGATGGTCTGATCTCTATGTTCGCTGTTTGTACTATGCCACTTCGTATATAAGAAGAACTTTAAGCAACAACATGGAACTACTCATATTGCAACTTAGTAATTGCATGAAATAAAGATGTGTGTGGACCTTTTCTTGAAAGAGACACCCTGTGGTTCGATTTTTGCAAATGACCACTTCCTTTAAGTGCCCTTATGGGAGGTTCAACTGTATATACTCAATGGCCCTGTGTAGCTAAGGGTGAAAAGTTTGATTTCCATTTTATGCAATCCAATTTAGGTAACAGGTTTGAAATAAAGAAGAAACTGGCTGAGGTCAAGGGAAATGAGAAATGTGTCCTGATAGGAACTCTGTTCAAGAAAATGGAACTCAAGCCTTGTATATTAAAGGAGATAAGCGAAGAGGTGCCTAGTTTAAAGAAGTGCTATGTTTAAGAAGTAGATAATGACTGATTTCAAAAACGAGACAGTCTGAAAAATATTGGATGAAAGTGTTGGTATTGGCTCTGTGCCTTTGTTTGTCATATGCCACATACACTTTCCACATTGTTTCAAGATCAGGTTTCAGAATTTGACTACATTTACACTGGTGGACAACTGCTTTTCAACTTTTTTTTTTCGCTGCCTTACCAAAATTTTGCCTGTCCTGTTTTAAAAAGCAAATACACAATGAAGTGGAAATACAGTAAAATGTAATAAAAATGTACTATTTGTCCTTGCCGAATATCTTTCAATCCATTGAAGCAAATTTAATCCAAGGAAAATTATTTTCCCACTTTAGCAGAATTTTTTTTCTACTCCAGATGTGCTATCATACTTTATTAAAACACCAACTGAATGGTTTTGACAAACTTTCCGAGAAGACAGACAGTTATGATAAGGATAAAAACAACATTGTCACAAATGGATGGTTGCTCTTTCTTGGCAACATCCTTCCCAGGTTCCTGTCCTACTCGTCCTCCAGGGGAGGAGTTGGATAAGCCTCTAGGAATGAGATTGCTTTCTCGGGATTGTTTTGCAATAGTGGTGCTTTGCCAGAAGAGCAGAAAAATTGAGTTACACACAAGTCATGTTTAGGGACTGGGAGATCTTTTACATAGTCTCAATGGAAGGATATCACTGAACATGGGCTGCTTATCATACAGTTGAGAAAGGACAAGTTTTGTATTCAATGTTCTCTCTATTCTCTTTGTAGGGAGTTTCAATATATATTCATTGCTATTTAAAACAGGTTATCACTGATGTACACCCTAAGCACTAGAAAATTCCCTGTACAACTGGAAGATAGTTGCCTAGTAAAAAGGCAACTGGGCTGAAAATGTTCCTTTTTCTTGAAAAATATCACCTGCCCCAGGAAATCAGTTACTGTGGATTCACCCAGAAGTTTAAAATGACTTCTTATTTTCAATAATTTAAGTTTATTTCATGGTTCTTAACAGCATAACCTGATGCCTCAACCATCCAGAGTAAAATATGCAGATGACAGTGATGAACTTGTGATTGAGGATGAATCAGAGAGGGTGACTCTTACTGGTAACATTCCAGTCGGGACGTCAGTAACAGGTGACTCAACTTAAAATAATTCAATATCTAATCCTCCTGTTAATGATATCAATACTTGATTTGCTGAATTTATATTACATTCATTTGGTGTGTTTTGCTGTGGAAAGGAAAGAAACTGGGGTTTTGACCCCATGGACTAGTACCACCCTTTGGAACCTTACGAAGTAGGTTTAAATCATATAAAGGCTGTATGTTGAAATAGTGGTGTAATTATCATGAAATGATGGGATGATTGATTGGTAAAACTGGGCTTATCAATTGTGGTAATTTTCTCCCTGTTACATATGACAATGAGTTTGCAATCCCAGCAACAAAGGAAAAAAATTATTTGAACCAAGATTTAAAATGAATCACAGCATTATGGAATGATAAGCAATGGAAAAGAATAAAATTAAAACCTTTATGACTTTCTCTTCCAGTTTGTTCTTACAGTATTGAATGTTTTTTTTGCCATCTTTAGGAACTATAGTAGCTCTCTGTGGCCATACAACTGAAAGTGGCAAATTCCATGTTGATGAGTACTGTTTTAGTGGTCTTCCATACCAAACTTCACCCAACCTTGATCAGTGTTTAACCAAGGGTGAAGACAGGTAAAATGACATCAGTCACTGTGATATTGATTAATGTAATGTTTCTCATTCAGTCAGTCTTCTTCAAGTTGTTTTTGCATGAAAAAAAAAATTAGAAATGTAGACAAGACACCCAAGACACTTTTTCCTCAATAGATGAAAGATAGGCACTACTGACTATTACTGGTGGTGGTTTGCAGGCAATGGTCCCCCAGTGATCTGTTATGTCCCTAGTAGTGTGGTCCAGGGTGCTTTCACATCCCACAAGATTCAGATCTGTGAAGTGTTTGAGACTGGGCATGCAGTTTTTTATCCCTTACCGAGAAGTCTAAAAAATATAGAGATGTTTGCGCGATGGCGCAAGGGGGGGAGGGGGGGTGGGGGGTTGGAATCCAGGGATTTTCATTGGAGGGGTGCATAAATTGTGCTCTCCCTTAGAATTTAATTTTACAACTTGTTTACAGATTATCATTGCCACCTGTCACAAGCAGAGCTATCTAACAGGCAACCCTTCAATGCCAGTGCTTTCAGTATGTAAATTCTATAAAATTAATGTTTGTAGTCTGATGAGTGCATTTAGGGGTCCGGGATCCTCCCCTTGGAACTGTCACTCTGGCAATACAATCTCCTCAGTTACTCTAAGATCCTAAGTATTGGTCCAGCCAGAAATCAGGCCTGGACATACCACTCCAAAAGACAGGCACCTGAACTAACTGAGCTAACTAATTTTTCTCATCATTTGTCAGGTATGTGGCACTCATATCTGGTCTTGGCTTTGGCTCTGAAAGCCAGGATATGCTCAGCCTACAGATGTTCTCTGATCTGGTGACAGGAGAGCTTGGGAGTGTTCAGGTAAGATTCTTCTGTTTTACCTAATTTTGCTAACACTTGCCCAGTCCAGGCCCAAGTTGTTCAAAAGATGGATAGCGCAGTAATTGGTTTTGGTAACTTTTATCCACTGATTATAACTTTTATTAGTGATTAATAGCACCAGTTTATAGCAATAGTAATTCCTACAAATTGTTACTGAAAGTGTTACTCAATCAACTACAGAGCATCTGTGCCCTAGTTGTGCTGAATATCTTATTGACTGTGTAAAACAGGGAATATTGTACTAGTCTGTACCCATTCCCCTCATCAAATGAGTTTCATACTGTATTTTATCCTTTTTGAAAAATGAAGGCCCAACAACAAAAATTATATTTCTAATAGTCTAACACTAATATTACTGCAGCTTCCAGAAGGTGTTTAAAAGTAATGCCACTTAGCTTTAAATAGCCTCAGTTGGTCACATTTCAGTAACCGTCTCCAATGAAAACAGTAAGTCTGTGCAAAAAATTTTGTGTTTTATTAAAAGCTTAACAAGTCAGACCACCTTGCCTTTTTTGTGGACTTTTAAAGAAAGCCCACACTTTAATATTCTTGAGTAATTTAACAGGCTCTTTTGCACAGTAGCAGCTTCCTTTGTACTCTAGTTTGGCATGTTTTCTCACCATGATTTGTGTTTTAGGATCAAGAGTCATGTGCCAAAATAAGCCGTGTCATCATTGCTGGTAATTCTTTGAGCCAGTGTACTCAAACAAAAGAGAGTGAAACTAAGGTAACAAAAAAAAAATTCCTTTTCTTTTTGCTGGCAGTAGTTATCAGTATTTAGCACTTCTAGTGATTTGATGGATCAGTACCATCCCCCTTTCTCATTTGAGGCATCTGTGCATCTTCAAGTTTTCCTGCATCCTGTGTTCTTCTATTCCAACGCATTCTAAAAATCAGAATCCTGGTTCATTTGCACAAAATATTCACTAGGGAGATAACAGTCTGGATCTGACAGTCCCCAACCCTCCCCATCATTGACTGTTGGAATGGGTTGGTGAGCATCTTGCATGGGACCCATTCCATCCCCACTGCGTGAAAGGCTCCATGCAAAAACATCTCCTAGCCTACTCATCTCCTTTGTGTCTTTGCATGGAGCCAAAAACTACTGATGTATATCTAAGAGTTTGCTCCTACCCCAATTTGGAGAAAGCTGTTTGAAACAACTCCAAAATTACATGAGCTTGGTTTTCATAAACCACAATGCTTTGCATGATAATTGTGTGTAAACAGCAATAAATGATGATGATGATGATGATGATGATGATCAGCATTGTCTTCATCATCATTACATTATCATCATCATCATTATCATTAAGGACAAATTATCAAAAAGAGTGAATAATCTTACCATTAATATCTTGTATCACGTACGAGTTTGTTTTGACCACCTCCTGTCGGCTGATGTCTTATTTCATTTCATTAATGAGTTAGGTCAGTTACTGAACTTCTTTTGCCTGATCAATGGCTATAACAGCAAGGTATATGCATGTGTATCAGACTTTTTTTGTGTCATGACTGAAAAAAAAAACGATATATACAAATGTGTAGTGCTTGTTTCTTTTTGTAAGTGAAACTTGAACTTAAGTTGTTAGCAAGTGGGGAGTCAGCAAAACGAAGCATAGGGAAACAAGTGGTCACTGACAAAGTGACTTTCACGAGATAAGCTCCAAATGAGCCCTGTCATCCACAAACTATGGTCACTGATAACAGTATTCTCTTTTAAACTCCCTAATGATCTTTTTGTGACAGGCAAAATATTTAACAAGAAACACAGTGGCAGGAAGTGTAGAGGCTATTAAGAGTCTGGATGACTTTGTTCTACAATTAGCAGTAAGTGACTGATCATCTTTCCATAAAGTCCAAACAAAACATCTTACGTGAATGCACAATGTTAAAAAATTGAGCCTCTAGACACAAGGAAAATAATAATTACTGAGAACGCAAGACAATAATGTTGAAGGTCTTGGTGAAAAAAGGGCACTGTTAGTGATTACTTTTCTGGAAATAAAAAGTTGCTCAAAAATGTCAGAGCCAACATCAACATTTCAGTATATAACTGACAGTTACCAGTACTGGTCCTTCCAAAAAAAAAATGAAAAGTGATTGACCACCCCCGGAAGCTCTGTTTGCCCTTCTATAACCTGCAAGCAACCTTAAGAACATTTTTGTGTAAGAACAATATTTTATATTATGTTTCTTTATTTCAAATGCTATTTCTGTACCTTAGATGCAATCACAAGTCATACCCAGTCATTTTTCAAAGTCTTGTTGCAGAAAGTAGTATAAAATAATGTGATCAATGATGGACGAAGAAGGAAAAATCGTAAATAACTTCATGATGTGTTTTAGCCAATAGGGTGGGGGGTTAAGGAATGCCGATTTATTAAATAAATCTTAACCACTGAAAACTGTAATTTGTCCTTGAAAAATCCTTGAAAAGTCCTTGAAATTTTTTTGTTCAATTCCTGTCGGGAACTCAGATTTTTTCTTTGTCCCATGCTCGTGACATGTTGATTACACCATTTCTCATTTCTTTACCGAGCTCAAAATTTACCATCTTTCTTTATTTATCACAGCCCTGTTAATCTTTCTTGTTTTCCTTTACAGGCATGTGTTCCTGTAGAAATAATGCCAGGTGAATTTGATCCAGCAAATCACACGATGCCACAGCAGCCCCTCCATCGCTGTATGTTTCCTCAGGCAGTGGCTTATTCTACTTTCCAAAGTGTTACCAACCCATATGAGGCTGTAATTGGAGGTGTAAGGTAGCCAAAGGAAATTTACGTAATATCTTTTCATATAAGTTTATCTAACCAGCCTTTCATTAGCCGGGGACCAGGCTCCTAAGTGAGGGAAAAGGGCTAAAAAAAGGGCCAACAAAGCAAGACAAGTGGGAGTCTGGGGAGGGAGAGGGTGGCCGCTGCCCTTTCTCTCTCCCCAGTCGACCACTAGGCTCGCTTTGCTCACCAATTGTTTTTTATTTGTTTGTTTGTTTGTTTTTTTTGTTGTTTCACCCAAGTTTTTGCCTTTTTCCTTCACCACAGAGCCTGGTCTCAGGCTAGTTTTTTGTTTAAACCCTGAAAAAAATGGGGTCATTGCCATGGTAACATGAATAATTGAAAACAAGCCTAAAATTTTGAATTTATTAAGTTTCCAAAAAATTAAATCATTAGATTTTCTTACAAATTTGTACATAGCTTCCATAGCTTTCCTGGAAATTAATGTTGATTGTATCACAAAACCCCTTCGTTCAAAATTTGTTTTGAGGCTTTCATTGAATAGGATTTCTGCCAAATTTCGTCAAATTTTGAAATAGCATGTAGGTTTTAAGATATTGTCATTTATTTACAATTATTCTTATAAAAGTCAACAAAACAAGCACCCTCACATTGCTTCTTAATTACCTATGCTCAGCATTTGTGCGTCCGTTGAGGTAACATGATATGTCAAAAAGACAAAAACAATACTAAATAGCACGTTGTCACCCTTTTTTCCTTAAAAGCTTATTGGATGCATACCTCCCCATGTTTAAGATGTTAAGATGAACAGTAAAGGTATAAATCAGATCTGATCAAAACGTCTGGGGTGATAGGCTTCTGATGTCAAGAACCTAGTCGTAATTTGATAGGGACCTAACACTCCTCTGTTGAATGTGGACAGTTTTTGTTCGCCAAAACAATTTTTTAATTTTTTAAGCTGACAAAGTATTCTTTGCTACTGAAAGGTTTTGTACGTGTTCAAAAAGGATGTTAAAGAAAATTATATAATTTTCAGTCTCCATCAGTACTTTGATTGACTTTGTTTTGATTTTTGATGTCAGGGTGCTTGGTACTGCAGGACAGAATGTAAATGACATCTTCAAAGTGTCCACCTTTGAAGATCGCTTGGAGATTTTAGAGCACACTATGAAATGGAGTCACATTGCGCCCACAGCTCCTGACACCTTAGGTAAATTGTATTGTATTGGTCTAAGAACTCCAGACTTGTAAAAACGTTTTAAAATCAGATGGAAAAACTTCATCAAAATACTCTTTTTAGTGTCAGAGCATTGATTCTTGTCCTCATGCTGCTCAGAGACAGGGATTTGAATGAGAATTTTTGAAGAGGTGGTCACACATGGAGCTTTGAATTAAGCCTTTCAAACACCAAAGATAACCTTTGCACCTCATTGTGACTAAATACACCTTCCAAGAAATTCTCTTCCTCCCAGTCCAAACTTGTTCAATAACAAAGGAAGCGACTGCACGTTGTCCATTAGCTGGGACAAATATGCCAGTGTCAAGTTAACAAAGTTCATTCTTGGATCCGAGGCTGAGGGGAATTTGAAACAAAAGAAATGAATTATTTATCCATGAATCTCAAGGCAATTTCTTTTGTTTTATGCCCCTCAGCTTTGGGTCAAGTAGGAACTTTAATGATTCGAAACTGGCCAGTTGCTGGCCCTCATTAGCACTTCTGCAGTGTATCTGCCTTATACATGGCTATCTGGTTTTGCTAACAATTGCTATTTCAATTGTTCAGGTTGTTATCCCTATTATGAGAAGGATCCCTTCATTCTGGACAAATGCCCACATGTGTGCTTTGTTGGAAATCAGCCTAAGTACCAAAGTAAAACTATTCAAGGTAAAGTCCCCTTGTCAGTGTTTCATTTTACTATAATACAAGCAGCTTACGCATAATCACGGTTCTCATGTTGGTAGGTTTAAAGGGCAACAGTTTGCTGCTTTGTTGTAGCCACTCTCCGACTTTATTAGCCTCGTACGCAGAAGTTCTTAGGGCTTTGTCATGCGTGAATTTGTGACGAAGCCCTAAGCGCAGGGGAGGAAAGTGTGATAAAACCCTAAAAATTCTGAGGAGGCTACCCCTTTATAGGATGAAAAGGTAATGATGTTGATAAATTCCATTCTTTGTTTGTTGTGTAGGGGAAAATGGCCAGAAAATACTGCTGATAACAGTACCTACCTTTTCCAATACAAAGACATGTGTACTGTTGAATCTGAGGACACTCTCGTGCCATCCAGTGAGCTTCTCTGCCTCACTGTCAACTCAACAAGACAACAGTACCAGTGATGAAGAGATGGAATTGTGAATATGAGCCAAGATTAAGAGTGTACATTCTAGTACATGTATATTATGTTAGCATCAACACAAGAACACAATAGGTCATCATTCTGACATTGCTGCACTGGTATCTACCTATAACATATAAGCAGCAATTAGAGAAGGATTGTCCAGCTTGTACTTTCTTCCCAAATCTGTTCTGCATGAACTAATACTGTAGCATAAAAAAAAATTCATGA
+    total 699M
+    -rw------- 1 shedurkin labmembers 3.2K Jan 25 15:46 index.html.tmp
+    -rw-r--r-- 1 shedurkin labmembers  15M Nov  2 08:39 peve_bedtools_lncRNAs.fasta
+    -rw-r--r-- 1 shedurkin labmembers  57M Feb  6 17:32 Porites_evermanni_CDS.fasta
+    -rw-r--r-- 1 shedurkin labmembers  24M Mar 11  2022 Porites_evermanni_v1.annot.gff
+    -rw-r--r-- 1 shedurkin labmembers  18M Feb  7 13:24 Porites_evermanni_v1_CDS.annot.gff
+    -rw-r--r-- 1 shedurkin labmembers 586M Mar 11  2022 Porites_evermanni_v1.fa
+    -rw-r--r-- 1 shedurkin labmembers 422K Jan 29 16:55 Porites_evermanni_v1.fa.fai
+    -rw-r--r-- 1 shedurkin labmembers    0 Nov  2 08:39 README.md
 
-# Align to reference transcriptome (Kallisto pseudoalignment)
+## 4.1 Verify transcriptome/genome FastA MD5 checksum
 
-## Building Index
+No checksum file(s) provided with download, so skipping this step
+
+# 5 Convert gff to a genes FASTA
+
+## 5.1 Extract only CDS from gff
+
+``` bash
+# Load bash variables into memory
+source .bashvars
+
+# Extract only the CDS sequence lines from the gff
+grep -w 'CDS' ${transcriptome_gff} > ${transcriptome_gff_filtered}
+
+head -n 5 ${transcriptome_gff_filtered}
+```
+
+    Porites_evermani_scaffold_1 Gmove   CDS 3107    3444    .   -   .   Parent=Peve_00000001
+    Porites_evermani_scaffold_1 Gmove   CDS 4284    4488    .   -   .   Parent=Peve_00000001
+    Porites_evermani_scaffold_1 Gmove   CDS 424479  425361  .   -   .   Parent=Peve_00000002
+    Porites_evermani_scaffold_1 Gmove   CDS 426181  426735  .   -   .   Parent=Peve_00000002
+    Porites_evermani_scaffold_1 Gmove   CDS 427013  427140  .   -   .   Parent=Peve_00000002
+
+## 5.2 Generate transcriptome fasta
+
+The below script will take as input a gff file containing information on
+CDS sequences, where multiple CDS sequences may originate from the same
+parent mrNA. The script will extract fastas for each sequence, and
+concatenate and label by parent. This should output a gene fasta that we
+can use for kallisto pseudoalignment and abundance quantification!
+**Warning**: This script will take a while to run – for our gff of
+231,320 CDS sequences, the script took \~4hours to output a complete
+gene fasta.
+
+``` bash
+# Load bash variables into memory
+source .bashvars
+
+# Navigate to correct directory and make output file
+cd ${transcriptome_dir}
+echo > ${transcriptome_fasta_name}
+
+# Helper list for processing all parent IDs
+processed_ids=()
+
+######################################################
+
+# Helper function to concatenate and format several bedtools output sequences 
+# into a single, appropriately named contig
+concatenate_helper() {
+    local input_bedtools_fastas="$1"
+    local parent_ID="$2"
+    local reference_name=""
+    local positions=""
+    local concatenated_sequences=""
+
+    # Read the input line by line
+    while IFS= read -r line; do
+        # Check if the line starts with ">"
+        if [[ "$line" == ">"* ]]; then
+            # Extract reference name and position from the line
+            reference_position="${line:1}"  # Remove ">"
+            reference_name=$(echo "$reference_position" | cut -d: -f1)
+            position=$(echo "$reference_position" | cut -d: -f2)
+
+            # Append position to the positions variable
+            positions+="$position,"
+        else
+            # Concatenate sequences
+            concatenated_sequences+="$line"
+        fi
+    done <<< "$input_bedtools_fastas"
+
+    # Remove trailing comma from positions
+    positions="${positions%,}"
+
+    # Output the reformatted result
+    echo ">$parent_ID $reference_name:$positions"
+    echo "$concatenated_sequences"
+}
+
+######################################################
+
+# Process your input gff file
+while IFS= read -r line; do
+
+    # pull the parent ID number for the current line of the gff
+    parentID=$(echo "$line" | grep -o 'Parent=Peve_[0-9]\+')
+    
+    # Only continue if you haven't already processed the CDS sequences associated with this parent ID
+    if [[ ! " ${processed_ids[@]} " =~ " $parentID " ]]; then
+ 
+        # Add the current parentID to the processed list
+        processed_ids+=("$parentID")
+
+        # Create temporary files to store intermediate results
+        temp_CDS_gff_file=$(mktemp)
+        temp_bedtools_fasta_file=$(mktemp)
+
+        # Grab all of the CDS sequences with the same parent ID and write to temporary file
+        grep "$parentID" ${transcriptome_gff_filtered} > "$temp_CDS_gff_file"
+
+        # Use bedtools to extract corresponding FASTAs and write to temporary file
+        ${programs_array[bedtools]} getfasta -fi ${genome_fasta} -bed "$temp_CDS_gff_file" -fo "$temp_bedtools_fasta_file"
+
+        # Use our helper function to concatenate and format all of these CDS fastas into a single contig
+        concatenated_fasta=$(concatenate_helper "$(cat "$temp_bedtools_fasta_file")" "$parentID")
+ 
+        # Add the concatenated CDS fasta to our output file on a new line
+        echo "$concatenated_fasta" >> ${transcriptome_fasta}
+
+        # Remove the temporary files
+        rm "$temp_CDS_gff_file" "$temp_bedtools_fasta_file"
+    fi
+done < ${transcriptome_gff_filtered}
+
+# The output file ends up having a blank first line before the data, so delete that unwanted empty first line
+sed -i '1{/^$/d}' ${transcriptome_fasta}
+
+head ${transcriptome_fasta}
+```
+
+## 5.3 Check transcriptome fasta
+
+Let’s do a quick check to see whether the output file contains all the
+CDS sequences we want and is grouping them appropriately
+
+``` bash
+# Load bash variables into memory
+source .bashvars
+
+# Output the first five fasta names in our transcriptome fasta (i.e. first five odd lines)
+sed -nu '1~2p' ${transcriptome_fasta} | head -n 5
+
+echo ""
+
+# Output the first twenty CDS sequences listed in the CDS gff
+head -n 20 ${transcriptome_gff_filtered}
+```
+
+    >Parent=Peve_00000001 Porites_evermani_scaffold_1:3106-3444,4283-4488
+    >Parent=Peve_00000002 Porites_evermani_scaffold_1:424478-425361,426180-426735,427012-427140,427664-427724,428641-429034
+    >Parent=Peve_00000003 Porites_evermani_scaffold_1:429499-429746,430884-431009,432043-432167,432627-432757,433482-433588,434246-434336,435358-435439,436216-436374,437429-437557,438130-438232,438531-438698
+    >Parent=Peve_00000004 Porites_evermani_scaffold_1:441399-441851,442759-443100,446240-447172
+    >Parent=Peve_00000005 Porites_evermani_scaffold_1:448044-448206,448308-448363,451515-451591,451816-451871,454946-455060,455886-456006,456781-456901,457021-457073,457639-457767,458842-458920,459554-459697,459961-460031
+
+    Porites_evermani_scaffold_1 Gmove   CDS 3107    3444    .   -   .   Parent=Peve_00000001
+    Porites_evermani_scaffold_1 Gmove   CDS 4284    4488    .   -   .   Parent=Peve_00000001
+    Porites_evermani_scaffold_1 Gmove   CDS 424479  425361  .   -   .   Parent=Peve_00000002
+    Porites_evermani_scaffold_1 Gmove   CDS 426181  426735  .   -   .   Parent=Peve_00000002
+    Porites_evermani_scaffold_1 Gmove   CDS 427013  427140  .   -   .   Parent=Peve_00000002
+    Porites_evermani_scaffold_1 Gmove   CDS 427665  427724  .   -   .   Parent=Peve_00000002
+    Porites_evermani_scaffold_1 Gmove   CDS 428642  429034  .   -   .   Parent=Peve_00000002
+    Porites_evermani_scaffold_1 Gmove   CDS 429500  429746  .   +   .   Parent=Peve_00000003
+    Porites_evermani_scaffold_1 Gmove   CDS 430885  431009  .   +   .   Parent=Peve_00000003
+    Porites_evermani_scaffold_1 Gmove   CDS 432044  432167  .   +   .   Parent=Peve_00000003
+    Porites_evermani_scaffold_1 Gmove   CDS 432628  432757  .   +   .   Parent=Peve_00000003
+    Porites_evermani_scaffold_1 Gmove   CDS 433483  433588  .   +   .   Parent=Peve_00000003
+    Porites_evermani_scaffold_1 Gmove   CDS 434247  434336  .   +   .   Parent=Peve_00000003
+    Porites_evermani_scaffold_1 Gmove   CDS 435359  435439  .   +   .   Parent=Peve_00000003
+    Porites_evermani_scaffold_1 Gmove   CDS 436217  436374  .   +   .   Parent=Peve_00000003
+    Porites_evermani_scaffold_1 Gmove   CDS 437430  437557  .   +   .   Parent=Peve_00000003
+    Porites_evermani_scaffold_1 Gmove   CDS 438131  438232  .   +   .   Parent=Peve_00000003
+    Porites_evermani_scaffold_1 Gmove   CDS 438532  438698  .   +   .   Parent=Peve_00000003
+    Porites_evermani_scaffold_1 Gmove   CDS 441400  441851  .   -   .   Parent=Peve_00000004
+    Porites_evermani_scaffold_1 Gmove   CDS 442760  443100  .   -   .   Parent=Peve_00000004
+
+``` bash
+# Load bash variables into memory
+source .bashvars
+
+# Output the first five fasta names in our transcriptome fasta (i.e. first five odd lines)
+sed -nu '1~2p' ${transcriptome_fasta} | tail -n 5
+
+echo ""
+
+# Output the first twenty CDS sequences listed in the CDS gff
+tail -n 20 ${transcriptome_gff_filtered}
+```
+
+    >Parent=Peve_00045353 Porites_evermani_scaffold_999:120490-120865
+    >Parent=Peve_00045355 Porites_evermani_scaffold_999:124812-124870,124921-125022
+    >Parent=Peve_00045356 Porites_evermani_scaffold_999:157406-158547,159689-159727
+    >Parent=Peve_00045357 Porites_evermani_scaffold_999:25255-25390,26056-26534,26987-27076
+    >Parent=Peve_00045358 Porites_evermani_scaffold_999:43038-43296,43486-43561,43917-44070
+
+    Porites_evermani_scaffold_999   Gmove   CDS 83897   84640   .   +   .   Parent=Peve_00045348
+    Porites_evermani_scaffold_999   Gmove   CDS 102185  102529  .   -   .   Parent=Peve_00045349
+    Porites_evermani_scaffold_999   Gmove   CDS 102653  103198  .   -   .   Parent=Peve_00045349
+    Porites_evermani_scaffold_999   Gmove   CDS 109635  109938  .   -   .   Parent=Peve_00045350
+    Porites_evermani_scaffold_999   Gmove   CDS 110552  110643  .   -   .   Parent=Peve_00045350
+    Porites_evermani_scaffold_999   Gmove   CDS 117115  117259  .   +   .   Parent=Peve_00045351
+    Porites_evermani_scaffold_999   Gmove   CDS 117364  117833  .   +   .   Parent=Peve_00045351
+    Porites_evermani_scaffold_999   Gmove   CDS 118858  119024  .   -   .   Parent=Peve_00045352
+    Porites_evermani_scaffold_999   Gmove   CDS 119373  119940  .   -   .   Parent=Peve_00045352
+    Porites_evermani_scaffold_999   Gmove   CDS 120491  120865  .   -   .   Parent=Peve_00045353
+    Porites_evermani_scaffold_999   Gmove   CDS 124813  124870  .   -   .   Parent=Peve_00045355
+    Porites_evermani_scaffold_999   Gmove   CDS 124922  125022  .   -   .   Parent=Peve_00045355
+    Porites_evermani_scaffold_999   Gmove   CDS 157407  158547  .   -   .   Parent=Peve_00045356
+    Porites_evermani_scaffold_999   Gmove   CDS 159690  159727  .   -   .   Parent=Peve_00045356
+    Porites_evermani_scaffold_999   Gmove   CDS 25256   25390   .   +   .   Parent=Peve_00045357
+    Porites_evermani_scaffold_999   Gmove   CDS 26057   26534   .   +   .   Parent=Peve_00045357
+    Porites_evermani_scaffold_999   Gmove   CDS 26988   27076   .   +   .   Parent=Peve_00045357
+    Porites_evermani_scaffold_999   Gmove   CDS 43039   43296   .   -   .   Parent=Peve_00045358
+    Porites_evermani_scaffold_999   Gmove   CDS 43487   43561   .   -   .   Parent=Peve_00045358
+    Porites_evermani_scaffold_999   Gmove   CDS 43918   44070   .   -   .   Parent=Peve_00045358
+
+# 6 Align to reference transcriptome (Kallisto pseudoalignment)
+
+## 6.1 Building Index
 
 ``` bash
 # Load bash variables into memory
@@ -256,23 +510,24 @@ ${programs_array[kallisto]} index \
 --threads=${threads} \
 --index="${kallisto_index_name}" \
 "${transcriptome_fasta}"
+
+ls -lh ${kallisto_output_dir}
 ```
 
-
-    [build] loading fasta file /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/data/Porites_evermanni_mRNA.fasta
+    [build] loading fasta file /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/data/Porites_evermanni_CDS.fasta
     [build] k-mer length: 31
     [build] warning: clipped off poly-A tail (longer than 10)
-            from 4 target sequences
-    [build] warning: replaced 10722052 non-ACGUT characters in the input sequence
+            from 2 target sequences
+    [build] warning: replaced 43264 non-ACGUT characters in the input sequence
             with pseudorandom nucleotides
     KmerStream::KmerStream(): Start computing k-mer cardinality estimations (1/2)
     KmerStream::KmerStream(): Start computing k-mer cardinality estimations (1/2)
     KmerStream::KmerStream(): Finished
-    CompactedDBG::build(): Estimated number of k-mers occurring at least once: 241599983
-    CompactedDBG::build(): Estimated number of minimizer occurring at least once: 57847036
-    CompactedDBG::filter(): Processed 281910300 k-mers in 40389 reads
-    CompactedDBG::filter(): Found 241037665 unique k-mers
-    CompactedDBG::filter(): Number of blocks in Bloom filter is 1651564
+    CompactedDBG::build(): Estimated number of k-mers occurring at least once: 46039676
+    CompactedDBG::build(): Estimated number of minimizer occurring at least once: 11275045
+    CompactedDBG::filter(): Processed 52809246 k-mers in 40389 reads
+    CompactedDBG::filter(): Found 46115154 unique k-mers
+    CompactedDBG::filter(): Number of blocks in Bloom filter is 314726
     CompactedDBG::construct(): Extract approximate unitigs (1/2)
     CompactedDBG::construct(): Extract approximate unitigs (2/2)
     CompactedDBG::construct(): Closed all input files
@@ -280,34 +535,48 @@ ${programs_array[kallisto]} index \
     CompactedDBG::construct(): Splitting unitigs (1/2)
 
     CompactedDBG::construct(): Splitting unitigs (2/2)
-    CompactedDBG::construct(): Before split: 3234002 unitigs
-    CompactedDBG::construct(): After split (1/1): 3234002 unitigs
-    CompactedDBG::construct(): Unitigs split: 940
+    CompactedDBG::construct(): Before split: 489099 unitigs
+    CompactedDBG::construct(): After split (1/1): 489099 unitigs
+    CompactedDBG::construct(): Unitigs split: 1045
     CompactedDBG::construct(): Unitigs deleted: 0
 
     CompactedDBG::construct(): Joining unitigs
-    CompactedDBG::construct(): After join: 3111634 unitigs
-    CompactedDBG::construct(): Joined 122663 unitigs
+    CompactedDBG::construct(): After join: 467413 unitigs
+    CompactedDBG::construct(): Joined 22018 unitigs
     [build] building MPHF
     [build] creating equivalence classes ... 
     [build] target de Bruijn graph has k-mer length 31 and minimizer length 23
-    [build] target de Bruijn graph has 3111634 contigs and contains 241249799 k-mers 
+    [build] target de Bruijn graph has 467413 contigs and contains 46155696 k-mers 
+
+    total 83M
+    -rw-r--r-- 1 shedurkin labmembers 1.5M Feb  7 13:25 kallisto.isoform.counts.matrix
+    -rw-r--r-- 1 shedurkin labmembers    0 Feb  7 13:25 kallisto.isoform.TMM.EXPR.matrix
+    -rw-r--r-- 1 shedurkin labmembers 2.2M Feb  7 13:25 kallisto.isoform.TPM.not_cross_norm
+    -rw-r--r-- 1 shedurkin labmembers  532 Feb  7 13:25 kallisto.isoform.TPM.not_cross_norm.runTMM.R
+    drwxr-xr-x 2 shedurkin labmembers 4.0K Feb  7 13:01 kallisto_quant_sample71
+    drwxr-xr-x 2 shedurkin labmembers 4.0K Feb  7 13:05 kallisto_quant_sample73
+    drwxr-xr-x 2 shedurkin labmembers 4.0K Feb  7 13:09 kallisto_quant_sample76
+    drwxr-xr-x 2 shedurkin labmembers 4.0K Feb  7 13:13 kallisto_quant_sample79
+    drwxr-xr-x 2 shedurkin labmembers 4.0K Feb  7 13:16 kallisto_quant_sample82
+    -rw-r--r-- 1 shedurkin labmembers  80M Feb  7 14:32 Peve_kallisto_index.idx
 
 Note that, when building an index, kallisto warns us that it “replaced
-10722052 non-ACGUT characters in the input sequence with pseudorandom
+43264 non-ACGUT characters in the input sequence with pseudorandom
 nucleotides.” This high number of identified “non-ACGUT” characters is
 related to the type of reference sequences we used to build the index.
 We obtained a coding sequence (CDS) gff file for P.evermanni and the
-associated scaffold genome fasta, filtered the gff to retain only mRNAs,
-and then used bedtools to extract the fasta sequences of every mRNA from
-the scaffold fasta. Notably, scaffolds are basically fragments of known
-DNA sequences “stitched” together by stretches of Ns to approximate the
-full sequence structure without complete sequence data. This means some
-of our mRNA sequences contain long, relatively-meaningless stretches of
-Ns. This shouldn’t interfere with the kallisto pseudoalignment process,
-so we will continue.
+associated scaffold genome fasta, filtered the gff to retain only coding
+sequences, and then used bedtools to extract the fasta sequences of
+every CDS from the scaffold fasta. Notably, scaffolds are basically
+fragments of known DNA sequences “stitched” together by stretches of Ns
+to approximate the full sequence structure without complete sequence
+data. This means some of our mRNA sequences contain long,
+relatively-meaningless stretches of Ns. I’m not sure how/to what extent
+this will interfere with the kallisto pseudoallignment process, since it
+differs from standard alignment of a full read to reference, but we’ll
+continue for now
 
-## Sample Quantification
+## 6.2 Sample Quantification
 
 Kallisto can run quantification on either single- or paired-end reads.
 The default option is paired-end, which requires the input of an even
@@ -392,15 +661,11 @@ for file_r1 in "${trimmed_reads_dir}"/*_R1.fastq.gz; do
         echo "Sample already processed: ${sample_name}"
     fi
 done
+
+ls -lh ${kallisto_output_dir}
 ```
 
-    Sample already processed: sample71
-    Sample already processed: sample73
-    Sample already processed: sample76
-    Sample already processed: sample79
-    Sample already processed: sample82
-
-## Trinity Matrix with Kallisto Output
+## 6.3 Trinity Matrix with Kallisto Output
 
 ``` bash
 # Load bash variables into memory
@@ -413,6 +678,33 @@ ${programs_array[trinity_abund_to_matrix]} \
 --gene_trans_map 'none' \
 --out_prefix 'kallisto' \
 --name_sample_by_basedir ${kallisto_output_dir}/kallisto_quant_*/abundance.tsv
+
+ls -lh ${kallisto_output_dir}
 ```
 
-# Summary
+    -reading file: /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/output/12-Peve-RNAseq-kallisto/kallisto/kallisto_quant_sample71/abundance.tsv
+    -reading file: /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/output/12-Peve-RNAseq-kallisto/kallisto/kallisto_quant_sample73/abundance.tsv
+    -reading file: /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/output/12-Peve-RNAseq-kallisto/kallisto/kallisto_quant_sample76/abundance.tsv
+    -reading file: /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/output/12-Peve-RNAseq-kallisto/kallisto/kallisto_quant_sample79/abundance.tsv
+    -reading file: /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/output/12-Peve-RNAseq-kallisto/kallisto/kallisto_quant_sample82/abundance.tsv
+
+
+    * Outputting combined matrix.
+
+    /home/shared/trinityrnaseq-v2.12.0/util/support_scripts/run_TMM_scale_matrix.pl --matrix kallisto.isoform.TPM.not_cross_norm > kallisto.isoform.TMM.EXPR.matrixCMD: R --no-save --no-restore --no-site-file --no-init-file -q < kallisto.isoform.TPM.not_cross_norm.runTMM.R 1>&2 
+    sh: 1: R: not found
+    Error, cmd: R --no-save --no-restore --no-site-file --no-init-file -q < kallisto.isoform.TPM.not_cross_norm.runTMM.R 1>&2  died with ret (32512)  at /home/shared/trinityrnaseq-v2.12.0/util/support_scripts/run_TMM_scale_matrix.pl line 105.
+    Error, CMD: /home/shared/trinityrnaseq-v2.12.0/util/support_scripts/run_TMM_scale_matrix.pl --matrix kallisto.isoform.TPM.not_cross_norm > kallisto.isoform.TMM.EXPR.matrix died with ret 6400 at /home/shared/trinityrnaseq-v2.12.0/util/abundance_estimates_to_matrix.pl line 385.
+    total 83M
+    -rw-r--r-- 1 shedurkin labmembers 1.5M Feb  7 14:32 kallisto.isoform.counts.matrix
+    -rw-r--r-- 1 shedurkin labmembers    0 Feb  7 14:32 kallisto.isoform.TMM.EXPR.matrix
+    -rw-r--r-- 1 shedurkin labmembers 2.2M Feb  7 14:32 kallisto.isoform.TPM.not_cross_norm
+    -rw-r--r-- 1 shedurkin labmembers  532 Feb  7 14:32 kallisto.isoform.TPM.not_cross_norm.runTMM.R
+    drwxr-xr-x 2 shedurkin labmembers 4.0K Feb  7 13:01 kallisto_quant_sample71
+    drwxr-xr-x 2 shedurkin labmembers 4.0K Feb  7 13:05 kallisto_quant_sample73
+    drwxr-xr-x 2 shedurkin labmembers 4.0K Feb  7 13:09 kallisto_quant_sample76
+    drwxr-xr-x 2 shedurkin labmembers 4.0K Feb  7 13:13 kallisto_quant_sample79
+    drwxr-xr-x 2 shedurkin labmembers 4.0K Feb  7 13:16 kallisto_quant_sample82
+    -rw-r--r-- 1 shedurkin labmembers  80M Feb  7 14:32 Peve_kallisto_index.idx
+
+# 7 Summary
