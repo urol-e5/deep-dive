@@ -1,15 +1,17 @@
-## deep-dive
+ ## deep-dive
 
-This repository is focused on takeing molecular data from three experiments where integrated epigenetic analysis has already been performed, and doing a _deeper dive_ into datasets to extract and analyze remaining points of excitement. 
+This repository is focused on taking molecular data from three experiments where integrated epigenetic analysis has already been performed, and doing a _deeper dive_ into datasets to extract and analyze remaining points of excitement.
+
+## [OSF Project Link](https://osf.io/aw53f/)
 
 # Specific sub-efforts
 
 
-**D**) Acropora pulcra
+**D**) Acropora pulchra
 
 **E**) Porites evermanni
 
-**F**) Pocillopora meandrina
+**F**) Pocillopora tuahiniensis
 
 ---
 
@@ -17,8 +19,9 @@ This repository is focused on takeing molecular data from three experiments wher
 # How to work in this repo
 ### (_file structure_)
 
-Top level directories are associated with each sub-effort 
-For instance.
+Top level directories are associated with each sub-effort categorized by species.
+
+For instance:
 
 ```
 A-Pver
@@ -26,10 +29,11 @@ B-Mcap
 C-Pacu
 D-Apul
 E-Peve
-F-Pmea
+F-Ptua
 ```
 
-Within each top level directory there should be 3 directories
+Within each top level directory there should be 3 directories: 
+
 ```
 data
 code
@@ -48,6 +52,7 @@ Links to other data types (e.g. FastQs, BAMs) can be [found in the project wiki]
 
 ### Genomes of interest
 
+All genomes of interest can be found in our [species descriptions and genomic resources wiki page](https://github.com/urol-e5/deep-dive/wiki/Species-Characteristics-and-Genomic-Resources).
 
 ### Workflows
 
