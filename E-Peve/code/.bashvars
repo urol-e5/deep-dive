@@ -10,14 +10,12 @@ export kallisto_output_dir=${output_dir_top}/kallisto
 export transcriptome_dir=${Peve_dir}/data
 export transcriptome_gff_name="Porites_evermanni_v1.annot.gff"
 export transcriptome_gff=${transcriptome_dir}/${transcriptome_gff_name}
-export transcriptome_gff_filtered_name="Porites_evermanni_v1_mRNA.annot.gff"
+export transcriptome_gff_filtered_name="Porites_evermanni_v1_CDS.annot.gff"
 export transcriptome_gff_filtered=${transcriptome_dir}/${transcriptome_gff_filtered_name}
 export genome_fasta_name="Porites_evermanni_v1.fa"
 export genome_fasta=${transcriptome_dir}/${genome_fasta_name}
-export transcriptome_fasta_name="Porites_evermanni_mRNA.fasta"
+export transcriptome_fasta_name="Porites_evermanni_CDS.fasta"
 export transcriptome_fasta=${transcriptome_dir}/${transcriptome_fasta_name}
-export transcriptome_fasta_collapsed_name="Porites_evermanni_mRNA_collapsed.fasta"
-export transcriptome_fasta_collapsed=${transcriptome_dir}/${transcriptome_fasta_collapsed_name}
 export kallisto_index_name="Peve_kallisto_index.idx"
 # External data URLs
 export trimmed_reads_url="https://gannet.fish.washington.edu/Atumefaciens/20230519-E5_coral-fastqc-fastp-multiqc-RNAseq/P_evermanni/trimmed/"
@@ -33,7 +31,6 @@ export R2_fastq_pattern='*_R2.fastq.gz'
 export kallisto=/home/shared/kallisto_linux-v0.50.1/kallisto
 export trinity_abund_to_matrix=/home/shared/trinityrnaseq-v2.12.0/util/abundance_estimates_to_matrix.pl
 export bedtools=/home/shared/bedtools2/bin/bedtools
-export fastx_toolkit="/home/shared/fastx_toolkit_0.0.13_binaries_Linux_2.6_amd64/bin"
 
 # Set number of CPUs to use
 export threads=20
@@ -44,5 +41,4 @@ programs_array=(
 [kallisto]="${kallisto}" \
 [trinity_abund_to_matrix]="${trinity_abund_to_matrix}" \
 [bedtools]="${bedtools}" \
-[fastx_toolkit]="${fastx_toolkit}" \
 )

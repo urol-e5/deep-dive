@@ -2,15 +2,20 @@
 title: "12-Peve-RNAseq-kallisto"
 author: "Kathleen Durkin"
 date: "2024-01-25"
-output:
-  github_document:
-  html_document:
+always_allow_html: true
+output: 
+  bookdown::html_document2:
     theme: cosmo
     toc: true
     toc_float: true
     number_sections: true
     code_folding: show
     code_download: true
+  github_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+    html_preview: true
 ---
 
 ```{r setup, include=FALSE}
@@ -24,14 +29,19 @@ knitr::opts_chunk$set(
 )
 ```
 
-Description
+**Description:**
 
-Inputs:
+Use kallisto to quantify *P. evermanni* RNAseq transcript abundances
 
-trimmed RNAseq reads
-CDS gff
+**Inputs:**
 
-Outputs:
+Trimmed RNAseq reads (e.g. `*.fastq.gz`).  *P. evermanni* reads found [here](https://gannet.fish.washington.edu/Atumefaciens/20230519-E5_coral-fastqc-fastp-multiqc-RNAseq/P_evermanni/trimmed/).
+
+Coding sequence gff file (e.g. `*.gff`) and scaffold genome (e.g. '*.fa'), found [here](https://www.genoscope.cns.fr/corals/data/).
+
+**Outputs:**
+
+kalisto counts matrix (`kallisto.isoform.counts.matrix`)
 
 
 ---
@@ -56,14 +66,12 @@ echo "# Input/Output files"
 echo 'export transcriptome_dir=${Peve_dir}/data'
 echo 'export transcriptome_gff_name="Porites_evermanni_v1.annot.gff"'
 echo 'export transcriptome_gff=${transcriptome_dir}/${transcriptome_gff_name}'
-echo 'export transcriptome_gff_filtered_name="Porites_evermanni_v1_mRNA.annot.gff"'
+echo 'export transcriptome_gff_filtered_name="Porites_evermanni_v1_CDS.annot.gff"'
 echo 'export transcriptome_gff_filtered=${transcriptome_dir}/${transcriptome_gff_filtered_name}'
 echo 'export genome_fasta_name="Porites_evermanni_v1.fa"'
 echo 'export genome_fasta=${transcriptome_dir}/${genome_fasta_name}'
-echo 'export transcriptome_fasta_name="Porites_evermanni_mRNA.fasta"'
+echo 'export transcriptome_fasta_name="Porites_evermanni_CDS.fasta"'
 echo 'export transcriptome_fasta=${transcriptome_dir}/${transcriptome_fasta_name}'
-echo 'export transcriptome_fasta_collapsed_name="Porites_evermanni_mRNA_collapsed.fasta"'
-echo 'export transcriptome_fasta_collapsed=${transcriptome_dir}/${transcriptome_fasta_collapsed_name}'
 echo 'export kallisto_index_name="Peve_kallisto_index.idx"'
 
 echo "# External data URLs"
@@ -82,7 +90,6 @@ echo "# Paths to programs"
 echo 'export kallisto=/home/shared/kallisto_linux-v0.50.1/kallisto'
 echo 'export trinity_abund_to_matrix=/home/shared/trinityrnaseq-v2.12.0/util/abundance_estimates_to_matrix.pl'
 echo 'export bedtools=/home/shared/bedtools2/bin/bedtools'
-echo 'export fastx_toolkit="/home/shared/fastx_toolkit_0.0.13_binaries_Linux_2.6_amd64/bin"'
 echo ""
 
 echo "# Set number of CPUs to use"
@@ -95,7 +102,6 @@ echo "programs_array=("
 echo '[kallisto]="${kallisto}" \'
 echo '[trinity_abund_to_matrix]="${trinity_abund_to_matrix}" \'
 echo '[bedtools]="${bedtools}" \'
-echo '[fastx_toolkit]="${fastx_toolkit}" \'
 echo ")"
 
 } > .bashvars
@@ -124,6 +130,11 @@ wget \
 --no-parent \
 --quiet \
 --accept "RNA-*.fastq.gz" ${trimmed_reads_url}
+```
+
+```{r view-reads-directory, engine='bash', eval=TRUE}
+# Load bash variables into memory
+source .bashvars
 
 ls -lh "${trimmed_reads_dir}"
 ```
@@ -151,8 +162,6 @@ wget \
 --quiet \
 --execute robots=off \
 --accept "${transcriptome_gff_name}" ${transcriptome_url}
-
-ls -lh "${transcriptome_dir}"
 ```
 Note that this is a CDS (coding sequence) gff file, not a FASTA, so can't input directly into kallisto. We'll need the reference genome as well to convert gff to FASTA
 
@@ -171,6 +180,11 @@ wget \
 --quiet \
 --execute robots=off \
 --accept "${genome_fasta_name}" ${genome_url}
+```
+
+```{r view-data-directory, engine='bash', eval=TRUE}
+# Load bash variables into memory
+source .bashvars
 
 ls -lh "${transcriptome_dir}"
 ```
@@ -179,22 +193,141 @@ ls -lh "${transcriptome_dir}"
 
 No checksum file(s) provided with download, so skipping this step
 
-# Convert gff to FASTA format
+# Convert gff to a genes FASTA
 
-```{r convert-gff-to-fasta, engine='bash', eval=TRUE}
+## Extract only CDS from gff
+
+```{r extract-CDS-from-transcriptome-gff, engine='bash', eval=TRUE}
 # Load bash variables into memory
 source .bashvars
 
-# The CDS gff we downloaded includes many different sequence types (CDS, UTR, mRNA, etc.). 
-# We only want to the mRNA, so we first need to extract only the mRNA feature-type lines.
-grep -w 'mRNA' ${transcriptome_gff} > ${transcriptome_gff_filtered}
+# Extract only the CDS sequence lines from the gff
+grep -w 'CDS' ${transcriptome_gff} > ${transcriptome_gff_filtered}
 
-head -n 3 ${transcriptome_gff_filtered}
+head -n 5 ${transcriptome_gff_filtered}
+```
 
-# Now we can use bedtools to extract the fasta sequences for each feature listed in the gff
-${programs_array[bedtools]} getfasta -fi ${genome_fasta} -bed ${transcriptome_gff_filtered} -fo ${transcriptome_fasta}
+## Generate transcriptome fasta
 
-head -n 6 ${transcriptome_fasta}
+The below script will take as input a gff file containing information on CDS sequences, where multiple CDS sequences may originate from the same parent mrNA. The script will extract fastas for each sequence, and concatenate and label by parent. This should output a gene fasta that we can use for kallisto pseudoalignment and abundance quantification!
+**Warning**: This script will take a while to run -- for our gff of 231,320 CDS sequences, the script took ~4hours to output a complete gene fasta.
+```{r generate-transcriptome-fasta, engine='bash', eval=FALSE}
+# Load bash variables into memory
+source .bashvars
+
+# Navigate to correct directory and make output file
+cd ${transcriptome_dir}
+echo > ${transcriptome_fasta_name}
+
+# Helper list for processing all parent IDs
+processed_ids=()
+
+######################################################
+
+# Helper function to concatenate and format several bedtools output sequences 
+# into a single, appropriately named contig
+concatenate_helper() {
+    local input_bedtools_fastas="$1"
+    local parent_ID="$2"
+    local reference_name=""
+    local positions=""
+    local concatenated_sequences=""
+
+    # Read the input line by line
+    while IFS= read -r line; do
+        # Check if the line starts with ">"
+        if [[ "$line" == ">"* ]]; then
+            # Extract reference name and position from the line
+            reference_position="${line:1}"  # Remove ">"
+            reference_name=$(echo "$reference_position" | cut -d: -f1)
+            position=$(echo "$reference_position" | cut -d: -f2)
+
+            # Append position to the positions variable
+            positions+="$position,"
+        else
+            # Concatenate sequences
+            concatenated_sequences+="$line"
+        fi
+    done <<< "$input_bedtools_fastas"
+
+    # Remove trailing comma from positions
+    positions="${positions%,}"
+
+    # Output the reformatted result
+    echo ">$parent_ID $reference_name:$positions"
+    echo "$concatenated_sequences"
+}
+
+######################################################
+
+# Process your input gff file
+while IFS= read -r line; do
+
+    # pull the parent ID number for the current line of the gff
+    parentID=$(echo "$line" | grep -o 'Parent=Peve_[0-9]\+')
+    
+    # Only continue if you haven't already processed the CDS sequences associated with this parent ID
+    if [[ ! " ${processed_ids[@]} " =~ " $parentID " ]]; then
+ 
+        # Add the current parentID to the processed list
+        processed_ids+=("$parentID")
+
+        # Create temporary files to store intermediate results
+        temp_CDS_gff_file=$(mktemp)
+        temp_bedtools_fasta_file=$(mktemp)
+
+        # Grab all of the CDS sequences with the same parent ID and write to temporary file
+        grep "$parentID" ${transcriptome_gff_filtered} > "$temp_CDS_gff_file"
+
+        # Use bedtools to extract corresponding FASTAs and write to temporary file
+        ${programs_array[bedtools]} getfasta -fi ${genome_fasta} -bed "$temp_CDS_gff_file" -fo "$temp_bedtools_fasta_file"
+
+        # Use our helper function to concatenate and format all of these CDS fastas into a single contig
+        concatenated_fasta=$(concatenate_helper "$(cat "$temp_bedtools_fasta_file")" "$parentID")
+ 
+        # Add the concatenated CDS fasta to our output file on a new line
+        echo "$concatenated_fasta" >> ${transcriptome_fasta}
+
+        # Remove the temporary files
+        rm "$temp_CDS_gff_file" "$temp_bedtools_fasta_file"
+    fi
+done < ${transcriptome_gff_filtered}
+
+# The output file ends up having a blank first line before the data, so delete that unwanted empty first line
+sed -i '1{/^$/d}' ${transcriptome_fasta}
+
+head ${transcriptome_fasta}
+```
+
+## Check transcriptome fasta
+
+Let's do a quick check to see whether the output file contains all the CDS sequences we want and is grouping them appropriately
+```{r check-transcriptome-fasta-head, engine='bash', eval=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+# Output the first five fasta names in our transcriptome fasta (i.e. first five odd lines)
+sed -nu '1~2p' ${transcriptome_fasta} | head -n 5
+
+echo ""
+
+# Output the first twenty CDS sequences listed in the CDS gff
+head -n 20 ${transcriptome_gff_filtered}
+
+```
+
+```{r check-transcriptome-fasta-tail, engine='bash', eval=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+# Output the first five fasta names in our transcriptome fasta (i.e. first five odd lines)
+sed -nu '1~2p' ${transcriptome_fasta} | tail -n 5
+
+echo ""
+
+# Output the first twenty CDS sequences listed in the CDS gff
+tail -n 20 ${transcriptome_gff_filtered}
+
 ```
 
 # Align to reference transcriptome (Kallisto pseudoalignment)
@@ -212,8 +345,9 @@ ${programs_array[kallisto]} index \
 --index="${kallisto_index_name}" \
 "${transcriptome_fasta}"
 
+ls -lh ${kallisto_output_dir}
 ```
-Note that, when building an index, kallisto warns us that it "replaced 10722052 non-ACGUT characters in the input sequence with pseudorandom nucleotides." This high number of identified "non-ACGUT" characters is related to the type of reference sequences we used to build the index. We obtained a coding sequence (CDS) gff file for P.evermanni and the associated scaffold genome fasta, filtered the gff to retain only mRNAs, and then used bedtools to extract the fasta sequences of every mRNA from the scaffold fasta. Notably, scaffolds are basically fragments of known DNA sequences "stitched" together by stretches of Ns to approximate the full sequence structure without complete sequence data. This means some of our mRNA sequences contain long, relatively-meaningless stretches of Ns. This shouldn't interfere with the kallisto pseudoalignment process, so we will continue.
+Note that, when building an index, kallisto warns us that it "replaced 43264 non-ACGUT characters in the input sequence with pseudorandom nucleotides." This high number of identified "non-ACGUT" characters is related to the type of reference sequences we used to build the index. We obtained a coding sequence (CDS) gff file for P.evermanni and the associated scaffold genome fasta, filtered the gff to retain only coding sequences, and then used bedtools to extract the fasta sequences of every CDS from the scaffold fasta. Notably, scaffolds are basically fragments of known DNA sequences "stitched" together by stretches of Ns to approximate the full sequence structure without complete sequence data. This means some of our mRNA sequences contain long, relatively-meaningless stretches of Ns. I'm not sure how/to what extent this will interfere with the kallisto pseudoallignment process, since it differs from standard alignment of a full read to reference, but we'll continue for now
 
 ## Sample Quantification
 
@@ -245,7 +379,7 @@ done
 ls -lh ${trimmed_reads_dir}
 ```
 
-```{r kallisto-quantification, engine='bash', eval=TRUE}
+```{r kallisto-quantification, engine='bash', eval=FALSE}
 # Load bash variables into memory
 source .bashvars
 
@@ -292,12 +426,14 @@ for file_r1 in "${trimmed_reads_dir}"/*_R1.fastq.gz; do
         echo "Sample already processed: ${sample_name}"
     fi
 done
+
+ls -lh ${kallisto_output_dir}
 ```
 
 
 ## Trinity Matrix with Kallisto Output
 
-```{r kallisto-trinity-matrix, engine='bash', eval=FALSE}
+```{r kallisto-trinity-matrix, engine='bash', eval=TRUE}
 # Load bash variables into memory
 source .bashvars
 
@@ -309,6 +445,7 @@ ${programs_array[trinity_abund_to_matrix]} \
 --out_prefix 'kallisto' \
 --name_sample_by_basedir ${kallisto_output_dir}/kallisto_quant_*/abundance.tsv
 
+ls -lh ${kallisto_output_dir}
 ```
 
 
