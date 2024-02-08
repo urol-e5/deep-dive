@@ -37,7 +37,7 @@ Use kallisto to quantify *P. evermanni* RNAseq transcript abundances
 
 Trimmed RNAseq reads (e.g. `*.fastq.gz`).  *P. evermanni* reads found [here](https://gannet.fish.washington.edu/Atumefaciens/20230519-E5_coral-fastqc-fastp-multiqc-RNAseq/P_evermanni/trimmed/).
 
-Coding sequence gff file (e.g. `*.gff`) and scaffold genome (e.g. '*.fa'), found [here](https://www.genoscope.cns.fr/corals/data/).
+Coding sequence gff file (e.g. `*.gff`) and scaffold genome (e.g. `*.fa`), found [here](https://www.genoscope.cns.fr/corals/data/).
 
 **Outputs:**
 
@@ -68,6 +68,8 @@ echo 'export transcriptome_gff_name="Porites_evermanni_v1.annot.gff"'
 echo 'export transcriptome_gff=${transcriptome_dir}/${transcriptome_gff_name}'
 echo 'export transcriptome_gff_filtered_name="Porites_evermanni_v1_CDS.annot.gff"'
 echo 'export transcriptome_gff_filtered=${transcriptome_dir}/${transcriptome_gff_filtered_name}'
+echo 'export transcriptome_bed_name="Porites_evermanni_v1_CDS.annot.bed"'
+echo 'export transcriptome_bed=${transcriptome_dir}/${transcriptome_bed_name}'
 echo 'export genome_fasta_name="Porites_evermanni_v1.fa"'
 echo 'export genome_fasta=${transcriptome_dir}/${genome_fasta_name}'
 echo 'export transcriptome_fasta_name="Porites_evermanni_CDS.fasta"'
@@ -90,6 +92,7 @@ echo "# Paths to programs"
 echo 'export kallisto=/home/shared/kallisto_linux-v0.50.1/kallisto'
 echo 'export trinity_abund_to_matrix=/home/shared/trinityrnaseq-v2.12.0/util/abundance_estimates_to_matrix.pl'
 echo 'export bedtools=/home/shared/bedtools2/bin/bedtools'
+echo 'export bedops=/home/shared/bedops_linux_x86_64-v2.4.41/bin'
 echo ""
 
 echo "# Set number of CPUs to use"
@@ -102,6 +105,7 @@ echo "programs_array=("
 echo '[kallisto]="${kallisto}" \'
 echo '[trinity_abund_to_matrix]="${trinity_abund_to_matrix}" \'
 echo '[bedtools]="${bedtools}" \'
+echo '[bedops]="${bedops}" \'
 echo ")"
 
 } > .bashvars
@@ -197,6 +201,7 @@ No checksum file(s) provided with download, so skipping this step
 
 ## Extract only CDS from gff
 
+We only want the sequences classified as "CDS"
 ```{r extract-CDS-from-transcriptome-gff, engine='bash', eval=TRUE}
 # Load bash variables into memory
 source .bashvars
@@ -207,10 +212,31 @@ grep -w 'CDS' ${transcriptome_gff} > ${transcriptome_gff_filtered}
 head -n 5 ${transcriptome_gff_filtered}
 ```
 
+## Convert gff to bed file
+
+To extract FASTAs for each of the CDS sequences we just extracted we'll be using bedtools, which takes bed files as input, so we need to convert our CDS gff file to a bed file. (Note that bedtools does accept gff files, but since gff and bed files have slightly different coordinate systems we're going to convert bed just in case)
+```{r convert-gff-to-bed, engine='bash', eval=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+# Ensure bedops can find its dependencies when running
+export PATH=/home/shared/bedops_linux_x86_64-v2.4.41/bin:$PATH
+
+${bedops}/gff2bed \
+--do-not-sort \
+< ${transcriptome_gff_filtered} \
+> ${transcriptome_bed}
+
+head -n 3 ${transcriptome_gff_filtered}
+echo ""
+head -n 3 ${transcriptome_bed}
+```
+
 ## Generate transcriptome fasta
 
-The below script will take as input a gff file containing information on CDS sequences, where multiple CDS sequences may originate from the same parent mrNA. The script will extract fastas for each sequence, and concatenate and label by parent. This should output a gene fasta that we can use for kallisto pseudoalignment and abundance quantification!
-**Warning**: This script will take a while to run -- for our gff of 231,320 CDS sequences, the script took ~4hours to output a complete gene fasta.
+The below script will take as input a bed file containing information on CDS sequences, where multiple CDS sequences may originate from the same parent mRNA. The script will extract FASTAs for each sequence, and concatenate and label by parent. This should output a gene FASTA that we can use for kallisto pseudoalignment and abundance quantification!
+**Warning**: This script will take a while to run -- for our bed file of 231,320 CDS sequences, the script took ~4hours to output a complete gene fasta.
+
 ```{r generate-transcriptome-fasta, engine='bash', eval=FALSE}
 # Load bash variables into memory
 source .bashvars
@@ -260,10 +286,10 @@ concatenate_helper() {
 
 ######################################################
 
-# Process your input gff file
+# Process your input bed file
 while IFS= read -r line; do
 
-    # pull the parent ID number for the current line of the gff
+    # pull the parent ID number for the current line of the bed
     parentID=$(echo "$line" | grep -o 'Parent=Peve_[0-9]\+')
     
     # Only continue if you haven't already processed the CDS sequences associated with this parent ID
@@ -273,14 +299,14 @@ while IFS= read -r line; do
         processed_ids+=("$parentID")
 
         # Create temporary files to store intermediate results
-        temp_CDS_gff_file=$(mktemp)
+        temp_CDS_bed_file=$(mktemp)
         temp_bedtools_fasta_file=$(mktemp)
 
         # Grab all of the CDS sequences with the same parent ID and write to temporary file
-        grep "$parentID" ${transcriptome_gff_filtered} > "$temp_CDS_gff_file"
+        grep "$parentID" ${transcriptome_bed} > "$temp_CDS_bed_file"
 
         # Use bedtools to extract corresponding FASTAs and write to temporary file
-        ${programs_array[bedtools]} getfasta -fi ${genome_fasta} -bed "$temp_CDS_gff_file" -fo "$temp_bedtools_fasta_file"
+        ${programs_array[bedtools]} getfasta -fi ${genome_fasta} -bed "$temp_CDS_bed_file" -fo "$temp_bedtools_fasta_file"
 
         # Use our helper function to concatenate and format all of these CDS fastas into a single contig
         concatenated_fasta=$(concatenate_helper "$(cat "$temp_bedtools_fasta_file")" "$parentID")
@@ -289,14 +315,14 @@ while IFS= read -r line; do
         echo "$concatenated_fasta" >> ${transcriptome_fasta}
 
         # Remove the temporary files
-        rm "$temp_CDS_gff_file" "$temp_bedtools_fasta_file"
+        rm "$temp_CDS_bed_file" "$temp_bedtools_fasta_file"
     fi
-done < ${transcriptome_gff_filtered}
+done < ${transcriptome_bed}
 
 # The output file ends up having a blank first line before the data, so delete that unwanted empty first line
 sed -i '1{/^$/d}' ${transcriptome_fasta}
 
-head ${transcriptome_fasta}
+head -n 4 ${transcriptome_fasta}
 ```
 
 ## Check transcriptome fasta
@@ -312,7 +338,7 @@ sed -nu '1~2p' ${transcriptome_fasta} | head -n 5
 echo ""
 
 # Output the first twenty CDS sequences listed in the CDS gff
-head -n 20 ${transcriptome_gff_filtered}
+head -n 20 ${transcriptome_bed}
 
 ```
 
@@ -326,9 +352,11 @@ sed -nu '1~2p' ${transcriptome_fasta} | tail -n 5
 echo ""
 
 # Output the first twenty CDS sequences listed in the CDS gff
-tail -n 20 ${transcriptome_gff_filtered}
+tail -n 20 ${transcriptome_bed}
 
 ```
+
+It looks like each grouped/concatenated FASTA in our output contains the correct number of original gff sequences from the correct parent and coordinates, and the output also contains sequences for all of the parents listed in the original gff!
 
 # Align to reference transcriptome (Kallisto pseudoalignment)
 

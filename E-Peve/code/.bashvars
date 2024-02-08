@@ -12,6 +12,8 @@ export transcriptome_gff_name="Porites_evermanni_v1.annot.gff"
 export transcriptome_gff=${transcriptome_dir}/${transcriptome_gff_name}
 export transcriptome_gff_filtered_name="Porites_evermanni_v1_CDS.annot.gff"
 export transcriptome_gff_filtered=${transcriptome_dir}/${transcriptome_gff_filtered_name}
+export transcriptome_bed_name="Porites_evermanni_v1_CDS.annot.bed"
+export transcriptome_bed=${transcriptome_dir}/${transcriptome_bed_name}
 export genome_fasta_name="Porites_evermanni_v1.fa"
 export genome_fasta=${transcriptome_dir}/${genome_fasta_name}
 export transcriptome_fasta_name="Porites_evermanni_CDS.fasta"
@@ -31,6 +33,7 @@ export R2_fastq_pattern='*_R2.fastq.gz'
 export kallisto=/home/shared/kallisto_linux-v0.50.1/kallisto
 export trinity_abund_to_matrix=/home/shared/trinityrnaseq-v2.12.0/util/abundance_estimates_to_matrix.pl
 export bedtools=/home/shared/bedtools2/bin/bedtools
+export bedops=/home/shared/bedops_linux_x86_64-v2.4.41/bin
 
 # Set number of CPUs to use
 export threads=20
@@ -41,4 +44,5 @@ programs_array=(
 [kallisto]="${kallisto}" \
 [trinity_abund_to_matrix]="${trinity_abund_to_matrix}" \
 [bedtools]="${bedtools}" \
+[bedops]="${bedops}" \
 )

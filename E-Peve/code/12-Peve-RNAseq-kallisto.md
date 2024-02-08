@@ -23,11 +23,13 @@ Kathleen Durkin
   FASTA</a>
   - <a href="#51-extract-only-cds-from-gff"
     id="toc-51-extract-only-cds-from-gff">5.1 Extract only CDS from gff</a>
-  - <a href="#52-generate-transcriptome-fasta"
-    id="toc-52-generate-transcriptome-fasta">5.2 Generate transcriptome
+  - <a href="#52-convert-gff-to-bed-file"
+    id="toc-52-convert-gff-to-bed-file">5.2 Convert gff to bed file</a>
+  - <a href="#53-generate-transcriptome-fasta"
+    id="toc-53-generate-transcriptome-fasta">5.3 Generate transcriptome
     fasta</a>
-  - <a href="#53-check-transcriptome-fasta"
-    id="toc-53-check-transcriptome-fasta">5.3 Check transcriptome fasta</a>
+  - <a href="#54-check-transcriptome-fasta"
+    id="toc-54-check-transcriptome-fasta">5.4 Check transcriptome fasta</a>
 - <a href="#6-align-to-reference-transcriptome-kallisto-pseudoalignment"
   id="toc-6-align-to-reference-transcriptome-kallisto-pseudoalignment">6
   Align to reference transcriptome (Kallisto pseudoalignment)</a>
@@ -50,7 +52,7 @@ Trimmed RNAseq reads (e.g. `*.fastq.gz`). *P. evermanni* reads found
 [here](https://gannet.fish.washington.edu/Atumefaciens/20230519-E5_coral-fastqc-fastp-multiqc-RNAseq/P_evermanni/trimmed/).
 
 Coding sequence gff file (e.g. `*.gff`) and scaffold genome
-(e.g. ‘\*.fa’), found [here](https://www.genoscope.cns.fr/corals/data/).
+(e.g. `*.fa`), found [here](https://www.genoscope.cns.fr/corals/data/).
 
 **Outputs:**
 
@@ -81,6 +83,8 @@ echo 'export transcriptome_gff_name="Porites_evermanni_v1.annot.gff"'
 echo 'export transcriptome_gff=${transcriptome_dir}/${transcriptome_gff_name}'
 echo 'export transcriptome_gff_filtered_name="Porites_evermanni_v1_CDS.annot.gff"'
 echo 'export transcriptome_gff_filtered=${transcriptome_dir}/${transcriptome_gff_filtered_name}'
+echo 'export transcriptome_bed_name="Porites_evermanni_v1_CDS.annot.bed"'
+echo 'export transcriptome_bed=${transcriptome_dir}/${transcriptome_bed_name}'
 echo 'export genome_fasta_name="Porites_evermanni_v1.fa"'
 echo 'export genome_fasta=${transcriptome_dir}/${genome_fasta_name}'
 echo 'export transcriptome_fasta_name="Porites_evermanni_CDS.fasta"'
@@ -103,6 +107,7 @@ echo "# Paths to programs"
 echo 'export kallisto=/home/shared/kallisto_linux-v0.50.1/kallisto'
 echo 'export trinity_abund_to_matrix=/home/shared/trinityrnaseq-v2.12.0/util/abundance_estimates_to_matrix.pl'
 echo 'export bedtools=/home/shared/bedtools2/bin/bedtools'
+echo 'export bedops=/home/shared/bedops_linux_x86_64-v2.4.41/bin'
 echo ""
 
 echo "# Set number of CPUs to use"
@@ -115,6 +120,7 @@ echo "programs_array=("
 echo '[kallisto]="${kallisto}" \'
 echo '[trinity_abund_to_matrix]="${trinity_abund_to_matrix}" \'
 echo '[bedtools]="${bedtools}" \'
+echo '[bedops]="${bedops}" \'
 echo ")"
 
 } > .bashvars
@@ -136,6 +142,8 @@ cat .bashvars
     export transcriptome_gff=${transcriptome_dir}/${transcriptome_gff_name}
     export transcriptome_gff_filtered_name="Porites_evermanni_v1_CDS.annot.gff"
     export transcriptome_gff_filtered=${transcriptome_dir}/${transcriptome_gff_filtered_name}
+    export transcriptome_bed_name="Porites_evermanni_v1_CDS.annot.bed"
+    export transcriptome_bed=${transcriptome_dir}/${transcriptome_bed_name}
     export genome_fasta_name="Porites_evermanni_v1.fa"
     export genome_fasta=${transcriptome_dir}/${genome_fasta_name}
     export transcriptome_fasta_name="Porites_evermanni_CDS.fasta"
@@ -155,6 +163,7 @@ cat .bashvars
     export kallisto=/home/shared/kallisto_linux-v0.50.1/kallisto
     export trinity_abund_to_matrix=/home/shared/trinityrnaseq-v2.12.0/util/abundance_estimates_to_matrix.pl
     export bedtools=/home/shared/bedtools2/bin/bedtools
+    export bedops=/home/shared/bedops_linux_x86_64-v2.4.41/bin
 
     # Set number of CPUs to use
     export threads=20
@@ -165,6 +174,7 @@ cat .bashvars
     [kallisto]="${kallisto}" \
     [trinity_abund_to_matrix]="${trinity_abund_to_matrix}" \
     [bedtools]="${bedtools}" \
+    [bedops]="${bedops}" \
     )
 
 # 2 Download trimmed RNAseq reads
@@ -211,16 +221,16 @@ ls -lh "${trimmed_reads_dir}"
     -rw-r--r-- 1 shedurkin labmembers 2.3G May 19  2023 RNA-POR-79-S1-TP2_R2_001.fastp-trim.20230519.fastq.gz
     -rw-r--r-- 1 shedurkin labmembers 2.6G May 19  2023 RNA-POR-82-S1-TP2_R1_001.fastp-trim.20230519.fastq.gz
     -rw-r--r-- 1 shedurkin labmembers 2.7G May 19  2023 RNA-POR-82-S1-TP2_R2_001.fastp-trim.20230519.fastq.gz
-    lrwxrwxrwx 1 shedurkin labmembers  149 Feb  7 12:58 sample71_R1.fastq.gz -> /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/output/12-Peve-RNAseq-kallisto/trimmed-reads/RNA-POR-71-S1-TP2_R1_001.fastp-trim.20230519.fastq.gz
-    lrwxrwxrwx 1 shedurkin labmembers  149 Feb  7 12:58 sample71_R2.fastq.gz -> /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/output/12-Peve-RNAseq-kallisto/trimmed-reads/RNA-POR-71-S1-TP2_R2_001.fastp-trim.20230519.fastq.gz
-    lrwxrwxrwx 1 shedurkin labmembers  149 Feb  7 12:58 sample73_R1.fastq.gz -> /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/output/12-Peve-RNAseq-kallisto/trimmed-reads/RNA-POR-73-S1-TP2_R1_001.fastp-trim.20230519.fastq.gz
-    lrwxrwxrwx 1 shedurkin labmembers  149 Feb  7 12:58 sample73_R2.fastq.gz -> /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/output/12-Peve-RNAseq-kallisto/trimmed-reads/RNA-POR-73-S1-TP2_R2_001.fastp-trim.20230519.fastq.gz
-    lrwxrwxrwx 1 shedurkin labmembers  149 Feb  7 12:58 sample76_R1.fastq.gz -> /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/output/12-Peve-RNAseq-kallisto/trimmed-reads/RNA-POR-76-S1-TP2_R1_001.fastp-trim.20230519.fastq.gz
-    lrwxrwxrwx 1 shedurkin labmembers  149 Feb  7 12:58 sample76_R2.fastq.gz -> /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/output/12-Peve-RNAseq-kallisto/trimmed-reads/RNA-POR-76-S1-TP2_R2_001.fastp-trim.20230519.fastq.gz
-    lrwxrwxrwx 1 shedurkin labmembers  149 Feb  7 12:58 sample79_R1.fastq.gz -> /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/output/12-Peve-RNAseq-kallisto/trimmed-reads/RNA-POR-79-S1-TP2_R1_001.fastp-trim.20230519.fastq.gz
-    lrwxrwxrwx 1 shedurkin labmembers  149 Feb  7 12:58 sample79_R2.fastq.gz -> /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/output/12-Peve-RNAseq-kallisto/trimmed-reads/RNA-POR-79-S1-TP2_R2_001.fastp-trim.20230519.fastq.gz
-    lrwxrwxrwx 1 shedurkin labmembers  149 Feb  7 12:58 sample82_R1.fastq.gz -> /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/output/12-Peve-RNAseq-kallisto/trimmed-reads/RNA-POR-82-S1-TP2_R1_001.fastp-trim.20230519.fastq.gz
-    lrwxrwxrwx 1 shedurkin labmembers  149 Feb  7 12:58 sample82_R2.fastq.gz -> /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/output/12-Peve-RNAseq-kallisto/trimmed-reads/RNA-POR-82-S1-TP2_R2_001.fastp-trim.20230519.fastq.gz
+    lrwxrwxrwx 1 shedurkin labmembers  149 Feb  8 08:49 sample71_R1.fastq.gz -> /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/output/12-Peve-RNAseq-kallisto/trimmed-reads/RNA-POR-71-S1-TP2_R1_001.fastp-trim.20230519.fastq.gz
+    lrwxrwxrwx 1 shedurkin labmembers  149 Feb  8 08:49 sample71_R2.fastq.gz -> /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/output/12-Peve-RNAseq-kallisto/trimmed-reads/RNA-POR-71-S1-TP2_R2_001.fastp-trim.20230519.fastq.gz
+    lrwxrwxrwx 1 shedurkin labmembers  149 Feb  8 08:49 sample73_R1.fastq.gz -> /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/output/12-Peve-RNAseq-kallisto/trimmed-reads/RNA-POR-73-S1-TP2_R1_001.fastp-trim.20230519.fastq.gz
+    lrwxrwxrwx 1 shedurkin labmembers  149 Feb  8 08:49 sample73_R2.fastq.gz -> /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/output/12-Peve-RNAseq-kallisto/trimmed-reads/RNA-POR-73-S1-TP2_R2_001.fastp-trim.20230519.fastq.gz
+    lrwxrwxrwx 1 shedurkin labmembers  149 Feb  8 08:49 sample76_R1.fastq.gz -> /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/output/12-Peve-RNAseq-kallisto/trimmed-reads/RNA-POR-76-S1-TP2_R1_001.fastp-trim.20230519.fastq.gz
+    lrwxrwxrwx 1 shedurkin labmembers  149 Feb  8 08:49 sample76_R2.fastq.gz -> /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/output/12-Peve-RNAseq-kallisto/trimmed-reads/RNA-POR-76-S1-TP2_R2_001.fastp-trim.20230519.fastq.gz
+    lrwxrwxrwx 1 shedurkin labmembers  149 Feb  8 08:49 sample79_R1.fastq.gz -> /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/output/12-Peve-RNAseq-kallisto/trimmed-reads/RNA-POR-79-S1-TP2_R1_001.fastp-trim.20230519.fastq.gz
+    lrwxrwxrwx 1 shedurkin labmembers  149 Feb  8 08:49 sample79_R2.fastq.gz -> /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/output/12-Peve-RNAseq-kallisto/trimmed-reads/RNA-POR-79-S1-TP2_R2_001.fastp-trim.20230519.fastq.gz
+    lrwxrwxrwx 1 shedurkin labmembers  149 Feb  8 08:49 sample82_R1.fastq.gz -> /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/output/12-Peve-RNAseq-kallisto/trimmed-reads/RNA-POR-82-S1-TP2_R1_001.fastp-trim.20230519.fastq.gz
+    lrwxrwxrwx 1 shedurkin labmembers  149 Feb  8 08:49 sample82_R2.fastq.gz -> /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/output/12-Peve-RNAseq-kallisto/trimmed-reads/RNA-POR-82-S1-TP2_R2_001.fastp-trim.20230519.fastq.gz
 
 # 3 FastQC/MultiQC on trimmed reads
 
@@ -278,12 +288,14 @@ source .bashvars
 ls -lh "${transcriptome_dir}"
 ```
 
-    total 699M
+    total 774M
     -rw------- 1 shedurkin labmembers 3.2K Jan 25 15:46 index.html.tmp
     -rw-r--r-- 1 shedurkin labmembers  15M Nov  2 08:39 peve_bedtools_lncRNAs.fasta
-    -rw-r--r-- 1 shedurkin labmembers  57M Feb  6 17:32 Porites_evermanni_CDS.fasta
+    -rw-r--r-- 1 shedurkin labmembers  57M Feb  7 22:12 Porites_evermanni_CDS.fasta
+    -rw-r--r-- 1 shedurkin labmembers  57M Feb  6 17:32 Porites_evermanni_CDS.from_gff.fasta
     -rw-r--r-- 1 shedurkin labmembers  24M Mar 11  2022 Porites_evermanni_v1.annot.gff
-    -rw-r--r-- 1 shedurkin labmembers  18M Feb  7 13:24 Porites_evermanni_v1_CDS.annot.gff
+    -rw-r--r-- 1 shedurkin labmembers  19M Feb  7 17:27 Porites_evermanni_v1_CDS.annot.bed
+    -rw-r--r-- 1 shedurkin labmembers  18M Feb  7 17:16 Porites_evermanni_v1_CDS.annot.gff
     -rw-r--r-- 1 shedurkin labmembers 586M Mar 11  2022 Porites_evermanni_v1.fa
     -rw-r--r-- 1 shedurkin labmembers 422K Jan 29 16:55 Porites_evermanni_v1.fa.fai
     -rw-r--r-- 1 shedurkin labmembers    0 Nov  2 08:39 README.md
@@ -295,6 +307,8 @@ No checksum file(s) provided with download, so skipping this step
 # 5 Convert gff to a genes FASTA
 
 ## 5.1 Extract only CDS from gff
+
+We only want the sequences classified as “CDS”
 
 ``` bash
 # Load bash variables into memory
@@ -312,14 +326,47 @@ head -n 5 ${transcriptome_gff_filtered}
     Porites_evermani_scaffold_1 Gmove   CDS 426181  426735  .   -   .   Parent=Peve_00000002
     Porites_evermani_scaffold_1 Gmove   CDS 427013  427140  .   -   .   Parent=Peve_00000002
 
-## 5.2 Generate transcriptome fasta
+## 5.2 Convert gff to bed file
 
-The below script will take as input a gff file containing information on
+To extract FASTAs for each of the CDS sequences we just extracted we’ll
+be using bedtools, which takes bed files as input, so we need to convert
+our CDS gff file to a bed file. (Note that bedtools does accept gff
+files, but since gff and bed files have slightly different coordinate
+systems we’re going to convert bed just in case)
+
+``` bash
+# Load bash variables into memory
+source .bashvars
+
+# Ensure bedops can find its dependencies when running
+export PATH=/home/shared/bedops_linux_x86_64-v2.4.41/bin:$PATH
+
+${bedops}/gff2bed \
+--do-not-sort \
+< ${transcriptome_gff_filtered} \
+> ${transcriptome_bed}
+
+head -n 3 ${transcriptome_gff_filtered}
+echo ""
+head -n 3 ${transcriptome_bed}
+```
+
+    Porites_evermani_scaffold_1 Gmove   CDS 3107    3444    .   -   .   Parent=Peve_00000001
+    Porites_evermani_scaffold_1 Gmove   CDS 4284    4488    .   -   .   Parent=Peve_00000001
+    Porites_evermani_scaffold_1 Gmove   CDS 424479  425361  .   -   .   Parent=Peve_00000002
+
+    Porites_evermani_scaffold_1 3106    3444    .   .   -   Gmove   CDS .   Parent=Peve_00000001
+    Porites_evermani_scaffold_1 4283    4488    .   .   -   Gmove   CDS .   Parent=Peve_00000001
+    Porites_evermani_scaffold_1 424478  425361  .   .   -   Gmove   CDS .   Parent=Peve_00000002
+
+## 5.3 Generate transcriptome fasta
+
+The below script will take as input a bed file containing information on
 CDS sequences, where multiple CDS sequences may originate from the same
-parent mrNA. The script will extract fastas for each sequence, and
-concatenate and label by parent. This should output a gene fasta that we
+parent mRNA. The script will extract FASTAs for each sequence, and
+concatenate and label by parent. This should output a gene FASTA that we
 can use for kallisto pseudoalignment and abundance quantification!
-**Warning**: This script will take a while to run – for our gff of
+**Warning**: This script will take a while to run – for our bed file of
 231,320 CDS sequences, the script took \~4hours to output a complete
 gene fasta.
 
@@ -372,10 +419,10 @@ concatenate_helper() {
 
 ######################################################
 
-# Process your input gff file
+# Process your input bed file
 while IFS= read -r line; do
 
-    # pull the parent ID number for the current line of the gff
+    # pull the parent ID number for the current line of the bed
     parentID=$(echo "$line" | grep -o 'Parent=Peve_[0-9]\+')
     
     # Only continue if you haven't already processed the CDS sequences associated with this parent ID
@@ -385,14 +432,14 @@ while IFS= read -r line; do
         processed_ids+=("$parentID")
 
         # Create temporary files to store intermediate results
-        temp_CDS_gff_file=$(mktemp)
+        temp_CDS_bed_file=$(mktemp)
         temp_bedtools_fasta_file=$(mktemp)
 
         # Grab all of the CDS sequences with the same parent ID and write to temporary file
-        grep "$parentID" ${transcriptome_gff_filtered} > "$temp_CDS_gff_file"
+        grep "$parentID" ${transcriptome_bed} > "$temp_CDS_bed_file"
 
         # Use bedtools to extract corresponding FASTAs and write to temporary file
-        ${programs_array[bedtools]} getfasta -fi ${genome_fasta} -bed "$temp_CDS_gff_file" -fo "$temp_bedtools_fasta_file"
+        ${programs_array[bedtools]} getfasta -fi ${genome_fasta} -bed "$temp_CDS_bed_file" -fo "$temp_bedtools_fasta_file"
 
         # Use our helper function to concatenate and format all of these CDS fastas into a single contig
         concatenated_fasta=$(concatenate_helper "$(cat "$temp_bedtools_fasta_file")" "$parentID")
@@ -401,17 +448,17 @@ while IFS= read -r line; do
         echo "$concatenated_fasta" >> ${transcriptome_fasta}
 
         # Remove the temporary files
-        rm "$temp_CDS_gff_file" "$temp_bedtools_fasta_file"
+        rm "$temp_CDS_bed_file" "$temp_bedtools_fasta_file"
     fi
-done < ${transcriptome_gff_filtered}
+done < ${transcriptome_bed}
 
 # The output file ends up having a blank first line before the data, so delete that unwanted empty first line
 sed -i '1{/^$/d}' ${transcriptome_fasta}
 
-head ${transcriptome_fasta}
+head -n 4 ${transcriptome_fasta}
 ```
 
-## 5.3 Check transcriptome fasta
+## 5.4 Check transcriptome fasta
 
 Let’s do a quick check to see whether the output file contains all the
 CDS sequences we want and is grouping them appropriately
@@ -426,7 +473,7 @@ sed -nu '1~2p' ${transcriptome_fasta} | head -n 5
 echo ""
 
 # Output the first twenty CDS sequences listed in the CDS gff
-head -n 20 ${transcriptome_gff_filtered}
+head -n 20 ${transcriptome_bed}
 ```
 
     >Parent=Peve_00000001 Porites_evermani_scaffold_1:3106-3444,4283-4488
@@ -435,26 +482,26 @@ head -n 20 ${transcriptome_gff_filtered}
     >Parent=Peve_00000004 Porites_evermani_scaffold_1:441399-441851,442759-443100,446240-447172
     >Parent=Peve_00000005 Porites_evermani_scaffold_1:448044-448206,448308-448363,451515-451591,451816-451871,454946-455060,455886-456006,456781-456901,457021-457073,457639-457767,458842-458920,459554-459697,459961-460031
 
-    Porites_evermani_scaffold_1 Gmove   CDS 3107    3444    .   -   .   Parent=Peve_00000001
-    Porites_evermani_scaffold_1 Gmove   CDS 4284    4488    .   -   .   Parent=Peve_00000001
-    Porites_evermani_scaffold_1 Gmove   CDS 424479  425361  .   -   .   Parent=Peve_00000002
-    Porites_evermani_scaffold_1 Gmove   CDS 426181  426735  .   -   .   Parent=Peve_00000002
-    Porites_evermani_scaffold_1 Gmove   CDS 427013  427140  .   -   .   Parent=Peve_00000002
-    Porites_evermani_scaffold_1 Gmove   CDS 427665  427724  .   -   .   Parent=Peve_00000002
-    Porites_evermani_scaffold_1 Gmove   CDS 428642  429034  .   -   .   Parent=Peve_00000002
-    Porites_evermani_scaffold_1 Gmove   CDS 429500  429746  .   +   .   Parent=Peve_00000003
-    Porites_evermani_scaffold_1 Gmove   CDS 430885  431009  .   +   .   Parent=Peve_00000003
-    Porites_evermani_scaffold_1 Gmove   CDS 432044  432167  .   +   .   Parent=Peve_00000003
-    Porites_evermani_scaffold_1 Gmove   CDS 432628  432757  .   +   .   Parent=Peve_00000003
-    Porites_evermani_scaffold_1 Gmove   CDS 433483  433588  .   +   .   Parent=Peve_00000003
-    Porites_evermani_scaffold_1 Gmove   CDS 434247  434336  .   +   .   Parent=Peve_00000003
-    Porites_evermani_scaffold_1 Gmove   CDS 435359  435439  .   +   .   Parent=Peve_00000003
-    Porites_evermani_scaffold_1 Gmove   CDS 436217  436374  .   +   .   Parent=Peve_00000003
-    Porites_evermani_scaffold_1 Gmove   CDS 437430  437557  .   +   .   Parent=Peve_00000003
-    Porites_evermani_scaffold_1 Gmove   CDS 438131  438232  .   +   .   Parent=Peve_00000003
-    Porites_evermani_scaffold_1 Gmove   CDS 438532  438698  .   +   .   Parent=Peve_00000003
-    Porites_evermani_scaffold_1 Gmove   CDS 441400  441851  .   -   .   Parent=Peve_00000004
-    Porites_evermani_scaffold_1 Gmove   CDS 442760  443100  .   -   .   Parent=Peve_00000004
+    Porites_evermani_scaffold_1 3106    3444    .   .   -   Gmove   CDS .   Parent=Peve_00000001
+    Porites_evermani_scaffold_1 4283    4488    .   .   -   Gmove   CDS .   Parent=Peve_00000001
+    Porites_evermani_scaffold_1 424478  425361  .   .   -   Gmove   CDS .   Parent=Peve_00000002
+    Porites_evermani_scaffold_1 426180  426735  .   .   -   Gmove   CDS .   Parent=Peve_00000002
+    Porites_evermani_scaffold_1 427012  427140  .   .   -   Gmove   CDS .   Parent=Peve_00000002
+    Porites_evermani_scaffold_1 427664  427724  .   .   -   Gmove   CDS .   Parent=Peve_00000002
+    Porites_evermani_scaffold_1 428641  429034  .   .   -   Gmove   CDS .   Parent=Peve_00000002
+    Porites_evermani_scaffold_1 429499  429746  .   .   +   Gmove   CDS .   Parent=Peve_00000003
+    Porites_evermani_scaffold_1 430884  431009  .   .   +   Gmove   CDS .   Parent=Peve_00000003
+    Porites_evermani_scaffold_1 432043  432167  .   .   +   Gmove   CDS .   Parent=Peve_00000003
+    Porites_evermani_scaffold_1 432627  432757  .   .   +   Gmove   CDS .   Parent=Peve_00000003
+    Porites_evermani_scaffold_1 433482  433588  .   .   +   Gmove   CDS .   Parent=Peve_00000003
+    Porites_evermani_scaffold_1 434246  434336  .   .   +   Gmove   CDS .   Parent=Peve_00000003
+    Porites_evermani_scaffold_1 435358  435439  .   .   +   Gmove   CDS .   Parent=Peve_00000003
+    Porites_evermani_scaffold_1 436216  436374  .   .   +   Gmove   CDS .   Parent=Peve_00000003
+    Porites_evermani_scaffold_1 437429  437557  .   .   +   Gmove   CDS .   Parent=Peve_00000003
+    Porites_evermani_scaffold_1 438130  438232  .   .   +   Gmove   CDS .   Parent=Peve_00000003
+    Porites_evermani_scaffold_1 438531  438698  .   .   +   Gmove   CDS .   Parent=Peve_00000003
+    Porites_evermani_scaffold_1 441399  441851  .   .   -   Gmove   CDS .   Parent=Peve_00000004
+    Porites_evermani_scaffold_1 442759  443100  .   .   -   Gmove   CDS .   Parent=Peve_00000004
 
 ``` bash
 # Load bash variables into memory
@@ -466,7 +513,7 @@ sed -nu '1~2p' ${transcriptome_fasta} | tail -n 5
 echo ""
 
 # Output the first twenty CDS sequences listed in the CDS gff
-tail -n 20 ${transcriptome_gff_filtered}
+tail -n 20 ${transcriptome_bed}
 ```
 
     >Parent=Peve_00045353 Porites_evermani_scaffold_999:120490-120865
@@ -475,26 +522,31 @@ tail -n 20 ${transcriptome_gff_filtered}
     >Parent=Peve_00045357 Porites_evermani_scaffold_999:25255-25390,26056-26534,26987-27076
     >Parent=Peve_00045358 Porites_evermani_scaffold_999:43038-43296,43486-43561,43917-44070
 
-    Porites_evermani_scaffold_999   Gmove   CDS 83897   84640   .   +   .   Parent=Peve_00045348
-    Porites_evermani_scaffold_999   Gmove   CDS 102185  102529  .   -   .   Parent=Peve_00045349
-    Porites_evermani_scaffold_999   Gmove   CDS 102653  103198  .   -   .   Parent=Peve_00045349
-    Porites_evermani_scaffold_999   Gmove   CDS 109635  109938  .   -   .   Parent=Peve_00045350
-    Porites_evermani_scaffold_999   Gmove   CDS 110552  110643  .   -   .   Parent=Peve_00045350
-    Porites_evermani_scaffold_999   Gmove   CDS 117115  117259  .   +   .   Parent=Peve_00045351
-    Porites_evermani_scaffold_999   Gmove   CDS 117364  117833  .   +   .   Parent=Peve_00045351
-    Porites_evermani_scaffold_999   Gmove   CDS 118858  119024  .   -   .   Parent=Peve_00045352
-    Porites_evermani_scaffold_999   Gmove   CDS 119373  119940  .   -   .   Parent=Peve_00045352
-    Porites_evermani_scaffold_999   Gmove   CDS 120491  120865  .   -   .   Parent=Peve_00045353
-    Porites_evermani_scaffold_999   Gmove   CDS 124813  124870  .   -   .   Parent=Peve_00045355
-    Porites_evermani_scaffold_999   Gmove   CDS 124922  125022  .   -   .   Parent=Peve_00045355
-    Porites_evermani_scaffold_999   Gmove   CDS 157407  158547  .   -   .   Parent=Peve_00045356
-    Porites_evermani_scaffold_999   Gmove   CDS 159690  159727  .   -   .   Parent=Peve_00045356
-    Porites_evermani_scaffold_999   Gmove   CDS 25256   25390   .   +   .   Parent=Peve_00045357
-    Porites_evermani_scaffold_999   Gmove   CDS 26057   26534   .   +   .   Parent=Peve_00045357
-    Porites_evermani_scaffold_999   Gmove   CDS 26988   27076   .   +   .   Parent=Peve_00045357
-    Porites_evermani_scaffold_999   Gmove   CDS 43039   43296   .   -   .   Parent=Peve_00045358
-    Porites_evermani_scaffold_999   Gmove   CDS 43487   43561   .   -   .   Parent=Peve_00045358
-    Porites_evermani_scaffold_999   Gmove   CDS 43918   44070   .   -   .   Parent=Peve_00045358
+    Porites_evermani_scaffold_999   83896   84640   .   .   +   Gmove   CDS .   Parent=Peve_00045348
+    Porites_evermani_scaffold_999   102184  102529  .   .   -   Gmove   CDS .   Parent=Peve_00045349
+    Porites_evermani_scaffold_999   102652  103198  .   .   -   Gmove   CDS .   Parent=Peve_00045349
+    Porites_evermani_scaffold_999   109634  109938  .   .   -   Gmove   CDS .   Parent=Peve_00045350
+    Porites_evermani_scaffold_999   110551  110643  .   .   -   Gmove   CDS .   Parent=Peve_00045350
+    Porites_evermani_scaffold_999   117114  117259  .   .   +   Gmove   CDS .   Parent=Peve_00045351
+    Porites_evermani_scaffold_999   117363  117833  .   .   +   Gmove   CDS .   Parent=Peve_00045351
+    Porites_evermani_scaffold_999   118857  119024  .   .   -   Gmove   CDS .   Parent=Peve_00045352
+    Porites_evermani_scaffold_999   119372  119940  .   .   -   Gmove   CDS .   Parent=Peve_00045352
+    Porites_evermani_scaffold_999   120490  120865  .   .   -   Gmove   CDS .   Parent=Peve_00045353
+    Porites_evermani_scaffold_999   124812  124870  .   .   -   Gmove   CDS .   Parent=Peve_00045355
+    Porites_evermani_scaffold_999   124921  125022  .   .   -   Gmove   CDS .   Parent=Peve_00045355
+    Porites_evermani_scaffold_999   157406  158547  .   .   -   Gmove   CDS .   Parent=Peve_00045356
+    Porites_evermani_scaffold_999   159689  159727  .   .   -   Gmove   CDS .   Parent=Peve_00045356
+    Porites_evermani_scaffold_999   25255   25390   .   .   +   Gmove   CDS .   Parent=Peve_00045357
+    Porites_evermani_scaffold_999   26056   26534   .   .   +   Gmove   CDS .   Parent=Peve_00045357
+    Porites_evermani_scaffold_999   26987   27076   .   .   +   Gmove   CDS .   Parent=Peve_00045357
+    Porites_evermani_scaffold_999   43038   43296   .   .   -   Gmove   CDS .   Parent=Peve_00045358
+    Porites_evermani_scaffold_999   43486   43561   .   .   -   Gmove   CDS .   Parent=Peve_00045358
+    Porites_evermani_scaffold_999   43917   44070   .   .   -   Gmove   CDS .   Parent=Peve_00045358
+
+It looks like each grouped/concatenated FASTA in our output contains the
+correct number of original gff sequences from the correct parent and
+coordinates, and the output also contains sequences for all of the
+parents listed in the original gff!
 
 # 6 Align to reference transcriptome (Kallisto pseudoalignment)
 
@@ -526,7 +578,7 @@ ls -lh ${kallisto_output_dir}
     CompactedDBG::build(): Estimated number of k-mers occurring at least once: 46039676
     CompactedDBG::build(): Estimated number of minimizer occurring at least once: 11275045
     CompactedDBG::filter(): Processed 52809246 k-mers in 40389 reads
-    CompactedDBG::filter(): Found 46115154 unique k-mers
+    CompactedDBG::filter(): Found 46115211 unique k-mers
     CompactedDBG::filter(): Number of blocks in Bloom filter is 314726
     CompactedDBG::construct(): Extract approximate unitigs (1/2)
     CompactedDBG::construct(): Extract approximate unitigs (2/2)
@@ -535,30 +587,30 @@ ls -lh ${kallisto_output_dir}
     CompactedDBG::construct(): Splitting unitigs (1/2)
 
     CompactedDBG::construct(): Splitting unitigs (2/2)
-    CompactedDBG::construct(): Before split: 489099 unitigs
-    CompactedDBG::construct(): After split (1/1): 489099 unitigs
-    CompactedDBG::construct(): Unitigs split: 1045
+    CompactedDBG::construct(): Before split: 489376 unitigs
+    CompactedDBG::construct(): After split (1/1): 489376 unitigs
+    CompactedDBG::construct(): Unitigs split: 1098
     CompactedDBG::construct(): Unitigs deleted: 0
 
     CompactedDBG::construct(): Joining unitigs
     CompactedDBG::construct(): After join: 467413 unitigs
-    CompactedDBG::construct(): Joined 22018 unitigs
+    CompactedDBG::construct(): Joined 22286 unitigs
     [build] building MPHF
     [build] creating equivalence classes ... 
     [build] target de Bruijn graph has k-mer length 31 and minimizer length 23
     [build] target de Bruijn graph has 467413 contigs and contains 46155696 k-mers 
 
     total 83M
-    -rw-r--r-- 1 shedurkin labmembers 1.5M Feb  7 13:25 kallisto.isoform.counts.matrix
-    -rw-r--r-- 1 shedurkin labmembers    0 Feb  7 13:25 kallisto.isoform.TMM.EXPR.matrix
-    -rw-r--r-- 1 shedurkin labmembers 2.2M Feb  7 13:25 kallisto.isoform.TPM.not_cross_norm
-    -rw-r--r-- 1 shedurkin labmembers  532 Feb  7 13:25 kallisto.isoform.TPM.not_cross_norm.runTMM.R
-    drwxr-xr-x 2 shedurkin labmembers 4.0K Feb  7 13:01 kallisto_quant_sample71
-    drwxr-xr-x 2 shedurkin labmembers 4.0K Feb  7 13:05 kallisto_quant_sample73
-    drwxr-xr-x 2 shedurkin labmembers 4.0K Feb  7 13:09 kallisto_quant_sample76
-    drwxr-xr-x 2 shedurkin labmembers 4.0K Feb  7 13:13 kallisto_quant_sample79
-    drwxr-xr-x 2 shedurkin labmembers 4.0K Feb  7 13:16 kallisto_quant_sample82
-    -rw-r--r-- 1 shedurkin labmembers  80M Feb  7 14:32 Peve_kallisto_index.idx
+    -rw-r--r-- 1 shedurkin labmembers 1.5M Feb  8 09:16 kallisto.isoform.counts.matrix
+    -rw-r--r-- 1 shedurkin labmembers    0 Feb  8 09:16 kallisto.isoform.TMM.EXPR.matrix
+    -rw-r--r-- 1 shedurkin labmembers 2.2M Feb  8 09:16 kallisto.isoform.TPM.not_cross_norm
+    -rw-r--r-- 1 shedurkin labmembers  532 Feb  8 09:16 kallisto.isoform.TPM.not_cross_norm.runTMM.R
+    drwxr-xr-x 2 shedurkin labmembers 4.0K Feb  8 08:53 kallisto_quant_sample71
+    drwxr-xr-x 2 shedurkin labmembers 4.0K Feb  8 08:57 kallisto_quant_sample73
+    drwxr-xr-x 2 shedurkin labmembers 4.0K Feb  8 09:00 kallisto_quant_sample76
+    drwxr-xr-x 2 shedurkin labmembers 4.0K Feb  8 09:04 kallisto_quant_sample79
+    drwxr-xr-x 2 shedurkin labmembers 4.0K Feb  8 09:08 kallisto_quant_sample82
+    -rw-r--r-- 1 shedurkin labmembers  80M Feb  8 11:12 Peve_kallisto_index.idx
 
 Note that, when building an index, kallisto warns us that it “replaced
 43264 non-ACGUT characters in the input sequence with pseudorandom
@@ -696,15 +748,15 @@ ls -lh ${kallisto_output_dir}
     Error, cmd: R --no-save --no-restore --no-site-file --no-init-file -q < kallisto.isoform.TPM.not_cross_norm.runTMM.R 1>&2  died with ret (32512)  at /home/shared/trinityrnaseq-v2.12.0/util/support_scripts/run_TMM_scale_matrix.pl line 105.
     Error, CMD: /home/shared/trinityrnaseq-v2.12.0/util/support_scripts/run_TMM_scale_matrix.pl --matrix kallisto.isoform.TPM.not_cross_norm > kallisto.isoform.TMM.EXPR.matrix died with ret 6400 at /home/shared/trinityrnaseq-v2.12.0/util/abundance_estimates_to_matrix.pl line 385.
     total 83M
-    -rw-r--r-- 1 shedurkin labmembers 1.5M Feb  7 14:32 kallisto.isoform.counts.matrix
-    -rw-r--r-- 1 shedurkin labmembers    0 Feb  7 14:32 kallisto.isoform.TMM.EXPR.matrix
-    -rw-r--r-- 1 shedurkin labmembers 2.2M Feb  7 14:32 kallisto.isoform.TPM.not_cross_norm
-    -rw-r--r-- 1 shedurkin labmembers  532 Feb  7 14:32 kallisto.isoform.TPM.not_cross_norm.runTMM.R
-    drwxr-xr-x 2 shedurkin labmembers 4.0K Feb  7 13:01 kallisto_quant_sample71
-    drwxr-xr-x 2 shedurkin labmembers 4.0K Feb  7 13:05 kallisto_quant_sample73
-    drwxr-xr-x 2 shedurkin labmembers 4.0K Feb  7 13:09 kallisto_quant_sample76
-    drwxr-xr-x 2 shedurkin labmembers 4.0K Feb  7 13:13 kallisto_quant_sample79
-    drwxr-xr-x 2 shedurkin labmembers 4.0K Feb  7 13:16 kallisto_quant_sample82
-    -rw-r--r-- 1 shedurkin labmembers  80M Feb  7 14:32 Peve_kallisto_index.idx
+    -rw-r--r-- 1 shedurkin labmembers 1.5M Feb  8 11:12 kallisto.isoform.counts.matrix
+    -rw-r--r-- 1 shedurkin labmembers    0 Feb  8 11:12 kallisto.isoform.TMM.EXPR.matrix
+    -rw-r--r-- 1 shedurkin labmembers 2.2M Feb  8 11:12 kallisto.isoform.TPM.not_cross_norm
+    -rw-r--r-- 1 shedurkin labmembers  532 Feb  8 11:12 kallisto.isoform.TPM.not_cross_norm.runTMM.R
+    drwxr-xr-x 2 shedurkin labmembers 4.0K Feb  8 08:53 kallisto_quant_sample71
+    drwxr-xr-x 2 shedurkin labmembers 4.0K Feb  8 08:57 kallisto_quant_sample73
+    drwxr-xr-x 2 shedurkin labmembers 4.0K Feb  8 09:00 kallisto_quant_sample76
+    drwxr-xr-x 2 shedurkin labmembers 4.0K Feb  8 09:04 kallisto_quant_sample79
+    drwxr-xr-x 2 shedurkin labmembers 4.0K Feb  8 09:08 kallisto_quant_sample82
+    -rw-r--r-- 1 shedurkin labmembers  80M Feb  8 11:12 Peve_kallisto_index.idx
 
 # 7 Summary
