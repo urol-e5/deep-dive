@@ -2,7 +2,9 @@
 
 This repository is focused on taking molecular data from three experiments where integrated epigenetic analysis has already been performed, and doing a _deeper dive_ into datasets to extract and analyze remaining points of excitement.
 
-## [OSF Project Link](https://osf.io/aw53f/)
+### [OSF Project Link](https://osf.io/aw53f/)
+
+Follow this link to our Open Science Framework (OSF) storage directory for more easily downloadable GitHub data and storage of larger data files (i.e., genomic data).
 
 # Specific sub-efforts
 
