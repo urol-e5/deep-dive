@@ -311,8 +311,7 @@ do
 
   # Generate md5 checksums for newly trimmed files
   {
-    md5sum "${R1_sample_name%%_*}.fastp_trim.${max_read_length}bp_1.fastq.gz"
-    md5sum "${R2_sample_name%%_*}.fastp_trim.${max_read_length}bp_2.fastq.gz"
+    md5sum "${R1_sample_name}.fastp_trim.${max_read_length}bp_1.fastq.gz"
   } >> "${trimmed_checksums}"
     
   # Change back to to raw reads directory
