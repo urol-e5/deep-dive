@@ -3,9 +3,6 @@ title: "08.2-Dapul-sRNAseq-trimming-31bp-fastp-merged"
 author: "Sam White"
 date: "2024-02-13"
 output: 
-  github_document:
-    toc: true
-    number_sections: true
   bookdown::html_document2:
     theme: cosmo
     toc: true
@@ -13,6 +10,9 @@ output:
     number_sections: true
     code_folding: show
     code_download: true
+  github_document:
+    toc: true
+    number_sections: true
   html_document:
     theme: cosmo
     toc: true
@@ -41,11 +41,11 @@ knitr::opts_chunk$set(
 
 FastQC/MultiQC [@ewels2016; @Andrews_undated-nf] assessment of raw and [`fastp`](https://github.com/OpenGene/fastp)-trimmed sequences of E5 *A.pulchra* sRNAseq data from [20230515](https://robertslab.github.io/sams-notebook/posts/2023/2023-05-17-Data-Management---E5-Coral-RNA-seq-and-sRNA-seq-Reorganizing-and-Renaming/).
 
-This notebook will utilize R1 reads only, per Azenta's sRNA-seq standard pipeline. The max length of 31bp is based on the `fastp` insert peak size from previous trimming tests based on the the adapter and polyG trimming results, and previous evaluation of mean read lengths via [`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) and [`MultiQC`](https://multiqc.info/).
+A max length of 31bp is based on the `fastp` insert peak size from previous trimming tests based on the the adapter and polyG trimming results, and previous evaluation of mean read lengths via [`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) and [`MultiQC`](https://multiqc.info/).
 
 Inputs:
 
--   sRNAseq R1 reads _only_ gzipped FastQs (e.g. `*R1_001.fastq.gz`)
+-   sRNAseq reads.
 
 Outputs:
 
@@ -53,7 +53,7 @@ Outputs:
 
 -   [`MultiQC`](https://multiqc.info/) HTML summaries of [`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) for raw and trimmed reads.
 
--   Trimmed reads with final length of 31bp: `*.R1.fastp_trim.31bp.fastq.gz`
+-   Trimmed and merged reads with final length of 31bp: `*fastp-adapters-polyG-31bp-merged.fq.gz`
 
 Libraries were prepared and sequenced by Azenta:
 
