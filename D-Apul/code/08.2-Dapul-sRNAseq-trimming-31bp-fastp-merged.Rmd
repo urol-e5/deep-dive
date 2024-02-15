@@ -73,19 +73,19 @@ echo "#### Assign Variables ####"
 echo ""
 
 echo "# Data directories"
-echo 'export deep_dive_dir=/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive'
+echo 'export deep_dive_dir=/home/sam/gitrepos/deep-dive'
 echo 'export output_dir_top=${deep_dive_dir}/D-Apul/output/08.2-Dapul-sRNAseq-trimming-31bp-fastp-merged'
 echo 'export raw_fastqc_dir=${deep_dive_dir}/D-Apul/output/08-Apul-sRNAseq-trimming/raw-fastqc'
 echo 'export raw_reads_dir=${deep_dive_dir}/D-Apul/data/08-Apul-sRNAseq-trimming/raw-reads'
-echo 'export raw_reads_url="https://owl.fish.washington.edu/nightingales/P_evermanni/30-852430235/"'
+echo 'export raw_reads_url="https://owl.fish.washington.edu/nightingales/A_pulchra/30-852430235/"'
 echo 'export trimmed_fastqc_dir=${output_dir_top}/trimmed-fastqc'
 echo 'export trimmed_reads_dir=${output_dir_top}/trimmed-reads'
 echo ""
 
 echo "# Paths to programs"
-echo 'export fastqc=/home/shared/FastQC-0.12.1/fastqc'
-echo 'export fastp=/home/shared/fastp'
-echo 'export multiqc=/home/sam/programs/mambaforge/bin/multiqc'
+echo 'export fastqc=/home/sam/programs/FastQC-0.12.1/fastqc'
+echo 'export fastp=/home/sam/programs/fastp.0.23.4'
+echo 'export multiqc=/home/sam/programs/miniconda3/bin/multiqc'
 echo ""
 
 
@@ -138,9 +138,9 @@ cat .bashvars
 
 # Download raw sRNAseq reads
 
-Reads are downloaded from <https://owl.fish.washington.edu/nightingales/P_evermanni/30-852430235/>
+Reads are downloaded from <https://owl.fish.washington.edu/nightingales/A_pulchra/30-852430235/>
 
-The `--cut-dirs 3` command cuts the preceding directory structure (i.e. `nightingales/P_evermanni/30-852430235/`) so that we just end up with the reads.
+The `--cut-dirs 3` command cuts the preceding directory structure (i.e. `nightingales/A_pulchra/30-852430235/`) so that we just end up with the reads.
 
 ```{bash download-raw-reads, engine='bash', eval=TRUE}
 # Load bash variables into memory
@@ -155,7 +155,7 @@ wget \
 --no-host-directories \
 --no-parent \
 --quiet \
---accept "${R1_fastq_pattern},checksums.md5" ${raw_reads_url}
+--accept "${fastq_pattern},checksums.md5" ${raw_reads_url}
 
 ls -lh "${raw_reads_dir}"/${fastq_pattern}
 ```
