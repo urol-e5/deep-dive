@@ -20,7 +20,6 @@ output:
     number_sections: true
     code_folding: show
     code_download: true
-bibliography: references.bib
 link-citations: true
 ---
 ```{r setup, include=FALSE}
@@ -174,7 +173,7 @@ source .bashvars
 cd "${raw_reads_dir}"
 
 # Checksums file contains other files, so this just looks for the sRNAseq files.
-grep "sRNA" checksums.md5 | md5sum --check
+grep "sRNA" checksums.md5 | grep "R1" | md5sum --check
 ```
 
 # Create adapters FastA for use with [`fastp`](https://github.com/OpenGene/fastp) trimming
@@ -411,7 +410,7 @@ A quick comparison of raw and trimmed reads to show trimming worked:
 
 | RAW                                                                                                                                                                                                | TRIMMED                                                                                                                                                                                                    |
 |----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| ![Raw MultiQC per base sequence quality plot](https://github.com/urol-e5/deep-dive/blob/main/F-Pmea/output/08-Pmea-sRNAseq-trimming/raw-fastqc/fastqc_per_base_sequence_quality_plot.png?raw=true) | ![Trimmed MultiQC per base sequence quality plot](https://github.com/urol-e5/deep-dive/blob/main/F-Pmea/output/08.1-Pmea-sRNAseq-trimming-R1-only/trimmed-fastqc/fastqc_per_base_sequence_quality_plot.png?raw=true) |
-| ![Raw MultiQC adapter content plot](https://github.com/urol-e5/deep-dive/blob/main/F-Pmea/output/08-Pmea-sRNAseq-trimming/raw-fastqc/fastqc_adapter_content_plot.png?raw=true)                     | ![Trimmed MultiQC adapter content plot](https://github.com/urol-e5/deep-dive/blob/main/F-Pmea/output/08.1-Pmea-sRNAseq-trimming-R1-only/trimmed-fastqc/fastqc_adapter_content_plot.png?raw=true)                      |
+| ![Raw MultiQC per base sequence quality plot](https://github.com/urol-e5/deep-dive/blob/main/F-Pmea/data/sRNAseq-raw_reads/raw-fastqc/fastqc_per_base_sequence_quality_plot.png?raw=true) | ![Trimmed MultiQC per base sequence quality plot](https://github.com/urol-e5/deep-dive/blob/main/F-Pmea/output/08.1-Pmea-sRNAseq-trimming-R1-only/trimmed-fastqc/fastqc_per_base_sequence_quality_plot.png?raw=true) |
+| ![Raw MultiQC adapter content plot](https://github.com/urol-e5/deep-dive/blob/main/F-Pmea/data/sRNAseq-raw_reads/raw-fastqc/fastqc_adapter_content_plot.png?raw=true)                     | ![Trimmed MultiQC adapter content plot](https://github.com/urol-e5/deep-dive/blob/main/F-Pmea/output/08.1-Pmea-sRNAseq-trimming-R1-only/trimmed-fastqc/fastqc_adapter_content_plot.png?raw=true)                      |
 
 # Citations
