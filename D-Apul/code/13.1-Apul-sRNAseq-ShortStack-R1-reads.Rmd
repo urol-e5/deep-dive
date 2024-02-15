@@ -203,7 +203,7 @@ This part of the code redirects the output of `time` to the end of `shortstack.l
 source .bashvars
 
 # Make output directory, if it doesn't exist
-mkdir "${output_dir_top}"
+mkdir --parents "${output_dir_top}"
 
 # Create array of trimmed FastQs
 trimmed_fastqs_array=(${trimmed_fastqs_dir}/${trimmed_fastqs_pattern})
@@ -251,7 +251,7 @@ source .bashvars
 tail -n 25 ${output_dir_top}/shortstack.log
 ```
 
-ShortStack identified 25 miRNAs.
+ShortStack identified 27 miRNAs.
 
 ## Inspect `Results.txt`
 
