@@ -1,0 +1,262 @@
+# reads processed: 12066776
+# reads with at least one alignment: 7535065 (62.44%)
+# reads that failed to align: 4531711 (37.56%)
+Reported 37442927 alignments
+
+ShortStack version 4.0.3
+
+Beginning run
+Options:
+{   'adapter': None,
+    'align_only': False,
+    'autotrim': False,
+    'autotrim_key': 'TCGGACCAGGCTTCATTCCCC',
+    'bamfile': None,
+    'dicermax': 24,
+    'dicermin': 21,
+    'dn_mirna': True,
+    'genomefile': '/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/data/Pocillopora_meandrina_HIv1.assembly.fa',
+    'known_miRNAs': '/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/data/mirbase-mature-v22.1.fa',
+    'locifile': None,
+    'locus': None,
+    'mincov': 1,
+    'mmap': 'u',
+    'nohp': False,
+    'outdir': '/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out',
+    'pad': 200,
+    'readfile': [   '/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/08.2-Pmea-sRNAseq-trimming-31bp-fastp-merged/trimmed-reads/sRNA-POC-47-S1-TP2-fastp-adapters-polyG-31bp-merged.fq.gz',
+                    '/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/08.2-Pmea-sRNAseq-trimming-31bp-fastp-merged/trimmed-reads/sRNA-POC-48-S1-TP2-fastp-adapters-polyG-31bp-merged.fq.gz',
+                    '/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/08.2-Pmea-sRNAseq-trimming-31bp-fastp-merged/trimmed-reads/sRNA-POC-50-S1-TP2-fastp-adapters-polyG-31bp-merged.fq.gz',
+                    '/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/08.2-Pmea-sRNAseq-trimming-31bp-fastp-merged/trimmed-reads/sRNA-POC-53-S1-TP2-fastp-adapters-polyG-31bp-merged.fq.gz',
+                    '/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/08.2-Pmea-sRNAseq-trimming-31bp-fastp-merged/trimmed-reads/sRNA-POC-57-S1-TP2-fastp-adapters-polyG-31bp-merged.fq.gz'],
+    'show_secondaries': False,
+    'strand_cutoff': 0.8,
+    'threads': 46}
+Required executable RNAfold : /home/sam/programs/mambaforge/envs/ShortStack-4.0.3_env/bin/RNAfold
+Required executable strucVis : /home/sam/programs/mambaforge/envs/ShortStack-4.0.3_env/bin/strucVis
+Required executable bowtie : /home/sam/programs/mambaforge/envs/ShortStack-4.0.3_env/bin/bowtie
+Required executable bowtie-build : /home/sam/programs/mambaforge/envs/ShortStack-4.0.3_env/bin/bowtie-build
+Required executable ShortTracks : /home/sam/programs/mambaforge/envs/ShortStack-4.0.3_env/bin/ShortTracks
+Required executable wigToBigWig : /home/sam/programs/mambaforge/envs/ShortStack-4.0.3_env/bin/wigToBigWig
+Required executable samtools : /home/sam/programs/mambaforge/envs/ShortStack-4.0.3_env/bin/samtools
+
+Beginning alignment phase
+
+Fri 16 Feb 2024 11:46:53 -0800 PST
+Aligning /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/08.2-Pmea-sRNAseq-trimming-31bp-fastp-merged/trimmed-reads/sRNA-POC-47-S1-TP2-fastp-adapters-polyG-31bp-merged.fq.gz
+First pass alignment with bowtie using 46 threads
+Second pass - placing multimappers using 46 threads to process 13 chunks
+[bam_sort_core] merging from 0 files and 46 in-memory blocks...
+# reads processed: 14045042
+# reads with at least one alignment: 8762911 (62.39%)
+# reads that failed to align: 5282131 (37.61%)
+Reported 39033925 alignments
+
+Converting to sorted bam format
+Uniquely mapped (U) reads: 2142481/12066776 (17.8%)
+Multi-mapped reads placed (P) with guidance: 3401914/12066776 (28.2%)
+Multi-mapped reads randomly (R) placed: 1913920/12066776 (15.9%)
+Very highly (H) multi-mapped reads (>=50 hits): 76750/12066776 (0.6%)
+Not mapped (N) reads (no hits): 4531711/12066776 (37.6%)
+
+Fri 16 Feb 2024 11:52:28 -0800 PST
+Aligning /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/08.2-Pmea-sRNAseq-trimming-31bp-fastp-merged/trimmed-reads/sRNA-POC-48-S1-TP2-fastp-adapters-polyG-31bp-merged.fq.gz
+First pass alignment with bowtie using 46 threads
+Second pass - placing multimappers using 46 threads to process 15 chunks
+[bam_sort_core] merging from 0 files and 46 in-memory blocks...
+# reads processed: 12141955
+# reads with at least one alignment: 6786360 (55.89%)
+# reads that failed to align: 5355595 (44.11%)
+Reported 33750734 alignments
+
+Converting to sorted bam format
+Uniquely mapped (U) reads: 1810393/14045042 (12.9%)
+Multi-mapped reads placed (P) with guidance: 4624242/14045042 (32.9%)
+Multi-mapped reads randomly (R) placed: 2250675/14045042 (16.0%)
+Very highly (H) multi-mapped reads (>=50 hits): 77601/14045042 (0.6%)
+Not mapped (N) reads (no hits): 5282131/14045042 (37.6%)
+
+Fri 16 Feb 2024 11:58:07 -0800 PST
+Aligning /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/08.2-Pmea-sRNAseq-trimming-31bp-fastp-merged/trimmed-reads/sRNA-POC-50-S1-TP2-fastp-adapters-polyG-31bp-merged.fq.gz
+First pass alignment with bowtie using 46 threads
+Second pass - placing multimappers using 46 threads to process 13 chunks
+[bam_sort_core] merging from 0 files and 46 in-memory blocks...
+# reads processed: 15732665
+# reads with at least one alignment: 11926432 (75.81%)
+# reads that failed to align: 3806233 (24.19%)
+Reported 45230690 alignments
+
+Converting to sorted bam format
+Uniquely mapped (U) reads: 1968136/12141955 (16.2%)
+Multi-mapped reads placed (P) with guidance: 3222798/12141955 (26.5%)
+Multi-mapped reads randomly (R) placed: 1507938/12141955 (12.4%)
+Very highly (H) multi-mapped reads (>=50 hits): 87488/12141955 (0.7%)
+Not mapped (N) reads (no hits): 5355595/12141955 (44.1%)
+
+Fri 16 Feb 2024 12:03:03 -0800 PST
+Aligning /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/08.2-Pmea-sRNAseq-trimming-31bp-fastp-merged/trimmed-reads/sRNA-POC-53-S1-TP2-fastp-adapters-polyG-31bp-merged.fq.gz
+First pass alignment with bowtie using 46 threads
+Second pass - placing multimappers using 46 threads to process 16 chunks
+[bam_sort_core] merging from 0 files and 46 in-memory blocks...
+# reads processed: 14136486
+# reads with at least one alignment: 11765022 (83.22%)
+# reads that failed to align: 2371464 (16.78%)
+Reported 40766404 alignments
+
+Converting to sorted bam format
+Uniquely mapped (U) reads: 2885541/15732665 (18.3%)
+Multi-mapped reads placed (P) with guidance: 4775412/15732665 (30.4%)
+Multi-mapped reads randomly (R) placed: 4167280/15732665 (26.5%)
+Very highly (H) multi-mapped reads (>=50 hits): 98199/15732665 (0.6%)
+Not mapped (N) reads (no hits): 3806233/15732665 (24.2%)
+
+Fri 16 Feb 2024 12:09:24 -0800 PST
+Aligning /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/08.2-Pmea-sRNAseq-trimming-31bp-fastp-merged/trimmed-reads/sRNA-POC-57-S1-TP2-fastp-adapters-polyG-31bp-merged.fq.gz
+First pass alignment with bowtie using 46 threads
+Second pass - placing multimappers using 46 threads to process 15 chunks
+[bam_sort_core] merging from 0 files and 46 in-memory blocks...
+ShortTracks version 1.1
+
+Required executable samtools : /home/sam/programs/mambaforge/envs/ShortStack-4.0.3_env/bin/samtools
+Required executable wigToBigWig : /home/sam/programs/mambaforge/envs/ShortStack-4.0.3_env/bin/wigToBigWig
+
+Preparing commands, counting overall reads
+
+Getting raw depths
+samtools view -F 256 -r sRNA-POC-47-S1-TP2-fastp-adapters-polyG-31bp-merged -h /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments.bam | samtools depth - > /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_sRNA-POC-47-S1-TP2-fastp-adapters-polyG-31bp-merged_depths.txt
+
+samtools view -F 256 -r sRNA-POC-48-S1-TP2-fastp-adapters-polyG-31bp-merged -h /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments.bam | samtools depth - > /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_sRNA-POC-48-S1-TP2-fastp-adapters-polyG-31bp-merged_depths.txt
+
+samtools view -F 256 -r sRNA-POC-50-S1-TP2-fastp-adapters-polyG-31bp-merged -h /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments.bam | samtools depth - > /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_sRNA-POC-50-S1-TP2-fastp-adapters-polyG-31bp-merged_depths.txt
+
+samtools view -F 256 -r sRNA-POC-53-S1-TP2-fastp-adapters-polyG-31bp-merged -h /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments.bam | samtools depth - > /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_sRNA-POC-53-S1-TP2-fastp-adapters-polyG-31bp-merged_depths.txt
+
+samtools view -F 256 -r sRNA-POC-57-S1-TP2-fastp-adapters-polyG-31bp-merged -h /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments.bam | samtools depth - > /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_sRNA-POC-57-S1-TP2-fastp-adapters-polyG-31bp-merged_depths.txt
+
+
+Writing wiggle files
+/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_sRNA-POC-47-S1-TP2-fastp-adapters-polyG-31bp-merged.wig
+/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_sRNA-POC-48-S1-TP2-fastp-adapters-polyG-31bp-merged.wig
+/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_sRNA-POC-50-S1-TP2-fastp-adapters-polyG-31bp-merged.wig
+/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_sRNA-POC-53-S1-TP2-fastp-adapters-polyG-31bp-merged.wig
+/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_sRNA-POC-57-S1-TP2-fastp-adapters-polyG-31bp-merged.wig
+
+Writing bigwig files
+wigToBigWig /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_sRNA-POC-47-S1-TP2-fastp-adapters-polyG-31bp-merged.wig chromSizes.txt /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_sRNA-POC-47-S1-TP2-fastp-adapters-polyG-31bp-merged.bw
+wigToBigWig /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_sRNA-POC-48-S1-TP2-fastp-adapters-polyG-31bp-merged.wig chromSizes.txt /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_sRNA-POC-48-S1-TP2-fastp-adapters-polyG-31bp-merged.bw
+wigToBigWig /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_sRNA-POC-50-S1-TP2-fastp-adapters-polyG-31bp-merged.wig chromSizes.txt /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_sRNA-POC-50-S1-TP2-fastp-adapters-polyG-31bp-merged.bw
+wigToBigWig /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_sRNA-POC-53-S1-TP2-fastp-adapters-polyG-31bp-merged.wig chromSizes.txt /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_sRNA-POC-53-S1-TP2-fastp-adapters-polyG-31bp-merged.bw
+wigToBigWig /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_sRNA-POC-57-S1-TP2-fastp-adapters-polyG-31bp-merged.wig chromSizes.txt /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_sRNA-POC-57-S1-TP2-fastp-adapters-polyG-31bp-merged.bw
+ShortTracks version 1.1
+
+Required executable samtools : /home/sam/programs/mambaforge/envs/ShortStack-4.0.3_env/bin/samtools
+Required executable wigToBigWig : /home/sam/programs/mambaforge/envs/ShortStack-4.0.3_env/bin/wigToBigWig
+
+Preparing commands, counting overall reads
+
+Getting raw depths
+samtools view -F 272 -e "qlen==21" -h /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments.bam | samtools depth - > /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_21_p_depths.txt
+
+samtools view -F 256 -f 16 -e "qlen==21" -h /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments.bam | samtools depth - > /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_21_m_depths.txt
+
+samtools view -F 272 -e "qlen==22" -h /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments.bam | samtools depth - > /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_22_p_depths.txt
+
+samtools view -F 256 -f 16 -e "qlen==22" -h /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments.bam | samtools depth - > /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_22_m_depths.txt
+
+samtools view -F 272 -e "qlen==23 || qlen==24" -h /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments.bam | samtools depth - > /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_23-24_p_depths.txt
+
+samtools view -F 256 -f 16 -e "qlen==23 || qlen==24" -h /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments.bam | samtools depth - > /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_23-24_m_depths.txt
+
+samtools view -F 272 -e "qlen < 21 || qlen > 24" -h /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments.bam | samtools depth - > /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_other_p_depths.txt
+
+samtools view -F 256 -f 16 -e "qlen < 21 || qlen > 24" -h /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments.bam | samtools depth - > /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_other_m_depths.txt
+
+
+Writing wiggle files
+/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_21_p.wig
+/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_21_m.wig
+/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_22_p.wig
+/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_22_m.wig
+/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_23-24_p.wig
+/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_23-24_m.wig
+/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_other_p.wig
+/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_other_m.wig
+
+Writing bigwig files
+wigToBigWig /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_21_p.wig chromSizes.txt /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_21_p.bw
+wigToBigWig /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_21_m.wig chromSizes.txt /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_21_m.bw
+wigToBigWig /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_22_p.wig chromSizes.txt /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_22_p.bw
+wigToBigWig /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_22_m.wig chromSizes.txt /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_22_m.bw
+wigToBigWig /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_23-24_p.wig chromSizes.txt /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_23-24_p.bw
+wigToBigWig /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_23-24_m.wig chromSizes.txt /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_23-24_m.bw
+wigToBigWig /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_other_p.wig chromSizes.txt /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_other_p.bw
+wigToBigWig /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_other_m.wig chromSizes.txt /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/13.2-Pmea-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments_other_m.bw
+
+Converting to sorted bam format
+Uniquely mapped (U) reads: 2380882/14136486 (16.8%)
+Multi-mapped reads placed (P) with guidance: 5594429/14136486 (39.6%)
+Multi-mapped reads randomly (R) placed: 3688290/14136486 (26.1%)
+Very highly (H) multi-mapped reads (>=50 hits): 101421/14136486 (0.7%)
+Not mapped (N) reads (no hits): 2371464/14136486 (16.8%)
+
+Fri 16 Feb 2024 12:14:58 -0800 PST
+Merging and indexing alignments
+
+Creating browser tracks by readgroup using ShortTracks
+
+Creating browser tracks by readlength and strand using ShortTracks
+
+Fri 16 Feb 2024 12:28:01 -0800 PST
+Defining small RNA clusters de novo
+With 68122924 total reads and mincov of 1 reads per million, the min read depth is 68
+
+Fri 16 Feb 2024 12:28:22 -0800 PST
+Analyzing cluster properties using 46 threads
+# reads processed: 48885
+# reads with at least one alignment: 111 (0.23%)
+# reads that failed to align: 48774 (99.77%)
+Reported 1714 alignments
+[bam_sort_core] merging from 0 files and 46 in-memory blocks...
+
+Fri 16 Feb 2024 12:30:05 -0800 PST
+ Completed
+
+Fri 16 Feb 2024 12:30:05 -0800 PST
+Searching for valid microRNA loci
+Aligning known_miRNAs sequences to genome
+
+Screening of possible microRNAs from user provided known_miRNAs
+
+Screening of possible de novo microRNAs
+
+Fri 16 Feb 2024 12:30:40 -0800 PST
+Analyzing cluster properties using 46 threads
+
+Fri 16 Feb 2024 12:30:44 -0800 PST
+ Completed
+
+Writing final files
+
+Found a total of 34 MIRNA loci
+
+
+Non-MIRNA loci by DicerCall:
+N 7091
+22 36
+23 34
+21 17
+24 15
+
+Creating visualizations of microRNA loci with strucVis
+<<< WARNING >>>
+Do not rely on these results alone to annotate new MIRNA loci!
+The false positive rate for de novo MIRNA identification is low, but NOT ZERO
+Insepct each mirna locus, especially the strucVis output, and see
+https://doi.org/10.1105/tpc.17.00851 , https://doi.org/10.1093/nar/gky1141
+
+Fri 16 Feb 2024 12:31:08 -0800 PST
+Run Completed!
+
+real	44m14.960s
+user	814m50.436s
+sys	284m22.086s
