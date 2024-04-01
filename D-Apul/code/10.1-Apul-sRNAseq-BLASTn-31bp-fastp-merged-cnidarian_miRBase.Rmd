@@ -3,6 +3,9 @@ title: "10.1-Apul-sRNAseq-BLASTn-31bp-fastp-merged-cnidarian_miRBase"
 author: "Sam White"
 date: "2024-03-29"
 output: 
+  github_document:
+    toc: true
+    number_sections: true
   bookdown::html_document2:
     theme: cosmo
     toc: true
@@ -10,9 +13,6 @@ output:
     number_sections: true
     code_folding: show
     code_download: true
-  github_document:
-    toc: true
-    number_sections: true
   html_document:
     theme: cosmo
     toc: true
@@ -344,12 +344,12 @@ ${ncbi_blastn} \
 ```
 
 
-# BLASTn E-value = 10
+# BLASTn E-value = 1
 
 Running this for simple comparison to the default `blastn-short` value of 1000.
 
 ## miRBase BLASTn e-value = 1
-```{r miRBase-BLASTn-10-eval, engine='bash', cache=TRUE}
+```{r miRBase-BLASTn-1-eval, engine='bash', cache=TRUE}
 # Load bash variables into memory
 source .bashvars
 
@@ -369,7 +369,7 @@ ${ncbi_blastn} \
 
 ## MirGene BLASTn e-value = 1
 
-```{r MirGene-BLASTn-10-eval, engine='bash', cache=TRUE}
+```{r MirGene-BLASTn-1-eval, engine='bash', cache=TRUE}
 # Load bash variables into memory
 source .bashvars
 
@@ -419,6 +419,19 @@ echo ""
 wc -l ${output_dir_top}/*eval_10.outfmt6
 ```
 
+## Check BLASTn e-value = 1 results
+```{r blastn-1-evalue-results, engine='bash', eval=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+head ${output_dir_top}/*eval_1.outfmt6
+
+echo ""
+echo "-----------------------------------------"
+echo ""
+
+wc -l ${output_dir_top}/*eval_1.outfmt6
+```
 The default e-value results in alignments for ~50% of sequences.
 
 Decreasing the e-value to `10` resulted in fewer query alignments, as we'd expect, but only minimally. 
