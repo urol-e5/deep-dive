@@ -3,9 +3,6 @@ title: "10.1-Apul-sRNAseq-BLASTn-31bp-fastp-merged-cnidarian_miRBase"
 author: "Sam White"
 date: "2024-03-29"
 output: 
-  github_document:
-    toc: true
-    number_sections: true
   bookdown::html_document2:
     theme: cosmo
     toc: true
@@ -13,6 +10,9 @@ output:
     number_sections: true
     code_folding: show
     code_download: true
+  github_document:
+    toc: true
+    number_sections: true
   html_document:
     theme: cosmo
     toc: true
@@ -357,7 +357,7 @@ time \
 ${ncbi_blastn} \
 -db ${blast_dbs_dir}/${mirbase_mature_fasta_no_U%.*} \
 -query ${output_dir_top}/${collapsed_reads_fasta} \
--out ${output_dir_top}/cindarian-miRBase-BLASTn-eval_10.outfmt6 \
+-out ${output_dir_top}/cindarian-miRBase-BLASTn-eval_1.outfmt6 \
 -task blastn-short \
 -evalue 1 \
 -max_hsps 1 \
@@ -377,7 +377,7 @@ time \
 ${ncbi_blastn} \
 -db ${blast_dbs_dir}/${mirgene_mature_fasta_no_U%.*} \
 -query ${output_dir_top}/${collapsed_reads_fasta} \
--out ${output_dir_top}/MirGene-BLASTn-eval_10.outfmt6 \
+-out ${output_dir_top}/MirGene-BLASTn-eval_1.outfmt6 \
 -task blastn-short \
 -evalue 1 \
 -max_hsps 1 \
