@@ -40,9 +40,9 @@ knitr::opts_chunk$set(
 
 Use [ShortStack](https://github.com/MikeAxtell/ShortStack) [@axtell2013a; @shahid2014; @johnson2016a]to perform alignment of sRNAseq data and annotation of sRNA-producing genes.
 
-This is the same ShortStack analysis as seen in [13.2-Apul-sRNAseq-ShortStack-31bp-fastp-merged.Rmd](https://github.com/urol-e5/deep-dive/blob/main/D-Apul/code/13.2-Apul-sRNAseq-ShortStack-31bp-fastp-merged.Rmd), but this analysis uses a customized miRBase database, created by Jill Ashley, which includes published cnidarian miRNAs:
+This is the same ShortStack analysis as seen in [13.2-Apul-sRNAseq-ShortStack-31bp-fastp-merged.Rmd](https://github.com/urol-e5/deep-dive/blob/main/D-Apul/code/13.2-Apul-sRNAseq-ShortStack-31bp-fastp-merged.Rmd), but this analysis uses a customized miRBase database, utilizing cnidarian miRNAs curated by Jill Ashley, which includes published cnidarian miRNAs:
 
-- [`cnidarian_miRNAs.fasta`](https://github.com/urol-e5/deep-dive/blob/main/DEF-cross-species/data/cnidarian_miRNAs.fasta)
+- [`cnidarian-mirbase-mature-v22.1.fasta`](../../data/cnidarian-mirbase-mature-v22.1.fasta)
 
 The *A.millepora* genome will be used as the reference genome for *A.pulchra*, as *A.pulchra* does not currently have a sequenced genome and *A.millepora* had highest alignment rates for standard RNAseq data compared to other published genomes tested.
 
@@ -99,9 +99,9 @@ echo "export trimmed_fastqs_pattern='*fastp-adapters-polyG-31bp-merged.fq.gz'"
 
 echo "# Data directories"
 echo 'export deep_dive_dir=/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive'
-echo 'export deep_dive_data_dir="${deep_dive_dir}/DEF-cross-species/data"'
+echo 'export deep_dive_data_dir="${deep_dive_dir}/data"'
 echo 'export output_dir_top=${deep_dive_dir}/D-Apul/output/13.2.1-Apul-sRNAseq-ShortStack-31bp-fastp-merged-cnidarian_miRBase'
-echo 'export trimmed_fastqs_dir="${deep_dive_dir}/D-Apul/output/08.2-Dapul-sRNAseq-trimming-31bp-fastp-merged/trimmed-reads"'
+echo 'export trimmed_fastqs_dir="${deep_dive_dir}/D-Apul/output/08.2-Apul-sRNAseq-trimming-31bp-fastp-merged/trimmed-reads"'
 echo ""
 
 echo "# Input/Output files"
@@ -109,7 +109,7 @@ echo 'export genome_fasta_dir=${deep_dive_dir}/D-Apul/data/Amil/ncbi_dataset/dat
 echo 'export genome_fasta_name="GCF_013753865.1_Amil_v2.1_genomic.fna"'
 echo 'export shortstack_genome_fasta_name="GCF_013753865.1_Amil_v2.1_genomic.fa"'
 
-echo 'export mirbase_mature_fasta_version=cnidarian_miRNAs.fasta'
+echo 'export mirbase_mature_fasta_version=cnidarian-mirbase-mature-v22.1.fasta'
 echo 'export genome_fasta="${genome_fasta_dir}/${shortstack_genome_fasta_name}"'
 echo ""
 
@@ -230,7 +230,7 @@ source .bashvars
 tail -n 25 ${output_dir_top}/shortstack.log
 ```
 
-ShortStack identified 37 miRNAs.
+ShortStack identified 38 miRNAs.
 
 ## Inspect `Results.txt`
 

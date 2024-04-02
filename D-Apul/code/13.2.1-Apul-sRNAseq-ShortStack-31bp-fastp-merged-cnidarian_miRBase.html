@@ -1621,10 +1621,10 @@ border-radius: 0px;
 </div>
 
 
-<p>Use <a href="https://github.com/MikeAxtell/ShortStack">ShortStack</a> <span class="citation">(<a href="#ref-axtell2013a">Axtell 2013</a>; <a href="#ref-shahid2014">Shahid and Axtell 2014</a>; <a href="#ref-johnson2016a">Johnson et al. 2016</a>)</span>to perform alignment of sRNAseq data and annotation of sRNA-producing genes.</p>
-<p>This is the same ShortStack analysis as seen in <a href="https://github.com/urol-e5/deep-dive/blob/main/D-Apul/code/13.2-Apul-sRNAseq-ShortStack-31bp-fastp-merged.Rmd">13.2-Apul-sRNAseq-ShortStack-31bp-fastp-merged.Rmd</a>, but this analysis uses a customized miRBase database, created by Jill Ashley, which includes published cnidarian miRNAs:</p>
+<p>Use <a href="https://github.com/MikeAxtell/ShortStack">ShortStack</a> <span class="citation">(<a href="#ref-axtell2013a" role="doc-biblioref">Axtell 2013</a>; <a href="#ref-shahid2014" role="doc-biblioref">Shahid and Axtell 2014</a>; <a href="#ref-johnson2016a" role="doc-biblioref">Johnson et al. 2016</a>)</span>to perform alignment of sRNAseq data and annotation of sRNA-producing genes.</p>
+<p>This is the same ShortStack analysis as seen in <a href="https://github.com/urol-e5/deep-dive/blob/main/D-Apul/code/13.2-Apul-sRNAseq-ShortStack-31bp-fastp-merged.Rmd">13.2-Apul-sRNAseq-ShortStack-31bp-fastp-merged.Rmd</a>, but this analysis uses a customized miRBase database, utilizing cnidarian miRNAs curated by Jill Ashley, which includes published cnidarian miRNAs:</p>
 <ul>
-<li><a href="https://github.com/urol-e5/deep-dive/blob/main/DEF-cross-species/data/cnidarian_miRNAs.fasta"><code>cnidarian_miRNAs.fasta</code></a></li>
+<li><a href="../../data/cnidarian-mirbase-mature-v22.1.fasta"><code>cnidarian-mirbase-mature-v22.1.fasta</code></a></li>
 </ul>
 <p>The <em>A.millepora</em> genome will be used as the reference genome for <em>A.pulchra</em>, as <em>A.pulchra</em> does not currently have a sequenced genome and <em>A.millepora</em> had highest alignment rates for standard RNAseq data compared to other published genomes tested.</p>
 <hr />
@@ -1669,9 +1669,9 @@ echo &quot;export trimmed_fastqs_pattern=&#39;*fastp-adapters-polyG-31bp-merged.
 
 echo &quot;# Data directories&quot;
 echo &#39;export deep_dive_dir=/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive&#39;
-echo &#39;export deep_dive_data_dir=&quot;${deep_dive_dir}/DEF-cross-species/data&quot;&#39;
+echo &#39;export deep_dive_data_dir=&quot;${deep_dive_dir}/data&quot;&#39;
 echo &#39;export output_dir_top=${deep_dive_dir}/D-Apul/output/13.2.1-Apul-sRNAseq-ShortStack-31bp-fastp-merged-cnidarian_miRBase&#39;
-echo &#39;export trimmed_fastqs_dir=&quot;${deep_dive_dir}/D-Apul/output/08.2-Dapul-sRNAseq-trimming-31bp-fastp-merged/trimmed-reads&quot;&#39;
+echo &#39;export trimmed_fastqs_dir=&quot;${deep_dive_dir}/D-Apul/output/08.2-Apul-sRNAseq-trimming-31bp-fastp-merged/trimmed-reads&quot;&#39;
 echo &quot;&quot;
 
 echo &quot;# Input/Output files&quot;
@@ -1679,7 +1679,7 @@ echo &#39;export genome_fasta_dir=${deep_dive_dir}/D-Apul/data/Amil/ncbi_dataset
 echo &#39;export genome_fasta_name=&quot;GCF_013753865.1_Amil_v2.1_genomic.fna&quot;&#39;
 echo &#39;export shortstack_genome_fasta_name=&quot;GCF_013753865.1_Amil_v2.1_genomic.fa&quot;&#39;
 
-echo &#39;export mirbase_mature_fasta_version=cnidarian_miRNAs.fasta&#39;
+echo &#39;export mirbase_mature_fasta_version=cnidarian-mirbase-mature-v22.1.fasta&#39;
 echo &#39;export genome_fasta=&quot;${genome_fasta_dir}/${shortstack_genome_fasta_name}&quot;&#39;
 echo &quot;&quot;
 
@@ -1700,15 +1700,15 @@ cat .bashvars</code></pre>
 export trimmed_fastqs_pattern=&#39;*fastp-adapters-polyG-31bp-merged.fq.gz&#39;
 # Data directories
 export deep_dive_dir=/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive
-export deep_dive_data_dir=&quot;${deep_dive_dir}/DEF-cross-species/data&quot;
+export deep_dive_data_dir=&quot;${deep_dive_dir}/data&quot;
 export output_dir_top=${deep_dive_dir}/D-Apul/output/13.2.1-Apul-sRNAseq-ShortStack-31bp-fastp-merged-cnidarian_miRBase
-export trimmed_fastqs_dir=&quot;${deep_dive_dir}/D-Apul/output/08.2-Dapul-sRNAseq-trimming-31bp-fastp-merged/trimmed-reads&quot;
+export trimmed_fastqs_dir=&quot;${deep_dive_dir}/D-Apul/output/08.2-Apul-sRNAseq-trimming-31bp-fastp-merged/trimmed-reads&quot;
 
 # Input/Output files
 export genome_fasta_dir=${deep_dive_dir}/D-Apul/data/Amil/ncbi_dataset/data/GCF_013753865.1
 export genome_fasta_name=&quot;GCF_013753865.1_Amil_v2.1_genomic.fna&quot;
 export shortstack_genome_fasta_name=&quot;GCF_013753865.1_Amil_v2.1_genomic.fa&quot;
-export mirbase_mature_fasta_version=cnidarian_miRNAs.fasta
+export mirbase_mature_fasta_version=cnidarian-mirbase-mature-v22.1.fasta
 export genome_fasta=&quot;${genome_fasta_dir}/${shortstack_genome_fasta_name}&quot;
 
 # Set number of CPUs to use
@@ -1806,7 +1806,7 @@ tail -n 3 ${output_dir_top}/shortstack.log \
 | grep &quot;real&quot; \
 | awk &#39;{print &quot;ShortStack runtime:&quot; &quot;\t&quot; $2}&#39;
 </code></pre>
-<pre><code>ShortStack runtime: 52m15.283s</code></pre>
+<pre><code>ShortStack runtime: 46m10.802s</code></pre>
 </div>
 </div>
 <div id="results" class="section level1" number="5">
@@ -1819,13 +1819,13 @@ source .bashvars
 tail -n 25 ${output_dir_top}/shortstack.log</code></pre>
 <pre><code>Writing final files
 
-Found a total of 37 MIRNA loci
+Found a total of 38 MIRNA loci
 
 
 Non-MIRNA loci by DicerCall:
-N 18798
-22 43
-23 34
+N 18768
+22 39
+23 32
 21 12
 24 6
 
@@ -1836,13 +1836,13 @@ The false positive rate for de novo MIRNA identification is low, but NOT ZERO
 Insepct each mirna locus, especially the strucVis output, and see
 https://doi.org/10.1105/tpc.17.00851 , https://doi.org/10.1093/nar/gky1141
 
-Thu 15 Feb 2024 12:11:05 -0800 PST
+Tue 02 Apr 2024 08:56:32 -0700 PDT
 Run Completed!
 
-real    52m15.283s
-user    928m12.803s
-sys 298m53.663s</code></pre>
-<p>ShortStack identified 37 miRNAs.</p>
+real    46m10.802s
+user    779m56.322s
+sys 253m43.749s</code></pre>
+<p>ShortStack identified 38 miRNAs.</p>
 </div>
 <div id="inspect-results.txt" class="section level2" number="5.2">
 <h2><span class="header-section-number">5.2</span> Inspect <code>Results.txt</code></h2>
@@ -1858,20 +1858,20 @@ echo &quot;&quot;
 echo &quot;Nummber of potential loci:&quot;
 awk &#39;(NR&gt;1)&#39; ${output_dir_top}/ShortStack_out/Results.txt | wc -l</code></pre>
 <pre><code>Locus   Name    Chrom   Start   End Length  Reads   DistinctSequences   FracTop Strand  MajorRNA    MajorRNAReads   Short   Long    21  22  23  24  DicerCall   MIRNA   known_miRNAs
-NC_058066.1:152483-152906   Cluster_1   NC_058066.1 152483  152906  424 132 33  0.030303030303030304    -   UAAGUACUUUAUCAACUAACUCUAGGCA    70  2   119 0   3   0   8   N   N   NA
-NC_058066.1:161064-161674   Cluster_2   NC_058066.1 161064  161674  611 532 232 0.28383458646616544 .   UUUUAGCCUAGUGCGGGUUUCCAGACGU    43  27  467 9   1   7   21  N   N   NA
-NC_058066.1:172072-172496   Cluster_3   NC_058066.1 172072  172496  425 112 40  0.08035714285714286 -   GCGAUUAUUAACGGCUGGAACGACAGGCGA  17  1   95  0   1   0   15  N   N   NA
-NC_058066.1:203241-203651   Cluster_4   NC_058066.1 203241  203651  411 112 58  0.625   .   UUCUGACUCUAUUAGCAACGAAGACUUU    28  2   107 0   2   1   0   N   N   NA
-NC_058066.1:204533-205151   Cluster_5   NC_058066.1 204533  205151  619 327 164 0.7889908256880734  .   UCCCAACACGUCUAGACUGUACAAUUUCU   32  2   317 1   0   0   7   N   N   NA
-NC_058066.1:205742-206966   Cluster_6   NC_058066.1 205742  206966  1225    1955    411 0.32838874680306906 .   CAAAAGAGCGGACAAAAUAGUCGACAGAUU  773 7   1904    10  2   7   25  N   N   NA
-NC_058066.1:210855-211344   Cluster_7   NC_058066.1 210855  211344  490 1264    331 0.7681962025316456  .   UAAUACUUGUAGUGAAGGUUCAAUCUCGA   96  10  1163    6   8   17  60  N   N   NA
-NC_058066.1:349655-351298   Cluster_8   NC_058066.1 349655  351298  1644    3281    1167    0.8153002133495886  +   UCAGCUUGGAAAUGACAGCUUUUGACGU    276 23  3146    12  18  22  60  N   N   NA
-NC_058066.1:351491-353439   Cluster_9   NC_058066.1 351491  353439  1949    8819    1622    0.4188683524209094  .   UUUCAAAUCAAAGAUCUUCGCAACGAUGA   753 78  8428    30  41  113 129 N   N   NA
+NC_058066.1:152483-152910   Cluster_1   NC_058066.1 152483  152910  428 140 32  0.05    -   UAAGUACUUUAUCAACUAACUCUAGGCA    75  1   130 0   2   0   7   N   N   NA
+NC_058066.1:161064-161674   Cluster_2   NC_058066.1 161064  161674  611 549 247 0.2987249544626594  .   UUUUAGCCUAGUGCGGGUUUCCAGACGU    43  25  479 16  4   4   21  N   N   NA
+NC_058066.1:172073-172496   Cluster_3   NC_058066.1 172073  172496  424 105 40  0.12380952380952381 -   GCGAUUAUUAACGGCUGGAACGACAGGCGA  16  1   88  1   1   0   14  N   N   NA
+NC_058066.1:203242-203651   Cluster_4   NC_058066.1 203242  203651  410 100 45  0.56    .   UUCUGACUCUAUUAGCAACGAAGACUUU    26  1   96  0   1   0   2   N   N   NA
+NC_058066.1:204535-205150   Cluster_5   NC_058066.1 204535  205150  616 313 157 0.7763578274760383  .   UCCCAACACGUCUAGACUGUACAAUUUCU   32  3   304 1   1   2   2   N   N   NA
+NC_058066.1:205745-206966   Cluster_6   NC_058066.1 205745  206966  1222    1930    416 0.35544041450777203 .   CAAAAGAGCGGACAAAAUAGUCGACAGAUU  716 3   1882    5   10  7   23  N   N   NA
+NC_058066.1:210841-211344   Cluster_7   NC_058066.1 210841  211344  504 1247    333 0.7457898957497995  .   UAAUACUUGUAGUGAAGGUUCAAUCUCGA   95  10  1133    7   7   20  70  N   N   NA
+NC_058066.1:349655-351297   Cluster_8   NC_058066.1 349655  351297  1643    3279    1165    0.8127477889600488  +   UCAGCUUGGAAAUGACAGCUUUUGACGU    255 27  3141    10  22  17  62  N   N   NA
+NC_058066.1:351491-353439   Cluster_9   NC_058066.1 351491  353439  1949    8889    1615    0.4114073574080324  .   UUUCAAAUCAAAGAUCUUCGCAACGAUGA   780 82  8503    34  34  114 122 N   N   NA
 
 ----------------------------------------------------------
 
 Nummber of potential loci:
-18930</code></pre>
+18895</code></pre>
 <p>Column 20 of the <code>Results.txt</code> file identifies if a cluster is a miRNA or not (<code>Y</code> or <code>N</code>).</p>
 <pre class="bash"><code># Load bash variables into memory
 source .bashvars
@@ -1889,12 +1889,12 @@ awk &#39;$20==&quot;N&quot; {print $0}&#39; ${output_dir_top}/ShortStack_out/Res
 | wc -l
 </code></pre>
 <pre><code>Number of loci characterized as miRNA:
-37
+38
 
 ----------------------------------------------------------
 
 Number of loci _not_ characterized as miRNA:
-18893</code></pre>
+18857</code></pre>
 <p>Column 21 of the <code>Results.txt</code> file identifies if a cluster aligned to a known miRNA (miRBase) or not (<code>Y</code> or <code>NA</code>).</p>
 <p>Since there are no miRNAs, the following code will <em>not</em> print any output.</p>
 <p>The <code>echo</code> command after the <code>awk</code> command is simply there to prove that the chunk executed.</p>
@@ -1914,12 +1914,12 @@ awk &#39;$21==&quot;NA&quot; {print $0}&#39; ${output_dir_top}/ShortStack_out/Re
 | wc -l
 </code></pre>
 <pre><code>Number of loci matching miRBase miRNAs:
-38
+69
 
 ----------------------------------------------------------
 
 Number of loci _not_ matching miRBase miRNAs:
-18893</code></pre>
+18827</code></pre>
 <p>Although there are loci with matches to miRBase miRNAs, ShortStack did <em>not</em> annotate these clusters as miRNAs likely <a href="https://github.com/MikeAxtell/ShortStack#mirna-annotation">because they do not <em>also</em> match secondary structure criteria</a>.</p>
 <div id="directory-tree-of-all-shortstack-outputs" class="section level3" number="5.2.1">
 <h3><span class="header-section-number">5.2.1</span> Directory tree of all ShortStack outputs</h3>
@@ -1935,8 +1935,8 @@ tree -h ${output_dir_top}/
 └── [ 36K]  ShortStack_out
     ├── [ 31K]  alignment_details.tsv
     ├── [1.1M]  Counts.txt
-    ├── [ 20K]  known_miRNAs.gff3
-    ├── [ 35K]  known_miRNAs_unaligned.fasta
+    ├── [106K]  known_miRNAs.gff3
+    ├── [1.8M]  known_miRNAs_unaligned.fasta
     ├── [5.3M]  merged_alignments_21_m.bw
     ├── [5.8M]  merged_alignments_21_p.bw
     ├── [5.1M]  merged_alignments_22_m.bw
@@ -1954,7 +1954,7 @@ tree -h ${output_dir_top}/
     ├── [ 41M]  merged_alignments_sRNA-ACR-178-S1-TP2-fastp-adapters-polyG-31bp-merged.bw
     ├── [ 11K]  mir.fasta
     ├── [1.9M]  Results.gff3
-    ├── [2.9M]  Results.txt
+    ├── [2.8M]  Results.txt
     ├── [256M]  sRNA-ACR-140-S1-TP2-fastp-adapters-polyG-31bp-merged.bam
     ├── [224K]  sRNA-ACR-140-S1-TP2-fastp-adapters-polyG-31bp-merged.bam.csi
     ├── [291M]  sRNA-ACR-145-S1-TP2-fastp-adapters-polyG-31bp-merged.bam
@@ -1962,86 +1962,88 @@ tree -h ${output_dir_top}/
     ├── [304M]  sRNA-ACR-150-S1-TP2-fastp-adapters-polyG-31bp-merged.bam
     ├── [229K]  sRNA-ACR-150-S1-TP2-fastp-adapters-polyG-31bp-merged.bam.csi
     ├── [268M]  sRNA-ACR-173-S1-TP2-fastp-adapters-polyG-31bp-merged.bam
-    ├── [228K]  sRNA-ACR-173-S1-TP2-fastp-adapters-polyG-31bp-merged.bam.csi
+    ├── [227K]  sRNA-ACR-173-S1-TP2-fastp-adapters-polyG-31bp-merged.bam.csi
     ├── [240M]  sRNA-ACR-178-S1-TP2-fastp-adapters-polyG-31bp-merged.bam
-    ├── [229K]  sRNA-ACR-178-S1-TP2-fastp-adapters-polyG-31bp-merged.bam.csi
+    ├── [228K]  sRNA-ACR-178-S1-TP2-fastp-adapters-polyG-31bp-merged.bam.csi
     └── [4.0K]  strucVis
-        ├── [ 12K]  Cluster_10070.ps
-        ├── [ 30K]  Cluster_10070.txt
-        ├── [ 11K]  Cluster_10203.ps
-        ├── [5.6K]  Cluster_10203.txt
-        ├── [ 12K]  Cluster_10503.ps
-        ├── [ 11K]  Cluster_10503.txt
-        ├── [ 11K]  Cluster_10687.ps
-        ├── [7.3K]  Cluster_10687.txt
-        ├── [ 11K]  Cluster_10741.ps
-        ├── [1.8K]  Cluster_10741.txt
-        ├── [ 11K]  Cluster_10784.ps
-        ├── [1.3K]  Cluster_10784.txt
-        ├── [ 11K]  Cluster_13378.ps
-        ├── [1.2K]  Cluster_13378.txt
-        ├── [ 11K]  Cluster_1514.ps
-        ├── [ 10K]  Cluster_1514.txt
-        ├── [ 11K]  Cluster_16063.ps
-        ├── [1.9K]  Cluster_16063.txt
-        ├── [ 12K]  Cluster_1901.ps
-        ├── [8.7K]  Cluster_1901.txt
+        ├── [ 12K]  Cluster_10055.ps
+        ├── [ 30K]  Cluster_10055.txt
+        ├── [ 11K]  Cluster_10187.ps
+        ├── [5.6K]  Cluster_10187.txt
+        ├── [ 12K]  Cluster_10487.ps
+        ├── [ 11K]  Cluster_10487.txt
+        ├── [ 11K]  Cluster_10675.ps
+        ├── [7.3K]  Cluster_10675.txt
+        ├── [ 11K]  Cluster_10726.ps
+        ├── [2.2K]  Cluster_10726.txt
+        ├── [ 11K]  Cluster_10729.ps
+        ├── [2.2K]  Cluster_10729.txt
+        ├── [ 11K]  Cluster_1506.ps
+        ├── [ 11K]  Cluster_1506.txt
+        ├── [ 11K]  Cluster_16040.ps
+        ├── [2.0K]  Cluster_16040.txt
+        ├── [ 11K]  Cluster_16041.ps
+        ├── [1.7K]  Cluster_16041.txt
+        ├── [ 11K]  Cluster_17867.ps
+        ├── [1.3K]  Cluster_17867.txt
+        ├── [ 12K]  Cluster_1900.ps
+        ├── [8.7K]  Cluster_1900.txt
         ├── [ 12K]  Cluster_1998.ps
         ├── [ 32K]  Cluster_1998.txt
         ├── [ 12K]  Cluster_2057.ps
         ├── [7.9K]  Cluster_2057.txt
         ├── [ 12K]  Cluster_2074.ps
-        ├── [ 42K]  Cluster_2074.txt
-        ├── [ 12K]  Cluster_2525.ps
-        ├── [ 40K]  Cluster_2525.txt
-        ├── [ 11K]  Cluster_2526.ps
-        ├── [ 27K]  Cluster_2526.txt
-        ├── [ 12K]  Cluster_2554.ps
-        ├── [ 22K]  Cluster_2554.txt
-        ├── [ 11K]  Cluster_3025.ps
-        ├── [5.1K]  Cluster_3025.txt
-        ├── [ 12K]  Cluster_3094.ps
-        ├── [6.4K]  Cluster_3094.txt
-        ├── [ 12K]  Cluster_3097.ps
-        ├── [3.5K]  Cluster_3097.txt
-        ├── [ 11K]  Cluster_319.ps
-        ├── [ 18K]  Cluster_319.txt
-        ├── [ 12K]  Cluster_3684.ps
-        ├── [ 15K]  Cluster_3684.txt
-        ├── [ 12K]  Cluster_3983.ps
-        ├── [ 21K]  Cluster_3983.txt
-        ├── [ 12K]  Cluster_4256.ps
-        ├── [ 29K]  Cluster_4256.txt
-        ├── [ 11K]  Cluster_4877.ps
-        ├── [ 15K]  Cluster_4877.txt
-        ├── [ 11K]  Cluster_518.ps
-        ├── [3.5K]  Cluster_518.txt
-        ├── [ 12K]  Cluster_5252.ps
-        ├── [ 57K]  Cluster_5252.txt
-        ├── [ 12K]  Cluster_553.ps
-        ├── [ 52K]  Cluster_553.txt
-        ├── [ 12K]  Cluster_6378.ps
-        ├── [ 21K]  Cluster_6378.txt
-        ├── [ 11K]  Cluster_6440.ps
-        ├── [ 42K]  Cluster_6440.txt
-        ├── [ 12K]  Cluster_6968.ps
-        ├── [ 42K]  Cluster_6968.txt
-        ├── [ 12K]  Cluster_6974.ps
-        ├── [ 11K]  Cluster_6974.txt
-        ├── [ 12K]  Cluster_6986.ps
-        ├── [ 63K]  Cluster_6986.txt
-        ├── [ 12K]  Cluster_7034.ps
-        ├── [ 14K]  Cluster_7034.txt
-        ├── [ 11K]  Cluster_7086.ps
-        ├── [ 24K]  Cluster_7086.txt
-        ├── [ 11K]  Cluster_8486.ps
-        ├── [4.6K]  Cluster_8486.txt
-        ├── [ 12K]  Cluster_8555.ps
-        ├── [ 29K]  Cluster_8555.txt
-        ├── [ 12K]  Cluster_9476.ps
-        └── [ 28K]  Cluster_9476.txt
+        ├── [ 41K]  Cluster_2074.txt
+        ├── [ 12K]  Cluster_2521.ps
+        ├── [ 40K]  Cluster_2521.txt
+        ├── [ 11K]  Cluster_2522.ps
+        ├── [ 27K]  Cluster_2522.txt
+        ├── [ 12K]  Cluster_2551.ps
+        ├── [ 22K]  Cluster_2551.txt
+        ├── [ 11K]  Cluster_3019.ps
+        ├── [5.0K]  Cluster_3019.txt
+        ├── [ 12K]  Cluster_3087.ps
+        ├── [6.3K]  Cluster_3087.txt
+        ├── [ 12K]  Cluster_3090.ps
+        ├── [3.5K]  Cluster_3090.txt
+        ├── [ 11K]  Cluster_316.ps
+        ├── [ 18K]  Cluster_316.txt
+        ├── [ 12K]  Cluster_3672.ps
+        ├── [ 15K]  Cluster_3672.txt
+        ├── [ 12K]  Cluster_3973.ps
+        ├── [ 21K]  Cluster_3973.txt
+        ├── [ 12K]  Cluster_4247.ps
+        ├── [ 29K]  Cluster_4247.txt
+        ├── [ 11K]  Cluster_4867.ps
+        ├── [ 15K]  Cluster_4867.txt
+        ├── [ 11K]  Cluster_514.ps
+        ├── [3.5K]  Cluster_514.txt
+        ├── [ 12K]  Cluster_5241.ps
+        ├── [ 57K]  Cluster_5241.txt
+        ├── [ 12K]  Cluster_548.ps
+        ├── [ 52K]  Cluster_548.txt
+        ├── [ 12K]  Cluster_6376.ps
+        ├── [ 21K]  Cluster_6376.txt
+        ├── [ 11K]  Cluster_6439.ps
+        ├── [ 42K]  Cluster_6439.txt
+        ├── [ 12K]  Cluster_6958.ps
+        ├── [ 42K]  Cluster_6958.txt
+        ├── [ 12K]  Cluster_6965.ps
+        ├── [ 11K]  Cluster_6965.txt
+        ├── [ 12K]  Cluster_6977.ps
+        ├── [ 63K]  Cluster_6977.txt
+        ├── [ 12K]  Cluster_7025.ps
+        ├── [ 14K]  Cluster_7025.txt
+        ├── [ 11K]  Cluster_7077.ps
+        ├── [ 24K]  Cluster_7077.txt
+        ├── [ 11K]  Cluster_8475.ps
+        ├── [4.6K]  Cluster_8475.txt
+        ├── [ 12K]  Cluster_8545.ps
+        ├── [ 29K]  Cluster_8545.txt
+        ├── [ 12K]  Cluster_9460.ps
+        └── [ 28K]  Cluster_9460.txt
 
-2 directories, 107 files</code></pre>
+2 directories, 109 files</code></pre>
 <hr />
 </div>
 </div>
@@ -2061,7 +2063,7 @@ Shahid, Saima, and Michael J. Axtell. 2014. <span>“Identification and Annotati
 </div>
 </div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiMTMuMi4xLUFwdWwtc1JOQXNlcS1TaG9ydFN0YWNrLTMxYnAtZmFzdHAtbWVyZ2VkLWNuaWRhcmlhbl9taVJCYXNlIgphdXRob3I6ICJTYW0gV2hpdGUiCmRhdGU6ICIyMDI0LTAyLTE1IgpvdXRwdXQ6IAogIGJvb2tkb3duOjpodG1sX2RvY3VtZW50MjoKICAgIHRoZW1lOiBjb3NtbwogICAgdG9jOiB0cnVlCiAgICB0b2NfZmxvYXQ6IHRydWUKICAgIG51bWJlcl9zZWN0aW9uczogdHJ1ZQogICAgY29kZV9mb2xkaW5nOiBzaG93CiAgICBjb2RlX2Rvd25sb2FkOiB0cnVlCiAgZ2l0aHViX2RvY3VtZW50OgogICAgdG9jOiB0cnVlCiAgICBudW1iZXJfc2VjdGlvbnM6IHRydWUKICBodG1sX2RvY3VtZW50OgogICAgdGhlbWU6IGNvc21vCiAgICB0b2M6IHRydWUKICAgIHRvY19mbG9hdDogdHJ1ZQogICAgbnVtYmVyX3NlY3Rpb25zOiB0cnVlCiAgICBjb2RlX2ZvbGRpbmc6IHNob3cKICAgIGNvZGVfZG93bmxvYWQ6IHRydWUKYmlibGlvZ3JhcGh5OiByZWZlcmVuY2VzLmJpYgpsaW5rLWNpdGF0aW9uczogdHJ1ZQotLS0KCmBgYHtyIHNldHVwLCBpbmNsdWRlPUZBTFNFfQpsaWJyYXJ5KGtuaXRyKQpsaWJyYXJ5KGthYmxlRXh0cmEpCmxpYnJhcnkoZHBseXIpCmxpYnJhcnkocmV0aWN1bGF0ZSkKa25pdHI6Om9wdHNfY2h1bmskc2V0KAogIGVjaG8gPSBUUlVFLCAgICAgICAgICMgRGlzcGxheSBjb2RlIGNodW5rcwogIGV2YWwgPSBGQUxTRSwgICAgICAgICMgRXZhbHVhdGUgY29kZSBjaHVua3MKICB3YXJuaW5nID0gRkFMU0UsICAgICAjIEhpZGUgd2FybmluZ3MKICBtZXNzYWdlID0gRkFMU0UsICAgICAjIEhpZGUgbWVzc2FnZXMKICBjb21tZW50ID0gIiIgICAgICAgICAjIFByZXZlbnRzIGFwcGVuZGluZyAnIyMnIHRvIGJlZ2lubmluZyBvZiBsaW5lcyBpbiBjb2RlIG91dHB1dAopCmBgYAoKVXNlIFtTaG9ydFN0YWNrXShodHRwczovL2dpdGh1Yi5jb20vTWlrZUF4dGVsbC9TaG9ydFN0YWNrKSBbQGF4dGVsbDIwMTNhOyBAc2hhaGlkMjAxNDsgQGpvaG5zb24yMDE2YV10byBwZXJmb3JtIGFsaWdubWVudCBvZiBzUk5Bc2VxIGRhdGEgYW5kIGFubm90YXRpb24gb2Ygc1JOQS1wcm9kdWNpbmcgZ2VuZXMuCgpUaGlzIGlzIHRoZSBzYW1lIFNob3J0U3RhY2sgYW5hbHlzaXMgYXMgc2VlbiBpbiBbMTMuMi1BcHVsLXNSTkFzZXEtU2hvcnRTdGFjay0zMWJwLWZhc3RwLW1lcmdlZC5SbWRdKGh0dHBzOi8vZ2l0aHViLmNvbS91cm9sLWU1L2RlZXAtZGl2ZS9ibG9iL21haW4vRC1BcHVsL2NvZGUvMTMuMi1BcHVsLXNSTkFzZXEtU2hvcnRTdGFjay0zMWJwLWZhc3RwLW1lcmdlZC5SbWQpLCBidXQgdGhpcyBhbmFseXNpcyB1c2VzIGEgY3VzdG9taXplZCBtaVJCYXNlIGRhdGFiYXNlLCBjcmVhdGVkIGJ5IEppbGwgQXNobGV5LCB3aGljaCBpbmNsdWRlcyBwdWJsaXNoZWQgY25pZGFyaWFuIG1pUk5BczoKCi0gW2BjbmlkYXJpYW5fbWlSTkFzLmZhc3RhYF0oaHR0cHM6Ly9naXRodWIuY29tL3Vyb2wtZTUvZGVlcC1kaXZlL2Jsb2IvbWFpbi9ERUYtY3Jvc3Mtc3BlY2llcy9kYXRhL2NuaWRhcmlhbl9taVJOQXMuZmFzdGEpCgpUaGUgKkEubWlsbGVwb3JhKiBnZW5vbWUgd2lsbCBiZSB1c2VkIGFzIHRoZSByZWZlcmVuY2UgZ2Vub21lIGZvciAqQS5wdWxjaHJhKiwgYXMgKkEucHVsY2hyYSogZG9lcyBub3QgY3VycmVudGx5IGhhdmUgYSBzZXF1ZW5jZWQgZ2Vub21lIGFuZCAqQS5taWxsZXBvcmEqIGhhZCBoaWdoZXN0IGFsaWdubWVudCByYXRlcyBmb3Igc3RhbmRhcmQgUk5Bc2VxIGRhdGEgY29tcGFyZWQgdG8gb3RoZXIgcHVibGlzaGVkIGdlbm9tZXMgdGVzdGVkLgoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCgpJbnB1dHM6CgotICAgUmVxdWlyZXMgdHJpbW1lZCBzUk5Bc2VxIGZpbGVzIGdlbmVyYXRlZCBieSBbMDguMi1EYXB1bC1zUk5Bc2VxLXRyaW1taW5nLTMxYnAtZmFzdHAtbWVyZ2VkLlJtZF0oaHR0cHM6Ly9naXRodWIuY29tL3Vyb2wtZTUvZGVlcC1kaXZlL2Jsb2IvbWFpbi9ELUFwdWwvY29kZS8wOC4yLURhcHVsLXNSTkFzZXEtdHJpbW1pbmctMzFicC1mYXN0cC1tZXJnZWQuUm1kKQoKICAgIC0gICBGaWxlbmFtZXMgZm9ybWF0dGVkOiBgKmZhc3RwLWFkYXB0ZXJzLXBvbHlHLTMxYnAtbWVyZ2VkLmZxLmd6YAoKLSAgICpBLm1pbGxlcG9yYSogZ2Vub21lIEZhc3RBLiBTZWUgWzEyLUFwdWwtc1JOQXNlcS1NaXJNYWNoaW5lLlJtZF0oaHR0cHM6Ly9naXRodWIuY29tL3Vyb2wtZTUvZGVlcC1kaXZlL2Jsb2IvbWFpbi9ELUFwdWwvY29kZS8xMi1BcHVsLXNSTkFzZXEtTWlyTWFjaGluZS5SbWQpIGZvciBkb3dubG9hZCBpbmZvIGlmIG5lZWRlZC4KCk91dHB1dHM6CgotICAgU2VlIFtTaG9ydFN0YWNrIG91dHB1dHMgZG9jdW1lbnRhdGlvbl0oaHR0cHM6Ly9naXRodWIuY29tL01pa2VBeHRlbGwvU2hvcnRTdGFjayNvdXRwdXRzKSBmb3IgZnVsbCBsaXN0IGFuZCBkZXRhaWxlZCBkZXNjcmlwdGlvbnMuCgpTb2Z0d2FyZSByZXF1aXJlbWVudHM6CgotICAgVXRpbGl6ZXMgYSBbU2hvcnRTdGFja10oaHR0cHM6Ly9naXRodWIuY29tL01pa2VBeHRlbGwvU2hvcnRTdGFjayNpbnN0YWxsYXRpb24pIENvbmRhL01hbWJhIGVudmlyb25tZW50LCBwZXIgdGhlIGluc3RhbGxhdGlvbiBpbnN0cnVjdGlvbnMuCgpSZXBsYWNlIHdpdGggbmFtZSBvZiB5b3VyIFNob3J0U3RhY2sgZW52aXJvbm1lbnQgYW5kIHRoZSBwYXRoIHRvIHRoZSBjb3JyZXNwb25kaW5nIGNvbmRhIGluc3RhbGxhdGlvbiAoZmluZCB0aGlzICphZnRlciogeW91J3ZlIGFjdGl2YXRlZCB0aGUgZW52aXJvbm1lbnQpLgoKRS5nLgoKYGBgIGJhc2gKIyBBY3RpdmF0ZSBlbnZpcm9ubWVudApjb25kYSBhY3RpdmF0ZSBTaG9ydFN0YWNrNF9lbnYKCiMgRmluZCBjb25kYSBwYXRoCndoaWNoIGNvbmRhCmBgYAoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCgojIFNldCBSIHZhcmlhYmxlcwoKYGBge3IgUi12YXJpYWJsZXMsIGV2YWw9VFJVRX0Kc2hvcnRzdGFja19jb25kYV9lbnZfbmFtZSA8LSBjKCJTaG9ydFN0YWNrLTQuMC4zX2VudiIpCnNob3J0c3RhY2tfY29uZF9wYXRoIDwtIGMoIi9ob21lL3NhbS9wcm9ncmFtcy9tYW1iYWZvcmdlL2NvbmRhYmluL2NvbmRhIikKYGBgCgojIENyZWF0ZSBhIEJhc2ggdmFyaWFibGVzIGZpbGUKClRoaXMgYWxsb3dzIHVzYWdlIG9mIEJhc2ggdmFyaWFibGVzIGFjcm9zcyBSIE1hcmtkb3duIGNodW5rcy4KCmBgYHtyIHNhdmUtYmFzaC12YXJpYWJsZXMtdG8tcnZhcnMtZmlsZSwgZW5naW5lPSdiYXNoJywgZXZhbD1UUlVFfQp7CmVjaG8gIiMjIyMgQXNzaWduIFZhcmlhYmxlcyAjIyMjIgplY2hvICIiCgplY2hvICIjIFRyaW1tZWQgRmFzdFEgbmFtaW5nIHBhdHRlcm4iCmVjaG8gImV4cG9ydCB0cmltbWVkX2Zhc3Rxc19wYXR0ZXJuPScqZmFzdHAtYWRhcHRlcnMtcG9seUctMzFicC1tZXJnZWQuZnEuZ3onIgoKZWNobyAiIyBEYXRhIGRpcmVjdG9yaWVzIgplY2hvICdleHBvcnQgZGVlcF9kaXZlX2Rpcj0vaG9tZS9zaGFyZWQvOFRCX0hERF8wMS9zYW0vZ2l0cmVwb3MvZGVlcC1kaXZlJwplY2hvICdleHBvcnQgZGVlcF9kaXZlX2RhdGFfZGlyPSIke2RlZXBfZGl2ZV9kaXJ9L0RFRi1jcm9zcy1zcGVjaWVzL2RhdGEiJwplY2hvICdleHBvcnQgb3V0cHV0X2Rpcl90b3A9JHtkZWVwX2RpdmVfZGlyfS9ELUFwdWwvb3V0cHV0LzEzLjIuMS1BcHVsLXNSTkFzZXEtU2hvcnRTdGFjay0zMWJwLWZhc3RwLW1lcmdlZC1jbmlkYXJpYW5fbWlSQmFzZScKZWNobyAnZXhwb3J0IHRyaW1tZWRfZmFzdHFzX2Rpcj0iJHtkZWVwX2RpdmVfZGlyfS9ELUFwdWwvb3V0cHV0LzA4LjItRGFwdWwtc1JOQXNlcS10cmltbWluZy0zMWJwLWZhc3RwLW1lcmdlZC90cmltbWVkLXJlYWRzIicKZWNobyAiIgoKZWNobyAiIyBJbnB1dC9PdXRwdXQgZmlsZXMiCmVjaG8gJ2V4cG9ydCBnZW5vbWVfZmFzdGFfZGlyPSR7ZGVlcF9kaXZlX2Rpcn0vRC1BcHVsL2RhdGEvQW1pbC9uY2JpX2RhdGFzZXQvZGF0YS9HQ0ZfMDEzNzUzODY1LjEnCmVjaG8gJ2V4cG9ydCBnZW5vbWVfZmFzdGFfbmFtZT0iR0NGXzAxMzc1Mzg2NS4xX0FtaWxfdjIuMV9nZW5vbWljLmZuYSInCmVjaG8gJ2V4cG9ydCBzaG9ydHN0YWNrX2dlbm9tZV9mYXN0YV9uYW1lPSJHQ0ZfMDEzNzUzODY1LjFfQW1pbF92Mi4xX2dlbm9taWMuZmEiJwoKZWNobyAnZXhwb3J0IG1pcmJhc2VfbWF0dXJlX2Zhc3RhX3ZlcnNpb249Y25pZGFyaWFuX21pUk5Bcy5mYXN0YScKZWNobyAnZXhwb3J0IGdlbm9tZV9mYXN0YT0iJHtnZW5vbWVfZmFzdGFfZGlyfS8ke3Nob3J0c3RhY2tfZ2Vub21lX2Zhc3RhX25hbWV9IicKZWNobyAiIgoKZWNobyAiIyBTZXQgbnVtYmVyIG9mIENQVXMgdG8gdXNlIgplY2hvICdleHBvcnQgdGhyZWFkcz00MCcKZWNobyAiIgoKZWNobyAiIyBJbml0aWFsaXplIGFycmF5cyIKZWNobyAnZXhwb3J0IHRyaW1tZWRfZmFzdHFzX2FycmF5PSgpJwoKCn0gPiAuYmFzaHZhcnMKCmNhdCAuYmFzaHZhcnMKYGBgCgojIExvYWQgW1Nob3J0U3RhY2tdKGh0dHBzOi8vZ2l0aHViLmNvbS9NaWtlQXh0ZWxsL1Nob3J0U3RhY2spIGNvbmRhIGVudmlyb25tZW50CgpJZiB0aGlzIGlzIHN1Y2Nlc3NmdWwsIHRoZSBmaXJzdCBsaW5lIG9mIG91dHB1dCBzaG91bGQgc2hvdyB0aGF0IHRoZSBQeXRob24gYmVpbmcgdXNlZCBpcyB0aGUgb25lIGluIHlvdXIgW1Nob3J0U3RhY2tdKDxodHRwczovL2dpdGh1Yi5jb20vTWlrZUF4dGVsbC9TaG9ydFN0YWNrPiBjb25kYSBlbnZpcm9ubWVudCBwYXRoLgoKRS5nLgoKYHB5dGhvbjogICAgICAgICAvaG9tZS9zYW0vcHJvZ3JhbXMvbWFtYmFmb3JnZS9lbnZzL21pcm1hY2hpbmVfZW52L2Jpbi9weXRob25gCgpgYGB7ciBsb2FkLXNob3J0c3RhY2stY29uZGEtZW52LCBldmFsPVRSVUV9CnVzZV9jb25kYWVudihjb25kYWVudiA9IHNob3J0c3RhY2tfY29uZGFfZW52X25hbWUsIGNvbmRhID0gc2hvcnRzdGFja19jb25kX3BhdGgpCgojIENoZWNrIHN1Y2Nlc3NmdWwgZW52IGxvYWRpbmcKcHlfY29uZmlnKCkKYGBgCgoKIyBSdW4gU2hvcnRTdGFjawoKIyMgTW9kaWZ5IGdlbm9tZSBmaWxlbmFtZSBmb3IgU2hvcnRTdGFjayBjb21wYXRhYmlsaXR5CgpgYGB7ciByZW5hbWUtZ2Vub21lLWZpbGVuYW1lLCBlbmdpbmU9J2Jhc2gnLCBjYWNoZT1UUlVFLCBldmFsPVRSVUV9CiMgTG9hZCBiYXNoIHZhcmlhYmxlcyBpbnRvIG1lbW9yeQpzb3VyY2UgLmJhc2h2YXJzCgojIENoZWNrIGZvciBGYXN0QSBmaWxlIGZpcnN0CiMgVGhlbiBjcmVhdGUgcmVuYW1lIGZpbGUgaWYgZG9lc24ndCBleGlzdAppZiBbIC1mICIke2dlbm9tZV9mYXN0YV9kaXJ9LyR7c2hvcnRzdGFja19nZW5vbWVfZmFzdGFfbmFtZX0iIF07IHRoZW4KICBlY2hvICIke2dlbm9tZV9mYXN0YV9kaXJ9LyR7c2hvcnRzdGFja19nZW5vbWVfZmFzdGFfbmFtZX0iCiAgZWNobyAiIgogIGVjaG8gIkFscmVhZHkgZXhpc3RzLiBOb3RoaW5nIHRvIGRvLiIKICBlY2hvICIiCmVsc2UKCiAgIyBDb3B5IGdlbm9tZSBGYXN0QSB0byBTaG9ydFN0YWNrLWNvbXBhdGlibGUgZmlsZW5hbWUgKGVuZGluZyB3aXRoIC5mYSkKICBjcCAke2dlbm9tZV9mYXN0YV9kaXJ9LyR7Z2Vub21lX2Zhc3RhX25hbWV9ICR7Z2Vub21lX2Zhc3RhX2Rpcn0vJHtzaG9ydHN0YWNrX2dlbm9tZV9mYXN0YV9uYW1lfQpmaQoKIyBDb25maXJtCmxzIC1saCAke2dlbm9tZV9mYXN0YV9kaXJ9LyR7c2hvcnRzdGFja19nZW5vbWVfZmFzdGFfbmFtZX0KYGBgCgojIyBFeGNlY3V0ZSBTaG9ydFN0YWNrIGNvbW1hbmQKClVzZXMgdGhlIGAtLWRuX21pcm5hYCBvcHRpb24gdG8gaWRlbnRpZnkgbWlSTkFzIGluIHRoZSBnZW5vbWUsIHdpdGhvdXQgcmVseWluZyBvbiB0aGUgYC0ta25vd25fbWlSTkFzYC4KClRoaXMgcGFydCBvZiB0aGUgY29kZSByZWRpcmVjdHMgdGhlIG91dHB1dCBvZiBgdGltZWAgdG8gdGhlIGVuZCBvZiBgc2hvcnRzdGFjay5sb2dgIGZpbGUuCgotICAgYDsgfSBcIDI+PiAke291dHB1dF9kaXJfdG9wfS9zaG9ydHN0YWNrLmxvZ2AKCgoKYGBge3Igc2hvcnRzdGFjaywgZW5naW5lPSdiYXNoJywgY2FjaGU9VFJVRX0KIyBMb2FkIGJhc2ggdmFyaWFibGVzIGludG8gbWVtb3J5CnNvdXJjZSAuYmFzaHZhcnMKCiMgTWFrZSBvdXRwdXQgZGlyZWN0b3J5LCBpZiBpdCBkb2Vzbid0IGV4aXN0Cm1rZGlyIC0tcGFyZW50cyAiJHtvdXRwdXRfZGlyX3RvcH0iCgojIENyZWF0ZSBhcnJheSBvZiB0cmltbWVkIEZhc3RRcwp0cmltbWVkX2Zhc3Rxc19hcnJheT0oJHt0cmltbWVkX2Zhc3Rxc19kaXJ9LyR7dHJpbW1lZF9mYXN0cXNfcGF0dGVybn0pCgoKIyBQYXNzIGFycmF5IGNvbnRlbnRzIHRvIG5ldyB2YXJpYWJsZSBhcyBzcGFjZS1kZWxpbWl0ZWQgbGlzdAp0cmltbWVkX2Zhc3Rxc19saXN0PSQoZWNobyAiJHt0cmltbWVkX2Zhc3Rxc19hcnJheVsqXX0iKQoKCiMjIyMjIyBSdW4gU2hvcnRTdGFjayAjIyMjIyMKeyB0aW1lIFwKU2hvcnRTdGFjayBcCi0tZ2Vub21lZmlsZSAiJHtnZW5vbWVfZmFzdGF9IiBcCi0tcmVhZGZpbGUgJHt0cmltbWVkX2Zhc3Rxc19saXN0fSBcCi0ta25vd25fbWlSTkFzICR7ZGVlcF9kaXZlX2RhdGFfZGlyfS8ke21pcmJhc2VfbWF0dXJlX2Zhc3RhX3ZlcnNpb259IFwKLS1kbl9taXJuYSBcCi0tdGhyZWFkcyAke3RocmVhZHN9IFwKLS1vdXRkaXIgJHtvdXRwdXRfZGlyX3RvcH0vU2hvcnRTdGFja19vdXQgXAomPiAke291dHB1dF9kaXJfdG9wfS9zaG9ydHN0YWNrLmxvZyA7IH0gXAoyPj4gJHtvdXRwdXRfZGlyX3RvcH0vc2hvcnRzdGFjay5sb2cKCmBgYAoKIyMgQ2hlY2sgcnVudGltZQoKYGBge3IgZW5naW5lPSdiYXNoJywgZXZhbD1UUlVFfQojIExvYWQgYmFzaCB2YXJpYWJsZXMgaW50byBtZW1vcnkKc291cmNlIC5iYXNodmFycwoKdGFpbCAtbiAzICR7b3V0cHV0X2Rpcl90b3B9L3Nob3J0c3RhY2subG9nIFwKfCBncmVwICJyZWFsIiBcCnwgYXdrICd7cHJpbnQgIlNob3J0U3RhY2sgcnVudGltZToiICJcdCIgJDJ9JwoKYGBgCgoKIyBSZXN1bHRzCgojIyBTaG9ydFN0YWNrIHN5bm9wc2lzCgpgYGB7ciBzaG9ydHN0YWNrLXN5bm9wc2lzLCBlbmdpbmU9J2Jhc2gnLCBldmFsPVRSVUV9CiMgTG9hZCBiYXNoIHZhcmlhYmxlcyBpbnRvIG1lbW9yeQpzb3VyY2UgLmJhc2h2YXJzCgp0YWlsIC1uIDI1ICR7b3V0cHV0X2Rpcl90b3B9L3Nob3J0c3RhY2subG9nCmBgYAoKU2hvcnRTdGFjayBpZGVudGlmaWVkIDM3IG1pUk5Bcy4KCiMjIEluc3BlY3QgYFJlc3VsdHMudHh0YAoKYGBge3IgcmVzdWx0cy10eHQtZmlsZSwgZW5naW5lPSdiYXNoJywgZXZhbD1UUlVFfQojIExvYWQgYmFzaCB2YXJpYWJsZXMgaW50byBtZW1vcnkKc291cmNlIC5iYXNodmFycwoKaGVhZCAke291dHB1dF9kaXJfdG9wfS9TaG9ydFN0YWNrX291dC9SZXN1bHRzLnR4dAoKZWNobyAiIgplY2hvICItLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tIgplY2hvICIiCgplY2hvICJOdW1tYmVyIG9mIHBvdGVudGlhbCBsb2NpOiIKYXdrICcoTlI+MSknICR7b3V0cHV0X2Rpcl90b3B9L1Nob3J0U3RhY2tfb3V0L1Jlc3VsdHMudHh0IHwgd2MgLWwKYGBgCgpDb2x1bW4gMjAgb2YgdGhlIGBSZXN1bHRzLnR4dGAgZmlsZSBpZGVudGlmaWVzIGlmIGEgY2x1c3RlciBpcyBhIG1pUk5BIG9yIG5vdCAoYFlgIG9yIGBOYCkuCgpgYGB7ciByZXN1bHRzLXR4dC1taVJOQXMsIGVuZ2luZT0nYmFzaCcsIGV2YWw9VFJVRX0KIyBMb2FkIGJhc2ggdmFyaWFibGVzIGludG8gbWVtb3J5CnNvdXJjZSAuYmFzaHZhcnMKCmVjaG8gIk51bWJlciBvZiBsb2NpIGNoYXJhY3Rlcml6ZWQgYXMgbWlSTkE6Igphd2sgJyQyMD09IlkiIHtwcmludCAkMH0nICR7b3V0cHV0X2Rpcl90b3B9L1Nob3J0U3RhY2tfb3V0L1Jlc3VsdHMudHh0IFwKfCB3YyAtbAplY2hvICIiCgplY2hvICItLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tIgoKZWNobyAiIgplY2hvICJOdW1iZXIgb2YgbG9jaSBfbm90XyBjaGFyYWN0ZXJpemVkIGFzIG1pUk5BOiIKYXdrICckMjA9PSJOIiB7cHJpbnQgJDB9JyAke291dHB1dF9kaXJfdG9wfS9TaG9ydFN0YWNrX291dC9SZXN1bHRzLnR4dCBcCnwgd2MgLWwKCmBgYAoKQ29sdW1uIDIxIG9mIHRoZSBgUmVzdWx0cy50eHRgIGZpbGUgaWRlbnRpZmllcyBpZiBhIGNsdXN0ZXIgYWxpZ25lZCB0byBhIGtub3duIG1pUk5BIChtaVJCYXNlKSBvciBub3QgKGBZYCBvciBgTkFgKS4KClNpbmNlIHRoZXJlIGFyZSBubyBtaVJOQXMsIHRoZSBmb2xsb3dpbmcgY29kZSB3aWxsICpub3QqIHByaW50IGFueSBvdXRwdXQuCgpUaGUgYGVjaG9gIGNvbW1hbmQgYWZ0ZXIgdGhlIGBhd2tgIGNvbW1hbmQgaXMgc2ltcGx5IHRoZXJlIHRvIHByb3ZlIHRoYXQgdGhlIGNodW5rIGV4ZWN1dGVkLgoKYGBge3IgcmVzdWx0cy10eHQtbWlSQmFzZS1taVJOQXMsIGVuZ2luZT0nYmFzaCcsIGV2YWw9VFJVRX0KIyBMb2FkIGJhc2ggdmFyaWFibGVzIGludG8gbWVtb3J5CnNvdXJjZSAuYmFzaHZhcnMKCmVjaG8gIk51bWJlciBvZiBsb2NpIG1hdGNoaW5nIG1pUkJhc2UgbWlSTkFzOiIKYXdrICckMjEhPSJOQSIge3ByaW50ICQwfScgJHtvdXRwdXRfZGlyX3RvcH0vU2hvcnRTdGFja19vdXQvUmVzdWx0cy50eHQgXAp8IHdjIC1sCmVjaG8gIiIKCmVjaG8gIi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0iCgplY2hvICIiCmVjaG8gIk51bWJlciBvZiBsb2NpIF9ub3RfIG1hdGNoaW5nIG1pUkJhc2UgbWlSTkFzOiIKYXdrICckMjE9PSJOQSIge3ByaW50ICQwfScgJHtvdXRwdXRfZGlyX3RvcH0vU2hvcnRTdGFja19vdXQvUmVzdWx0cy50eHQgXAp8IHdjIC1sCgpgYGAKCkFsdGhvdWdoIHRoZXJlIGFyZSBsb2NpIHdpdGggbWF0Y2hlcyB0byBtaVJCYXNlIG1pUk5BcywgU2hvcnRTdGFjayBkaWQgKm5vdCogYW5ub3RhdGUgdGhlc2UgY2x1c3RlcnMgYXMgbWlSTkFzIGxpa2VseSBbYmVjYXVzZSB0aGV5IGRvIG5vdCAqYWxzbyogbWF0Y2ggc2Vjb25kYXJ5IHN0cnVjdHVyZSBjcml0ZXJpYV0oaHR0cHM6Ly9naXRodWIuY29tL01pa2VBeHRlbGwvU2hvcnRTdGFjayNtaXJuYS1hbm5vdGF0aW9uKS4KCiMjIyBEaXJlY3RvcnkgdHJlZSBvZiBhbGwgU2hvcnRTdGFjayBvdXRwdXRzCgpNYW55IG9mIHRoZXNlIGFyZSBsYXJnZSAoYnkgR2l0SHViIHN0YW5kYXJkcykgQkFNIGZpbGVzLCBzbyB3aWxsIG5vdCBiZSBhZGRlZCB0byB0aGUgcmVwby4KCkFkZGl0aW9uYWxseSwgaXQncyB1bmxpa2VseSB3ZSdsbCB1dGlsaXplIG1vc3Qgb2YgdGhlIG90aGVyIGZpbGVzIChiaWd3aWcpIGdlbmVyYXRlZCBieSBTaG9ydFN0YWNrLgoKYGBge3Igc2hvcnRzdGFjay1kaXJlY3RvcnktdHJlZSwgZW5naW5lPSdiYXNoJywgZXZhbD1UUlVFfQojIExvYWQgYmFzaCB2YXJpYWJsZXMgaW50byBtZW1vcnkKc291cmNlIC5iYXNodmFycwoKdHJlZSAtaCAke291dHB1dF9kaXJfdG9wfS8KCmBgYAoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCgojIENpdGF0aW9ucw==</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiMTMuMi4xLUFwdWwtc1JOQXNlcS1TaG9ydFN0YWNrLTMxYnAtZmFzdHAtbWVyZ2VkLWNuaWRhcmlhbl9taVJCYXNlIgphdXRob3I6ICJTYW0gV2hpdGUiCmRhdGU6ICIyMDI0LTAyLTE1IgpvdXRwdXQ6IAogIGJvb2tkb3duOjpodG1sX2RvY3VtZW50MjoKICAgIHRoZW1lOiBjb3NtbwogICAgdG9jOiB0cnVlCiAgICB0b2NfZmxvYXQ6IHRydWUKICAgIG51bWJlcl9zZWN0aW9uczogdHJ1ZQogICAgY29kZV9mb2xkaW5nOiBzaG93CiAgICBjb2RlX2Rvd25sb2FkOiB0cnVlCiAgZ2l0aHViX2RvY3VtZW50OgogICAgdG9jOiB0cnVlCiAgICBudW1iZXJfc2VjdGlvbnM6IHRydWUKICBodG1sX2RvY3VtZW50OgogICAgdGhlbWU6IGNvc21vCiAgICB0b2M6IHRydWUKICAgIHRvY19mbG9hdDogdHJ1ZQogICAgbnVtYmVyX3NlY3Rpb25zOiB0cnVlCiAgICBjb2RlX2ZvbGRpbmc6IHNob3cKICAgIGNvZGVfZG93bmxvYWQ6IHRydWUKYmlibGlvZ3JhcGh5OiByZWZlcmVuY2VzLmJpYgpsaW5rLWNpdGF0aW9uczogdHJ1ZQotLS0KCmBgYHtyIHNldHVwLCBpbmNsdWRlPUZBTFNFfQpsaWJyYXJ5KGtuaXRyKQpsaWJyYXJ5KGthYmxlRXh0cmEpCmxpYnJhcnkoZHBseXIpCmxpYnJhcnkocmV0aWN1bGF0ZSkKa25pdHI6Om9wdHNfY2h1bmskc2V0KAogIGVjaG8gPSBUUlVFLCAgICAgICAgICMgRGlzcGxheSBjb2RlIGNodW5rcwogIGV2YWwgPSBGQUxTRSwgICAgICAgICMgRXZhbHVhdGUgY29kZSBjaHVua3MKICB3YXJuaW5nID0gRkFMU0UsICAgICAjIEhpZGUgd2FybmluZ3MKICBtZXNzYWdlID0gRkFMU0UsICAgICAjIEhpZGUgbWVzc2FnZXMKICBjb21tZW50ID0gIiIgICAgICAgICAjIFByZXZlbnRzIGFwcGVuZGluZyAnIyMnIHRvIGJlZ2lubmluZyBvZiBsaW5lcyBpbiBjb2RlIG91dHB1dAopCmBgYAoKVXNlIFtTaG9ydFN0YWNrXShodHRwczovL2dpdGh1Yi5jb20vTWlrZUF4dGVsbC9TaG9ydFN0YWNrKSBbQGF4dGVsbDIwMTNhOyBAc2hhaGlkMjAxNDsgQGpvaG5zb24yMDE2YV10byBwZXJmb3JtIGFsaWdubWVudCBvZiBzUk5Bc2VxIGRhdGEgYW5kIGFubm90YXRpb24gb2Ygc1JOQS1wcm9kdWNpbmcgZ2VuZXMuCgpUaGlzIGlzIHRoZSBzYW1lIFNob3J0U3RhY2sgYW5hbHlzaXMgYXMgc2VlbiBpbiBbMTMuMi1BcHVsLXNSTkFzZXEtU2hvcnRTdGFjay0zMWJwLWZhc3RwLW1lcmdlZC5SbWRdKGh0dHBzOi8vZ2l0aHViLmNvbS91cm9sLWU1L2RlZXAtZGl2ZS9ibG9iL21haW4vRC1BcHVsL2NvZGUvMTMuMi1BcHVsLXNSTkFzZXEtU2hvcnRTdGFjay0zMWJwLWZhc3RwLW1lcmdlZC5SbWQpLCBidXQgdGhpcyBhbmFseXNpcyB1c2VzIGEgY3VzdG9taXplZCBtaVJCYXNlIGRhdGFiYXNlLCB1dGlsaXppbmcgY25pZGFyaWFuIG1pUk5BcyBjdXJhdGVkIGJ5IEppbGwgQXNobGV5LCB3aGljaCBpbmNsdWRlcyBwdWJsaXNoZWQgY25pZGFyaWFuIG1pUk5BczoKCi0gW2BjbmlkYXJpYW4tbWlyYmFzZS1tYXR1cmUtdjIyLjEuZmFzdGFgXSguLi8uLi9kYXRhL2NuaWRhcmlhbi1taXJiYXNlLW1hdHVyZS12MjIuMS5mYXN0YSkKClRoZSAqQS5taWxsZXBvcmEqIGdlbm9tZSB3aWxsIGJlIHVzZWQgYXMgdGhlIHJlZmVyZW5jZSBnZW5vbWUgZm9yICpBLnB1bGNocmEqLCBhcyAqQS5wdWxjaHJhKiBkb2VzIG5vdCBjdXJyZW50bHkgaGF2ZSBhIHNlcXVlbmNlZCBnZW5vbWUgYW5kICpBLm1pbGxlcG9yYSogaGFkIGhpZ2hlc3QgYWxpZ25tZW50IHJhdGVzIGZvciBzdGFuZGFyZCBSTkFzZXEgZGF0YSBjb21wYXJlZCB0byBvdGhlciBwdWJsaXNoZWQgZ2Vub21lcyB0ZXN0ZWQuCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KCklucHV0czoKCi0gICBSZXF1aXJlcyB0cmltbWVkIHNSTkFzZXEgZmlsZXMgZ2VuZXJhdGVkIGJ5IFswOC4yLURhcHVsLXNSTkFzZXEtdHJpbW1pbmctMzFicC1mYXN0cC1tZXJnZWQuUm1kXShodHRwczovL2dpdGh1Yi5jb20vdXJvbC1lNS9kZWVwLWRpdmUvYmxvYi9tYWluL0QtQXB1bC9jb2RlLzA4LjItRGFwdWwtc1JOQXNlcS10cmltbWluZy0zMWJwLWZhc3RwLW1lcmdlZC5SbWQpCgogICAgLSAgIEZpbGVuYW1lcyBmb3JtYXR0ZWQ6IGAqZmFzdHAtYWRhcHRlcnMtcG9seUctMzFicC1tZXJnZWQuZnEuZ3pgCgotICAgKkEubWlsbGVwb3JhKiBnZW5vbWUgRmFzdEEuIFNlZSBbMTItQXB1bC1zUk5Bc2VxLU1pck1hY2hpbmUuUm1kXShodHRwczovL2dpdGh1Yi5jb20vdXJvbC1lNS9kZWVwLWRpdmUvYmxvYi9tYWluL0QtQXB1bC9jb2RlLzEyLUFwdWwtc1JOQXNlcS1NaXJNYWNoaW5lLlJtZCkgZm9yIGRvd25sb2FkIGluZm8gaWYgbmVlZGVkLgoKT3V0cHV0czoKCi0gICBTZWUgW1Nob3J0U3RhY2sgb3V0cHV0cyBkb2N1bWVudGF0aW9uXShodHRwczovL2dpdGh1Yi5jb20vTWlrZUF4dGVsbC9TaG9ydFN0YWNrI291dHB1dHMpIGZvciBmdWxsIGxpc3QgYW5kIGRldGFpbGVkIGRlc2NyaXB0aW9ucy4KClNvZnR3YXJlIHJlcXVpcmVtZW50czoKCi0gICBVdGlsaXplcyBhIFtTaG9ydFN0YWNrXShodHRwczovL2dpdGh1Yi5jb20vTWlrZUF4dGVsbC9TaG9ydFN0YWNrI2luc3RhbGxhdGlvbikgQ29uZGEvTWFtYmEgZW52aXJvbm1lbnQsIHBlciB0aGUgaW5zdGFsbGF0aW9uIGluc3RydWN0aW9ucy4KClJlcGxhY2Ugd2l0aCBuYW1lIG9mIHlvdXIgU2hvcnRTdGFjayBlbnZpcm9ubWVudCBhbmQgdGhlIHBhdGggdG8gdGhlIGNvcnJlc3BvbmRpbmcgY29uZGEgaW5zdGFsbGF0aW9uIChmaW5kIHRoaXMgKmFmdGVyKiB5b3UndmUgYWN0aXZhdGVkIHRoZSBlbnZpcm9ubWVudCkuCgpFLmcuCgpgYGAgYmFzaAojIEFjdGl2YXRlIGVudmlyb25tZW50CmNvbmRhIGFjdGl2YXRlIFNob3J0U3RhY2s0X2VudgoKIyBGaW5kIGNvbmRhIHBhdGgKd2hpY2ggY29uZGEKYGBgCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KCiMgU2V0IFIgdmFyaWFibGVzCgpgYGB7ciBSLXZhcmlhYmxlcywgZXZhbD1UUlVFfQpzaG9ydHN0YWNrX2NvbmRhX2Vudl9uYW1lIDwtIGMoIlNob3J0U3RhY2stNC4wLjNfZW52IikKc2hvcnRzdGFja19jb25kX3BhdGggPC0gYygiL2hvbWUvc2FtL3Byb2dyYW1zL21hbWJhZm9yZ2UvY29uZGFiaW4vY29uZGEiKQpgYGAKCiMgQ3JlYXRlIGEgQmFzaCB2YXJpYWJsZXMgZmlsZQoKVGhpcyBhbGxvd3MgdXNhZ2Ugb2YgQmFzaCB2YXJpYWJsZXMgYWNyb3NzIFIgTWFya2Rvd24gY2h1bmtzLgoKYGBge3Igc2F2ZS1iYXNoLXZhcmlhYmxlcy10by1ydmFycy1maWxlLCBlbmdpbmU9J2Jhc2gnLCBldmFsPVRSVUV9CnsKZWNobyAiIyMjIyBBc3NpZ24gVmFyaWFibGVzICMjIyMiCmVjaG8gIiIKCmVjaG8gIiMgVHJpbW1lZCBGYXN0USBuYW1pbmcgcGF0dGVybiIKZWNobyAiZXhwb3J0IHRyaW1tZWRfZmFzdHFzX3BhdHRlcm49JypmYXN0cC1hZGFwdGVycy1wb2x5Ry0zMWJwLW1lcmdlZC5mcS5neiciCgplY2hvICIjIERhdGEgZGlyZWN0b3JpZXMiCmVjaG8gJ2V4cG9ydCBkZWVwX2RpdmVfZGlyPS9ob21lL3NoYXJlZC84VEJfSEREXzAxL3NhbS9naXRyZXBvcy9kZWVwLWRpdmUnCmVjaG8gJ2V4cG9ydCBkZWVwX2RpdmVfZGF0YV9kaXI9IiR7ZGVlcF9kaXZlX2Rpcn0vZGF0YSInCmVjaG8gJ2V4cG9ydCBvdXRwdXRfZGlyX3RvcD0ke2RlZXBfZGl2ZV9kaXJ9L0QtQXB1bC9vdXRwdXQvMTMuMi4xLUFwdWwtc1JOQXNlcS1TaG9ydFN0YWNrLTMxYnAtZmFzdHAtbWVyZ2VkLWNuaWRhcmlhbl9taVJCYXNlJwplY2hvICdleHBvcnQgdHJpbW1lZF9mYXN0cXNfZGlyPSIke2RlZXBfZGl2ZV9kaXJ9L0QtQXB1bC9vdXRwdXQvMDguMi1BcHVsLXNSTkFzZXEtdHJpbW1pbmctMzFicC1mYXN0cC1tZXJnZWQvdHJpbW1lZC1yZWFkcyInCmVjaG8gIiIKCmVjaG8gIiMgSW5wdXQvT3V0cHV0IGZpbGVzIgplY2hvICdleHBvcnQgZ2Vub21lX2Zhc3RhX2Rpcj0ke2RlZXBfZGl2ZV9kaXJ9L0QtQXB1bC9kYXRhL0FtaWwvbmNiaV9kYXRhc2V0L2RhdGEvR0NGXzAxMzc1Mzg2NS4xJwplY2hvICdleHBvcnQgZ2Vub21lX2Zhc3RhX25hbWU9IkdDRl8wMTM3NTM4NjUuMV9BbWlsX3YyLjFfZ2Vub21pYy5mbmEiJwplY2hvICdleHBvcnQgc2hvcnRzdGFja19nZW5vbWVfZmFzdGFfbmFtZT0iR0NGXzAxMzc1Mzg2NS4xX0FtaWxfdjIuMV9nZW5vbWljLmZhIicKCmVjaG8gJ2V4cG9ydCBtaXJiYXNlX21hdHVyZV9mYXN0YV92ZXJzaW9uPWNuaWRhcmlhbi1taXJiYXNlLW1hdHVyZS12MjIuMS5mYXN0YScKZWNobyAnZXhwb3J0IGdlbm9tZV9mYXN0YT0iJHtnZW5vbWVfZmFzdGFfZGlyfS8ke3Nob3J0c3RhY2tfZ2Vub21lX2Zhc3RhX25hbWV9IicKZWNobyAiIgoKZWNobyAiIyBTZXQgbnVtYmVyIG9mIENQVXMgdG8gdXNlIgplY2hvICdleHBvcnQgdGhyZWFkcz00MCcKZWNobyAiIgoKZWNobyAiIyBJbml0aWFsaXplIGFycmF5cyIKZWNobyAnZXhwb3J0IHRyaW1tZWRfZmFzdHFzX2FycmF5PSgpJwoKCn0gPiAuYmFzaHZhcnMKCmNhdCAuYmFzaHZhcnMKYGBgCgojIExvYWQgW1Nob3J0U3RhY2tdKGh0dHBzOi8vZ2l0aHViLmNvbS9NaWtlQXh0ZWxsL1Nob3J0U3RhY2spIGNvbmRhIGVudmlyb25tZW50CgpJZiB0aGlzIGlzIHN1Y2Nlc3NmdWwsIHRoZSBmaXJzdCBsaW5lIG9mIG91dHB1dCBzaG91bGQgc2hvdyB0aGF0IHRoZSBQeXRob24gYmVpbmcgdXNlZCBpcyB0aGUgb25lIGluIHlvdXIgW1Nob3J0U3RhY2tdKDxodHRwczovL2dpdGh1Yi5jb20vTWlrZUF4dGVsbC9TaG9ydFN0YWNrPiBjb25kYSBlbnZpcm9ubWVudCBwYXRoLgoKRS5nLgoKYHB5dGhvbjogICAgICAgICAvaG9tZS9zYW0vcHJvZ3JhbXMvbWFtYmFmb3JnZS9lbnZzL21pcm1hY2hpbmVfZW52L2Jpbi9weXRob25gCgpgYGB7ciBsb2FkLXNob3J0c3RhY2stY29uZGEtZW52LCBldmFsPVRSVUV9CnVzZV9jb25kYWVudihjb25kYWVudiA9IHNob3J0c3RhY2tfY29uZGFfZW52X25hbWUsIGNvbmRhID0gc2hvcnRzdGFja19jb25kX3BhdGgpCgojIENoZWNrIHN1Y2Nlc3NmdWwgZW52IGxvYWRpbmcKcHlfY29uZmlnKCkKYGBgCgoKIyBSdW4gU2hvcnRTdGFjawoKIyMgTW9kaWZ5IGdlbm9tZSBmaWxlbmFtZSBmb3IgU2hvcnRTdGFjayBjb21wYXRhYmlsaXR5CgpgYGB7ciByZW5hbWUtZ2Vub21lLWZpbGVuYW1lLCBlbmdpbmU9J2Jhc2gnLCBjYWNoZT1UUlVFLCBldmFsPVRSVUV9CiMgTG9hZCBiYXNoIHZhcmlhYmxlcyBpbnRvIG1lbW9yeQpzb3VyY2UgLmJhc2h2YXJzCgojIENoZWNrIGZvciBGYXN0QSBmaWxlIGZpcnN0CiMgVGhlbiBjcmVhdGUgcmVuYW1lIGZpbGUgaWYgZG9lc24ndCBleGlzdAppZiBbIC1mICIke2dlbm9tZV9mYXN0YV9kaXJ9LyR7c2hvcnRzdGFja19nZW5vbWVfZmFzdGFfbmFtZX0iIF07IHRoZW4KICBlY2hvICIke2dlbm9tZV9mYXN0YV9kaXJ9LyR7c2hvcnRzdGFja19nZW5vbWVfZmFzdGFfbmFtZX0iCiAgZWNobyAiIgogIGVjaG8gIkFscmVhZHkgZXhpc3RzLiBOb3RoaW5nIHRvIGRvLiIKICBlY2hvICIiCmVsc2UKCiAgIyBDb3B5IGdlbm9tZSBGYXN0QSB0byBTaG9ydFN0YWNrLWNvbXBhdGlibGUgZmlsZW5hbWUgKGVuZGluZyB3aXRoIC5mYSkKICBjcCAke2dlbm9tZV9mYXN0YV9kaXJ9LyR7Z2Vub21lX2Zhc3RhX25hbWV9ICR7Z2Vub21lX2Zhc3RhX2Rpcn0vJHtzaG9ydHN0YWNrX2dlbm9tZV9mYXN0YV9uYW1lfQpmaQoKIyBDb25maXJtCmxzIC1saCAke2dlbm9tZV9mYXN0YV9kaXJ9LyR7c2hvcnRzdGFja19nZW5vbWVfZmFzdGFfbmFtZX0KYGBgCgojIyBFeGNlY3V0ZSBTaG9ydFN0YWNrIGNvbW1hbmQKClVzZXMgdGhlIGAtLWRuX21pcm5hYCBvcHRpb24gdG8gaWRlbnRpZnkgbWlSTkFzIGluIHRoZSBnZW5vbWUsIHdpdGhvdXQgcmVseWluZyBvbiB0aGUgYC0ta25vd25fbWlSTkFzYC4KClRoaXMgcGFydCBvZiB0aGUgY29kZSByZWRpcmVjdHMgdGhlIG91dHB1dCBvZiBgdGltZWAgdG8gdGhlIGVuZCBvZiBgc2hvcnRzdGFjay5sb2dgIGZpbGUuCgotICAgYDsgfSBcIDI+PiAke291dHB1dF9kaXJfdG9wfS9zaG9ydHN0YWNrLmxvZ2AKCgoKYGBge3Igc2hvcnRzdGFjaywgZW5naW5lPSdiYXNoJywgY2FjaGU9VFJVRX0KIyBMb2FkIGJhc2ggdmFyaWFibGVzIGludG8gbWVtb3J5CnNvdXJjZSAuYmFzaHZhcnMKCiMgTWFrZSBvdXRwdXQgZGlyZWN0b3J5LCBpZiBpdCBkb2Vzbid0IGV4aXN0Cm1rZGlyIC0tcGFyZW50cyAiJHtvdXRwdXRfZGlyX3RvcH0iCgojIENyZWF0ZSBhcnJheSBvZiB0cmltbWVkIEZhc3RRcwp0cmltbWVkX2Zhc3Rxc19hcnJheT0oJHt0cmltbWVkX2Zhc3Rxc19kaXJ9LyR7dHJpbW1lZF9mYXN0cXNfcGF0dGVybn0pCgoKIyBQYXNzIGFycmF5IGNvbnRlbnRzIHRvIG5ldyB2YXJpYWJsZSBhcyBzcGFjZS1kZWxpbWl0ZWQgbGlzdAp0cmltbWVkX2Zhc3Rxc19saXN0PSQoZWNobyAiJHt0cmltbWVkX2Zhc3Rxc19hcnJheVsqXX0iKQoKCiMjIyMjIyBSdW4gU2hvcnRTdGFjayAjIyMjIyMKeyB0aW1lIFwKU2hvcnRTdGFjayBcCi0tZ2Vub21lZmlsZSAiJHtnZW5vbWVfZmFzdGF9IiBcCi0tcmVhZGZpbGUgJHt0cmltbWVkX2Zhc3Rxc19saXN0fSBcCi0ta25vd25fbWlSTkFzICR7ZGVlcF9kaXZlX2RhdGFfZGlyfS8ke21pcmJhc2VfbWF0dXJlX2Zhc3RhX3ZlcnNpb259IFwKLS1kbl9taXJuYSBcCi0tdGhyZWFkcyAke3RocmVhZHN9IFwKLS1vdXRkaXIgJHtvdXRwdXRfZGlyX3RvcH0vU2hvcnRTdGFja19vdXQgXAomPiAke291dHB1dF9kaXJfdG9wfS9zaG9ydHN0YWNrLmxvZyA7IH0gXAoyPj4gJHtvdXRwdXRfZGlyX3RvcH0vc2hvcnRzdGFjay5sb2cKCmBgYAoKIyMgQ2hlY2sgcnVudGltZQoKYGBge3IgZW5naW5lPSdiYXNoJywgZXZhbD1UUlVFfQojIExvYWQgYmFzaCB2YXJpYWJsZXMgaW50byBtZW1vcnkKc291cmNlIC5iYXNodmFycwoKdGFpbCAtbiAzICR7b3V0cHV0X2Rpcl90b3B9L3Nob3J0c3RhY2subG9nIFwKfCBncmVwICJyZWFsIiBcCnwgYXdrICd7cHJpbnQgIlNob3J0U3RhY2sgcnVudGltZToiICJcdCIgJDJ9JwoKYGBgCgoKIyBSZXN1bHRzCgojIyBTaG9ydFN0YWNrIHN5bm9wc2lzCgpgYGB7ciBzaG9ydHN0YWNrLXN5bm9wc2lzLCBlbmdpbmU9J2Jhc2gnLCBldmFsPVRSVUV9CiMgTG9hZCBiYXNoIHZhcmlhYmxlcyBpbnRvIG1lbW9yeQpzb3VyY2UgLmJhc2h2YXJzCgp0YWlsIC1uIDI1ICR7b3V0cHV0X2Rpcl90b3B9L3Nob3J0c3RhY2subG9nCmBgYAoKU2hvcnRTdGFjayBpZGVudGlmaWVkIDM4IG1pUk5Bcy4KCiMjIEluc3BlY3QgYFJlc3VsdHMudHh0YAoKYGBge3IgcmVzdWx0cy10eHQtZmlsZSwgZW5naW5lPSdiYXNoJywgZXZhbD1UUlVFfQojIExvYWQgYmFzaCB2YXJpYWJsZXMgaW50byBtZW1vcnkKc291cmNlIC5iYXNodmFycwoKaGVhZCAke291dHB1dF9kaXJfdG9wfS9TaG9ydFN0YWNrX291dC9SZXN1bHRzLnR4dAoKZWNobyAiIgplY2hvICItLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tIgplY2hvICIiCgplY2hvICJOdW1tYmVyIG9mIHBvdGVudGlhbCBsb2NpOiIKYXdrICcoTlI+MSknICR7b3V0cHV0X2Rpcl90b3B9L1Nob3J0U3RhY2tfb3V0L1Jlc3VsdHMudHh0IHwgd2MgLWwKYGBgCgpDb2x1bW4gMjAgb2YgdGhlIGBSZXN1bHRzLnR4dGAgZmlsZSBpZGVudGlmaWVzIGlmIGEgY2x1c3RlciBpcyBhIG1pUk5BIG9yIG5vdCAoYFlgIG9yIGBOYCkuCgpgYGB7ciByZXN1bHRzLXR4dC1taVJOQXMsIGVuZ2luZT0nYmFzaCcsIGV2YWw9VFJVRX0KIyBMb2FkIGJhc2ggdmFyaWFibGVzIGludG8gbWVtb3J5CnNvdXJjZSAuYmFzaHZhcnMKCmVjaG8gIk51bWJlciBvZiBsb2NpIGNoYXJhY3Rlcml6ZWQgYXMgbWlSTkE6Igphd2sgJyQyMD09IlkiIHtwcmludCAkMH0nICR7b3V0cHV0X2Rpcl90b3B9L1Nob3J0U3RhY2tfb3V0L1Jlc3VsdHMudHh0IFwKfCB3YyAtbAplY2hvICIiCgplY2hvICItLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tIgoKZWNobyAiIgplY2hvICJOdW1iZXIgb2YgbG9jaSBfbm90XyBjaGFyYWN0ZXJpemVkIGFzIG1pUk5BOiIKYXdrICckMjA9PSJOIiB7cHJpbnQgJDB9JyAke291dHB1dF9kaXJfdG9wfS9TaG9ydFN0YWNrX291dC9SZXN1bHRzLnR4dCBcCnwgd2MgLWwKCmBgYAoKQ29sdW1uIDIxIG9mIHRoZSBgUmVzdWx0cy50eHRgIGZpbGUgaWRlbnRpZmllcyBpZiBhIGNsdXN0ZXIgYWxpZ25lZCB0byBhIGtub3duIG1pUk5BIChtaVJCYXNlKSBvciBub3QgKGBZYCBvciBgTkFgKS4KClNpbmNlIHRoZXJlIGFyZSBubyBtaVJOQXMsIHRoZSBmb2xsb3dpbmcgY29kZSB3aWxsICpub3QqIHByaW50IGFueSBvdXRwdXQuCgpUaGUgYGVjaG9gIGNvbW1hbmQgYWZ0ZXIgdGhlIGBhd2tgIGNvbW1hbmQgaXMgc2ltcGx5IHRoZXJlIHRvIHByb3ZlIHRoYXQgdGhlIGNodW5rIGV4ZWN1dGVkLgoKYGBge3IgcmVzdWx0cy10eHQtbWlSQmFzZS1taVJOQXMsIGVuZ2luZT0nYmFzaCcsIGV2YWw9VFJVRX0KIyBMb2FkIGJhc2ggdmFyaWFibGVzIGludG8gbWVtb3J5CnNvdXJjZSAuYmFzaHZhcnMKCmVjaG8gIk51bWJlciBvZiBsb2NpIG1hdGNoaW5nIG1pUkJhc2UgbWlSTkFzOiIKYXdrICckMjEhPSJOQSIge3ByaW50ICQwfScgJHtvdXRwdXRfZGlyX3RvcH0vU2hvcnRTdGFja19vdXQvUmVzdWx0cy50eHQgXAp8IHdjIC1sCmVjaG8gIiIKCmVjaG8gIi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0iCgplY2hvICIiCmVjaG8gIk51bWJlciBvZiBsb2NpIF9ub3RfIG1hdGNoaW5nIG1pUkJhc2UgbWlSTkFzOiIKYXdrICckMjE9PSJOQSIge3ByaW50ICQwfScgJHtvdXRwdXRfZGlyX3RvcH0vU2hvcnRTdGFja19vdXQvUmVzdWx0cy50eHQgXAp8IHdjIC1sCgpgYGAKCkFsdGhvdWdoIHRoZXJlIGFyZSBsb2NpIHdpdGggbWF0Y2hlcyB0byBtaVJCYXNlIG1pUk5BcywgU2hvcnRTdGFjayBkaWQgKm5vdCogYW5ub3RhdGUgdGhlc2UgY2x1c3RlcnMgYXMgbWlSTkFzIGxpa2VseSBbYmVjYXVzZSB0aGV5IGRvIG5vdCAqYWxzbyogbWF0Y2ggc2Vjb25kYXJ5IHN0cnVjdHVyZSBjcml0ZXJpYV0oaHR0cHM6Ly9naXRodWIuY29tL01pa2VBeHRlbGwvU2hvcnRTdGFjayNtaXJuYS1hbm5vdGF0aW9uKS4KCiMjIyBEaXJlY3RvcnkgdHJlZSBvZiBhbGwgU2hvcnRTdGFjayBvdXRwdXRzCgpNYW55IG9mIHRoZXNlIGFyZSBsYXJnZSAoYnkgR2l0SHViIHN0YW5kYXJkcykgQkFNIGZpbGVzLCBzbyB3aWxsIG5vdCBiZSBhZGRlZCB0byB0aGUgcmVwby4KCkFkZGl0aW9uYWxseSwgaXQncyB1bmxpa2VseSB3ZSdsbCB1dGlsaXplIG1vc3Qgb2YgdGhlIG90aGVyIGZpbGVzIChiaWd3aWcpIGdlbmVyYXRlZCBieSBTaG9ydFN0YWNrLgoKYGBge3Igc2hvcnRzdGFjay1kaXJlY3RvcnktdHJlZSwgZW5naW5lPSdiYXNoJywgZXZhbD1UUlVFfQojIExvYWQgYmFzaCB2YXJpYWJsZXMgaW50byBtZW1vcnkKc291cmNlIC5iYXNodmFycwoKdHJlZSAtaCAke291dHB1dF9kaXJfdG9wfS8KCmBgYAoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCgojIENpdGF0aW9ucw==</div>
 
 
 </div>
