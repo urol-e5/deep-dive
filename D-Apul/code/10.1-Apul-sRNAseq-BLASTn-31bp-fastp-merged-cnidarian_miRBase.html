@@ -1657,8 +1657,8 @@ echo &quot;&quot;
 echo &quot;# Input/Output files&quot;
 echo &#39;export collapsed_reads_fasta=&quot;collapsed-reads-all.fasta&quot;&#39;
 echo &#39;export concatenated_trimmed_reads_fastq=&quot;concatenated-trimmed-reads-all.fastq.gz&quot;&#39;
-echo &#39;export mirbase_mature_fasta_name=&quot;cnidarian_miRNAs.fasta&quot;&#39;
-echo &#39;export mirbase_mature_fasta_no_U=&quot;cnidarian_miRNAs-no_U.fa&quot;&#39;
+echo &#39;export mirbase_mature_fasta_name=&quot;cnidarian-mirbase-mature-v22.1.fasta&quot;&#39;
+echo &#39;export mirbase_mature_fasta_no_U=&quot;cnidarian-mirbase-mature-v22.1-no_U.fa&quot;&#39;
 echo &#39;export mirgene_mature_fasta_name=&quot;mirgene-mature-all-v2.1.fa&quot;&#39;
 echo &#39;export mirgene_mature_fasta_no_U=&quot;mirgene-mature-all-v2.1-no_U.fa&quot;&#39;
 echo &quot;&quot;
@@ -1698,8 +1698,8 @@ export blast_dbs_dir=&quot;${deep_dive_dir}/data/blast_dbs&quot;
 # Input/Output files
 export collapsed_reads_fasta=&quot;collapsed-reads-all.fasta&quot;
 export concatenated_trimmed_reads_fastq=&quot;concatenated-trimmed-reads-all.fastq.gz&quot;
-export mirbase_mature_fasta_name=&quot;cnidarian_miRNAs.fasta&quot;
-export mirbase_mature_fasta_no_U=&quot;cnidarian_miRNAs-no_U.fa&quot;
+export mirbase_mature_fasta_name=&quot;cnidarian-mirbase-mature-v22.1.fasta&quot;
+export mirbase_mature_fasta_no_U=&quot;cnidarian-mirbase-mature-v22.1-no_U.fa&quot;
 export mirgene_mature_fasta_name=&quot;mirgene-mature-all-v2.1.fa&quot;
 export mirgene_mature_fasta_no_U=&quot;mirgene-mature-all-v2.1-no_U.fa&quot;
 
@@ -1739,10 +1739,11 @@ if [ ! -f &quot;${deep_dive_data_dir}/${mirgene_mature_fasta_name}&quot; ]; then
  fi
  
  ls -lh ${deep_dive_data_dir}</code></pre>
-<pre><code>total 13M
-drwxr-xr-x 2 sam sam 4.0K Mar 29 12:38 blast_dbs
--rw-r--r-- 1 sam sam  45K Feb 16 12:50 cnidarian_miRNAs.fasta
--rw-r--r-- 1 sam sam  45K Mar 29 12:37 cnidarian_miRNAs-no_U.fa
+<pre><code>total 20M
+drwxr-xr-x 2 sam sam 4.0K Apr  2 07:01 blast_dbs
+-rw-rw-r-- 1 sam sam 3.8M Apr  2 06:51 cnidarian-mirbase-mature-v22.1.fasta
+-rw-r--r-- 1 sam sam 3.8M Apr  2 07:00 cnidarian-mirbase-mature-v22.1-no_U.fa
+-rw-r--r-- 1 sam sam  44K Apr  2 06:49 cnidarian_miRNAs.fasta
 -rw-r--r-- 1 sam sam 3.7M Feb 16 12:36 mirbase-mature-v22.1.fa
 -rw-r--r-- 1 sam sam 3.7M Dec  4 11:05 mirbase-mature-v22.1-no_spaces.fa
 -rw-r--r-- 1 sam sam 3.7M Nov 17 07:59 mirbase-mature-v22.1-no_U.fa
@@ -1754,7 +1755,31 @@ drwxr-xr-x 2 sam sam 4.0K Mar 29 12:38 blast_dbs
 source .bashvars
 
 head &quot;${deep_dive_data_dir}&quot;/[cm][ni]*.fa*</code></pre>
-<pre><code>==&gt; /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/data/cnidarian_miRNAs.fasta &lt;==
+<pre><code>==&gt; /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/data/cnidarian-mirbase-mature-v22.1.fasta &lt;==
+&gt;cel-let-7-5p MIMAT0000001 Caenorhabditis elegans let-7-5p
+UGAGGUAGUAGGUUGUAUAGUU
+&gt;cel-let-7-3p MIMAT0015091 Caenorhabditis elegans let-7-3p
+CUAUGCAAUUUUCUACCUUACC
+&gt;cel-lin-4-5p MIMAT0000002 Caenorhabditis elegans lin-4-5p
+UCCCUGAGACCUCAAGUGUGA
+&gt;cel-lin-4-3p MIMAT0015092 Caenorhabditis elegans lin-4-3p
+ACACCUGGGCUCUCCGGGUACC
+&gt;cel-miR-1-5p MIMAT0020301 Caenorhabditis elegans miR-1-5p
+CAUACUUCCUUACAUGCCCAUA
+
+==&gt; /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/data/cnidarian-mirbase-mature-v22.1-no_U.fa &lt;==
+&gt;cel-let-7-5p MIMAT0000001 Caenorhabditis elegans let-7-5p
+TGAGGTAGTAGGTTGTATAGTT
+&gt;cel-let-7-3p MIMAT0015091 Caenorhabditis elegans let-7-3p
+CTATGCAATTTTCTACCTTACC
+&gt;cel-lin-4-5p MIMAT0000002 Caenorhabditis elegans lin-4-5p
+TCCCTGAGACCTCAAGTGTGA
+&gt;cel-lin-4-3p MIMAT0015092 Caenorhabditis elegans lin-4-3p
+ACACCTGGGCTCTCCGGGTACC
+&gt;cel-miR-1-5p MIMAT0020301 Caenorhabditis elegans miR-1-5p
+CATACTTCCTTACATGCCCATA
+
+==&gt; /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/data/cnidarian_miRNAs.fasta &lt;==
 &gt;spi-mir-temp-1_Stylophora_pistillata_Liew_et_al._2014_Matches_miR-100_family.
 ACCCGUAGAUCCGAACUUGUGG
 &gt;spi-mir-temp-2_Stylophora_pistillata_Liew_et_al._2014_NA
@@ -1765,18 +1790,6 @@ UCAGGGAUUGUGGUGAGUUAGUU
 AAAGAAGUACAAGUGGUAGGG
 &gt;spi-mir-temp-5_Stylophora_pistillata_Liew_et_al._2014_NA
 GAGGUCCGGAUGGUUGA
-
-==&gt; /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/data/cnidarian_miRNAs-no_U.fa &lt;==
-&gt;spi-mir-temp-1_Stylophora_pistillata_Liew_et_al._2014_Matches_miR-100_family.
-ACCCGTAGATCCGAACTTGTGG
-&gt;spi-mir-temp-2_Stylophora_pistillata_Liew_et_al._2014_NA
-TATCGAATCCGTCAAAAAGAGA
-&gt;spi-mir-temp-3_Stylophora_pistillata_Liew_et_al._2014_NA
-TCAGGGATTGTGGTGAGTTAGTT
-&gt;spi-mir-temp-4_Stylophora_pistillata_Liew_et_al._2014_Exact_match_of_nve-miR-2023.
-AAAGAAGTACAAGTGGTAGGG
-&gt;spi-mir-temp-5_Stylophora_pistillata_Liew_et_al._2014_NA
-GAGGTCCGGATGGTTGA
 
 ==&gt; /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/data/mirbase-mature-v22.1.fa &lt;==
 &gt;cel-let-7-5p MIMAT0000001 Caenorhabditis elegans let-7-5p
@@ -1861,17 +1874,17 @@ fi
 
 head &quot;${deep_dive_data_dir}&quot;/[cm][ni]*U.fa
   </code></pre>
-<pre><code>==&gt; /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/data/cnidarian_miRNAs-no_U.fa &lt;==
-&gt;spi-mir-temp-1_Stylophora_pistillata_Liew_et_al._2014_Matches_miR-100_family.
-ACCCGTAGATCCGAACTTGTGG
-&gt;spi-mir-temp-2_Stylophora_pistillata_Liew_et_al._2014_NA
-TATCGAATCCGTCAAAAAGAGA
-&gt;spi-mir-temp-3_Stylophora_pistillata_Liew_et_al._2014_NA
-TCAGGGATTGTGGTGAGTTAGTT
-&gt;spi-mir-temp-4_Stylophora_pistillata_Liew_et_al._2014_Exact_match_of_nve-miR-2023.
-AAAGAAGTACAAGTGGTAGGG
-&gt;spi-mir-temp-5_Stylophora_pistillata_Liew_et_al._2014_NA
-GAGGTCCGGATGGTTGA
+<pre><code>==&gt; /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/data/cnidarian-mirbase-mature-v22.1-no_U.fa &lt;==
+&gt;cel-let-7-5p MIMAT0000001 Caenorhabditis elegans let-7-5p
+TGAGGTAGTAGGTTGTATAGTT
+&gt;cel-let-7-3p MIMAT0015091 Caenorhabditis elegans let-7-3p
+CTATGCAATTTTCTACCTTACC
+&gt;cel-lin-4-5p MIMAT0000002 Caenorhabditis elegans lin-4-5p
+TCCCTGAGACCTCAAGTGTGA
+&gt;cel-lin-4-3p MIMAT0015092 Caenorhabditis elegans lin-4-3p
+ACACCTGGGCTCTCCGGGTACC
+&gt;cel-miR-1-5p MIMAT0020301 Caenorhabditis elegans miR-1-5p
+CATACTTCCTTACATGCCCATA
 
 ==&gt; /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/data/mirbase-mature-v22.1-no_U.fa &lt;==
 &gt;cel-let-7-5p MIMAT0000001 Caenorhabditis elegans let-7-5p
@@ -1977,9 +1990,9 @@ head &quot;${output_dir_top}/${collapsed_reads_fasta}&quot;
 
 wc -l &quot;${output_dir_top}/${collapsed_reads_fasta}&quot;</code></pre>
 <pre><code>
-real    3m33.692s
-user    4m48.278s
-sys 0m31.773s
+real    0m0.000s
+user    0m0.000s
+sys 0m0.000s
 &gt;1-1843196
 GCACTGGTGGTTCAGTGGTAGAATTCTCGCC
 &gt;2-1083086
@@ -2134,16 +2147,16 @@ echo &quot;&quot;
 
 wc -l ${output_dir_top}/*eval_1000.outfmt6</code></pre>
 <pre><code>==&gt; /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/D-Apul/output/10.1-Apul-sRNAseq-BLASTn-31bp-fastp-merged-cnidarian_miRBase/cnidarian-miRBase-BLASTn-eval_1000.outfmt6 &lt;==
-1-1843196   miR-9413_Nematostella_vectensis_Moran_et_al._2014_NA    100.000 9   0   0   12  20  10  18  0.51    18.3
-2-1083086   hma-mir-new29_Hydra_magnipapillata_Krishna_et_al._2013_NA   100.000 9   0   0   7   15  19  11  0.38    18.3
-3-967720    miR-9413_Nematostella_vectensis_Moran_et_al._2014_NA    100.000 9   0   0   12  20  10  18  0.51    18.3
-4-832824    miR-9413_Nematostella_vectensis_Moran_et_al._2014_NA    100.000 10  0   0   14  23  19  10  0.11    20.3
-5-750080    miR-9413_Nematostella_vectensis_Moran_et_al._2014_NA    100.000 9   0   0   11  19  10  18  0.49    18.3
-6-691325    miR-9413_Nematostella_vectensis_Moran_et_al._2014_NA    100.000 9   0   0   12  20  10  18  0.45    18.3
-7-659957    miR-9443_Nematostella_vectensis_Moran_et_al._2014_NA    100.000 9   0   0   15  23  16  8   0.49    18.3
-8-606529    miR-9458_Nematostella_vectensis_Moran_et_al._2014_NA    100.000 10  0   0   6   15  14  5   0.096   20.3
-9-571297    adi-nve-F-miR-100_Acropora_digitifera__Praher_et_al._2021_NA    100.000 20  0   0   1   20  1   20  7.31e-08    40.1
-10-528956   hma-mir-new4_Hydra_magnipapillata_Krishna_et_al._2013_NA    100.000 8   0   0   7   14  19  12  1.7 16.4
+1-1843196   ppc-miR-8214-5p 100.000 13  0   0   12  24  18  6   0.11    26.3
+2-1083086   ppy-miR-1255a   100.000 12  0   0   3   14  22  11  0.37    24.3
+3-967720    ppc-miR-8214-5p 100.000 13  0   0   12  24  18  6   0.11    26.3
+4-832824    dme-miR-4971-5p 100.000 12  0   0   17  28  18  7   0.45    24.3
+5-750080    ppc-miR-8214-5p 100.000 13  0   0   11  23  18  6   0.13    26.3
+6-691325    ppc-miR-8214-5p 100.000 13  0   0   12  24  18  6   0.11    26.3
+7-659957    ami-miR-2184-5p 100.000 11  0   0   4   14  12  22  2.0 22.3
+8-606529    cpo-miR-509c-3p 100.000 12  0   0   13  24  8   19  0.37    24.3
+9-571297    adi-nve-F-miR-100_Acropora_digitifera__Praher_et_al._2021_NA    100.000 20  0   0   1   20  1   20  3.98e-06    40.1
+10-528956   egr-miR-10227d-5p   100.000 11  0   0   14  24  20  10  1.7 22.3
 
 ==&gt; /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/D-Apul/output/10.1-Apul-sRNAseq-BLASTn-31bp-fastp-merged-cnidarian_miRBase/MirGene-BLASTn-eval_1000.outfmt6 &lt;==
 1-1843196   Pma-Mir-96-P3o2_5p  100.000 11  0   0   16  26  9   19  0.78    22.3
@@ -2159,9 +2172,9 @@ wc -l ${output_dir_top}/*eval_1000.outfmt6</code></pre>
 
 -----------------------------------------
 
-  11070870 /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/D-Apul/output/10.1-Apul-sRNAseq-BLASTn-31bp-fastp-merged-cnidarian_miRBase/cnidarian-miRBase-BLASTn-eval_1000.outfmt6
+  11082917 /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/D-Apul/output/10.1-Apul-sRNAseq-BLASTn-31bp-fastp-merged-cnidarian_miRBase/cnidarian-miRBase-BLASTn-eval_1000.outfmt6
   11082917 /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/D-Apul/output/10.1-Apul-sRNAseq-BLASTn-31bp-fastp-merged-cnidarian_miRBase/MirGene-BLASTn-eval_1000.outfmt6
-  22153787 total</code></pre>
+  22165834 total</code></pre>
 </div>
 <div id="check-blastn-e-value-10-results" class="section level2" number="9.2">
 <h2><span class="header-section-number">9.2</span> Check BLASTn e-value = 10 results</h2>
@@ -2176,16 +2189,16 @@ echo &quot;&quot;
 
 wc -l ${output_dir_top}/*eval_10.outfmt6</code></pre>
 <pre><code>==&gt; /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/D-Apul/output/10.1-Apul-sRNAseq-BLASTn-31bp-fastp-merged-cnidarian_miRBase/cindarian-miRBase-BLASTn-eval_10.outfmt6 &lt;==
-1-1843196   miR-9413_Nematostella_vectensis_Moran_et_al._2014_NA    100.000 9   0   0   12  20  10  18  0.51    18.3
-2-1083086   hma-mir-new29_Hydra_magnipapillata_Krishna_et_al._2013_NA   100.000 9   0   0   7   15  19  11  0.38    18.3
-3-967720    miR-9413_Nematostella_vectensis_Moran_et_al._2014_NA    100.000 9   0   0   12  20  10  18  0.51    18.3
-4-832824    miR-9413_Nematostella_vectensis_Moran_et_al._2014_NA    100.000 10  0   0   14  23  19  10  0.11    20.3
-5-750080    miR-9413_Nematostella_vectensis_Moran_et_al._2014_NA    100.000 9   0   0   11  19  10  18  0.49    18.3
-6-691325    miR-9413_Nematostella_vectensis_Moran_et_al._2014_NA    100.000 9   0   0   12  20  10  18  0.45    18.3
-7-659957    miR-9443_Nematostella_vectensis_Moran_et_al._2014_NA    100.000 9   0   0   15  23  16  8   0.49    18.3
-8-606529    miR-9458_Nematostella_vectensis_Moran_et_al._2014_NA    100.000 10  0   0   6   15  14  5   0.096   20.3
-9-571297    adi-nve-F-miR-100_Acropora_digitifera__Praher_et_al._2021_NA    100.000 20  0   0   1   20  1   20  7.31e-08    40.1
-10-528956   hma-mir-new4_Hydra_magnipapillata_Krishna_et_al._2013_NA    100.000 8   0   0   7   14  19  12  1.7 16.4
+1-1843196   ppc-miR-8214-5p 100.000 13  0   0   12  24  18  6   0.11    26.3
+2-1083086   ppy-miR-1255a   100.000 12  0   0   3   14  22  11  0.37    24.3
+3-967720    ppc-miR-8214-5p 100.000 13  0   0   12  24  18  6   0.11    26.3
+4-832824    dme-miR-4971-5p 100.000 12  0   0   17  28  18  7   0.45    24.3
+5-750080    ppc-miR-8214-5p 100.000 13  0   0   11  23  18  6   0.13    26.3
+6-691325    ppc-miR-8214-5p 100.000 13  0   0   12  24  18  6   0.11    26.3
+7-659957    ami-miR-2184-5p 100.000 11  0   0   4   14  12  22  2.0 22.3
+8-606529    cpo-miR-509c-3p 100.000 12  0   0   13  24  8   19  0.37    24.3
+9-571297    adi-nve-F-miR-100_Acropora_digitifera__Praher_et_al._2021_NA    100.000 20  0   0   1   20  1   20  3.98e-06    40.1
+10-528956   egr-miR-10227d-5p   100.000 11  0   0   14  24  20  10  1.7 22.3
 
 ==&gt; /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/D-Apul/output/10.1-Apul-sRNAseq-BLASTn-31bp-fastp-merged-cnidarian_miRBase/MirGene-BLASTn-eval_10.outfmt6 &lt;==
 1-1843196   Pma-Mir-96-P3o2_5p  100.000 11  0   0   16  26  9   19  0.78    22.3
@@ -2201,9 +2214,9 @@ wc -l ${output_dir_top}/*eval_10.outfmt6</code></pre>
 
 -----------------------------------------
 
-  11070870 /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/D-Apul/output/10.1-Apul-sRNAseq-BLASTn-31bp-fastp-merged-cnidarian_miRBase/cindarian-miRBase-BLASTn-eval_10.outfmt6
+  11059697 /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/D-Apul/output/10.1-Apul-sRNAseq-BLASTn-31bp-fastp-merged-cnidarian_miRBase/cindarian-miRBase-BLASTn-eval_10.outfmt6
   10189571 /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/D-Apul/output/10.1-Apul-sRNAseq-BLASTn-31bp-fastp-merged-cnidarian_miRBase/MirGene-BLASTn-eval_10.outfmt6
-  21260441 total</code></pre>
+  21249268 total</code></pre>
 </div>
 <div id="check-blastn-e-value-1-results" class="section level2" number="9.3">
 <h2><span class="header-section-number">9.3</span> Check BLASTn e-value = 1 results</h2>
@@ -2218,16 +2231,16 @@ echo &quot;&quot;
 
 wc -l ${output_dir_top}/*eval_1.outfmt6</code></pre>
 <pre><code>==&gt; /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/D-Apul/output/10.1-Apul-sRNAseq-BLASTn-31bp-fastp-merged-cnidarian_miRBase/cindarian-miRBase-BLASTn-eval_1.outfmt6 &lt;==
-1-1843196   miR-9413_Nematostella_vectensis_Moran_et_al._2014_NA    100.000 9   0   0   12  20  10  18  0.51    18.3
-2-1083086   hma-mir-new29_Hydra_magnipapillata_Krishna_et_al._2013_NA   100.000 9   0   0   7   15  19  11  0.38    18.3
-3-967720    miR-9413_Nematostella_vectensis_Moran_et_al._2014_NA    100.000 9   0   0   12  20  10  18  0.51    18.3
-4-832824    miR-9413_Nematostella_vectensis_Moran_et_al._2014_NA    100.000 10  0   0   14  23  19  10  0.11    20.3
-5-750080    miR-9413_Nematostella_vectensis_Moran_et_al._2014_NA    100.000 9   0   0   11  19  10  18  0.49    18.3
-6-691325    miR-9413_Nematostella_vectensis_Moran_et_al._2014_NA    100.000 9   0   0   12  20  10  18  0.45    18.3
-7-659957    miR-9443_Nematostella_vectensis_Moran_et_al._2014_NA    100.000 9   0   0   15  23  16  8   0.49    18.3
-8-606529    miR-9458_Nematostella_vectensis_Moran_et_al._2014_NA    100.000 10  0   0   6   15  14  5   0.096   20.3
-9-571297    adi-nve-F-miR-100_Acropora_digitifera__Praher_et_al._2021_NA    100.000 20  0   0   1   20  1   20  7.31e-08    40.1
-11-456706   miR-9413_Nematostella_vectensis_Moran_et_al._2014_NA    100.000 10  0   0   14  23  19  10  0.13    20.3
+1-1843196   ppc-miR-8214-5p 100.000 13  0   0   12  24  18  6   0.11    26.3
+2-1083086   ppy-miR-1255a   100.000 12  0   0   3   14  22  11  0.37    24.3
+3-967720    ppc-miR-8214-5p 100.000 13  0   0   12  24  18  6   0.11    26.3
+4-832824    dme-miR-4971-5p 100.000 12  0   0   17  28  18  7   0.45    24.3
+5-750080    ppc-miR-8214-5p 100.000 13  0   0   11  23  18  6   0.13    26.3
+6-691325    ppc-miR-8214-5p 100.000 13  0   0   12  24  18  6   0.11    26.3
+8-606529    cpo-miR-509c-3p 100.000 12  0   0   13  24  8   19  0.37    24.3
+9-571297    adi-nve-F-miR-100_Acropora_digitifera__Praher_et_al._2021_NA    100.000 20  0   0   1   20  1   20  3.98e-06    40.1
+11-456706   dme-miR-4971-5p 100.000 12  0   0   17  28  18  7   0.45    24.3
+12-455987   ppc-miR-8214-5p 100.000 13  0   0   12  24  18  6   0.11    26.3
 
 ==&gt; /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/D-Apul/output/10.1-Apul-sRNAseq-BLASTn-31bp-fastp-merged-cnidarian_miRBase/MirGene-BLASTn-eval_1.outfmt6 &lt;==
 1-1843196   Pma-Mir-96-P3o2_5p  100.000 11  0   0   16  26  9   19  0.78    22.3
@@ -2243,11 +2256,12 @@ wc -l ${output_dir_top}/*eval_1.outfmt6</code></pre>
 
 -----------------------------------------
 
-  6454816 /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/D-Apul/output/10.1-Apul-sRNAseq-BLASTn-31bp-fastp-merged-cnidarian_miRBase/cindarian-miRBase-BLASTn-eval_1.outfmt6
+  5108736 /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/D-Apul/output/10.1-Apul-sRNAseq-BLASTn-31bp-fastp-merged-cnidarian_miRBase/cindarian-miRBase-BLASTn-eval_1.outfmt6
   4196511 /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/D-Apul/output/10.1-Apul-sRNAseq-BLASTn-31bp-fastp-merged-cnidarian_miRBase/MirGene-BLASTn-eval_1.outfmt6
- 10651327 total</code></pre>
+  9305247 total</code></pre>
 <p>The default e-value results in alignments for ~50% of sequences.</p>
 <p>Decreasing the e-value to <code>10</code> resulted in fewer query alignments, as we’d expect, but only minimally.</p>
+<p>Decreasing the e-value to <code>1</code> resulted in ~25% of query alignments.</p>
 <p>For further analysis, we should probably discuss a reasonable e-value to use for filtering, as it might be worthwhile to test even lower e-value thresholds.</p>
 <hr />
 </div>
@@ -2261,7 +2275,7 @@ Altschul, Stephen F., Warren Gish, Webb Miller, Eugene W. Myers, and David J. Li
 </div>
 </div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiMTAuMS1BcHVsLXNSTkFzZXEtQkxBU1RuLTMxYnAtZmFzdHAtbWVyZ2VkLWNuaWRhcmlhbl9taVJCYXNlIgphdXRob3I6ICJTYW0gV2hpdGUiCmRhdGU6ICIyMDI0LTAzLTI5IgpvdXRwdXQ6IAogIGJvb2tkb3duOjpodG1sX2RvY3VtZW50MjoKICAgIHRoZW1lOiBjb3NtbwogICAgdG9jOiB0cnVlCiAgICB0b2NfZmxvYXQ6IHRydWUKICAgIG51bWJlcl9zZWN0aW9uczogdHJ1ZQogICAgY29kZV9mb2xkaW5nOiBzaG93CiAgICBjb2RlX2Rvd25sb2FkOiB0cnVlCiAgZ2l0aHViX2RvY3VtZW50OgogICAgdG9jOiB0cnVlCiAgICBudW1iZXJfc2VjdGlvbnM6IHRydWUKICBodG1sX2RvY3VtZW50OgogICAgdGhlbWU6IGNvc21vCiAgICB0b2M6IHRydWUKICAgIHRvY19mbG9hdDogdHJ1ZQogICAgbnVtYmVyX3NlY3Rpb25zOiB0cnVlCiAgICBjb2RlX2ZvbGRpbmc6IHNob3cKICAgIGNvZGVfZG93bmxvYWQ6IHRydWUKYmlibGlvZ3JhcGh5OiByZWZlcmVuY2VzLmJpYgpsaW5rLWNpdGF0aW9uczogdHJ1ZQotLS0KCmBgYHtyIHNldHVwLCBpbmNsdWRlPUZBTFNFfQpsaWJyYXJ5KGtuaXRyKQpsaWJyYXJ5KGthYmxlRXh0cmEpCmxpYnJhcnkoZHBseXIpCmxpYnJhcnkocmV0aWN1bGF0ZSkKa25pdHI6Om9wdHNfY2h1bmskc2V0KAogIGVjaG8gPSBUUlVFLCAgICAgICAgICMgRGlzcGxheSBjb2RlIGNodW5rcwogIGV2YWwgPSBGQUxTRSwgICAgICAgICMgRXZhbHVhdGUgY29kZSBjaHVua3MKICB3YXJuaW5nID0gRkFMU0UsICAgICAjIEhpZGUgd2FybmluZ3MKICBtZXNzYWdlID0gRkFMU0UsICAgICAjIEhpZGUgbWVzc2FnZXMKICBjb21tZW50ID0gIiIsICAgICAgICAjIFByZXZlbnRzIGFwcGVuZGluZyAnIyMnIHRvIGJlZ2lubmluZyBvZiBsaW5lcyBpbiBjb2RlIG91dHB1dAogIHdpZHRoID0gMTAwMCAgICAgICAgICMgYWRkcyBzY3JvbGwgYmFyCikKYGBgCgoKVGhpcyBub3RlYm9vayBwZXJmb3JtcyBhIHNpbXBsZSBbTkNCSSBCTEFTVG5dKGh0dHBzOi8vd3d3Lm5jYmkubmxtLm5paC5nb3YvYm9va3MvTkJLMjc5NjkwLykgW0BhbHRzY2h1bDE5OTBdIGFnYWluc3QgdHdvIG1pUk5BIGRhdGFiYXNlcyB0byBhdHRlbXB0IHRvIGlkZW50aWZ5IG1pUk5BIGluIF9BLnB1bGNocmFfIHNSTkFzZXE6CgotIFttaVJCYXNlXShodHRwczovL21pcmJhc2Uub3JnL2Rvd25sb2FkLykKCiAgLSBVdGlsaXplcyBhIG1vZGlmaWVkIHZlcnNpb24sIHdoaWNoIGluY2x1ZGVzIGNuaWRhcmlhbiBtaVJOQSBjdWxsZWQgZnJvbSBsaXRlcmF0dXJlLgoKLSBbTWlyR2VuZURCXShodHRwczovL3d3dy5taXJnZW5lZGIub3JnL2Rvd25sb2FkKQoKUmVsaWVzIG9uIHRoZSBmb2xsb3dpbmcgc29mdHdhcmU6CiAgCi0gW2Zhc3R4X3Rvb2xraXRdKGh0dHA6Ly9oYW5ub25sYWIuY3NobC5lZHUvZmFzdHhfdG9vbGtpdC8pCgogIC0gYGZhc3R4X2NvbGxhcHNlcmA6IENvbGxhcHNlcyBkdXBsaWNhdGUgc2VxdWVuY2VzIGluIEZhc3RBL1EgaW50byBzaW5nbGUgc2VxdWVuY2UuCgojIENyZWF0ZSBhIEJhc2ggdmFyaWFibGVzIGZpbGUKClRoaXMgYWxsb3dzIHVzYWdlIG9mIEJhc2ggdmFyaWFibGVzIGFjcm9zcyBSIE1hcmtkb3duIGNodW5rcy4KCmBgYHtyIHNhdmUtYmFzaC12YXJpYWJsZXMtdG8tcnZhcnMtZmlsZSwgZW5naW5lPSdiYXNoJywgZXZhbD1UUlVFfQp7CmVjaG8gIiMjIyMgQXNzaWduIFZhcmlhYmxlcyAjIyMjIgplY2hvICIiCgplY2hvICIjIFRyaW1tZWQgRmFzdFEgbmFtaW5nIHBhdHRlcm4iCmVjaG8gImV4cG9ydCB0cmltbWVkX2Zhc3Rxc19wYXR0ZXJuPScqZmFzdHAtYWRhcHRlcnMtcG9seUctMzFicC1tZXJnZWQuZnEuZ3onIgoKZWNobyAiIyBEYXRhIGRpcmVjdG9yaWVzIgplY2hvICdleHBvcnQgZGVlcF9kaXZlX2Rpcj0vaG9tZS9zaGFyZWQvOFRCX0hERF8wMS9zYW0vZ2l0cmVwb3MvZGVlcC1kaXZlJwplY2hvICdleHBvcnQgZGVlcF9kaXZlX2RhdGFfZGlyPSIke2RlZXBfZGl2ZV9kaXJ9L2RhdGEiJwplY2hvICdleHBvcnQgb3V0cHV0X2Rpcl90b3A9JHtkZWVwX2RpdmVfZGlyfS9ELUFwdWwvb3V0cHV0LzEwLjEtQXB1bC1zUk5Bc2VxLUJMQVNUbi0zMWJwLWZhc3RwLW1lcmdlZC1jbmlkYXJpYW5fbWlSQmFzZScKZWNobyAnZXhwb3J0IHRyaW1tZWRfZmFzdHFzX2Rpcj0iJHtkZWVwX2RpdmVfZGlyfS9ELUFwdWwvb3V0cHV0LzA4LjItQXB1bC1zUk5Bc2VxLXRyaW1taW5nLTMxYnAtZmFzdHAtbWVyZ2VkL3RyaW1tZWQtcmVhZHMiJwplY2hvICdleHBvcnQgYmxhc3RfZGJzX2Rpcj0iJHtkZWVwX2RpdmVfZGlyfS9kYXRhL2JsYXN0X2RicyInCmVjaG8gIiIKCmVjaG8gIiMgSW5wdXQvT3V0cHV0IGZpbGVzIgplY2hvICdleHBvcnQgY29sbGFwc2VkX3JlYWRzX2Zhc3RhPSJjb2xsYXBzZWQtcmVhZHMtYWxsLmZhc3RhIicKZWNobyAnZXhwb3J0IGNvbmNhdGVuYXRlZF90cmltbWVkX3JlYWRzX2Zhc3RxPSJjb25jYXRlbmF0ZWQtdHJpbW1lZC1yZWFkcy1hbGwuZmFzdHEuZ3oiJwplY2hvICdleHBvcnQgbWlyYmFzZV9tYXR1cmVfZmFzdGFfbmFtZT0iY25pZGFyaWFuX21pUk5Bcy5mYXN0YSInCmVjaG8gJ2V4cG9ydCBtaXJiYXNlX21hdHVyZV9mYXN0YV9ub19VPSJjbmlkYXJpYW5fbWlSTkFzLW5vX1UuZmEiJwplY2hvICdleHBvcnQgbWlyZ2VuZV9tYXR1cmVfZmFzdGFfbmFtZT0ibWlyZ2VuZS1tYXR1cmUtYWxsLXYyLjEuZmEiJwplY2hvICdleHBvcnQgbWlyZ2VuZV9tYXR1cmVfZmFzdGFfbm9fVT0ibWlyZ2VuZS1tYXR1cmUtYWxsLXYyLjEtbm9fVS5mYSInCmVjaG8gIiIKCmVjaG8gIiMgRXh0ZXJuYWwgZGF0YSBVUkxzIgplY2hvICdleHBvcnQgbWlyZ2VuZWRiX2Zhc3RhX3VybD0iaHR0cHM6Ly93d3cubWlyZ2VuZWRiLm9yZy9mYXN0YS9BTEw/bWF0PTEiJwplY2hvICIiCgplY2hvICIjIFBhdGhzIHRvIHByb2dyYW1zIgplY2hvICdleHBvcnQgbmNiaV9ibGFzdF9kaXI9Ii9ob21lL3NoYXJlZC9uY2JpLWJsYXN0LTIuMTUuMCsvYmluLyInCmVjaG8gJ2V4cG9ydCBuY2JpX2JsYXN0bj0iJHtuY2JpX2JsYXN0X2Rpcn0vYmxhc3RuIicKZWNobyAnZXhwb3J0IG5jYmlfbWFrZWJsYXN0X2RiPSIke25jYmlfYmxhc3RfZGlyfS9tYWtlYmxhc3RkYiInCmVjaG8gJ2V4cG9ydCBmYXN0eF9jb2xsYXBzZXI9Ii9ob21lL3NoYXJlZC9mYXN0eF90b29sa2l0XzAuMC4xM19iaW5hcmllc19MaW51eF8yLjZfYW1kNjQvYmluL2Zhc3R4X2NvbGxhcHNlciInCgplY2hvICIjIFNldCBudW1iZXIgb2YgQ1BVcyB0byB1c2UiCmVjaG8gJ2V4cG9ydCB0aHJlYWRzPTQwJwplY2hvICIiCgplY2hvICIjIEluaXRpYWxpemUgYXJyYXlzIgplY2hvICdleHBvcnQgdHJpbW1lZF9mYXN0cXNfYXJyYXk9KCknCgoKfSA+IC5iYXNodmFycwoKY2F0IC5iYXNodmFycwpgYGAKCgojIERvd25sb2FkIE1pckdlbmVEQiBGYXN0YQpgYGB7ciBkb3dubG9hZC1taXJnZW5lLWRiLUZhc3RBLCBlbmdpbmU9J2Jhc2gnLCBldmFsPVRSVUV9CiMgTG9hZCBiYXNoIHZhcmlhYmxlcyBpbnRvIG1lbW9yeQpzb3VyY2UgLmJhc2h2YXJzCgojIERvd25sb2FkIE1pckdlbmVEQiwgaWYgaXQgZG9lc24ndCBleGlzdAppZiBbICEgLWYgIiR7ZGVlcF9kaXZlX2RhdGFfZGlyfS8ke21pcmdlbmVfbWF0dXJlX2Zhc3RhX25hbWV9IiBdOyB0aGVuCgogIHdnZXQgXAogIC0tbm8tY2hlY2stY2VydGlmaWNhdGUgXAogIC0tY29udGludWUgXAogIC0tbm8taG9zdC1kaXJlY3RvcmllcyBcCiAgLS1uby1kaXJlY3RvcmllcyBcCiAgLS1uby1wYXJlbnQgXAogIC0tcXVpZXQgXAogIC0tZXhlY3V0ZSByb2JvdHM9b2ZmIFwKICAtLW91dHB1dC1kb2N1bWVudCAke2RlZXBfZGl2ZV9kYXRhX2Rpcn0vJHttaXJnZW5lX21hdHVyZV9mYXN0YV9uYW1lfSBcCiAgICR7bWlyZ2VuZWRiX2Zhc3RhX3VybH0KIAogZmkKIAogbHMgLWxoICR7ZGVlcF9kaXZlX2RhdGFfZGlyfQpgYGAKCiMjIEluc3BlY3QgbWlSTkEgRmFzdEFzCmBgYHtyIGluc3BlY3QtbWlSTkEtRmFzdEFzLCBlbmdpbmU9J2Jhc2gnLCBldmFsPVRSVUV9CiMgTG9hZCBiYXNoIHZhcmlhYmxlcyBpbnRvIG1lbW9yeQpzb3VyY2UgLmJhc2h2YXJzCgpoZWFkICIke2RlZXBfZGl2ZV9kYXRhX2Rpcn0iL1tjbV1bbmldKi5mYSoKYGBgCgoKIyBDb252ZXJ0IGBVYCB0byBgVGAgaW4gbWlSTkEgRmFzdEFzCgpUaGlzIGlzIG5lZWRlZCBiZWNhdXNlIHRoZSBzUk5Bc2VxIHNlcXVlbmNlcyBkbyBfbm90XyBoYXZlIHVyYWNpbHMgKGBVYCkgLSB0aGV5IGhhdmUgdGh5bWluZXMgKGBUYCkuCgpgYGB7ciBjb252ZXJ0LVUtdG8tVCwgZW5naW5lPSdiYXNoJywgZXZhbD1UUlVFfQojIExvYWQgYmFzaCB2YXJpYWJsZXMgaW50byBtZW1vcnkKc291cmNlIC5iYXNodmFycwoKIyBDb252ZXJ0IG1pUkJhc2UgRmFzdEEKaWYgWyAhIC1mICIke2RlZXBfZGl2ZV9kYXRhX2Rpcn0vJHttaXJiYXNlX21hdHVyZV9mYXN0YV9ub19VfSIgXTsgdGhlbgogIHNlZCAnL15bXj5dL3MvVS9UL2cnICIke2RlZXBfZGl2ZV9kYXRhX2Rpcn0vJHttaXJiYXNlX21hdHVyZV9mYXN0YV9uYW1lfSIgXAogID4gIiR7ZGVlcF9kaXZlX2RhdGFfZGlyfS8ke21pcmJhc2VfbWF0dXJlX2Zhc3RhX25vX1V9IgpmaQoKCiMgQ29udmVydCBNaXJHZW5lIEZhc3RBCmlmIFsgISAtZiAiJHtkZWVwX2RpdmVfZGF0YV9kaXJ9LyR7bWlyZ2VuZV9tYXR1cmVfZmFzdGFfbm9fVX0iIF07IHRoZW4KICBzZWQgJy9eW14+XS9zL1UvVC9nJyAiJHtkZWVwX2RpdmVfZGF0YV9kaXJ9LyR7bWlyZ2VuZV9tYXR1cmVfZmFzdGFfbmFtZX0iIFwKICA+ICIke2RlZXBfZGl2ZV9kYXRhX2Rpcn0vJHttaXJnZW5lX21hdHVyZV9mYXN0YV9ub19VfSIKZmkKCgpoZWFkICIke2RlZXBfZGl2ZV9kYXRhX2Rpcn0iL1tjbV1bbmldKlUuZmEKICAKYGBgCgojIENyZWF0ZSBCTEFTVCBEYXRhYmFzZXMKYGBge3IgbWFrZS1ibGFzdC1kYnMsIGVuZ2luZT0nYmFzaCcsIGV2YWw9VFJVRX0KIyBMb2FkIGJhc2ggdmFyaWFibGVzIGludG8gbWVtb3J5CnNvdXJjZSAuYmFzaHZhcnMKCgoKIyBtaVJCYXNlIEJMQVNUIERCCiMjIE1ha2Ugc3VyZSBvdXRwdXQgZGlyZWN0b3J5IGV4aXN0cwppZiBbICEgLWQgIiR7Ymxhc3RfZGJzX2Rpcn0iIF07IHRoZW4KICBta2RpciAtLXBhcmVudHMgIiR7Ymxhc3RfZGJzX2Rpcn0iCmZpCgojIyBDaGVjayBmb3IgcHJlLWV4aXNpbmcgZGF0YWJhc2UKaWYgWyAhIC1mICIke2JsYXN0X2Ric19kaXJ9LyR7bWlyZ2VuZV9tYXR1cmVfZmFzdGFfbm9fVSUuKn0uYmxhc3RkYi5sb2ciIF07IHRoZW4KICAke25jYmlfbWFrZWJsYXN0X2RifSBcCiAgLWluICR7ZGVlcF9kaXZlX2RhdGFfZGlyfS8ke21pcmdlbmVfbWF0dXJlX2Zhc3RhX25vX1V9IFwKICAtdGl0bGUgJHttaXJnZW5lX21hdHVyZV9mYXN0YV9ub19VJS4qfSBcCiAgLWRidHlwZSBudWNsIFwKICAtb3V0ICR7Ymxhc3RfZGJzX2Rpcn0vJHttaXJnZW5lX21hdHVyZV9mYXN0YV9ub19VJS4qfSBcCiAgLWxvZ2ZpbGUgJHtibGFzdF9kYnNfZGlyfS8ke21pcmdlbmVfbWF0dXJlX2Zhc3RhX25vX1UlLip9LmJsYXN0ZGIubG9nCmZpCgojIG1pUkJhc2UgQkxBU1QgREIKIyMgTWFrZSBzdXJlIG91dHB1dCBkaXJlY3RvcnkgZXhpc3RzCmlmIFsgISAtZCAiJHtibGFzdF9kYnNfZGlyfSIgXTsgdGhlbgogIG1rZGlyIC0tcGFyZW50cyAiJHtibGFzdF9kYnNfZGlyfSIKZmkKCiMjIENoZWNrIGZvciBwcmUtZXhpc2luZyBkYXRhYmFzZQppZiBbICEgLWYgIiR7Ymxhc3RfZGJzX2Rpcn0vJHttaXJiYXNlX21hdHVyZV9mYXN0YV9ub19VJS4qfS5ibGFzdGRiLmxvZyIgXTsgdGhlbgogICR7bmNiaV9tYWtlYmxhc3RfZGJ9IFwKICAtaW4gJHtkZWVwX2RpdmVfZGF0YV9kaXJ9LyR7bWlyYmFzZV9tYXR1cmVfZmFzdGFfbm9fVX0gXAogIC10aXRsZSAke21pcmJhc2VfbWF0dXJlX2Zhc3RhX25vX1UlLip9IFwKICAtZGJ0eXBlIG51Y2wgXAogIC1vdXQgJHtibGFzdF9kYnNfZGlyfS8ke21pcmJhc2VfbWF0dXJlX2Zhc3RhX25vX1UlLip9IFwKICAtbG9nZmlsZSAke2JsYXN0X2Ric19kaXJ9LyR7bWlyYmFzZV9tYXR1cmVfZmFzdGFfbm9fVSUuKn0uYmxhc3RkYi5sb2cKZmkKYGBgCgoKIyBQcmVwYXJlIHJlYWRzIGZvciBCTEFTVGluZwoKIyMgQ29uY2F0ZW5hdGUgYWxsIHRyaW1tZWQgcmVhZHMKYGBge3IgY29uY2F0ZW5hdGUtdHJpbW1lZC1yZWFkcywgZW5naW5lPSdiYXNoJywgZXZhbD1UUlVFfQojIExvYWQgYmFzaCB2YXJpYWJsZXMgaW50byBtZW1vcnkKc291cmNlIC5iYXNodmFycwoKIyBNYWtlIG91dHB1dCBkaXJlY3RvcnksIGlmIGl0IGRvZW5zJ3QgZXhpc3QKaWYgWyAhIC1kICIke291dHB1dF9kaXJfdG9wfSIgXTsgdGhlbgogIG1rZGlyIC0tcGFyZW50cyAiJHtvdXRwdXRfZGlyX3RvcH0iCmZpCgojIENoZWNrIGZvciBleGlzdGVuY2Ugb2YgY29uY2F0ZW5hdGVkIEZhc3RBIGJlZm9yZSBydW5uaW5nCmlmIFsgISAtZiAiJHtvdXRwdXRfZGlyX3RvcH0vJHtjb25jYXRlbmF0ZWRfdHJpbW1lZF9yZWFkc19mYXN0cX0iIF07IHRoZW4KICBjYXQgJHt0cmltbWVkX2Zhc3Rxc19kaXJ9LyR7dHJpbW1lZF9mYXN0cXNfcGF0dGVybn0gXAogID4gIiR7b3V0cHV0X2Rpcl90b3B9LyR7Y29uY2F0ZW5hdGVkX3RyaW1tZWRfcmVhZHNfZmFzdHF9IgpmaQoKbHMgLWxoICIke291dHB1dF9kaXJfdG9wfS8ke2NvbmNhdGVuYXRlZF90cmltbWVkX3JlYWRzX2Zhc3RxfSIKYGBgCgojIyBDb2xsYXBzZSByZWFkcyB0byBGYXN0QQoKVXNlcyBgZmFzdHhfY29sbGFwc2VyYCB0byBjb2xsYXBzZSB0byB1bmlxdWUgcmVhZHMuCgpSZXF1aXJlcyB1bmRvY3VtZW50ZWQgcXVhbGl0eSBzZXR0aW5nLiBIYXZlIHNlbGVjdGVkIGAzMGAgYXMgY3V0dG9mZjogYC1RMzBgLgpgYGB7ciBjb2xsYXBzZS1yZWFkcy10by1GYXN0QSwgZW5naW5lPSdiYXNoJywgZXZhbD1UUlVFfQojIExvYWQgYmFzaCB2YXJpYWJsZXMgaW50byBtZW1vcnkKc291cmNlIC5iYXNodmFycwoKIyBDaGVjayBmb3IgZXhpc3RlbmNlIG9mIGNvbGxhcHNlZCBGYXN0QSBiZWZvcmUgcnVubmluZwp0aW1lIFwKaWYgWyAhIC1mICIke291dHB1dF9kaXJfdG9wfS8ke2NvbGxhcHNlZF9yZWFkc19mYXN0YX0iIF07IHRoZW4KICB6Y2F0ICR7b3V0cHV0X2Rpcl90b3B9LyR7Y29uY2F0ZW5hdGVkX3RyaW1tZWRfcmVhZHNfZmFzdHF9IFwKICB8ICR7ZmFzdHhfY29sbGFwc2VyfSBcCiAgLVEzMCBcCiAgLW8gIiR7b3V0cHV0X2Rpcl90b3B9LyR7Y29sbGFwc2VkX3JlYWRzX2Zhc3RhfSIKZmkKCmhlYWQgIiR7b3V0cHV0X2Rpcl90b3B9LyR7Y29sbGFwc2VkX3JlYWRzX2Zhc3RhfSIKCndjIC1sICIke291dHB1dF9kaXJfdG9wfS8ke2NvbGxhcHNlZF9yZWFkc19mYXN0YX0iCmBgYAoKIyBSdW4gQkxBU1RuIERlZmF1bHQgRS12YWx1ZQoKLSAxMDAwIGZvciBibGFzdG4tc2hvcnQKClJ1bnMgQkxBU1RuIHVzaW5nIHRoZSBgYmxhc3RuLXNob3J0YCB0YXNrIGZvciBzZXF1ZW5jZXMgPCAzMGJwLgoKTG9vayBmb3IgdG9wIG1hdGNoIChgLW1heF9oc3BzIDFgICYgYC1tYXhfdGFyZ2V0X3NlcXMgMWApIGZvciBlYWNoIHF1ZXJ5LgoKICAtIFN1cHByZXNzIHN1YnNlcXVlbnQgd2FybmluZyBgRXhhbWluaW5nIDUgb3IgbW9yZSBtYXRjaGVzIGlzIHJlY29tbWVuZGVkYCBieQogIHJlZGlyZWN0aW5nIHN0ZG91dDogYDI+IC9kZXYvbnVsbGAKCiMjIG1pUkJhc2UgQkxBU1RuIERlZmF1bHQgZS12YWx1ZQpgYGB7ciBtaVJCYXNlLUJMQVNUbi1kZWZhdWx0LWV2YWwsIGVuZ2luZT0nYmFzaCcsIGNhY2hlPVRSVUV9CiMgTG9hZCBiYXNoIHZhcmlhYmxlcyBpbnRvIG1lbW9yeQpzb3VyY2UgLmJhc2h2YXJzCgp0aW1lIFwKJHtuY2JpX2JsYXN0bn0gXAotZGIgJHtibGFzdF9kYnNfZGlyfS8ke21pcmJhc2VfbWF0dXJlX2Zhc3RhX25vX1UlLip9IFwKLXF1ZXJ5ICR7b3V0cHV0X2Rpcl90b3B9LyR7Y29sbGFwc2VkX3JlYWRzX2Zhc3RhfSBcCi1vdXQgJHtvdXRwdXRfZGlyX3RvcH0vY25pZGFyaWFuLW1pUkJhc2UtQkxBU1RuLWV2YWxfMTAwMC5vdXRmbXQ2IFwKLXRhc2sgYmxhc3RuLXNob3J0IFwKLW1heF9oc3BzIDEgXAotbWF4X3RhcmdldF9zZXFzIDEgXAotb3V0Zm10IDYgXAotbnVtX3RocmVhZHMgJHt0aHJlYWRzfSBcCjI+IC9kZXYvbnVsbApgYGAKCiMjIE1pckdlbmUgQkxBU1RuIERlZmF1bHQgZS12YWx1ZQoKYGBge3IgTWlyR2VuZS1CTEFTVG4tZGVmYXVsdC1ldmFsLCBlbmdpbmU9J2Jhc2gnLCBjYWNoZT1UUlVFfQojIExvYWQgYmFzaCB2YXJpYWJsZXMgaW50byBtZW1vcnkKc291cmNlIC5iYXNodmFycwoKdGltZSBcCiR7bmNiaV9ibGFzdG59IFwKLWRiICR7Ymxhc3RfZGJzX2Rpcn0vJHttaXJnZW5lX21hdHVyZV9mYXN0YV9ub19VJS4qfSBcCi1xdWVyeSAke291dHB1dF9kaXJfdG9wfS8ke2NvbGxhcHNlZF9yZWFkc19mYXN0YX0gXAotb3V0ICR7b3V0cHV0X2Rpcl90b3B9L01pckdlbmUtQkxBU1RuLWV2YWxfMTAwMC5vdXRmbXQ2IFwKLXRhc2sgYmxhc3RuLXNob3J0IFwKLW1heF9oc3BzIDEgXAotbWF4X3RhcmdldF9zZXFzIDEgXAotb3V0Zm10IDYgXAotbnVtX3RocmVhZHMgJHt0aHJlYWRzfSBcCjI+IC9kZXYvbnVsbApgYGAKCgojIEJMQVNUbiBFLXZhbHVlID0gMTAKClJ1bm5pbmcgdGhpcyBmb3Igc2ltcGxlIGNvbXBhcmlzb24gdG8gdGhlIGRlZmF1bHQgYGJsYXN0bi1zaG9ydGAgdmFsdWUgb2YgMTAwMC4KCiMjIG1pUkJhc2UgQkxBU1RuIGUtdmFsdWUgPSAxMApgYGB7ciBtaVJCYXNlLUJMQVNUbi0xMC1ldmFsLCBlbmdpbmU9J2Jhc2gnLCBjYWNoZT1UUlVFfQojIExvYWQgYmFzaCB2YXJpYWJsZXMgaW50byBtZW1vcnkKc291cmNlIC5iYXNodmFycwoKdGltZSBcCiR7bmNiaV9ibGFzdG59IFwKLWRiICR7Ymxhc3RfZGJzX2Rpcn0vJHttaXJiYXNlX21hdHVyZV9mYXN0YV9ub19VJS4qfSBcCi1xdWVyeSAke291dHB1dF9kaXJfdG9wfS8ke2NvbGxhcHNlZF9yZWFkc19mYXN0YX0gXAotb3V0ICR7b3V0cHV0X2Rpcl90b3B9L2NpbmRhcmlhbi1taVJCYXNlLUJMQVNUbi1ldmFsXzEwLm91dGZtdDYgXAotdGFzayBibGFzdG4tc2hvcnQgXAotZXZhbHVlIDEwIFwKLW1heF9oc3BzIDEgXAotbWF4X3RhcmdldF9zZXFzIDEgXAotb3V0Zm10IDYgXAotbnVtX3RocmVhZHMgJHt0aHJlYWRzfSBcCjI+IC9kZXYvbnVsbApgYGAKCiMjIE1pckdlbmUgQkxBU1RuIGUtdmFsdWUgPSAxMAoKYGBge3IgTWlyR2VuZS1CTEFTVG4tMTAtZXZhbCwgZW5naW5lPSdiYXNoJywgY2FjaGU9VFJVRX0KIyBMb2FkIGJhc2ggdmFyaWFibGVzIGludG8gbWVtb3J5CnNvdXJjZSAuYmFzaHZhcnMKCnRpbWUgXAoke25jYmlfYmxhc3RufSBcCi1kYiAke2JsYXN0X2Ric19kaXJ9LyR7bWlyZ2VuZV9tYXR1cmVfZmFzdGFfbm9fVSUuKn0gXAotcXVlcnkgJHtvdXRwdXRfZGlyX3RvcH0vJHtjb2xsYXBzZWRfcmVhZHNfZmFzdGF9IFwKLW91dCAke291dHB1dF9kaXJfdG9wfS9NaXJHZW5lLUJMQVNUbi1ldmFsXzEwLm91dGZtdDYgXAotdGFzayBibGFzdG4tc2hvcnQgXAotZXZhbHVlIDEwIFwKLW1heF9oc3BzIDEgXAotbWF4X3RhcmdldF9zZXFzIDEgXAotb3V0Zm10IDYgXAotbnVtX3RocmVhZHMgJHt0aHJlYWRzfSBcCjI+IC9kZXYvbnVsbApgYGAKCgojIEJMQVNUbiBFLXZhbHVlID0gMQoKUnVubmluZyB0aGlzIGZvciBzaW1wbGUgY29tcGFyaXNvbiB0byB0aGUgZGVmYXVsdCBgYmxhc3RuLXNob3J0YCB2YWx1ZSBvZiAxMDAwLgoKIyMgbWlSQmFzZSBCTEFTVG4gZS12YWx1ZSA9IDEKYGBge3IgbWlSQmFzZS1CTEFTVG4tMS1ldmFsLCBlbmdpbmU9J2Jhc2gnLCBjYWNoZT1UUlVFfQojIExvYWQgYmFzaCB2YXJpYWJsZXMgaW50byBtZW1vcnkKc291cmNlIC5iYXNodmFycwoKdGltZSBcCiR7bmNiaV9ibGFzdG59IFwKLWRiICR7Ymxhc3RfZGJzX2Rpcn0vJHttaXJiYXNlX21hdHVyZV9mYXN0YV9ub19VJS4qfSBcCi1xdWVyeSAke291dHB1dF9kaXJfdG9wfS8ke2NvbGxhcHNlZF9yZWFkc19mYXN0YX0gXAotb3V0ICR7b3V0cHV0X2Rpcl90b3B9L2NpbmRhcmlhbi1taVJCYXNlLUJMQVNUbi1ldmFsXzEub3V0Zm10NiBcCi10YXNrIGJsYXN0bi1zaG9ydCBcCi1ldmFsdWUgMSBcCi1tYXhfaHNwcyAxIFwKLW1heF90YXJnZXRfc2VxcyAxIFwKLW91dGZtdCA2IFwKLW51bV90aHJlYWRzICR7dGhyZWFkc30gXAoyPiAvZGV2L251bGwKYGBgCgojIyBNaXJHZW5lIEJMQVNUbiBlLXZhbHVlID0gMQoKYGBge3IgTWlyR2VuZS1CTEFTVG4tMS1ldmFsLCBlbmdpbmU9J2Jhc2gnLCBjYWNoZT1UUlVFfQojIExvYWQgYmFzaCB2YXJpYWJsZXMgaW50byBtZW1vcnkKc291cmNlIC5iYXNodmFycwoKdGltZSBcCiR7bmNiaV9ibGFzdG59IFwKLWRiICR7Ymxhc3RfZGJzX2Rpcn0vJHttaXJnZW5lX21hdHVyZV9mYXN0YV9ub19VJS4qfSBcCi1xdWVyeSAke291dHB1dF9kaXJfdG9wfS8ke2NvbGxhcHNlZF9yZWFkc19mYXN0YX0gXAotb3V0ICR7b3V0cHV0X2Rpcl90b3B9L01pckdlbmUtQkxBU1RuLWV2YWxfMS5vdXRmbXQ2IFwKLXRhc2sgYmxhc3RuLXNob3J0IFwKLWV2YWx1ZSAxIFwKLW1heF9oc3BzIDEgXAotbWF4X3RhcmdldF9zZXFzIDEgXAotb3V0Zm10IDYgXAotbnVtX3RocmVhZHMgJHt0aHJlYWRzfSBcCjI+IC9kZXYvbnVsbApgYGAKCgoKIyBSZXN1bHRzCgojIyBDaGVjayBCTEFTVG4gRGVmYXVsdCBlLXZhbHVlIHJlc3VsdHMKYGBge3IgYmxhc3RuLWRlZmF1bHQtZXZhbHVlLXJlc3VsdHMsIGVuZ2luZT0nYmFzaCcsIGV2YWw9VFJVRX0KIyBMb2FkIGJhc2ggdmFyaWFibGVzIGludG8gbWVtb3J5CnNvdXJjZSAuYmFzaHZhcnMKCmhlYWQgJHtvdXRwdXRfZGlyX3RvcH0vKmV2YWxfMTAwMC5vdXRmbXQ2CgplY2hvICIiCmVjaG8gIi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tIgplY2hvICIiCgp3YyAtbCAke291dHB1dF9kaXJfdG9wfS8qZXZhbF8xMDAwLm91dGZtdDYKYGBgCgojIyBDaGVjayBCTEFTVG4gZS12YWx1ZSA9IDEwIHJlc3VsdHMKYGBge3IgYmxhc3RuLTEwLWV2YWx1ZS1yZXN1bHRzLCBlbmdpbmU9J2Jhc2gnLCBldmFsPVRSVUV9CiMgTG9hZCBiYXNoIHZhcmlhYmxlcyBpbnRvIG1lbW9yeQpzb3VyY2UgLmJhc2h2YXJzCgpoZWFkICR7b3V0cHV0X2Rpcl90b3B9LypldmFsXzEwLm91dGZtdDYKCmVjaG8gIiIKZWNobyAiLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0iCmVjaG8gIiIKCndjIC1sICR7b3V0cHV0X2Rpcl90b3B9LypldmFsXzEwLm91dGZtdDYKYGBgCgojIyBDaGVjayBCTEFTVG4gZS12YWx1ZSA9IDEgcmVzdWx0cwpgYGB7ciBibGFzdG4tMS1ldmFsdWUtcmVzdWx0cywgZW5naW5lPSdiYXNoJywgZXZhbD1UUlVFfQojIExvYWQgYmFzaCB2YXJpYWJsZXMgaW50byBtZW1vcnkKc291cmNlIC5iYXNodmFycwoKaGVhZCAke291dHB1dF9kaXJfdG9wfS8qZXZhbF8xLm91dGZtdDYKCmVjaG8gIiIKZWNobyAiLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0iCmVjaG8gIiIKCndjIC1sICR7b3V0cHV0X2Rpcl90b3B9LypldmFsXzEub3V0Zm10NgpgYGAKVGhlIGRlZmF1bHQgZS12YWx1ZSByZXN1bHRzIGluIGFsaWdubWVudHMgZm9yIH41MCUgb2Ygc2VxdWVuY2VzLgoKRGVjcmVhc2luZyB0aGUgZS12YWx1ZSB0byBgMTBgIHJlc3VsdGVkIGluIGZld2VyIHF1ZXJ5IGFsaWdubWVudHMsIGFzIHdlJ2QgZXhwZWN0LCBidXQgb25seSBtaW5pbWFsbHkuIAoKRm9yIGZ1cnRoZXIgYW5hbHlzaXMsIHdlIHNob3VsZCBwcm9iYWJseSBkaXNjdXNzIGEgcmVhc29uYWJsZSBlLXZhbHVlIHRvIHVzZSBmb3IgZmlsdGVyaW5nLCBhcyBpdCBtaWdodCBiZSB3b3J0aHdoaWxlIHRvIHRlc3QgZXZlbiBsb3dlciBlLXZhbHVlIHRocmVzaG9sZHMuCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KCiMgQ2l0YXRpb25zCg==</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiMTAuMS1BcHVsLXNSTkFzZXEtQkxBU1RuLTMxYnAtZmFzdHAtbWVyZ2VkLWNuaWRhcmlhbl9taVJCYXNlIgphdXRob3I6ICJTYW0gV2hpdGUiCmRhdGU6ICIyMDI0LTAzLTI5IgpvdXRwdXQ6IAogIGJvb2tkb3duOjpodG1sX2RvY3VtZW50MjoKICAgIHRoZW1lOiBjb3NtbwogICAgdG9jOiB0cnVlCiAgICB0b2NfZmxvYXQ6IHRydWUKICAgIG51bWJlcl9zZWN0aW9uczogdHJ1ZQogICAgY29kZV9mb2xkaW5nOiBzaG93CiAgICBjb2RlX2Rvd25sb2FkOiB0cnVlCiAgZ2l0aHViX2RvY3VtZW50OgogICAgdG9jOiB0cnVlCiAgICBudW1iZXJfc2VjdGlvbnM6IHRydWUKICBodG1sX2RvY3VtZW50OgogICAgdGhlbWU6IGNvc21vCiAgICB0b2M6IHRydWUKICAgIHRvY19mbG9hdDogdHJ1ZQogICAgbnVtYmVyX3NlY3Rpb25zOiB0cnVlCiAgICBjb2RlX2ZvbGRpbmc6IHNob3cKICAgIGNvZGVfZG93bmxvYWQ6IHRydWUKYmlibGlvZ3JhcGh5OiByZWZlcmVuY2VzLmJpYgpsaW5rLWNpdGF0aW9uczogdHJ1ZQotLS0KCmBgYHtyIHNldHVwLCBpbmNsdWRlPUZBTFNFfQpsaWJyYXJ5KGtuaXRyKQpsaWJyYXJ5KGthYmxlRXh0cmEpCmxpYnJhcnkoZHBseXIpCmxpYnJhcnkocmV0aWN1bGF0ZSkKa25pdHI6Om9wdHNfY2h1bmskc2V0KAogIGVjaG8gPSBUUlVFLCAgICAgICAgICMgRGlzcGxheSBjb2RlIGNodW5rcwogIGV2YWwgPSBGQUxTRSwgICAgICAgICMgRXZhbHVhdGUgY29kZSBjaHVua3MKICB3YXJuaW5nID0gRkFMU0UsICAgICAjIEhpZGUgd2FybmluZ3MKICBtZXNzYWdlID0gRkFMU0UsICAgICAjIEhpZGUgbWVzc2FnZXMKICBjb21tZW50ID0gIiIsICAgICAgICAjIFByZXZlbnRzIGFwcGVuZGluZyAnIyMnIHRvIGJlZ2lubmluZyBvZiBsaW5lcyBpbiBjb2RlIG91dHB1dAogIHdpZHRoID0gMTAwMCAgICAgICAgICMgYWRkcyBzY3JvbGwgYmFyCikKYGBgCgoKVGhpcyBub3RlYm9vayBwZXJmb3JtcyBhIHNpbXBsZSBbTkNCSSBCTEFTVG5dKGh0dHBzOi8vd3d3Lm5jYmkubmxtLm5paC5nb3YvYm9va3MvTkJLMjc5NjkwLykgW0BhbHRzY2h1bDE5OTBdIGFnYWluc3QgdHdvIG1pUk5BIGRhdGFiYXNlcyB0byBhdHRlbXB0IHRvIGlkZW50aWZ5IG1pUk5BIGluIF9BLnB1bGNocmFfIHNSTkFzZXE6CgotIFttaVJCYXNlXShodHRwczovL21pcmJhc2Uub3JnL2Rvd25sb2FkLykKCiAgLSBVdGlsaXplcyBhIG1vZGlmaWVkIHZlcnNpb24sIHdoaWNoIGluY2x1ZGVzIGNuaWRhcmlhbiBtaVJOQSBjdWxsZWQgZnJvbSBsaXRlcmF0dXJlLgoKLSBbTWlyR2VuZURCXShodHRwczovL3d3dy5taXJnZW5lZGIub3JnL2Rvd25sb2FkKQoKUmVsaWVzIG9uIHRoZSBmb2xsb3dpbmcgc29mdHdhcmU6CiAgCi0gW2Zhc3R4X3Rvb2xraXRdKGh0dHA6Ly9oYW5ub25sYWIuY3NobC5lZHUvZmFzdHhfdG9vbGtpdC8pCgogIC0gYGZhc3R4X2NvbGxhcHNlcmA6IENvbGxhcHNlcyBkdXBsaWNhdGUgc2VxdWVuY2VzIGluIEZhc3RBL1EgaW50byBzaW5nbGUgc2VxdWVuY2UuCgojIENyZWF0ZSBhIEJhc2ggdmFyaWFibGVzIGZpbGUKClRoaXMgYWxsb3dzIHVzYWdlIG9mIEJhc2ggdmFyaWFibGVzIGFjcm9zcyBSIE1hcmtkb3duIGNodW5rcy4KCmBgYHtyIHNhdmUtYmFzaC12YXJpYWJsZXMtdG8tcnZhcnMtZmlsZSwgZW5naW5lPSdiYXNoJywgZXZhbD1UUlVFfQp7CmVjaG8gIiMjIyMgQXNzaWduIFZhcmlhYmxlcyAjIyMjIgplY2hvICIiCgplY2hvICIjIFRyaW1tZWQgRmFzdFEgbmFtaW5nIHBhdHRlcm4iCmVjaG8gImV4cG9ydCB0cmltbWVkX2Zhc3Rxc19wYXR0ZXJuPScqZmFzdHAtYWRhcHRlcnMtcG9seUctMzFicC1tZXJnZWQuZnEuZ3onIgoKZWNobyAiIyBEYXRhIGRpcmVjdG9yaWVzIgplY2hvICdleHBvcnQgZGVlcF9kaXZlX2Rpcj0vaG9tZS9zaGFyZWQvOFRCX0hERF8wMS9zYW0vZ2l0cmVwb3MvZGVlcC1kaXZlJwplY2hvICdleHBvcnQgZGVlcF9kaXZlX2RhdGFfZGlyPSIke2RlZXBfZGl2ZV9kaXJ9L2RhdGEiJwplY2hvICdleHBvcnQgb3V0cHV0X2Rpcl90b3A9JHtkZWVwX2RpdmVfZGlyfS9ELUFwdWwvb3V0cHV0LzEwLjEtQXB1bC1zUk5Bc2VxLUJMQVNUbi0zMWJwLWZhc3RwLW1lcmdlZC1jbmlkYXJpYW5fbWlSQmFzZScKZWNobyAnZXhwb3J0IHRyaW1tZWRfZmFzdHFzX2Rpcj0iJHtkZWVwX2RpdmVfZGlyfS9ELUFwdWwvb3V0cHV0LzA4LjItQXB1bC1zUk5Bc2VxLXRyaW1taW5nLTMxYnAtZmFzdHAtbWVyZ2VkL3RyaW1tZWQtcmVhZHMiJwplY2hvICdleHBvcnQgYmxhc3RfZGJzX2Rpcj0iJHtkZWVwX2RpdmVfZGlyfS9kYXRhL2JsYXN0X2RicyInCmVjaG8gIiIKCmVjaG8gIiMgSW5wdXQvT3V0cHV0IGZpbGVzIgplY2hvICdleHBvcnQgY29sbGFwc2VkX3JlYWRzX2Zhc3RhPSJjb2xsYXBzZWQtcmVhZHMtYWxsLmZhc3RhIicKZWNobyAnZXhwb3J0IGNvbmNhdGVuYXRlZF90cmltbWVkX3JlYWRzX2Zhc3RxPSJjb25jYXRlbmF0ZWQtdHJpbW1lZC1yZWFkcy1hbGwuZmFzdHEuZ3oiJwplY2hvICdleHBvcnQgbWlyYmFzZV9tYXR1cmVfZmFzdGFfbmFtZT0iY25pZGFyaWFuLW1pcmJhc2UtbWF0dXJlLXYyMi4xLmZhc3RhIicKZWNobyAnZXhwb3J0IG1pcmJhc2VfbWF0dXJlX2Zhc3RhX25vX1U9ImNuaWRhcmlhbi1taXJiYXNlLW1hdHVyZS12MjIuMS1ub19VLmZhIicKZWNobyAnZXhwb3J0IG1pcmdlbmVfbWF0dXJlX2Zhc3RhX25hbWU9Im1pcmdlbmUtbWF0dXJlLWFsbC12Mi4xLmZhIicKZWNobyAnZXhwb3J0IG1pcmdlbmVfbWF0dXJlX2Zhc3RhX25vX1U9Im1pcmdlbmUtbWF0dXJlLWFsbC12Mi4xLW5vX1UuZmEiJwplY2hvICIiCgplY2hvICIjIEV4dGVybmFsIGRhdGEgVVJMcyIKZWNobyAnZXhwb3J0IG1pcmdlbmVkYl9mYXN0YV91cmw9Imh0dHBzOi8vd3d3Lm1pcmdlbmVkYi5vcmcvZmFzdGEvQUxMP21hdD0xIicKZWNobyAiIgoKZWNobyAiIyBQYXRocyB0byBwcm9ncmFtcyIKZWNobyAnZXhwb3J0IG5jYmlfYmxhc3RfZGlyPSIvaG9tZS9zaGFyZWQvbmNiaS1ibGFzdC0yLjE1LjArL2Jpbi8iJwplY2hvICdleHBvcnQgbmNiaV9ibGFzdG49IiR7bmNiaV9ibGFzdF9kaXJ9L2JsYXN0biInCmVjaG8gJ2V4cG9ydCBuY2JpX21ha2VibGFzdF9kYj0iJHtuY2JpX2JsYXN0X2Rpcn0vbWFrZWJsYXN0ZGIiJwplY2hvICdleHBvcnQgZmFzdHhfY29sbGFwc2VyPSIvaG9tZS9zaGFyZWQvZmFzdHhfdG9vbGtpdF8wLjAuMTNfYmluYXJpZXNfTGludXhfMi42X2FtZDY0L2Jpbi9mYXN0eF9jb2xsYXBzZXIiJwoKZWNobyAiIyBTZXQgbnVtYmVyIG9mIENQVXMgdG8gdXNlIgplY2hvICdleHBvcnQgdGhyZWFkcz00MCcKZWNobyAiIgoKZWNobyAiIyBJbml0aWFsaXplIGFycmF5cyIKZWNobyAnZXhwb3J0IHRyaW1tZWRfZmFzdHFzX2FycmF5PSgpJwoKCn0gPiAuYmFzaHZhcnMKCmNhdCAuYmFzaHZhcnMKYGBgCgoKIyBEb3dubG9hZCBNaXJHZW5lREIgRmFzdGEKYGBge3IgZG93bmxvYWQtbWlyZ2VuZS1kYi1GYXN0QSwgZW5naW5lPSdiYXNoJywgZXZhbD1UUlVFfQojIExvYWQgYmFzaCB2YXJpYWJsZXMgaW50byBtZW1vcnkKc291cmNlIC5iYXNodmFycwoKIyBEb3dubG9hZCBNaXJHZW5lREIsIGlmIGl0IGRvZXNuJ3QgZXhpc3QKaWYgWyAhIC1mICIke2RlZXBfZGl2ZV9kYXRhX2Rpcn0vJHttaXJnZW5lX21hdHVyZV9mYXN0YV9uYW1lfSIgXTsgdGhlbgoKICB3Z2V0IFwKICAtLW5vLWNoZWNrLWNlcnRpZmljYXRlIFwKICAtLWNvbnRpbnVlIFwKICAtLW5vLWhvc3QtZGlyZWN0b3JpZXMgXAogIC0tbm8tZGlyZWN0b3JpZXMgXAogIC0tbm8tcGFyZW50IFwKICAtLXF1aWV0IFwKICAtLWV4ZWN1dGUgcm9ib3RzPW9mZiBcCiAgLS1vdXRwdXQtZG9jdW1lbnQgJHtkZWVwX2RpdmVfZGF0YV9kaXJ9LyR7bWlyZ2VuZV9tYXR1cmVfZmFzdGFfbmFtZX0gXAogICAke21pcmdlbmVkYl9mYXN0YV91cmx9CiAKIGZpCiAKIGxzIC1saCAke2RlZXBfZGl2ZV9kYXRhX2Rpcn0KYGBgCgojIyBJbnNwZWN0IG1pUk5BIEZhc3RBcwpgYGB7ciBpbnNwZWN0LW1pUk5BLUZhc3RBcywgZW5naW5lPSdiYXNoJywgZXZhbD1UUlVFfQojIExvYWQgYmFzaCB2YXJpYWJsZXMgaW50byBtZW1vcnkKc291cmNlIC5iYXNodmFycwoKaGVhZCAiJHtkZWVwX2RpdmVfZGF0YV9kaXJ9Ii9bY21dW25pXSouZmEqCmBgYAoKCiMgQ29udmVydCBgVWAgdG8gYFRgIGluIG1pUk5BIEZhc3RBcwoKVGhpcyBpcyBuZWVkZWQgYmVjYXVzZSB0aGUgc1JOQXNlcSBzZXF1ZW5jZXMgZG8gX25vdF8gaGF2ZSB1cmFjaWxzIChgVWApIC0gdGhleSBoYXZlIHRoeW1pbmVzIChgVGApLgoKYGBge3IgY29udmVydC1VLXRvLVQsIGVuZ2luZT0nYmFzaCcsIGV2YWw9VFJVRX0KIyBMb2FkIGJhc2ggdmFyaWFibGVzIGludG8gbWVtb3J5CnNvdXJjZSAuYmFzaHZhcnMKCiMgQ29udmVydCBtaVJCYXNlIEZhc3RBCmlmIFsgISAtZiAiJHtkZWVwX2RpdmVfZGF0YV9kaXJ9LyR7bWlyYmFzZV9tYXR1cmVfZmFzdGFfbm9fVX0iIF07IHRoZW4KICBzZWQgJy9eW14+XS9zL1UvVC9nJyAiJHtkZWVwX2RpdmVfZGF0YV9kaXJ9LyR7bWlyYmFzZV9tYXR1cmVfZmFzdGFfbmFtZX0iIFwKICA+ICIke2RlZXBfZGl2ZV9kYXRhX2Rpcn0vJHttaXJiYXNlX21hdHVyZV9mYXN0YV9ub19VfSIKZmkKCgojIENvbnZlcnQgTWlyR2VuZSBGYXN0QQppZiBbICEgLWYgIiR7ZGVlcF9kaXZlX2RhdGFfZGlyfS8ke21pcmdlbmVfbWF0dXJlX2Zhc3RhX25vX1V9IiBdOyB0aGVuCiAgc2VkICcvXltePl0vcy9VL1QvZycgIiR7ZGVlcF9kaXZlX2RhdGFfZGlyfS8ke21pcmdlbmVfbWF0dXJlX2Zhc3RhX25hbWV9IiBcCiAgPiAiJHtkZWVwX2RpdmVfZGF0YV9kaXJ9LyR7bWlyZ2VuZV9tYXR1cmVfZmFzdGFfbm9fVX0iCmZpCgoKaGVhZCAiJHtkZWVwX2RpdmVfZGF0YV9kaXJ9Ii9bY21dW25pXSpVLmZhCiAgCmBgYAoKIyBDcmVhdGUgQkxBU1QgRGF0YWJhc2VzCmBgYHtyIG1ha2UtYmxhc3QtZGJzLCBlbmdpbmU9J2Jhc2gnLCBldmFsPVRSVUV9CiMgTG9hZCBiYXNoIHZhcmlhYmxlcyBpbnRvIG1lbW9yeQpzb3VyY2UgLmJhc2h2YXJzCgoKCiMgbWlSQmFzZSBCTEFTVCBEQgojIyBNYWtlIHN1cmUgb3V0cHV0IGRpcmVjdG9yeSBleGlzdHMKaWYgWyAhIC1kICIke2JsYXN0X2Ric19kaXJ9IiBdOyB0aGVuCiAgbWtkaXIgLS1wYXJlbnRzICIke2JsYXN0X2Ric19kaXJ9IgpmaQoKIyMgQ2hlY2sgZm9yIHByZS1leGlzaW5nIGRhdGFiYXNlCmlmIFsgISAtZiAiJHtibGFzdF9kYnNfZGlyfS8ke21pcmdlbmVfbWF0dXJlX2Zhc3RhX25vX1UlLip9LmJsYXN0ZGIubG9nIiBdOyB0aGVuCiAgJHtuY2JpX21ha2VibGFzdF9kYn0gXAogIC1pbiAke2RlZXBfZGl2ZV9kYXRhX2Rpcn0vJHttaXJnZW5lX21hdHVyZV9mYXN0YV9ub19VfSBcCiAgLXRpdGxlICR7bWlyZ2VuZV9tYXR1cmVfZmFzdGFfbm9fVSUuKn0gXAogIC1kYnR5cGUgbnVjbCBcCiAgLW91dCAke2JsYXN0X2Ric19kaXJ9LyR7bWlyZ2VuZV9tYXR1cmVfZmFzdGFfbm9fVSUuKn0gXAogIC1sb2dmaWxlICR7Ymxhc3RfZGJzX2Rpcn0vJHttaXJnZW5lX21hdHVyZV9mYXN0YV9ub19VJS4qfS5ibGFzdGRiLmxvZwpmaQoKIyBtaVJCYXNlIEJMQVNUIERCCiMjIE1ha2Ugc3VyZSBvdXRwdXQgZGlyZWN0b3J5IGV4aXN0cwppZiBbICEgLWQgIiR7Ymxhc3RfZGJzX2Rpcn0iIF07IHRoZW4KICBta2RpciAtLXBhcmVudHMgIiR7Ymxhc3RfZGJzX2Rpcn0iCmZpCgojIyBDaGVjayBmb3IgcHJlLWV4aXNpbmcgZGF0YWJhc2UKaWYgWyAhIC1mICIke2JsYXN0X2Ric19kaXJ9LyR7bWlyYmFzZV9tYXR1cmVfZmFzdGFfbm9fVSUuKn0uYmxhc3RkYi5sb2ciIF07IHRoZW4KICAke25jYmlfbWFrZWJsYXN0X2RifSBcCiAgLWluICR7ZGVlcF9kaXZlX2RhdGFfZGlyfS8ke21pcmJhc2VfbWF0dXJlX2Zhc3RhX25vX1V9IFwKICAtdGl0bGUgJHttaXJiYXNlX21hdHVyZV9mYXN0YV9ub19VJS4qfSBcCiAgLWRidHlwZSBudWNsIFwKICAtb3V0ICR7Ymxhc3RfZGJzX2Rpcn0vJHttaXJiYXNlX21hdHVyZV9mYXN0YV9ub19VJS4qfSBcCiAgLWxvZ2ZpbGUgJHtibGFzdF9kYnNfZGlyfS8ke21pcmJhc2VfbWF0dXJlX2Zhc3RhX25vX1UlLip9LmJsYXN0ZGIubG9nCmZpCmBgYAoKCiMgUHJlcGFyZSByZWFkcyBmb3IgQkxBU1RpbmcKCiMjIENvbmNhdGVuYXRlIGFsbCB0cmltbWVkIHJlYWRzCmBgYHtyIGNvbmNhdGVuYXRlLXRyaW1tZWQtcmVhZHMsIGVuZ2luZT0nYmFzaCcsIGV2YWw9VFJVRX0KIyBMb2FkIGJhc2ggdmFyaWFibGVzIGludG8gbWVtb3J5CnNvdXJjZSAuYmFzaHZhcnMKCiMgTWFrZSBvdXRwdXQgZGlyZWN0b3J5LCBpZiBpdCBkb2Vucyd0IGV4aXN0CmlmIFsgISAtZCAiJHtvdXRwdXRfZGlyX3RvcH0iIF07IHRoZW4KICBta2RpciAtLXBhcmVudHMgIiR7b3V0cHV0X2Rpcl90b3B9IgpmaQoKIyBDaGVjayBmb3IgZXhpc3RlbmNlIG9mIGNvbmNhdGVuYXRlZCBGYXN0QSBiZWZvcmUgcnVubmluZwppZiBbICEgLWYgIiR7b3V0cHV0X2Rpcl90b3B9LyR7Y29uY2F0ZW5hdGVkX3RyaW1tZWRfcmVhZHNfZmFzdHF9IiBdOyB0aGVuCiAgY2F0ICR7dHJpbW1lZF9mYXN0cXNfZGlyfS8ke3RyaW1tZWRfZmFzdHFzX3BhdHRlcm59IFwKICA+ICIke291dHB1dF9kaXJfdG9wfS8ke2NvbmNhdGVuYXRlZF90cmltbWVkX3JlYWRzX2Zhc3RxfSIKZmkKCmxzIC1saCAiJHtvdXRwdXRfZGlyX3RvcH0vJHtjb25jYXRlbmF0ZWRfdHJpbW1lZF9yZWFkc19mYXN0cX0iCmBgYAoKIyMgQ29sbGFwc2UgcmVhZHMgdG8gRmFzdEEKClVzZXMgYGZhc3R4X2NvbGxhcHNlcmAgdG8gY29sbGFwc2UgdG8gdW5pcXVlIHJlYWRzLgoKUmVxdWlyZXMgdW5kb2N1bWVudGVkIHF1YWxpdHkgc2V0dGluZy4gSGF2ZSBzZWxlY3RlZCBgMzBgIGFzIGN1dHRvZmY6IGAtUTMwYC4KYGBge3IgY29sbGFwc2UtcmVhZHMtdG8tRmFzdEEsIGVuZ2luZT0nYmFzaCcsIGV2YWw9VFJVRX0KIyBMb2FkIGJhc2ggdmFyaWFibGVzIGludG8gbWVtb3J5CnNvdXJjZSAuYmFzaHZhcnMKCiMgQ2hlY2sgZm9yIGV4aXN0ZW5jZSBvZiBjb2xsYXBzZWQgRmFzdEEgYmVmb3JlIHJ1bm5pbmcKdGltZSBcCmlmIFsgISAtZiAiJHtvdXRwdXRfZGlyX3RvcH0vJHtjb2xsYXBzZWRfcmVhZHNfZmFzdGF9IiBdOyB0aGVuCiAgemNhdCAke291dHB1dF9kaXJfdG9wfS8ke2NvbmNhdGVuYXRlZF90cmltbWVkX3JlYWRzX2Zhc3RxfSBcCiAgfCAke2Zhc3R4X2NvbGxhcHNlcn0gXAogIC1RMzAgXAogIC1vICIke291dHB1dF9kaXJfdG9wfS8ke2NvbGxhcHNlZF9yZWFkc19mYXN0YX0iCmZpCgpoZWFkICIke291dHB1dF9kaXJfdG9wfS8ke2NvbGxhcHNlZF9yZWFkc19mYXN0YX0iCgp3YyAtbCAiJHtvdXRwdXRfZGlyX3RvcH0vJHtjb2xsYXBzZWRfcmVhZHNfZmFzdGF9IgpgYGAKCiMgUnVuIEJMQVNUbiBEZWZhdWx0IEUtdmFsdWUKCi0gMTAwMCBmb3IgYmxhc3RuLXNob3J0CgpSdW5zIEJMQVNUbiB1c2luZyB0aGUgYGJsYXN0bi1zaG9ydGAgdGFzayBmb3Igc2VxdWVuY2VzIDwgMzBicC4KCkxvb2sgZm9yIHRvcCBtYXRjaCAoYC1tYXhfaHNwcyAxYCAmIGAtbWF4X3RhcmdldF9zZXFzIDFgKSBmb3IgZWFjaCBxdWVyeS4KCiAgLSBTdXBwcmVzcyBzdWJzZXF1ZW50IHdhcm5pbmcgYEV4YW1pbmluZyA1IG9yIG1vcmUgbWF0Y2hlcyBpcyByZWNvbW1lbmRlZGAgYnkKICByZWRpcmVjdGluZyBzdGRvdXQ6IGAyPiAvZGV2L251bGxgCgojIyBtaVJCYXNlIEJMQVNUbiBEZWZhdWx0IGUtdmFsdWUKYGBge3IgbWlSQmFzZS1CTEFTVG4tZGVmYXVsdC1ldmFsLCBlbmdpbmU9J2Jhc2gnLCBjYWNoZT1UUlVFfQojIExvYWQgYmFzaCB2YXJpYWJsZXMgaW50byBtZW1vcnkKc291cmNlIC5iYXNodmFycwoKdGltZSBcCiR7bmNiaV9ibGFzdG59IFwKLWRiICR7Ymxhc3RfZGJzX2Rpcn0vJHttaXJiYXNlX21hdHVyZV9mYXN0YV9ub19VJS4qfSBcCi1xdWVyeSAke291dHB1dF9kaXJfdG9wfS8ke2NvbGxhcHNlZF9yZWFkc19mYXN0YX0gXAotb3V0ICR7b3V0cHV0X2Rpcl90b3B9L2NuaWRhcmlhbi1taVJCYXNlLUJMQVNUbi1ldmFsXzEwMDAub3V0Zm10NiBcCi10YXNrIGJsYXN0bi1zaG9ydCBcCi1tYXhfaHNwcyAxIFwKLW1heF90YXJnZXRfc2VxcyAxIFwKLW91dGZtdCA2IFwKLW51bV90aHJlYWRzICR7dGhyZWFkc30gXAoyPiAvZGV2L251bGwKYGBgCgojIyBNaXJHZW5lIEJMQVNUbiBEZWZhdWx0IGUtdmFsdWUKCmBgYHtyIE1pckdlbmUtQkxBU1RuLWRlZmF1bHQtZXZhbCwgZW5naW5lPSdiYXNoJywgY2FjaGU9VFJVRX0KIyBMb2FkIGJhc2ggdmFyaWFibGVzIGludG8gbWVtb3J5CnNvdXJjZSAuYmFzaHZhcnMKCnRpbWUgXAoke25jYmlfYmxhc3RufSBcCi1kYiAke2JsYXN0X2Ric19kaXJ9LyR7bWlyZ2VuZV9tYXR1cmVfZmFzdGFfbm9fVSUuKn0gXAotcXVlcnkgJHtvdXRwdXRfZGlyX3RvcH0vJHtjb2xsYXBzZWRfcmVhZHNfZmFzdGF9IFwKLW91dCAke291dHB1dF9kaXJfdG9wfS9NaXJHZW5lLUJMQVNUbi1ldmFsXzEwMDAub3V0Zm10NiBcCi10YXNrIGJsYXN0bi1zaG9ydCBcCi1tYXhfaHNwcyAxIFwKLW1heF90YXJnZXRfc2VxcyAxIFwKLW91dGZtdCA2IFwKLW51bV90aHJlYWRzICR7dGhyZWFkc30gXAoyPiAvZGV2L251bGwKYGBgCgoKIyBCTEFTVG4gRS12YWx1ZSA9IDEwCgpSdW5uaW5nIHRoaXMgZm9yIHNpbXBsZSBjb21wYXJpc29uIHRvIHRoZSBkZWZhdWx0IGBibGFzdG4tc2hvcnRgIHZhbHVlIG9mIDEwMDAuCgojIyBtaVJCYXNlIEJMQVNUbiBlLXZhbHVlID0gMTAKYGBge3IgbWlSQmFzZS1CTEFTVG4tMTAtZXZhbCwgZW5naW5lPSdiYXNoJywgY2FjaGU9VFJVRX0KIyBMb2FkIGJhc2ggdmFyaWFibGVzIGludG8gbWVtb3J5CnNvdXJjZSAuYmFzaHZhcnMKCnRpbWUgXAoke25jYmlfYmxhc3RufSBcCi1kYiAke2JsYXN0X2Ric19kaXJ9LyR7bWlyYmFzZV9tYXR1cmVfZmFzdGFfbm9fVSUuKn0gXAotcXVlcnkgJHtvdXRwdXRfZGlyX3RvcH0vJHtjb2xsYXBzZWRfcmVhZHNfZmFzdGF9IFwKLW91dCAke291dHB1dF9kaXJfdG9wfS9jaW5kYXJpYW4tbWlSQmFzZS1CTEFTVG4tZXZhbF8xMC5vdXRmbXQ2IFwKLXRhc2sgYmxhc3RuLXNob3J0IFwKLWV2YWx1ZSAxMCBcCi1tYXhfaHNwcyAxIFwKLW1heF90YXJnZXRfc2VxcyAxIFwKLW91dGZtdCA2IFwKLW51bV90aHJlYWRzICR7dGhyZWFkc30gXAoyPiAvZGV2L251bGwKYGBgCgojIyBNaXJHZW5lIEJMQVNUbiBlLXZhbHVlID0gMTAKCmBgYHtyIE1pckdlbmUtQkxBU1RuLTEwLWV2YWwsIGVuZ2luZT0nYmFzaCcsIGNhY2hlPVRSVUV9CiMgTG9hZCBiYXNoIHZhcmlhYmxlcyBpbnRvIG1lbW9yeQpzb3VyY2UgLmJhc2h2YXJzCgp0aW1lIFwKJHtuY2JpX2JsYXN0bn0gXAotZGIgJHtibGFzdF9kYnNfZGlyfS8ke21pcmdlbmVfbWF0dXJlX2Zhc3RhX25vX1UlLip9IFwKLXF1ZXJ5ICR7b3V0cHV0X2Rpcl90b3B9LyR7Y29sbGFwc2VkX3JlYWRzX2Zhc3RhfSBcCi1vdXQgJHtvdXRwdXRfZGlyX3RvcH0vTWlyR2VuZS1CTEFTVG4tZXZhbF8xMC5vdXRmbXQ2IFwKLXRhc2sgYmxhc3RuLXNob3J0IFwKLWV2YWx1ZSAxMCBcCi1tYXhfaHNwcyAxIFwKLW1heF90YXJnZXRfc2VxcyAxIFwKLW91dGZtdCA2IFwKLW51bV90aHJlYWRzICR7dGhyZWFkc30gXAoyPiAvZGV2L251bGwKYGBgCgoKIyBCTEFTVG4gRS12YWx1ZSA9IDEKClJ1bm5pbmcgdGhpcyBmb3Igc2ltcGxlIGNvbXBhcmlzb24gdG8gdGhlIGRlZmF1bHQgYGJsYXN0bi1zaG9ydGAgdmFsdWUgb2YgMTAwMC4KCiMjIG1pUkJhc2UgQkxBU1RuIGUtdmFsdWUgPSAxCmBgYHtyIG1pUkJhc2UtQkxBU1RuLTEtZXZhbCwgZW5naW5lPSdiYXNoJywgY2FjaGU9VFJVRX0KIyBMb2FkIGJhc2ggdmFyaWFibGVzIGludG8gbWVtb3J5CnNvdXJjZSAuYmFzaHZhcnMKCnRpbWUgXAoke25jYmlfYmxhc3RufSBcCi1kYiAke2JsYXN0X2Ric19kaXJ9LyR7bWlyYmFzZV9tYXR1cmVfZmFzdGFfbm9fVSUuKn0gXAotcXVlcnkgJHtvdXRwdXRfZGlyX3RvcH0vJHtjb2xsYXBzZWRfcmVhZHNfZmFzdGF9IFwKLW91dCAke291dHB1dF9kaXJfdG9wfS9jaW5kYXJpYW4tbWlSQmFzZS1CTEFTVG4tZXZhbF8xLm91dGZtdDYgXAotdGFzayBibGFzdG4tc2hvcnQgXAotZXZhbHVlIDEgXAotbWF4X2hzcHMgMSBcCi1tYXhfdGFyZ2V0X3NlcXMgMSBcCi1vdXRmbXQgNiBcCi1udW1fdGhyZWFkcyAke3RocmVhZHN9IFwKMj4gL2Rldi9udWxsCmBgYAoKIyMgTWlyR2VuZSBCTEFTVG4gZS12YWx1ZSA9IDEKCmBgYHtyIE1pckdlbmUtQkxBU1RuLTEtZXZhbCwgZW5naW5lPSdiYXNoJywgY2FjaGU9VFJVRX0KIyBMb2FkIGJhc2ggdmFyaWFibGVzIGludG8gbWVtb3J5CnNvdXJjZSAuYmFzaHZhcnMKCnRpbWUgXAoke25jYmlfYmxhc3RufSBcCi1kYiAke2JsYXN0X2Ric19kaXJ9LyR7bWlyZ2VuZV9tYXR1cmVfZmFzdGFfbm9fVSUuKn0gXAotcXVlcnkgJHtvdXRwdXRfZGlyX3RvcH0vJHtjb2xsYXBzZWRfcmVhZHNfZmFzdGF9IFwKLW91dCAke291dHB1dF9kaXJfdG9wfS9NaXJHZW5lLUJMQVNUbi1ldmFsXzEub3V0Zm10NiBcCi10YXNrIGJsYXN0bi1zaG9ydCBcCi1ldmFsdWUgMSBcCi1tYXhfaHNwcyAxIFwKLW1heF90YXJnZXRfc2VxcyAxIFwKLW91dGZtdCA2IFwKLW51bV90aHJlYWRzICR7dGhyZWFkc30gXAoyPiAvZGV2L251bGwKYGBgCgoKCiMgUmVzdWx0cwoKIyMgQ2hlY2sgQkxBU1RuIERlZmF1bHQgZS12YWx1ZSByZXN1bHRzCmBgYHtyIGJsYXN0bi1kZWZhdWx0LWV2YWx1ZS1yZXN1bHRzLCBlbmdpbmU9J2Jhc2gnLCBldmFsPVRSVUV9CiMgTG9hZCBiYXNoIHZhcmlhYmxlcyBpbnRvIG1lbW9yeQpzb3VyY2UgLmJhc2h2YXJzCgpoZWFkICR7b3V0cHV0X2Rpcl90b3B9LypldmFsXzEwMDAub3V0Zm10NgoKZWNobyAiIgplY2hvICItLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSIKZWNobyAiIgoKd2MgLWwgJHtvdXRwdXRfZGlyX3RvcH0vKmV2YWxfMTAwMC5vdXRmbXQ2CmBgYAoKIyMgQ2hlY2sgQkxBU1RuIGUtdmFsdWUgPSAxMCByZXN1bHRzCmBgYHtyIGJsYXN0bi0xMC1ldmFsdWUtcmVzdWx0cywgZW5naW5lPSdiYXNoJywgZXZhbD1UUlVFfQojIExvYWQgYmFzaCB2YXJpYWJsZXMgaW50byBtZW1vcnkKc291cmNlIC5iYXNodmFycwoKaGVhZCAke291dHB1dF9kaXJfdG9wfS8qZXZhbF8xMC5vdXRmbXQ2CgplY2hvICIiCmVjaG8gIi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tIgplY2hvICIiCgp3YyAtbCAke291dHB1dF9kaXJfdG9wfS8qZXZhbF8xMC5vdXRmbXQ2CmBgYAoKIyMgQ2hlY2sgQkxBU1RuIGUtdmFsdWUgPSAxIHJlc3VsdHMKYGBge3IgYmxhc3RuLTEtZXZhbHVlLXJlc3VsdHMsIGVuZ2luZT0nYmFzaCcsIGV2YWw9VFJVRX0KIyBMb2FkIGJhc2ggdmFyaWFibGVzIGludG8gbWVtb3J5CnNvdXJjZSAuYmFzaHZhcnMKCmhlYWQgJHtvdXRwdXRfZGlyX3RvcH0vKmV2YWxfMS5vdXRmbXQ2CgplY2hvICIiCmVjaG8gIi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tIgplY2hvICIiCgp3YyAtbCAke291dHB1dF9kaXJfdG9wfS8qZXZhbF8xLm91dGZtdDYKYGBgClRoZSBkZWZhdWx0IGUtdmFsdWUgcmVzdWx0cyBpbiBhbGlnbm1lbnRzIGZvciB+NTAlIG9mIHNlcXVlbmNlcy4KCkRlY3JlYXNpbmcgdGhlIGUtdmFsdWUgdG8gYDEwYCByZXN1bHRlZCBpbiBmZXdlciBxdWVyeSBhbGlnbm1lbnRzLCBhcyB3ZSdkIGV4cGVjdCwgYnV0IG9ubHkgbWluaW1hbGx5LgoKRGVjcmVhc2luZyB0aGUgZS12YWx1ZSB0byBgMWAgcmVzdWx0ZWQgaW4gfjI1JSBvZiBxdWVyeSBhbGlnbm1lbnRzLgoKRm9yIGZ1cnRoZXIgYW5hbHlzaXMsIHdlIHNob3VsZCBwcm9iYWJseSBkaXNjdXNzIGEgcmVhc29uYWJsZSBlLXZhbHVlIHRvIHVzZSBmb3IgZmlsdGVyaW5nLCBhcyBpdCBtaWdodCBiZSB3b3J0aHdoaWxlIHRvIHRlc3QgZXZlbiBsb3dlciBlLXZhbHVlIHRocmVzaG9sZHMuCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KCiMgQ2l0YXRpb25zCg==</div>
 
 
 </div>
