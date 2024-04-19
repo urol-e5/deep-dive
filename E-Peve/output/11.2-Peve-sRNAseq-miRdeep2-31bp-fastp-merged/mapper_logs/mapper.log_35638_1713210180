@@ -1,0 +1,19 @@
+current dir:	/home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/code
+mapper command:	/home/shared/mirdeep2/bin/mapper.pl /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/output/11.2-Peve-sRNAseq-miRdeep2-31bp-fastp-merged/collapsed-reads-over17bp-mirdeep2.fasta -c -p /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/data/Porites_evermanni_v1_genomic-no_spaces -t /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/output/11.2-Peve-sRNAseq-miRdeep2-31bp-fastp-merged/Peve-mirdeep2-mapping.arf -o 46
+
+timestamp:	15_04_2024_t_12_43_00
+
+discarding short reads
+fastaparse.pl /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/output/11.2-Peve-sRNAseq-miRdeep2-31bp-fastp-merged/collapsed-reads-over17bp-mirdeep2.fasta -a 18 > dir_mapper_seq_collapsed-reads-over17bp-mirdeep2.fasta_8201165824_15_04_2024_t_12_43_00/reads_no_short.fa 2>dir_mapper_seq_collapsed-reads-over17bp-mirdeep2.fasta_8201165824_15_04_2024_t_12_43_00/reads_too_short
+mapping reads to genome index
+bowtie -p 46 -f -n 0 -e 80 -l 18 -a -m 5 --best --strata  /home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve/data/Porites_evermanni_v1_genomic-no_spaces  --al dir_mapper_seq_collapsed-reads-over17bp-mirdeep2.fasta_8201165824_15_04_2024_t_12_43_00/collapsed-reads-over17bp-mirdeep2.fasta_mapped --un dir_mapper_seq_collapsed-reads-over17bp-mirdeep2.fasta_8201165824_15_04_2024_t_12_43_00/collapsed-reads-over17bp-mirdeep2.fasta_not_mapped  dir_mapper_seq_collapsed-reads-over17bp-mirdeep2.fasta_8201165824_15_04_2024_t_12_43_00/reads_no_short.fa dir_mapper_seq_collapsed-reads-over17bp-mirdeep2.fasta_8201165824_15_04_2024_t_12_43_00/mappings.bwt 2>bowtie.log
+
+convert_bowtie_output.pl dir_mapper_seq_collapsed-reads-over17bp-mirdeep2.fasta_8201165824_15_04_2024_t_12_43_00/mappings.bwt > dir_mapper_seq_collapsed-reads-over17bp-mirdeep2.fasta_8201165824_15_04_2024_t_12_43_00/mappings.arf
+trimming unmapped nts in the 3' ends
+parse_mappings.pl dir_mapper_seq_collapsed-reads-over17bp-mirdeep2.fasta_8201165824_15_04_2024_t_12_43_00/mappings.arf -j > dir_mapper_seq_collapsed-reads-over17bp-mirdeep2.fasta_8201165824_15_04_2024_t_12_43_00/mappings_trim.arf
+
+remove tmp dir
+rmtree(dir_mapper_seq_collapsed-reads-over17bp-mirdeep2.fasta_8201165824_15_04_2024_t_12_43_00)
+
+############################################################
+
