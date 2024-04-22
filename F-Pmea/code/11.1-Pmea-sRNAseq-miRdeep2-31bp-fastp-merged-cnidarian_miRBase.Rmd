@@ -177,6 +177,13 @@ grep "^>" ${genome_fasta_dir}/${genome_fasta_no_spaces} \
 
 # Reformat miRBase FastA description lines
 
+miRDeep2 can't process genome FastAs with spaces in the description
+lines.
+
+So, I'm replacing spaces with underscores.
+
+And, for aesthetics, I'm also removing commas.
+
 ```{r remove-spaces-mirbase-FastA, eval=TRUE, engine='bash'}
 # Load bash variables into memory
 source .bashvars
