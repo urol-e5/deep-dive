@@ -1,0 +1,276 @@
+---
+title: "10.1-Peve-sRNAseq-BLASTn-31bp-fastp-merged-cnidarian_miRBase"
+author: "Sam White (modified by K Durkin for P. evermanni analysis)"
+date: "2024-04-19"
+output: 
+  github_document:
+    toc: true
+    number_sections: true
+  bookdown::html_document2:
+    theme: cosmo
+    toc: true
+    toc_float: true
+    number_sections: true
+    code_folding: show
+    code_download: true
+  html_document:
+    theme: cosmo
+    toc: true
+    toc_float: true
+    number_sections: true
+    code_folding: show
+    code_download: true
+bibliography: /home/shared/8TB_HDD_02/shedurkin/deep-dive/D-Apul/code/references.bib
+link-citations: true
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(kableExtra)
+library(dplyr)
+library(reticulate)
+knitr::opts_chunk$set(
+  echo = TRUE,         # Display code chunks
+  eval = FALSE,        # Evaluate code chunks
+  warning = FALSE,     # Hide warnings
+  message = FALSE,     # Hide messages
+  comment = "",        # Prevents appending '##' to beginning of lines in code output
+  width = 1000         # adds scroll bar
+)
+```
+
+This notebook performs a simple [NCBI BLASTn](https://www.ncbi.nlm.nih.gov/books/NBK279690/) [@altschul1990] against an miRNA database to attempt to identify miRNA in *P.evermanni* sRNAseq:
+
+-   [miRBase](https://mirbase.org/download/)
+    -   Utilizes a modified version, which includes cnidarian miRNA culled from literature by Jill Ahsley.
+
+    -   [`cnidarian-mirbase-mature-v22.1.fasta`](../../data/cnidarian-mirbase-mature-v22.1.fasta)
+
+Relies on the following software:
+
+-   [fastx_toolkit](http://hannonlab.cshl.edu/fastx_toolkit/)
+
+    -   `fastx_collapser`: Collapses duplicate sequences in FastA/Q into single sequence.
+
+# Create a Bash variables file
+
+This allows usage of Bash variables across R Markdown chunks.
+
+```{r save-bash-variables-to-rvars-file, engine='bash', eval=TRUE}
+{
+echo "#### Assign Variables ####"
+echo ""
+
+echo "# Trimmed FastQ naming pattern"
+echo "export trimmed_fastqs_pattern='*31bp-merged.fq'"
+
+echo "# Data directories"
+echo 'export deep_dive_dir=/home/shared/8TB_HDD_02/shedurkin/deep-dive'
+echo 'export deep_dive_data_dir="${deep_dive_dir}/data"'
+echo 'export output_dir_top=${deep_dive_dir}/E-Peve/output/10.1-Peve-sRNAseq-BLASTn-31bp-fastp-merged-cnidarian_miRBase'
+echo 'export trimmed_fastqs_dir="${deep_dive_dir}/E-Peve/output/06.2-Peve-sRNAseq-trimming-31bp-fastp-merged/trimmed-reads"'
+echo 'export blast_dbs_dir="${deep_dive_dir}/data/blast_dbs"'
+echo ""
+
+echo "# Input/Output files"
+echo 'export collapsed_reads_fasta="collapsed-reads-all.fasta"'
+echo 'export concatenated_trimmed_reads_fastq="concatenated-trimmed-reads-all.fastq.gz"'
+echo 'export mirbase_mature_fasta_name="cnidarian-mirbase-mature-v22.1.fasta"'
+echo 'export mirbase_mature_fasta_no_U="cnidarian-mirbase-mature-v22.1-no_U.fa"'
+echo ""
+
+echo "# Paths to programs"
+echo 'export ncbi_blast_dir="/home/shared/ncbi-blast-2.15.0+/bin/"'
+echo 'export ncbi_blastn="${ncbi_blast_dir}/blastn"'
+echo 'export ncbi_makeblast_db="${ncbi_blast_dir}/makeblastdb"'
+echo 'export fastx_collapser="/home/shared/fastx_toolkit_0.0.13_binaries_Linux_2.6_amd64/bin/fastx_collapser"'
+
+echo "# Set number of CPUs to use"
+echo 'export threads=46'
+echo ""
+
+echo "# Initialize arrays"
+echo 'export trimmed_fastqs_array=()'
+
+
+} > .bashvars
+
+cat .bashvars
+```
+
+## Inspect miRNA FastAs
+
+```{r inspect-miRNA-FastAs, engine='bash', eval=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+head "${deep_dive_data_dir}"/cni*.fasta
+```
+
+# Convert `U` to `T` in miRNA FastAs
+
+This is needed because the sRNAseq sequences do *not* have uracils (`U`) - they have thymines (`T`).
+
+```{r convert-U-to-T, engine='bash', eval=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+# Convert miRBase FastA
+sed '/^[^>]/s/U/T/g' "${deep_dive_data_dir}/${mirbase_mature_fasta_name}" \
+> "${deep_dive_data_dir}/${mirbase_mature_fasta_no_U}"
+
+head ${deep_dive_data_dir}/*.fa
+  
+```
+
+# Create BLAST Databases
+
+```{r make-blast-dbs, engine='bash', eval=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+# miRBase BLAST DB
+## Make sure output directory exists
+if [ ! -d "${blast_dbs_dir}" ]; then
+  mkdir --parents "${blast_dbs_dir}"
+fi
+
+## Check for pre-exising database
+if [ ! -f "${blast_dbs_dir}/${mirbase_mature_fasta_no_U%.*}.blastdb.log" ]; then
+  ${ncbi_makeblast_db} \
+  -in ${deep_dive_data_dir}/${mirbase_mature_fasta_no_U} \
+  -title ${mirbase_mature_fasta_no_U%.*} \
+  -dbtype nucl \
+  -out ${blast_dbs_dir}/${mirbase_mature_fasta_no_U%.*} \
+  -logfile ${blast_dbs_dir}/${mirbase_mature_fasta_no_U%.*}.blastdb.log
+fi
+```
+
+# Prepare reads for BLASTing
+
+## Concatenate all trimmed reads
+
+```{r concatenate-trimmed-reads, engine='bash', eval=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+# Check for existence of concatenated FastA before running
+if [ ! -f "${output_dir_top}/${concatenated_trimmed_reads_fastq}" ]; then
+  cat ${trimmed_fastqs_dir}/${trimmed_fastqs_pattern}.gz \
+  > "${output_dir_top}/${concatenated_trimmed_reads_fastq}"
+fi
+
+ls -lh "${output_dir_top}/${concatenated_trimmed_reads_fastq}"
+```
+
+## Collapse reads to FastA
+
+Uses `fastx_collapser` to collapse to unique reads.
+
+Requires undocumented quality setting. Have selected `30` as cuttoff: `-Q30`.
+
+```{r collapse-reads-to-FastA, engine='bash', eval=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+# Check for existence of collapsed FastA before running
+time \
+if [ ! -f "${output_dir_top}/${collapsed_reads_fasta}" ]; then
+  zcat ${output_dir_top}/${concatenated_trimmed_reads_fastq} \
+  | ${fastx_collapser} \
+  -Q30 \
+  -o "${output_dir_top}/${collapsed_reads_fasta}"
+fi
+
+head "${output_dir_top}/${collapsed_reads_fasta}"
+```
+
+# Run BLASTn Default E-value
+
+-   1000 for blastn-short
+
+Runs BLASTn using the `blastn-short` task for sequences \< 30bp.
+
+Look for top match (`-max_hsps 1` & `-max_target_seqs 1`) for each query.
+
+-   Suppress subsequent warning `Examining 5 or more matches is recommended` by redirecting stdout: `2> /dev/null`
+
+## cnidarian miRBase BLASTn Default e-value
+
+```{r miRBase-BLASTn-default-eval, engine='bash', cache=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+time \
+${ncbi_blastn} \
+-db ${blast_dbs_dir}/${mirbase_mature_fasta_no_U%.*} \
+-query ${output_dir_top}/${collapsed_reads_fasta} \
+-out ${output_dir_top}/miRBase-BLASTn-eval_1000.outfmt6 \
+-task blastn-short \
+-max_hsps 1 \
+-max_target_seqs 1 \
+-outfmt 6 \
+-num_threads ${threads} \
+2> /dev/null
+```
+
+# BLASTn E-value = 10
+
+Running this for simple comparison to the defaul `blastn-short` value of 1000.
+
+## cnidarian miRBase BLASTn e-value = 10
+
+```{r miRBase-BLASTn-10-eval, engine='bash', cache=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+time \
+${ncbi_blastn} \
+-db ${blast_dbs_dir}/${mirbase_mature_fasta_no_U%.*} \
+-query ${output_dir_top}/${collapsed_reads_fasta} \
+-out ${output_dir_top}/miRBase-BLASTn-eval_10.outfmt6 \
+-task blastn-short \
+-evalue 10 \
+-max_hsps 1 \
+-max_target_seqs 1 \
+-outfmt 6 \
+-num_threads ${threads} \
+2> /dev/null
+```
+
+# Results
+
+## Check BLASTn Default e-value results
+
+```{r blastn-default-evalue-results, engine='bash', eval=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+head ${output_dir_top}/*eval_1000.outfmt6
+
+echo ""
+echo "-----------------------------------------"
+echo ""
+
+wc -l ${output_dir_top}/*eval_1000.outfmt6
+```
+
+## Check BLASTn e-value = 10 results
+
+```{r blastn-10-evalue-results, engine='bash', eval=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+head ${output_dir_top}/*eval_10.outfmt6
+
+echo ""
+echo "-----------------------------------------"
+echo ""
+
+wc -l ${output_dir_top}/*eval_10.outfmt6
+```
+
+
+------------------------------------------------------------------------
+
+# Citations
