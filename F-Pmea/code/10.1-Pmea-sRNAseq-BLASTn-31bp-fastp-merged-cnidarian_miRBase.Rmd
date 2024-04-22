@@ -20,7 +20,7 @@ output:
     number_sections: true
     code_folding: show
     code_download: true
-bibliography: /home/shared/8TB_HDD_02/shedurkin/deep-dive/D-Apul/code/references.bib
+bibliography: references.bib
 link-citations: true
 ---
 
@@ -45,6 +45,8 @@ This notebook performs a simple [NCBI BLASTn](https://www.ncbi.nlm.nih.gov/books
     -   Utilizes a modified version, which includes cnidarian miRNA culled from literature by Jill Ahsley.
 
     -   [`cnidarian-mirbase-mature-v22.1.fasta`](../../data/cnidarian-mirbase-mature-v22.1.fasta)
+    
+- [MirGeneDB](https://www.mirgenedb.org/download)
 
 Relies on the following software:
 
@@ -65,7 +67,7 @@ echo "# Trimmed FastQ naming pattern"
 echo "export trimmed_fastqs_pattern='*31bp-merged.fq'"
 
 echo "# Data directories"
-echo 'export deep_dive_dir=/home/shared/8TB_HDD_02/shedurkin/deep-dive'
+echo 'export deep_dive_dir=/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive'
 echo 'export deep_dive_data_dir="${deep_dive_dir}/data"'
 echo 'export output_dir_top=${deep_dive_dir}/F-Pmea/output/10.1-Pmea-sRNAseq-BLASTn-31bp-fastp-merged-cnidarian_miRBase'
 echo 'export trimmed_fastqs_dir="${deep_dive_dir}/F-Pmea/output/08.2-Pmea-sRNAseq-trimming-31bp-fastp-merged/trimmed-reads"'
@@ -108,7 +110,7 @@ cat .bashvars
 # Load bash variables into memory
 source .bashvars
 
-head "${deep_dive_data_dir}"/cni*.fasta
+head "${deep_dive_data_dir}"/[cm][ni]*.fa*
 ```
 
 # Convert `U` to `T` in miRNA FastAs
@@ -127,7 +129,7 @@ sed '/^[^>]/s/U/T/g' "${deep_dive_data_dir}/${mirbase_mature_fasta_name}" \
 sed '/^[^>]/s/U/T/g' "${deep_dive_data_dir}/${mirgene_mature_fasta_name}" \
 > "${deep_dive_data_dir}/${mirgene_mature_fasta_no_U}"
 
-head ${deep_dive_data_dir}/*.fa
+head "${deep_dive_data_dir}"/[cm][ni]*U.fa
   
 ```
 
