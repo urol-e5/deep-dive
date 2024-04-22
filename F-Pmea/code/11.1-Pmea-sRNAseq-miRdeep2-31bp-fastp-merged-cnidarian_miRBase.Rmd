@@ -13,11 +13,11 @@ output:
     number_sections: true
     code_folding: show
     code_download: true
-bibliography: /home/shared/8TB_HDD_02/shedurkin/deep-dive/D-Apul/code/references.bib
+bibliography: references.bib
 link-citations: true
 ---
 
-Use [miRDeep2](https://github.com/rajewsky-lab/mirdeep2) [@friedländer2011] to identify potential miRNAs using _P.meandrina_ sRNAseq reads. The *P.meandrina* genome will be used as the reference genome. The mature miRBase miRNA database will also be used.
+Use [miRDeep2](https://github.com/rajewsky-lab/mirdeep2) [@friedländer2011] to identify potential miRNAs using _P.meandrina_ sRNAseq reads. The *P.meandrina* genome will be used as the reference genome. A modified version of the mature miRBase miRNA database, which includes cnidarian miRNA culled from literature by Jill Ahsley, will also be used.
 
 ------------------------------------------------------------------------
 
@@ -41,7 +41,7 @@ Outputs:
   
 - Other output files are too large for GitHub (and some (all?) are not needed for this analysis). Please find a full backup here:
 
-https://gannet.fish.washington.edu/Atumefaciens/gitrepos/deep-dive/F-Pmea/output/11-Pmea-sRNAseq-miRdeep2/
+https://gannet.fish.washington.edu/Atumefaciens/gitrepos/deep-dive/F-Pmea/output/11.1-Pmea-sRNAseq-miRdeep2-31bp-fastp-merged-cnidarian_miRBase/
 
 
 ------------------------------------------------------------------------
@@ -72,18 +72,15 @@ echo "#### Assign Variables ####"
 echo ""
 
 echo "# Trimmed FastQ naming pattern"
-echo "export trimmed_fastqs_pattern='*flexbar_trim.25bp*.fastq.gz'"
+echo "export trimmed_fastqs_pattern='*fastp-adapters-polyG-31bp-merged.fq.gz'"
 echo ""
-
-echo "# miRTrace FastA naming pattern"
-echo "export mirtrace_fasta_pattern='*flexbar_trim.25bp*.fasta'"
 
 echo "# Data directories"
 echo 'export deep_dive_dir=/home/shared/8TB_HDD_02/shedurkin/deep-dive'
 echo 'export deep_dive_data_dir="${deep_dive_dir}/data"'
-echo 'export output_dir_top=${deep_dive_dir}/F-Pmea/output/11-Pmea-sRNAseq-miRdeep2'
+echo 'export output_dir_top=${deep_dive_dir}/F-Pmea/output/11.1-Pmea-sRNAseq-miRdeep2-31bp-fastp-merged-cnidarian_miRBase'
 echo 'export genome_fasta_dir=${deep_dive_dir}/F-Pmea/data/Pmea'
-echo 'export trimmed_fastqs_dir="${deep_dive_dir}/F-Pmea/output/08-Pmea-sRNAseq-trimming/trimmed-reads"'
+echo 'export trimmed_fastqs_dir="${deep_dive_dir}/F-Pmea/output//08.2-Pmea-sRNAseq-trimming-31bp-fastp-merged/trimmed-reads"'
 echo 'export collapsed_reads_dir="${deep_dive_dir}/F-Pmea/output/10-Pmea-sRNAseq-BLASTn"'
 echo ""
 
