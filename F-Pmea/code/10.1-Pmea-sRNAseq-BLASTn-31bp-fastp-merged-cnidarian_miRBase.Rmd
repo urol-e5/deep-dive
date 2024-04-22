@@ -276,7 +276,7 @@ ${ncbi_blastn} \
 
 Running this for simple comparison to the defaul `blastn-short` value of 1000.
 
-## cnidarian miRBase BLASTn e-value = 10
+## Cnidarian miRBase BLASTn e-value = 10
 
 ```{r miRBase-BLASTn-10-eval, engine='bash', cache=TRUE}
 # Load bash variables into memory
@@ -287,6 +287,26 @@ ${ncbi_blastn} \
 -db ${blast_dbs_dir}/${mirbase_mature_fasta_no_U%.*} \
 -query ${output_dir_top}/${collapsed_reads_fasta} \
 -out ${output_dir_top}/miRBase-BLASTn-eval_10.outfmt6 \
+-task blastn-short \
+-evalue 10 \
+-max_hsps 1 \
+-max_target_seqs 1 \
+-outfmt 6 \
+-num_threads ${threads} \
+2> /dev/null
+```
+
+## MirGene BLASTn e-value = 10
+
+```{r MirGene-BLASTn-10-eval, engine='bash', cache=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+time \
+${ncbi_blastn} \
+-db ${blast_dbs_dir}/${mirgene_mature_fasta_no_U%.*} \
+-query ${output_dir_top}/${collapsed_reads_fasta} \
+-out ${output_dir_top}/MirGene-BLASTn-eval_10.outfmt6 \
 -task blastn-short \
 -evalue 10 \
 -max_hsps 1 \
