@@ -394,9 +394,22 @@ echo ""
 wc -l ${output_dir_top}/*eval_10.outfmt6
 ```
 
-The default e-value results in alignments for all query sequences, which is likely not what we'd expect.
 
-Decreasing the e-value resulted in fewer queary alignments, as we'd expect.
+## Check BLASTn e-value = 1 results
+```{r blastn-1-evalue-results, engine='bash', eval=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+head ${output_dir_top}/*eval_1.outfmt6
+
+echo ""
+echo "-----------------------------------------"
+echo ""
+
+wc -l ${output_dir_top}/*eval_1.outfmt6
+```
+
+
 
 For further analysis, we should probably discuss a reasonable e-value to use for filtering.
 
