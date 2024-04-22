@@ -240,6 +240,13 @@ if [ ! -f "${output_dir_top}/${collapsed_reads_fasta}" ]; then
 fi
 
 head "${output_dir_top}/${collapsed_reads_fasta}"
+
+echo ""
+
+echo "-----------------------------------------------------"
+echo ""
+echo "Number of collapsed reads:"
+grep --count "^>" "${output_dir_top}/${collapsed_reads_fasta}"
 ```
 
 # Run BLASTn Default E-value
@@ -286,7 +293,8 @@ ${ncbi_blastn} \
 -max_hsps 1 \
 -max_target_seqs 1 \
 -outfmt 6 \
--num_threads ${threads}
+-num_threads ${threads} \
+2> /dev/null
 ```
 
 # BLASTn E-value = 10
@@ -426,7 +434,15 @@ echo ""
 wc -l ${output_dir_top}/*eval_1.outfmt6
 ```
 
+# Summary
 
+The default e-value results in alignments for 100% of sequences.
+
+Decreasing the e-value to `10` resulted in fewer query alignments, as we'd expect, but only minimally.
+
+Decreasing the e-value to `1` resulted in ~40-45% of query alignments.
+
+For further analysis, we should probably discuss a reasonable e-value to use for filtering, as it might be worthwhile to test even lower e-value thresholds.
 
 For further analysis, we should probably discuss a reasonable e-value to use for filtering.
 
