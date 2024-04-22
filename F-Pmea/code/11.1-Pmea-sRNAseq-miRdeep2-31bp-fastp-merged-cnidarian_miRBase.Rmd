@@ -127,6 +127,9 @@ Per miRDeep2 documentation:
 # Load bash variables into memory
 source .bashvars
 
+# Make output directory, if it doesn't exist
+mkdir --parents "${output_dir_top}"
+
 
 sed '/^>/ s/-/_x/g' "${collapsed_reads_dir}/${collapsed_reads_fasta}" \
 | sed '/^>/ s/>/>seq_/' \
