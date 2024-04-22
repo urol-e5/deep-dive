@@ -79,6 +79,8 @@ echo 'export collapsed_reads_fasta="collapsed-reads-all.fasta"'
 echo 'export concatenated_trimmed_reads_fastq="concatenated-trimmed-reads-all.fastq.gz"'
 echo 'export mirbase_mature_fasta_name="cnidarian-mirbase-mature-v22.1.fasta"'
 echo 'export mirbase_mature_fasta_no_U="cnidarian-mirbase-mature-v22.1-no_U.fa"'
+echo 'export mirgene_mature_fasta_name="mirgene-mature-all-v2.1.fa"'
+echo 'export mirgene_mature_fasta_no_U="mirgene-mature-all-v2.1-no_U.fa"'
 echo ""
 
 echo "# External data URLs"
@@ -162,6 +164,22 @@ head "${deep_dive_data_dir}"/[cm][ni]*U.fa
 ```{r make-blast-dbs, engine='bash', eval=TRUE}
 # Load bash variables into memory
 source .bashvars
+
+# MirGene BLAST DB
+## Make sure output directory exists
+if [ ! -d "${blast_dbs_dir}" ]; then
+  mkdir --parents "${blast_dbs_dir}"
+fi
+
+## Check for pre-exising database
+if [ ! -f "${blast_dbs_dir}/${mirgene_mature_fasta_no_U%.*}.blastdb.log" ]; then
+  ${ncbi_makeblast_db} \
+  -in ${deep_dive_data_dir}/${mirgene_mature_fasta_no_U} \
+  -title ${mirgene_mature_fasta_no_U%.*} \
+  -dbtype nucl \
+  -out ${blast_dbs_dir}/${mirgene_mature_fasta_no_U%.*} \
+  -logfile ${blast_dbs_dir}/${mirgene_mature_fasta_no_U%.*}.blastdb.log
+fi
 
 # miRBase BLAST DB
 ## Make sure output directory exists
@@ -268,8 +286,7 @@ ${ncbi_blastn} \
 -max_hsps 1 \
 -max_target_seqs 1 \
 -outfmt 6 \
--num_threads ${threads} \
-2> /dev/null
+-num_threads ${threads}
 ```
 
 # BLASTn E-value = 10
