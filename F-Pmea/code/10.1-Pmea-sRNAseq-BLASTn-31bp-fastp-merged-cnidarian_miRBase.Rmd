@@ -64,7 +64,7 @@ echo "#### Assign Variables ####"
 echo ""
 
 echo "# Trimmed FastQ naming pattern"
-echo "export trimmed_fastqs_pattern='*31bp-merged.fq'"
+echo "export trimmed_fastqs_pattern='*fastp-adapters-polyG-31bp-merged.fq.gz'"
 
 echo "# Data directories"
 echo 'export deep_dive_dir=/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive'
@@ -103,8 +103,32 @@ echo 'export trimmed_fastqs_array=()'
 
 cat .bashvars
 ```
+# Download MirGeneDB Fasta
+```{r download-mirgene-db-FastA, engine='bash', eval=TRUE}
+# Load bash variables into memory
+source .bashvars
 
-## Inspect miRNA FastAs
+# Download MirGeneDB, if it doesn't exist
+if [ ! -f "${deep_dive_data_dir}/${mirgene_mature_fasta_name}" ]; then
+
+  wget \
+  --no-check-certificate \
+  --continue \
+  --no-host-directories \
+  --no-directories \
+  --no-parent \
+  --quiet \
+  --execute robots=off \
+  --output-document ${deep_dive_data_dir}/${mirgene_mature_fasta_name} \
+   ${mirgenedb_fasta_url}
+ 
+fi
+ 
+ls -lh ${deep_dive_data_dir}
+```
+
+
+# Inspect miRNA FastAs
 
 ```{r inspect-miRNA-FastAs, engine='bash', eval=TRUE}
 # Load bash variables into memory
