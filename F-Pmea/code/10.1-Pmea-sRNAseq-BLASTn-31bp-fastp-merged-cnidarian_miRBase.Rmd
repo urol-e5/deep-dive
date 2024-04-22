@@ -226,7 +226,7 @@ head "${output_dir_top}/${collapsed_reads_fasta}"
 
 # Run BLASTn Default E-value
 
--   1000 for blastn-short
+-   `1000` for `blastn-short`
 
 Runs BLASTn using the `blastn-short` task for sequences \< 30bp.
 
@@ -234,7 +234,7 @@ Look for top match (`-max_hsps 1` & `-max_target_seqs 1`) for each query.
 
 -   Suppress subsequent warning `Examining 5 or more matches is recommended` by redirecting stdout: `2> /dev/null`
 
-## cnidarian miRBase BLASTn Default e-value
+## Cnidarian miRBase BLASTn Default e-value
 
 ```{r miRBase-BLASTn-default-eval, engine='bash', cache=TRUE}
 # Load bash variables into memory
@@ -245,6 +245,25 @@ ${ncbi_blastn} \
 -db ${blast_dbs_dir}/${mirbase_mature_fasta_no_U%.*} \
 -query ${output_dir_top}/${collapsed_reads_fasta} \
 -out ${output_dir_top}/miRBase-BLASTn-eval_1000.outfmt6 \
+-task blastn-short \
+-max_hsps 1 \
+-max_target_seqs 1 \
+-outfmt 6 \
+-num_threads ${threads} \
+2> /dev/null
+```
+
+## MirGene BLASTn Default e-value
+
+```{r MirGene-BLASTn-default-eval, engine='bash', cache=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+time \
+${ncbi_blastn} \
+-db ${blast_dbs_dir}/${mirgene_mature_fasta_no_U%.*} \
+-query ${output_dir_top}/${collapsed_reads_fasta} \
+-out ${output_dir_top}/MirGene-BLASTn-eval_1000.outfmt6 \
 -task blastn-short \
 -max_hsps 1 \
 -max_target_seqs 1 \
