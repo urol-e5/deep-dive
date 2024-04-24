@@ -398,6 +398,8 @@ ls --directory dir_* mapper_logs mirdeep_runs mirna_results* pdfs_*
 
 ## Peep output file format
 
+NOTE: You will need to replace the name of the output CSV with the one from the current run.
+
 The formatting of this CSV is terrible. It has a 3-column table on top
 of a 17-column table. This makes parsing a bit of a pain in its raw
 format.
@@ -407,7 +409,7 @@ format.
 source .bashvars
 
 
-head -n 30 "${output_dir_top}/result_30_11_2023_t_09_23_06.csv"
+head -n 30 "${output_dir_top}/result_22_04_2024_t_15_27_22.csv"
 ```
 
 ## Create more easily parasable results file
@@ -420,20 +422,20 @@ the end of the file (represented by the `$p`. `$` = end, `p` = print)
 source .bashvars
 
 
-sed --quiet '/provisional id/,$p' "${output_dir_top}/result_30_11_2023_t_09_23_06.csv" \
-> "${output_dir_top}/parsable-result_30_11_2023_t_09_23_06.csv"
+sed --quiet '/provisional id/,$p' "${output_dir_top}/result_22_04_2024_t_15_27_22.csv" \
+> "${output_dir_top}/parsable-result_22_04_2024_t_15_27_22.csv"
 
-head "${output_dir_top}/parsable-result_30_11_2023_t_09_23_06.csv"
+head "${output_dir_top}/parsable-result_22_04_2024_t_15_27_22.csv"
 ```
 
 ## Read in output CSV
 
-This chunk provides a more convise overview of the data and it's
+This chunk provides a more concise overview of the data and it's
 columns.
 
 ```{r read-in-result-csv, eval=TRUE}
 
-mirdeep_result.df <- read.csv("../output/11-Pmea-sRNAseq-miRdeep2/parsable-result_30_11_2023_t_09_23_06.csv",
+mirdeep_result.df <- read.csv("../output/11.1-Pmea-sRNAseq-miRdeep2-31bp-fastp-merged-cnidarian_miRBase/parsable-result_22_04_2024_t_15_27_22.csv",
                               header = TRUE,
                               sep = "\t")
 
@@ -453,7 +455,7 @@ families, etc.
 source .bashvars
 
 # Total predicted miRNAS
-total_miRNAs=$(awk 'NR > 1' ${output_dir_top}/parsable-result_30_11_2023_t_09_23_06.csv \
+total_miRNAs=$(awk 'NR > 1' ${output_dir_top}/parsable-result_22_04_2024_t_15_27_22.csv \
 | wc -l
 )
 
@@ -461,7 +463,7 @@ echo "Total of predicted miRNAs: ${total_miRNAs}"
 echo ""
 
 # Matches to known mature miRNAs
-mature_miRNAs=$(awk -F'\t' '$11 != "-" && $11 != "" {print $11}' ${output_dir_top}/parsable-result_30_11_2023_t_09_23_06.csv \
+mature_miRNAs=$(awk -F'\t' '$11 != "-" && $11 != "" {print $11}' ${output_dir_top}/parsable-result_22_04_2024_t_15_27_22.csv \
 | wc -l
 )
 
@@ -469,7 +471,7 @@ echo "Number of seed matches to known miRNAS: ${mature_miRNAs}"
 echo ""
 
 # Novel miRNAs
-novel_miRNAs=$(awk -F "\t" '$11 == "-" || $11 == "" {print $11}' ${output_dir_top}/parsable-result_30_11_2023_t_09_23_06.csv \
+novel_miRNAs=$(awk -F "\t" '$11 == "-" || $11 == "" {print $11}' ${output_dir_top}/parsable-result_22_04_2024_t_15_27_22.csv \
 | awk 'NR > 1' \
 | wc -l
 )
