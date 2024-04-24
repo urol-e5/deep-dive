@@ -1,48 +1,34 @@
 #### Assign Variables ####
 
+# Trimmed FastQ naming pattern
+export trimmed_fastqs_pattern='*-31bp-merged.fq.gz'
+
 # Data directories
-export Peve_dir=/home/shared/8TB_HDD_02/shedurkin/deep-dive/E-Peve
-export output_dir_top=${Peve_dir}/output/12-Peve-RNAseq-kallisto
-export trimmed_reads_dir=${output_dir_top}/trimmed-reads
-export kallisto_output_dir=${output_dir_top}/kallisto
+export deep_dive_dir=/home/shared/8TB_HDD_02/shedurkin/deep-dive
+export deep_dive_data_dir="${deep_dive_dir}/data"
+export output_dir_top=${deep_dive_dir}/E-Peve/output/11.1-Peve-sRNAseq-miRdeep2-31bp-fastp-merged-cnidarian_miRBase
+export genome_fasta_dir=${deep_dive_dir}/E-Peve/data
+export trimmed_fastqs_dir="${deep_dive_dir}/E-Peve/output/06.2-Peve-sRNAseq-trimming-31bp-fastp-merged/trimmed-reads"
+export collapsed_reads_dir="${deep_dive_dir}/E-Peve/output/10.2-Peve-sRNAseq-BLASTn-31bp-fastp-merged"
 
 # Input/Output files
-export transcriptome_dir=${Peve_dir}/data
-export transcriptome_gff_name="Porites_evermanni_v1.annot.gff"
-export transcriptome_gff=${transcriptome_dir}/${transcriptome_gff_name}
-export transcriptome_gff_filtered_name="Porites_evermanni_v1_CDS.annot.gff"
-export transcriptome_gff_filtered=${transcriptome_dir}/${transcriptome_gff_filtered_name}
-export transcriptome_bed_name="Porites_evermanni_v1_CDS.annot.bed"
-export transcriptome_bed=${transcriptome_dir}/${transcriptome_bed_name}
+export collapsed_reads_fasta="collapsed-reads-all.fasta"
+export collapsed_reads_mirdeep2="collapsed-reads-all-mirdeep2.fasta"
+export collapsed_reads_mirdeep2_over17bp="collapsed-reads-over17bp-mirdeep2.fasta"
+export concatenated_trimmed_reads_fastq="concatenated-trimmed-reads-all.fastq.gz"
 export genome_fasta_name="Porites_evermanni_v1.fa"
-export genome_fasta=${transcriptome_dir}/${genome_fasta_name}
-export transcriptome_fasta_name="Porites_evermanni_CDS.fasta"
-export transcriptome_fasta=${transcriptome_dir}/${transcriptome_fasta_name}
-export kallisto_index_name="Peve_kallisto_index.idx"
-# External data URLs
-export trimmed_reads_url="https://gannet.fish.washington.edu/Atumefaciens/20230519-E5_coral-fastqc-fastp-multiqc-RNAseq/P_evermanni/trimmed/"
-export transcriptome_url="https://www.genoscope.cns.fr/corals/data/Porites_evermanni_v1.annot.gff"
-export genome_url="https://www.genoscope.cns.fr/corals/data/Porites_evermanni_v1.fa"
-
-# Set filename patterns
-export fastq_pattern='*.fastq.gz'
-export R1_fastq_pattern='*_R1.fastq.gz'
-export R2_fastq_pattern='*_R2.fastq.gz'
+export genome_fasta_no_spaces="Porites_evermanni_v1_genomic-no_spaces.fna"
+export mirdeep2_mapping_file="Peve-mirdeep2-mapping.arf"
+export mirbase_mature_fasta_name="cnidarian-mirbase-mature-v22.1.fasta"
+export mirbase_mature_fasta_no_spaces="cnidarian-mirbase-mature-v22.1-no_spaces.fa"
 
 # Paths to programs
-export kallisto=/home/shared/kallisto_linux-v0.50.1/kallisto
-export trinity_abund_to_matrix=/home/shared/trinityrnaseq-v2.12.0/util/abundance_estimates_to_matrix.pl
-export bedtools=/home/shared/bedtools2/bin/bedtools
-export bedops=/home/shared/bedops_linux_x86_64-v2.4.41/bin
+export mirdeep2_mapper="mapper.pl"
+export mirdeep2="miRDeep2.pl"
+export bowtie_build="/home/shared/bowtie-1.3.1-linux-x86_64/bowtie-build"
 
 # Set number of CPUs to use
-export threads=20
+export threads=46
 
-# Programs associative array
-declare -A programs_array
-programs_array=(
-[kallisto]="${kallisto}" \
-[trinity_abund_to_matrix]="${trinity_abund_to_matrix}" \
-[bedtools]="${bedtools}" \
-[bedops]="${bedops}" \
-)
+# Initialize arrays
+export trimmed_fastqs_array=()
