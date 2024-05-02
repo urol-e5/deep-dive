@@ -145,7 +145,7 @@ Reads are downloaded from <https://owl.fish.washington.edu/nightingales/P_everma
 
 The `--cut-dirs 3` command cuts the preceding directory structure (i.e. `nightingales/P_evermanni/30-852430235/`) so that we just end up with the reads.
 
-```{bash download-raw-reads, engine='bash', eval=TRUE}
+```{bash download-raw-reads, engine='bash', eval=FALSE}
 # Load bash variables into memory
 source .bashvars
 
@@ -323,9 +323,9 @@ do
   --merge \
   --merged_out ${trimmed_reads_dir}/${R1_sample_name}-fastp-adapters-polyG-${max_read_length}bp-merged.fq.gz \
   --thread ${threads} \
-  --html "${R1_sample_name}-fastp-adapters-polyG-${max_read_length}bp-merged.html" \
-  --json "${R1_sample_name}-fastp-adapters-polyG-${max_read_length}bp-merged.json" \
-  --report_title "${R1_sample_name}-fastp-adapters-polyG-${max_read_length}bp-merged"
+  --html "${trimmed_reads_dir}/${R1_sample_name}-fastp-adapters-polyG-${max_read_length}bp-merged.html" \
+  --json "${trimmed_reads_dir}/${R1_sample_name}-fastp-adapters-polyG-${max_read_length}bp-merged.json" \
+  --report_title "${trimmed_reads_dir}/${R1_sample_name}-fastp-adapters-polyG-${max_read_length}bp-merged"
     
   # Move to trimmed directory
   # This is done so checksums file doesn't include excess path
