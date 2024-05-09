@@ -203,10 +203,10 @@ tail -n 3 ${output_dir_top}/shortstack.log \
 # Load bash variables into memory
 source .bashvars
 
-tail -n 20 ${output_dir_top}/shortstack.log
+tail -n 25 ${output_dir_top}/shortstack.log
 ```
 
-ShortStack didn't identify *any* miRNAs.
+ShortStack found 46 miRNAs.
 
 ## Inspect `Results.txt`
 
@@ -246,9 +246,6 @@ awk '$20=="N" {print $0}' ${output_dir_top}/ShortStack_out/Results.txt \
 
 Column 21 of the `Results.txt` file identifies if a cluster aligned to a known miRNA (miRBase) or not (`Y` or `NA`).
 
-Since there are no miRNAs, the following code will *not* print any output.
-
-The `echo` command after the `awk` command is simply there to prove that the chunk executed.
 
 ```{r results-txt-miRBase-miRNAs, engine='bash', eval=TRUE}
 # Load bash variables into memory
@@ -268,7 +265,9 @@ awk '$21=="NA" {print $0}' ${output_dir_top}/ShortStack_out/Results.txt \
 
 ```
 
-Although there are loci with matches to miRBase miRNAs, ShortStack did *not* annotate these clusters as miRNAs likely [because they do not *also* match secondary structure criteria](https://github.com/MikeAxtell/ShortStack#mirna-annotation).
+Although there are 46 loci with matches to miRBase miRNAs, ShortStack did *not* annotate 9 of these clusters as miRNAs likely [because they do not *also* match secondary structure criteria](https://github.com/MikeAxtell/ShortStack#mirna-annotation).
+
+This explains the difference between the 46 and 37 miRNAs.
 
 ### Directory tree of all ShortStack outputs
 
