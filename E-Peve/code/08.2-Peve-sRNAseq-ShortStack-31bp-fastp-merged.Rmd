@@ -51,7 +51,9 @@ Inputs:
 
     -   Filenames formatted: `*fastp-R1-31bp-auto_adapters-polyG.fq.gz`
 
--   *A.millepora* genome FastA. See [07-Peve-sRNAseq-MirMachine.md](https://github.com/urol-e5/deep-dive/blob/main/E-Peve/code/07-Peve-sRNAseq-MirMachine.md) for download info if needed.
+-   Genome FastA. See [07-Peve-sRNAseq-MirMachine.md](https://github.com/urol-e5/deep-dive/blob/main/E-Peve/code/07-Peve-sRNAseq-MirMachine.md) for download info if needed.
+
+- Modified MiRBase v22.1 FastA. Includes cnidarian miRNAs provided by Jill Ashley.
 
 Outputs:
 
@@ -105,17 +107,13 @@ echo "# Input/Output files"
 echo 'export genome_fasta_dir=${deep_dive_dir}/E-Peve/data'
 echo 'export genome_fasta_name="Porites_evermanni_v1.fa"'
 echo 'export shortstack_genome_fasta_name="Porites_evermanni_v1.fa"'
-echo 'export mirbase_mature_fasta=mature.fa'
-echo 'export mirbase_mature_fasta_version=mirbase-mature-v22.1.fa'
+echo 'export mirbase_mature_fasta_version=cnidarian-mirbase-mature-v22.1.fa'
 echo 'export genome_fasta="${genome_fasta_dir}/${shortstack_genome_fasta_name}"'
 echo ""
 
-echo "# External data URLs"
-echo 'export mirbase_fasta_url="https://mirbase.org/download_version_files/22.1/"'
-echo ""
 
 echo "# Set number of CPUs to use"
-echo 'export threads=20'
+echo 'export threads=40'
 echo ""
 
 echo "# Initialize arrays"
@@ -142,29 +140,7 @@ use_condaenv(condaenv = shortstack_conda_env_name, conda = shortstack_cond_path)
 py_config()
 ```
 
-# Download [miRBase](https://mirbase.org/) mature miRNA FastA
 
-```{r download-mirbase-mature-fasta, engine='bash', eval=TRUE}
-# Load bash variables into memory
-source .bashvars
-
-wget \
---directory-prefix ${deep_dive_data_dir} \
---recursive \
---no-check-certificate \
---continue \
---no-host-directories \
---no-directories \
---no-parent \
---quiet \
---execute robots=off \
- ${mirbase_fasta_url}/${mirbase_mature_fasta}
-
-# Rename to indicate miRBase FastA version
-mv ${deep_dive_data_dir}/${mirbase_mature_fasta} ${deep_dive_data_dir}/${mirbase_mature_fasta_version}
-
-ls -lh "${deep_dive_data_dir}"
-```
 
 # Run ShortStack
 
