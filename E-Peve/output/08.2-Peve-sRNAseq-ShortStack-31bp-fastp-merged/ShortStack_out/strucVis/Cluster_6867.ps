@@ -1,0 +1,576 @@
+%!PS-Adobe-3.0 EPSF-3.0
+%%Creator: ViennaRNA-2.6.4
+%%CreationDate: Thu May  9 10:44:17 2024
+%%Title: RNA Secondary Structure Plot
+%%BoundingBox: 0 0 612 792
+%%DocumentFonts: Helvetica
+%%Pages: 1
+%%EndComments
+% maple legend and information
+0 0 1 setrgbcolor
+72 720 4 0 360 arc closepath fill stroke
+0 0.5 1 setrgbcolor
+72 710 4 0 360 arc closepath fill stroke
+0 1 1 setrgbcolor
+72 700 4 0 360 arc closepath fill stroke
+0.5 1 0.5 setrgbcolor
+72 690 4 0 360 arc closepath fill stroke
+1 1 0 setrgbcolor
+72 680 4 0 360 arc closepath fill stroke
+1 0.5 0 setrgbcolor
+72 670 4 0 360 arc closepath fill stroke
+1 0 0 setrgbcolor
+72 660 4 0 360 arc closepath fill stroke
+1 0 0.5 setrgbcolor
+72 650 4 0 360 arc closepath fill stroke
+1 0 1 setrgbcolor
+72 640 4 0 360 arc closepath fill stroke
+
+0 0 0 setrgbcolor
+/Helvetica findfont
+8 scalefont
+setfont
+80 718 moveto
+(10) show
+/Helvetica findfont
+4 scalefont
+setfont
+90 722 moveto
+(0) show
+
+/Helvetica findfont
+8 scalefont
+setfont
+80 698 moveto
+(10) show
+/Helvetica findfont
+4 scalefont
+setfont
+90 702 moveto
+(1) show
+
+/Helvetica findfont
+8 scalefont
+setfont
+80 678 moveto
+(10) show
+/Helvetica findfont
+4 scalefont
+setfont
+90 682 moveto
+(2) show
+
+/Helvetica findfont
+8 scalefont
+setfont
+80 658 moveto
+(10) show
+/Helvetica findfont
+4 scalefont
+setfont
+90 662 moveto
+(3) show
+
+/Helvetica findfont
+8 scalefont
+setfont
+80 638 moveto
+(>=10) show
+/Helvetica findfont
+4 scalefont
+setfont
+99 642 moveto
+(4) show
+
+/Helvetica findfont
+8 scalefont
+setfont
+68 730 moveto
+(Depth of Coverage) show
+
+
+% Information at bottom page.
+/Helvetica findfont
+8 scalefont setfont
+72 134 moveto
+(Genome: /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/E-Peve/data/Porites_evermanni_v1.fa) show
+
+/Helvetica findfont
+8 scalefont setfont
+72 124 moveto
+(Alignments: /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/E-Peve/output/08.2-Peve-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/merged_alignments.bam) show
+
+/Helvetica findfont
+8 scalefont setfont
+72 114 moveto
+(Location: Porites_evermani_scaffold_590:199803-199896 plus) show
+
+/Helvetica findfont
+8 scalefont setfont
+72 104 moveto
+(Name: Cluster_6867) show
+
+
+
+% Program options: 
+
+% To switch off outline pairs of sequence comment or
+% delete the appropriate line near the end of the file
+
+/RNAplot 100 dict def
+
+RNAplot begin
+
+%%BeginProlog
+
+/fsize  14 def
+/outlinecolor {0.2 setgray} bind def
+/paircolor    {0.2 setgray} bind def
+/seqcolor     {0   setgray} bind def
+/cshow  { dup stringwidth pop -2 div fsize -3 div rmoveto show} bind def
+/min { 2 copy gt { exch } if pop } bind def
+/max { 2 copy lt { exch } if pop } bind def
+/arccoords { % i j arccoords
+  % puts optimal x1 y1 x2 y2 coordinates used in bezier curves from i to j
+  % onto the stack
+  dup 3 -1 roll dup 4 -1 roll lt dup dup 5 2 roll {exch} if
+  dup 3 -1 roll dup 3 -1 roll exch sub 1 sub dup
+  4 -2 roll 5 -1 roll {exch} if 4 2 roll
+  sequence length dup 2 div exch 3 1 roll lt 
+  {exch 5 -1 roll pop 4 -2 roll exch 4 2 roll}
+  { 4 2 roll 5 -1 roll dup 6 1 roll {exch} if
+    4 -2 roll exch pop dup 3 -1 roll dup 4 1 roll
+    exch add 4 -1 roll dup 5 1 roll sub 1 sub
+    5 -1 roll not {4 -2 roll exch 4 2 roll} if
+  }ifelse
+   % compute the scalingfactor and prepare (1-sf) and sf*r
+  2 mul exch cpr 3 1 roll div dup
+  3 -1 roll mul exch 1 exch sub exch
+   % compute the coordinates
+  3 -1 roll 1 sub coor exch get aload pop % get coord for i
+  4 -1 roll dup 5 1 roll mul 3 -1 roll dup 4 1 roll add exch % calculate y1
+  4 -1 roll dup 5 1 roll mul 3 -1 roll dup 4 1 roll add exch % calculate x1
+  5 -1 roll 1 sub coor exch get aload pop % get coord for j
+  % duplicate j coord
+  dup 3 -1 roll dup 4 1 roll exch 8 2 roll
+  6 -1 roll dup 7 1 roll mul 5 -1 roll dup 6 1 roll add exch % calculate y2
+  6 -1 roll mul 5 -1 roll add exch % calculate x2
+  6 -2 roll % reorder
+} bind def
+/drawoutline {
+  gsave outlinecolor newpath
+  coor 0 get aload pop 0.8 0 360 arc % draw 5' circle of 1st sequence
+  currentdict /cutpoint known        % check if cutpoint is defined
+  {coor 0 cutpoint getinterval
+   {aload pop lineto} forall         % draw outline of 1st sequence
+   coor cutpoint 1 add get aload pop
+   2 copy moveto 0.8 0 360 arc       % draw 5' circle of 2nd sequence
+   coor cutpoint 1 add coor length cutpoint 1 add sub getinterval
+   {aload pop lineto} forall        % draw outline of 2nd sequence
+     } {
+        /i 0 def
+        coor {
+            /p coor i get def
+            /a arcs i get def
+            /l a length def
+            l 0 eq {
+                %% standard point... draw simple line
+                p 0 2 getinterval aload pop lineto
+            } {
+                %% point in loop... draw arc around loop center
+                /clockwise a 5 get def
+                clockwise 0.0000000 gt {
+                    a 0 5 getinterval aload pop arcn
+                } {
+                    a 0 5 getinterval aload pop arc
+                } ifelse
+            } ifelse
+            /i i 1 add def
+        } forall
+    }
+  ifelse
+  stroke grestore
+} bind def
+/drawpairs {
+  paircolor
+  0.7 setlinewidth
+  [9 3.01] 9 setdash
+  newpath
+  pairs {aload pop
+      currentdict (cpr) known
+      { exch dup
+        coor  exch 1 sub get aload pop moveto
+        exch arccoords curveto
+      }
+      { coor exch 1 sub get aload pop moveto
+        coor exch 1 sub get aload pop lineto
+      }ifelse
+  } forall
+  stroke
+} bind def
+% draw bases
+/drawbases {
+  [] 0 setdash
+  seqcolor
+  0
+  coor {
+    aload pop moveto
+    dup sequence exch 1 getinterval cshow
+    1 add
+  } forall
+  pop
+} bind def
+/init {
+  /Helvetica findfont fsize scalefont setfont
+  1 setlinejoin
+  1 setlinecap
+  0.8 setlinewidth
+  % find the coordinate range
+  /xmax -1000 def /xmin 10000 def
+  /ymax -1000 def /ymin 10000 def
+  coor {
+      aload pop
+      dup ymin lt {dup /ymin exch def} if
+      dup ymax gt {/ymax exch def} {pop} ifelse
+      dup xmin lt {dup /xmin exch def} if
+      dup xmax gt {/xmax exch def} {pop} ifelse
+  } forall
+  /size {xmax xmin sub ymax ymin sub max} bind def
+  /width {xmax xmin sub} bind def
+  /height {ymax ymin sub} bind def
+  10 10 translate
+  680 size 10 add div dup scale
+  size width sub width xmin sub xmax sub add 2 div 5 add
+  size height sub height ymin sub ymax sub add 2 div 5 add
+  translate
+} bind def
+
+%%EndProlog
+
+% data start here
+/sequence { (\
+GGAUUAAGAAGCUUACGUUUCGCGCGCUAGUCCUUUGGUAAAGCGUUUCGUUUCACGAAUGGCUAGUGCACGAUACGUAGGCUUGACCUUUCAU\
+) } def
+/len { sequence length } bind def
+
+/coor [
+[119.70110321 510.57366943]
+[118.70974731 495.60644531]
+[117.71839142 480.63925171]
+[103.84330750 475.16680908]
+[93.67840576 464.16754150]
+[89.27915955 449.78671265]
+[91.56935883 434.86105347]
+[100.14770508 422.35910034]
+[113.35688782 414.79083252]
+[112.36553192 399.82363892]
+[111.37417603 384.85641479]
+[110.38281250 369.88922119]
+[109.39145660 354.92202759]
+[108.40010071 339.95480347]
+[107.40873718 324.98760986]
+[106.41738129 310.02038574]
+[105.42601776 295.05319214]
+[104.43466187 280.08599854]
+[95.87312317 267.89791870]
+[102.68144989 253.61654663]
+[101.69008636 238.64933777]
+[100.69873047 223.68214417]
+[92.13719177 211.49404907]
+[98.94551849 197.21269226]
+[97.95415497 182.24548340]
+[96.96279907 167.27828979]
+[95.97144318 152.31108093]
+[94.98007965 137.34387207]
+[93.98872375 122.37667084]
+[92.99736023 107.40946198]
+[89.30191803 100.05082703]
+[92.22901154 91.93251038]
+[91.73306274 76.94071198]
+[83.54370880 63.40390396]
+[90.85597229 50.42776871]
+[90.36002350 35.43597031]
+[82.17067719 21.89916420]
+[89.48294067 8.92302895]
+[88.98698425 -6.06876993]
+[80.79763794 -19.60557556]
+[88.10990143 -32.58171082]
+[87.61395264 -47.57350922]
+[87.11800385 -62.56530762]
+[86.62204742 -77.55710602]
+[86.12609863 -92.54890442]
+[79.55937195 -108.17946625]
+[92.76123047 -118.81653595]
+[106.63723755 -109.07524109]
+[101.11789703 -93.04485321]
+[101.61384583 -78.05305481]
+[102.10980225 -63.06126022]
+[102.60575104 -48.06945801]
+[103.10169983 -33.07765961]
+[111.25557709 -20.61316872]
+[103.97879028 -6.56472015]
+[104.47473907 8.42707825]
+[112.62861633 20.89157104]
+[105.35182190 34.94001770]
+[105.84777069 49.93181610]
+[114.00164795 62.39630890]
+[106.72486115 76.44475555]
+[107.22080994 91.43655396]
+[107.96456909 106.41810608]
+[108.95592499 121.38531494]
+[109.94728851 136.35250854]
+[110.93864441 151.31971741]
+[111.93000031 166.28692627]
+[112.92136383 181.25413513]
+[113.91271973 196.22132874]
+[122.54516602 209.47996521]
+[115.66593170 222.69078064]
+[116.65729523 237.65798950]
+[117.64865112 252.62518311]
+[126.28109741 265.88381958]
+[119.40186310 279.09463501]
+[120.39322662 294.06182861]
+[121.38458252 309.02905273]
+[122.37594604 323.99624634]
+[123.36730194 338.96343994]
+[124.35865784 353.93066406]
+[125.35002136 368.89785767]
+[126.34137726 383.86505127]
+[127.33273315 398.83227539]
+[128.32409668 413.79946899]
+[142.41607666 419.55944824]
+[152.56840515 430.82077026]
+[156.80717468 445.31396484]
+[154.34307861 460.14938354]
+[145.71768188 472.39324951]
+[132.68559265 479.64788818]
+[133.67695618 494.61511230]
+[134.66830444 509.58230591]
+[141.74824524 524.98718262]
+[128.90530396 536.05493164]
+] def
+/arcs [
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+[]
+] def
+/pairs [
+[1 92]
+[2 91]
+[3 90]
+[9 84]
+[10 83]
+[11 82]
+[12 81]
+[13 80]
+[14 79]
+[15 78]
+[16 77]
+[17 76]
+[18 75]
+[20 73]
+[21 72]
+[22 71]
+[24 69]
+[25 68]
+[26 67]
+[27 66]
+[28 65]
+[29 64]
+[30 63]
+[32 62]
+[33 61]
+[35 59]
+[36 58]
+[38 56]
+[39 55]
+[41 53]
+[42 52]
+[43 51]
+[44 50]
+[45 49]
+] def
+
+init
+
+% From maple
+/maplemark { % i r g b maplemark  draw filled circle around base i
+  setrgbcolor
+  newpath 1 sub coor exch get aload pop
+  fsize 2 div 0 360 arc closepath fill stroke
+} bind def
+/show5 { % i mark 5-prime end at base i
+  newpath 1 sub coor exch get aload pop moveto
+  -5 0 rmoveto
+  -15 10 rlineto
+  -8 0 rmoveto (5') show stroke
+} bind def
+1 show5
+32 1.00 0.61 0.00 maplemark
+42 1.00 0.85 0.00 maplemark
+27 1.00 0.61 0.00 maplemark
+39 1.00 0.61 0.00 maplemark
+31 1.00 0.61 0.00 maplemark
+41 1.00 0.79 0.00 maplemark
+49 0.00 0.00 1.00 maplemark
+24 1.00 0.61 0.00 maplemark
+46 0.00 0.00 1.00 maplemark
+36 1.00 0.61 0.00 maplemark
+78 0.00 0.00 1.00 maplemark
+75 1.00 0.00 0.14 maplemark
+33 1.00 0.61 0.00 maplemark
+70 1.00 0.00 0.40 maplemark
+43 0.93 1.00 0.07 maplemark
+84 0.00 0.00 1.00 maplemark
+54 1.00 0.00 0.38 maplemark
+76 0.15 1.00 0.85 maplemark
+48 0.00 0.00 1.00 maplemark
+38 1.00 0.61 0.00 maplemark
+40 1.00 0.70 0.00 maplemark
+45 0.00 0.00 1.00 maplemark
+30 1.00 0.61 0.00 maplemark
+67 1.00 0.00 0.42 maplemark
+73 1.00 0.00 0.33 maplemark
+35 1.00 0.61 0.00 maplemark
+72 1.00 0.00 0.39 maplemark
+57 1.00 0.00 0.42 maplemark
+64 1.00 0.00 0.42 maplemark
+87 0.00 0.00 1.00 maplemark
+71 1.00 0.00 0.40 maplemark
+79 0.00 0.00 1.00 maplemark
+26 1.00 0.61 0.00 maplemark
+88 0.00 0.00 1.00 maplemark
+80 0.00 0.00 1.00 maplemark
+85 0.00 0.00 1.00 maplemark
+23 1.00 0.61 0.00 maplemark
+44 0.41 1.00 0.59 maplemark
+34 1.00 0.61 0.00 maplemark
+58 1.00 0.00 0.42 maplemark
+55 1.00 0.00 0.41 maplemark
+50 0.00 0.00 1.00 maplemark
+68 1.00 0.00 0.42 maplemark
+47 0.00 0.00 1.00 maplemark
+65 1.00 0.00 0.42 maplemark
+37 1.00 0.61 0.00 maplemark
+60 1.00 0.00 0.42 maplemark
+21 1.00 0.87 0.00 maplemark
+29 1.00 0.61 0.00 maplemark
+22 1.00 0.67 0.00 maplemark
+52 1.00 0.54 0.00 maplemark
+77 0.00 0.00 1.00 maplemark
+63 1.00 0.00 0.42 maplemark
+81 0.00 0.00 1.00 maplemark
+89 0.00 0.00 1.00 maplemark
+66 1.00 0.00 0.42 maplemark
+82 0.00 0.00 1.00 maplemark
+59 1.00 0.00 0.42 maplemark
+51 1.00 0.56 0.00 maplemark
+61 1.00 0.00 0.42 maplemark
+69 1.00 0.00 0.41 maplemark
+86 0.00 0.00 1.00 maplemark
+28 1.00 0.61 0.00 maplemark
+25 1.00 0.61 0.00 maplemark
+83 0.00 0.00 1.00 maplemark
+74 1.00 0.00 0.32 maplemark
+56 1.00 0.00 0.42 maplemark
+62 1.00 0.00 0.42 maplemark
+53 1.00 0.00 0.38 maplemark
+
+% switch off outline pairs or bases by removing these lines
+% drawoutline
+% drawpairs
+drawbases
+showpage
+end
+%%EOF
