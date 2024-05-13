@@ -1,5 +1,5 @@
 ---
-title: "05.3-Apul-lncRNA-discovery - no splice"
+title: "15-Hisat"
 author: "Steven Roberts"
 date: "`r format(Sys.time(), '%d %B, %Y')`"  
 output: 
@@ -45,24 +45,21 @@ Will end up with 5 sorted bam files.
 
 ## Grab Trimmed RNA-seq Reads
 
-```{r, engine='bash'}
+```{r, engine='bash', eval=TRUE }
 
-wget -r \
---no-directories --no-parent \
--P ../data/fastq/ \
--A "*fastq.gz" https://gannet.fish.washington.edu/Atumefaciens/20230519-E5_coral-fastqc-fastp-multiqc-RNAseq/A_pulchra/trimmed/
+ls ../data/fastq/ 
+
 
 ```
+
 ## Genome
 
-```{r, engine='bash'}
-cd ../data
-
-curl -O http://gannet.fish.washington.edu/seashell/snaps/GCF_013753865.1_Amil_v2.1_genomic.fna
+```{r, engine='bash', eval=TRUE}
+ls ../data/GCF_013753865.1_Amil_v2.1_genomic.fna
 ```
 
 
-```{r, engine='bash'}
+```{r, engine='bash', eval=TRUE}
 head ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gtf
 
 wc -l ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gtf
@@ -74,7 +71,7 @@ grep -c "transcript" ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gtf
 grep -c "gene" ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gtf
 ```
 
-```{r, engine='bash'}
+```{r, engine='bash', eval=TRUE}
 head ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gff
 
 wc -l ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gff
