@@ -136,7 +136,8 @@ find ../data/fastq/*R2_001.fastp-trim.20230519.fastq.gz \
 | xargs basename -s -S1-TP2_R2_001.fastp-trim.20230519.fastq.gz | xargs -I{} \
 /home/shared/hisat2-2.2.1/hisat2 \
 -x ../output/15-Apul-hisat/GCF_013753865.1_Amil_v2.1.index \
--p 48 \
+--dta \
+-p 20 \
 -1 ../data/fastq/{}-S1-TP2_R1_001.fastp-trim.20230519.fastq.gz \
 -2 ../data/fastq/{}-S1-TP2_R2_001.fastp-trim.20230519.fastq.gz \
 -S ../output/15-Apul-hisat/{}.sam \
