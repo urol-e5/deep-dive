@@ -10,20 +10,17 @@ Steven Roberts
     Reads</a>
   - <a href="#12-genome" id="toc-12-genome">1.2 Genome</a>
   - <a href="#13-hisat" id="toc-13-hisat">1.3 HiSat</a>
-  - <a href="#14-convert-to-bams" id="toc-14-convert-to-bams">1.4 convert to
-    bams</a>
+    - <a href="#131-performance-tuning" id="toc-131-performance-tuning">1.3.1
+      Performance tuning</a>
+  - <a href="#14-convert-to-bam" id="toc-14-convert-to-bam">1.4 convert to
+    bam</a>
   - <a href="#15-looking-at-bams" id="toc-15-looking-at-bams">1.5 Looking at
     Bams</a>
+    - <a
+      href="#151-an-alternate-faster-differential-expression-analysis-workflow"
+      id="toc-151-an-alternate-faster-differential-expression-analysis-workflow">1.5.1
+      An alternate, faster differential expression analysis workflow</a>
 - <a href="#2-stringtie" id="toc-2-stringtie">2 StringTie</a>
-- <a href="#3-gffcompare" id="toc-3-gffcompare">3 GFFcompare</a>
-- <a href="#4-filter" id="toc-4-filter">4 Filter</a>
-- <a href="#5-bedtools" id="toc-5-bedtools">5 Bedtools</a>
-- <a href="#6-cpc2" id="toc-6-cpc2">6 CPC2</a>
-- <a href="#7-subsetting-fasta" id="toc-7-subsetting-fasta">7 subsetting
-  fasta</a>
-- <a href="#8-getting-genome-feature-track"
-  id="toc-8-getting-genome-feature-track">8 Getting genome feature
-  track</a>
 
 # 1 Run HiSat on RNA-seq
 
@@ -130,552 +127,334 @@ grep -c "gene" ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gff
 ## 1.3 HiSat
 
 ``` bash
+/home/shared/hisat2-2.2.1/hisat2_extract_exons.py \
+../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gtf \
+> ../output/15-Apul-hisat/m_exon.tab
+```
+
+``` bash
+head ../output/15-Apul-hisat/m_exon.tab
+wc -l ../output/15-Apul-hisat/m_exon.tab
+```
+
+    NC_058066.1 1961    2118    -
+    NC_058066.1 15360   15663   +
+    NC_058066.1 18710   18774   -
+    NC_058066.1 21000   21092   -
+    NC_058066.1 22158   22442   +
+    NC_058066.1 23084   23220   -
+    NC_058066.1 24770   25066   +
+    NC_058066.1 26652   26912   +
+    NC_058066.1 27071   27358   +
+    NC_058066.1 27658   27951   +
+    228010 ../output/15-Apul-hisat/m_exon.tab
+
+``` bash
+
+/home/shared/hisat2-2.2.1/hisat2_extract_splice_sites.py \
+../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gtf \
+> ../output/15-Apul-hisat/m_splice_sites.tab
+```
+
+``` bash
+head ../output/15-Apul-hisat/m_splice_sites.tab
+```
+
+    NC_058066.1 2118    18710   -
+    NC_058066.1 15663   22158   +
+    NC_058066.1 18774   21000   -
+    NC_058066.1 21092   23084   -
+    NC_058066.1 22442   24770   +
+    NC_058066.1 25066   26652   +
+    NC_058066.1 26912   27071   +
+    NC_058066.1 27358   27658   +
+    NC_058066.1 27951   28247   +
+    NC_058066.1 28534   29196   +
+
+``` bash
 /home/shared/hisat2-2.2.1/hisat2-build \
 ../data/GCF_013753865.1_Amil_v2.1_genomic.fna \
-../output/05.33-lncRNA-discovery/GCF_013753865.1_Amil_v2.1.index \
--p 24 \
+../output/15-Apul-hisat/GCF_013753865.1_Amil_v2.1.index \
+--exon ../output/15-Apul-hisat/m_exon.tab \
+--ss ../output/15-Apul-hisat/m_splice_sites.tab \
+-p 40 \
 ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gtf \
-2> ../output/05.33-lncRNA-discovery/hisat2-build_stats.txt
+2> ../output/15-Apul-hisat/hisat2-build_stats.txt
 ```
 
 ``` bash
-cat ../output/05.33-lncRNA-discovery/hisat2-build_stats.txt
+tail ../output/15-Apul-hisat/hisat2-build_stats.txt
 ```
 
-    Settings:
-      Output files: "../output/05.33-lncRNA-discovery/GCF_013753865.1_Amil_v2.1.index.*.ht2"
-      Line rate: 6 (line is 64 bytes)
-      Lines per side: 1 (side is 64 bytes)
-      Offset rate: 4 (one in 16)
-      FTable chars: 10
-      Strings: unpacked
-      Local offset rate: 3 (one in 8)
-      Local fTable chars: 6
-      Local sequence length: 57344
-      Local sequence overlap between two consecutive indexes: 1024
-      Endianness: little
-      Actual local endianness: little
-      Sanity checking: disabled
-      Assertions: disabled
-      Random seed: 0
-      Sizeofs: void*:8, int:4, long:8, size_t:8
-    Input files DNA, FASTA:
-      ../data/GCF_013753865.1_Amil_v2.1_genomic.fna
-    Reading reference sizes
-      Time reading reference sizes: 00:00:02
-    Calculating joined length
-    Writing header
-    Reserving space for joined string
-    Joining reference sequences
-      Time to join reference sequences: 00:00:02
-      Time to read SNPs and splice sites: 00:00:00
-    Using parameters --bmax 3713613 --dcv 1024
-      Doing ahead-of-time memory usage test
-      Passed!  Constructing with these parameters: --bmax 3713613 --dcv 1024
-    Constructing suffix-array element generator
-    Converting suffix-array elements to index image
-    Allocating ftab, absorbFtab
-    Entering GFM loop
-    Exited GFM loop
-    fchr[A]: 0
-    fchr[C]: 144834195
-    fchr[G]: 237637860
-    fchr[T]: 330514140
-    fchr[$]: 475342477
-    Exiting GFM::buildToDisk()
-    Returning from initFromVector
-    Wrote 162768226 bytes to primary GFM file: ../output/05.33-lncRNA-discovery/GCF_013753865.1_Amil_v2.1.index.1.ht2
-    Wrote 118835624 bytes to secondary GFM file: ../output/05.33-lncRNA-discovery/GCF_013753865.1_Amil_v2.1.index.2.ht2
-    Re-opening _in1 and _in2 as input streams
-    Returning from GFM constructor
-    Returning from initFromVector
-    Wrote 212701387 bytes to primary GFM file: ../output/05.33-lncRNA-discovery/GCF_013753865.1_Amil_v2.1.index.5.ht2
-    Wrote 120924662 bytes to secondary GFM file: ../output/05.33-lncRNA-discovery/GCF_013753865.1_Amil_v2.1.index.6.ht2
-    Re-opening _in5 and _in5 as input streams
-    Returning from HGFM constructor
-    Headers:
-        len: 475342477
-        gbwtLen: 475342478
-        nodes: 475342478
-        sz: 118835620
-        gbwtSz: 118835620
-        lineRate: 6
-        offRate: 4
-        offMask: 0xfffffff0
-        ftabChars: 10
-        eftabLen: 0
-        eftabSz: 0
-        ftabLen: 1048577
-        ftabSz: 4194308
-        offsLen: 29708905
-        offsSz: 118835620
-        lineSz: 64
-        sideSz: 64
-        sideGbwtSz: 48
-        sideGbwtLen: 192
-        numSides: 2475743
-        numLines: 2475743
-        gbwtTotLen: 158447552
-        gbwtTotSz: 158447552
+        sideSz: 128
+        sideGbwtSz: 104
+        sideGbwtLen: 208
+        numSides: 2299750
+        numLines: 2299750
+        gbwtTotLen: 294368000
+        gbwtTotSz: 294368000
         reverse: 0
-        linearFM: Yes
-    Total time for call to driver() for forward index: 00:02:37
+        linearFM: No
+    Total time for call to driver() for forward index: 00:07:58
 
-``` bash
-find ../data/fastq/*gz
-```
+### 1.3.1 Performance tuning
 
-    ../data/fastq/RNA-ACR-140-S1-TP2_R1_001.fastp-trim.20230519.fastq.gz
-    ../data/fastq/RNA-ACR-140-S1-TP2_R2_001.fastp-trim.20230519.fastq.gz
-    ../data/fastq/RNA-ACR-145-S1-TP2_R1_001.fastp-trim.20230519.fastq.gz
-    ../data/fastq/RNA-ACR-145-S1-TP2_R2_001.fastp-trim.20230519.fastq.gz
-    ../data/fastq/RNA-ACR-150-S1-TP2_R1_001.fastp-trim.20230519.fastq.gz
-    ../data/fastq/RNA-ACR-150-S1-TP2_R2_001.fastp-trim.20230519.fastq.gz
-    ../data/fastq/RNA-ACR-173-S1-TP2_R1_001.fastp-trim.20230519.fastq.gz
-    ../data/fastq/RNA-ACR-173-S1-TP2_R2_001.fastp-trim.20230519.fastq.gz
-    ../data/fastq/RNA-ACR-178-S1-TP2_R1_001.fastp-trim.20230519.fastq.gz
-    ../data/fastq/RNA-ACR-178-S1-TP2_R2_001.fastp-trim.20230519.fastq.gz
-
-``` bash
-find ../data/fastq/*R2_001.fastp-trim.20230519.fastq.gz \
-| xargs basename -s -S1-TP2_R2_001.fastp-trim.20230519.fastq.gz | xargs -I{} \
-echo {}
-```
-
-    RNA-ACR-140
-    RNA-ACR-145
-    RNA-ACR-150
-    RNA-ACR-173
-    RNA-ACR-178
+If your computer has multiple processors/cores, use -p The -p option
+causes HISAT2 to launch a specified number of parallel search threads.
+Each thread runs on a different processor/core and all threads find
+alignments in parallel, increasing alignment throughput by approximately
+a multiple of the number of threads (though in practice, speedup is
+somewhat worse than linear).
 
 ``` bash
 find ../data/fastq/*R2_001.fastp-trim.20230519.fastq.gz \
 | xargs basename -s -S1-TP2_R2_001.fastp-trim.20230519.fastq.gz | xargs -I{} \
 /home/shared/hisat2-2.2.1/hisat2 \
--x ../output/05.33-lncRNA-discovery/GCF_013753865.1_Amil_v2.1.index\ \
--p 48 \
+-x ../output/15-Apul-hisat/GCF_013753865.1_Amil_v2.1.index \
+--dta \
+-p 20 \
 -1 ../data/fastq/{}-S1-TP2_R1_001.fastp-trim.20230519.fastq.gz \
 -2 ../data/fastq/{}-S1-TP2_R2_001.fastp-trim.20230519.fastq.gz \
--S ../output/05.33-lncRNA-discovery/{}.sam \
-2> ../output/05.33-lncRNA-discovery/hisat.out
+-S ../output/15-Apul-hisat/{}.sam \
+2> ../output/15-Apul-hisat/hisat.out
 ```
 
 ``` bash
-cat ../output/05.33-lncRNA-discovery/hisat.out
+cat ../output/15-Apul-hisat/hisat.out
 ```
 
     47710408 reads; of these:
       47710408 (100.00%) were paired; of these:
-        27060558 (56.72%) aligned concordantly 0 times
-        19176285 (40.19%) aligned concordantly exactly 1 time
-        1473565 (3.09%) aligned concordantly >1 times
+        27825914 (58.32%) aligned concordantly 0 times
+        18559152 (38.90%) aligned concordantly exactly 1 time
+        1325342 (2.78%) aligned concordantly >1 times
         ----
-        27060558 pairs aligned concordantly 0 times; of these:
-          1274633 (4.71%) aligned discordantly 1 time
+        27825914 pairs aligned concordantly 0 times; of these:
+          1201636 (4.32%) aligned discordantly 1 time
         ----
-        25785925 pairs aligned 0 times concordantly or discordantly; of these:
-          51571850 mates make up the pairs; of these:
-            41230080 (79.95%) aligned 0 times
-            9296317 (18.03%) aligned exactly 1 time
-            1045453 (2.03%) aligned >1 times
-    56.79% overall alignment rate
+        26624278 pairs aligned 0 times concordantly or discordantly; of these:
+          53248556 mates make up the pairs; of these:
+            42533390 (79.88%) aligned 0 times
+            9692346 (18.20%) aligned exactly 1 time
+            1022820 (1.92%) aligned >1 times
+    55.43% overall alignment rate
     42864294 reads; of these:
       42864294 (100.00%) were paired; of these:
-        23640036 (55.15%) aligned concordantly 0 times
-        17633629 (41.14%) aligned concordantly exactly 1 time
-        1590629 (3.71%) aligned concordantly >1 times
+        24356414 (56.82%) aligned concordantly 0 times
+        17135863 (39.98%) aligned concordantly exactly 1 time
+        1372017 (3.20%) aligned concordantly >1 times
         ----
-        23640036 pairs aligned concordantly 0 times; of these:
-          1207857 (5.11%) aligned discordantly 1 time
+        24356414 pairs aligned concordantly 0 times; of these:
+          1142678 (4.69%) aligned discordantly 1 time
         ----
-        22432179 pairs aligned 0 times concordantly or discordantly; of these:
-          44864358 mates make up the pairs; of these:
-            35417854 (78.94%) aligned 0 times
-            8221441 (18.33%) aligned exactly 1 time
-            1225063 (2.73%) aligned >1 times
-    58.69% overall alignment rate
+        23213736 pairs aligned 0 times concordantly or discordantly; of these:
+          46427472 mates make up the pairs; of these:
+            36609836 (78.85%) aligned 0 times
+            8675847 (18.69%) aligned exactly 1 time
+            1141789 (2.46%) aligned >1 times
+    57.30% overall alignment rate
     43712298 reads; of these:
       43712298 (100.00%) were paired; of these:
-        30353070 (69.44%) aligned concordantly 0 times
-        12098419 (27.68%) aligned concordantly exactly 1 time
-        1260809 (2.88%) aligned concordantly >1 times
+        30967520 (70.84%) aligned concordantly 0 times
+        11666917 (26.69%) aligned concordantly exactly 1 time
+        1077861 (2.47%) aligned concordantly >1 times
         ----
-        30353070 pairs aligned concordantly 0 times; of these:
-          826489 (2.72%) aligned discordantly 1 time
+        30967520 pairs aligned concordantly 0 times; of these:
+          791338 (2.56%) aligned discordantly 1 time
         ----
-        29526581 pairs aligned 0 times concordantly or discordantly; of these:
-          59053162 mates make up the pairs; of these:
-            51066335 (86.48%) aligned 0 times
-            6685083 (11.32%) aligned exactly 1 time
-            1301744 (2.20%) aligned >1 times
-    41.59% overall alignment rate
+        30176182 pairs aligned 0 times concordantly or discordantly; of these:
+          60352364 mates make up the pairs; of these:
+            52153613 (86.42%) aligned 0 times
+            7011301 (11.62%) aligned exactly 1 time
+            1187450 (1.97%) aligned >1 times
+    40.34% overall alignment rate
     47501524 reads; of these:
       47501524 (100.00%) were paired; of these:
-        27841628 (58.61%) aligned concordantly 0 times
-        18249998 (38.42%) aligned concordantly exactly 1 time
-        1409898 (2.97%) aligned concordantly >1 times
+        28603496 (60.22%) aligned concordantly 0 times
+        17627744 (37.11%) aligned concordantly exactly 1 time
+        1270284 (2.67%) aligned concordantly >1 times
         ----
-        27841628 pairs aligned concordantly 0 times; of these:
-          1281752 (4.60%) aligned discordantly 1 time
+        28603496 pairs aligned concordantly 0 times; of these:
+          1201709 (4.20%) aligned discordantly 1 time
         ----
-        26559876 pairs aligned 0 times concordantly or discordantly; of these:
-          53119752 mates make up the pairs; of these:
-            42721011 (80.42%) aligned 0 times
-            9197577 (17.31%) aligned exactly 1 time
-            1201164 (2.26%) aligned >1 times
-    55.03% overall alignment rate
+        27401787 pairs aligned 0 times concordantly or discordantly; of these:
+          54803574 mates make up the pairs; of these:
+            44045470 (80.37%) aligned 0 times
+            9614980 (17.54%) aligned exactly 1 time
+            1143124 (2.09%) aligned >1 times
+    53.64% overall alignment rate
     42677752 reads; of these:
       42677752 (100.00%) were paired; of these:
-        25633048 (60.06%) aligned concordantly 0 times
-        15651560 (36.67%) aligned concordantly exactly 1 time
-        1393144 (3.26%) aligned concordantly >1 times
+        26422177 (61.91%) aligned concordantly 0 times
+        15005422 (35.16%) aligned concordantly exactly 1 time
+        1250153 (2.93%) aligned concordantly >1 times
         ----
-        25633048 pairs aligned concordantly 0 times; of these:
-          1075688 (4.20%) aligned discordantly 1 time
+        26422177 pairs aligned concordantly 0 times; of these:
+          1009838 (3.82%) aligned discordantly 1 time
         ----
-        24557360 pairs aligned 0 times concordantly or discordantly; of these:
-          49114720 mates make up the pairs; of these:
-            38244722 (77.87%) aligned 0 times
-            9400848 (19.14%) aligned exactly 1 time
-            1469150 (2.99%) aligned >1 times
-    55.19% overall alignment rate
+        25412339 pairs aligned 0 times concordantly or discordantly; of these:
+          50824678 mates make up the pairs; of these:
+            39698309 (78.11%) aligned 0 times
+            9739502 (19.16%) aligned exactly 1 time
+            1386867 (2.73%) aligned >1 times
+    53.49% overall alignment rate
 
-## 1.4 convert to bams
+## 1.4 convert to bam
 
 ``` bash
-for samfile in ../output/05.33-lncRNA-discovery/*.sam; do
+for samfile in ../output/15-Apul-hisat/*.sam; do
   bamfile="${samfile%.sam}.bam"
   sorted_bamfile="${samfile%.sam}.sorted.bam"
-  
-  # Convert SAM to BAM
   /home/shared/samtools-1.12/samtools view -bS -@ 20 "$samfile" > "$bamfile"
-  
-  # Sort BAM
   /home/shared/samtools-1.12/samtools sort -@ 20 "$bamfile" -o "$sorted_bamfile"
-  
-  # Index sorted BAM
   /home/shared/samtools-1.12/samtools index -@ 20 "$sorted_bamfile"
 done
 ```
 
 ## 1.5 Looking at Bams
 
-![igv](http//gannet.fish.washington.edu/seashell/snaps/Monosnap_IGV_2023-11-05_09-57-16.png)
+$$igv$$
+
+------------------------------------------------------------------------
+
+#### 1.5.0.1 **Differential expression analysis**
+
+Together with [HISAT](http://ccb.jhu.edu/software/hisat2) and
+[Ballgown](http://biorxiv.org/content/early/2014/09/05/003665),
+StringTie can be used for estimating differential expression across
+multiple RNA-Seq samples and generating plots and differential
+expression tables as described in our [protocol
+paper](http://www.nature.com/nprot/journal/v11/n9/full/nprot.2016.095.html).<img src="https://ccb.jhu.edu/software/stringtie/DE_pipeline.png"
+alt="DE workflow" />  
+Our recommended workflow includes the following steps:
+
+1.  for each RNA-Seq sample, map the reads to the genome with
+    [HISAT2](http://ccb.jhu.edu/software/hisat2) using the --dta option.
+    It is highly recommended to use the reference annotation information
+    when mapping the reads, which can be either embedded in the genome
+    index (built with the --ss and --exon options, see [HISAT2
+    manual](http://ccb.jhu.edu/software/hisat2/manual.shtml#the-hisat2-build-indexer)),
+    or provided separately at run time (using the
+    --known-splicesite-infile option of
+    [HISAT2](http://ccb.jhu.edu/software/hisat2/manual.shtml#running-hisat2)).
+    The SAM output of each HISAT2 run must be sorted and converted to
+    BAM using samtools as explained above.
+
+2.  for each RNA-Seq sample, run StringTie to assemble the read
+    alignments obtained in the previous step; it is recommended to run
+    StringTie with the -G option if the reference annotation is
+    available.
+
+3.  run StringTie with **--merge** in order to generate a non-redundant
+    set of transcripts observed in any of the RNA-Seq samples assembled
+    previously. The stringtie --merge mode takes as input a list of all
+    the assembled transcripts files (in GTF format) previously obtained
+    for each sample, as well as a reference annotation file (-G option)
+    if available.
+
+4.  for each RNA-Seq sample, run StringTie using the -B/-b and -e
+    options in order to estimate transcript abundances and generate read
+    coverage tables for Ballgown. The -e option is not required but
+    recommended for this run in order to produce more accurate abundance
+    estimations of the input transcripts. Each StringTie run in this
+    step will take as input the sorted read alignments (BAM file)
+    obtained in step 1 for the corresponding sample and the -G option
+    with the merged transcripts (GTF file) generated by stringtie
+    --merge in step 3. Please note that this is the only case where the
+    -G option is not used with a reference annotation, but with the
+    global, merged set of transcripts as observed across all samples.
+    (This step is the equivalent of the *Tablemaker* step described in
+    the original [Ballgown
+    pipeline](https://github.com/alyssafrazee/ballgown).)
+
+5.  Ballgown can now be used to load the coverage tables generated in
+    the previous step and perform various statistical analyses for
+    differential expression, generate plots etc.
+
+<!--# using faster -->
+
+### 1.5.1 An alternate, faster differential expression analysis workflow
+
+can be pursued if there is no interest in novel isoforms (i.e. assembled
+transcripts present in the samples but missing from the reference
+annotation), or if only a well known set of transcripts of interest are
+targeted by the analysis. This simplified protocol has only 3 steps
+(depicted below) as it bypasses the individual assembly of each RNA-Seq
+sample and the *“transcript merge”* step.<img
+src="https://ccb.jhu.edu/software/stringtie/DE_pipeline_refonly.png"
+alt="DE workflow" />This simplified workflow attempts to directly
+estimate and analyze the expression of a known set of transcripts as
+given in the *reference annotation* file.
+
+  
+
+The R package
+[**IsoformSwitchAnalyzeR**](https://bioconductor.org/packages/devel/bioc/html/IsoformSwitchAnalyzeR.html)
+can be used to assign gene names to transcripts assembled by StringTie,
+which can be particularly helpful in cases where StringTie could not
+perform this assignment unambigiously.  
+The `importIsoformExpression() + importRdata()` function of the package
+can be used to import the expression and annotation data into R. During
+this import the package will attempt to clean up and recover isoform
+annotations where possible. From the resulting `switchAnalyzeRlist`
+object, *IsoformSwitchAnalyzeR* can detect isoform switches along with
+predicted functional consequences. The `extractGeneExpression()`
+function can be used to get a gene expression (read count) matrix for
+analysis with other tools.  
+More information and code examples can be found
+[here](https://bioconductor.org/packages/devel/bioc/vignettes/IsoformSwitchAnalyzeR/inst/doc/IsoformSwitchAnalyzeR.html#examples-visualizations).
+
+  
 
 # 2 StringTie
 
 StringTie uses the sorted BAM files to assemble transcripts for each
-sample, outputting them as GTF (Gene Transfer Format) files. And then
-merges all individual GTF assemblies into a single merged GTF file. This
-step extracts transcript information and merges GTFs from all samples–an
-important step in creating a canonical list of lncRNAs across all
-samples included in the pipeline.
+sample, outputting them as GTF files. And then merges all individual GTF
+assemblies into a single merged GTF file. This step extracts transcript
+information and merges GTFs from all samples–an important step in
+creating a canonical list of across all samples included in the
+pipeline.
+
+|             |                                                                                                                                                                                                                                                                                                                                             |
+|:------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| -b \<path\> | Just like -B this option enables the output of \*.ctab files for Ballgown, but these files will be created in the provided directory \<path\> instead of the directory specified by the -o option. Note: adding the -e option is recommended with the -B/-b options, unless novel transcripts are still wanted in the StringTie GTF output. |
+
+<table style="width:98%;">
+<colgroup>
+<col style="width: 6%" />
+<col style="width: 91%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><br />
+-e</td>
+<td style="text-align: left;">this option directs StringTie to operate
+in <a
+href="https://ccb.jhu.edu/software/stringtie/index.shtml?t=manual#emode">expression
+estimation mode</a>; this limits the processing of read alignments to
+estimating the coverage of the transcripts given with the -G option
+(hence this option requires -G).</td>
+</tr>
+</tbody>
+</table>
+
+|                    |                                                                                                                                                                                                                                                                                                                                                                                              |
+|:-------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| -G \<ref_ann.gff\> | Use a [reference annotation file](https://ccb.jhu.edu/software/stringtie/index.shtml?t=manual#refann) (in [GTF or GFF3 format](https://ccb.jhu.edu/software/stringtie/gff.shtml)) to guide the assembly process. The output will include expressed reference transcripts as well as any novel transcripts that are assembled. This option is required by options -B, -b, -e, -C (see below). |
 
 ``` bash
-find ../output/05.33-lncRNA-discovery/*sorted.bam \
+find ../output/15-Apul-hisat/*sorted.bam \
 | xargs basename -s .sorted.bam | xargs -I{} \
 /home/shared/stringtie-2.2.1.Linux_x86_64/stringtie \
--p 16 \
+-p 20 \
+-eB \
 -G ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gff \
--o ../output/05.33-lncRNA-discovery/{}.gtf \
-../output/05.33-lncRNA-discovery/{}.sorted.bam
+-o ../output/15-Apul-hisat/{}.gtf \
+../output/15-Apul-hisat/{}.sorted.bam
 ```
 
 ``` bash
-wc -l ../output/05.33-lncRNA-discovery/RNA*.gtf
-ls ../output/05.33-lncRNA-discovery/RNA*.gtf
-#head ../output/05.33-lncRNA-discovery/RNA*.gtf
+wc -l ../output/15-Apul-hisat/RNA*.gtf
+ls ../output/15-Apul-hisat/RNA*.gtf
+#head ../output/15-Apul-hisat/RNA*.gtf
 ```
-
-       359447 ../output/05.33-lncRNA-discovery/RNA-ACR-140.gtf
-       308507 ../output/05.33-lncRNA-discovery/RNA-ACR-145.gtf
-       326448 ../output/05.33-lncRNA-discovery/RNA-ACR-150.gtf
-       354558 ../output/05.33-lncRNA-discovery/RNA-ACR-173.gtf
-       412414 ../output/05.33-lncRNA-discovery/RNA-ACR-178.gtf
-      1761374 total
-    ../output/05.33-lncRNA-discovery/RNA-ACR-140.gtf
-    ../output/05.33-lncRNA-discovery/RNA-ACR-145.gtf
-    ../output/05.33-lncRNA-discovery/RNA-ACR-150.gtf
-    ../output/05.33-lncRNA-discovery/RNA-ACR-173.gtf
-    ../output/05.33-lncRNA-discovery/RNA-ACR-178.gtf
-
-![gtf](http://gannet.fish.washington.edu/seashell/snaps/Monosnap_IGV_-_Session_Userssr320DesktopApul_lncRNA_igv_session.xml_2023-11-05_10-11-31.png)
-
-![igv2](http://gannet.fish.washington.edu/seashell/snaps/Monosnap_IGV_-_Session_Userssr320DesktopApul_lncRNA_igv_session.xml_2023-11-05_12-33-58.png)
-
-Merges all individual GTF assemblies into a single merged GTF file.
-
-This is used to create a non-redundant set of transcripts after running
-StringTie separately on multiple RNA-Seq datasets.
-
-``` bash
-/home/shared/stringtie-2.2.1.Linux_x86_64/stringtie \
---merge \
--G ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gff \
--o ../output/05.33-lncRNA-discovery/stringtie_merged.gtf \
-../output/05.33-lncRNA-discovery/*.gtf
-```
-
-``` bash
-tail ../output/05.33-lncRNA-discovery/stringtie_merged.gtf
-```
-
-``` bash
-
-wc -l ../output/05.33-lncRNA-discovery/stringtie_merged.gtf
-head ../output/05.33-lncRNA-discovery/stringtie_merged.gtf
-
-
-echo "what is possible"
-
-grep -v '^#' ../output/05.33-lncRNA-discovery/stringtie_merged.gtf | cut -f3 | sort | uniq -c
-```
-
-    742826 ../output/05.33-lncRNA-discovery/stringtie_merged.gtf
-    # /home/shared/stringtie-2.2.1.Linux_x86_64/stringtie --merge -G ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gff -o ../output/05.33-lncRNA-discovery/stringtie_merged.gtf ../output/05.33-lncRNA-discovery/RNA-ACR-140.gtf ../output/05.33-lncRNA-discovery/RNA-ACR-145.gtf ../output/05.33-lncRNA-discovery/RNA-ACR-150.gtf ../output/05.33-lncRNA-discovery/RNA-ACR-173.gtf ../output/05.33-lncRNA-discovery/RNA-ACR-178.gtf
-    # StringTie version 2.2.1
-    NC_058066.1 StringTie   transcript  345 1190    1000    .   .   gene_id "MSTRG.1"; transcript_id "MSTRG.1.1"; 
-    NC_058066.1 StringTie   exon    345 1190    1000    .   .   gene_id "MSTRG.1"; transcript_id "MSTRG.1.1"; exon_number "1"; 
-    NC_058066.1 StringTie   transcript  1962    23221   1000    -   .   gene_id "MSTRG.2"; transcript_id "rna-XR_003825913.2"; gene_name "LOC114963522"; ref_gene_id "gene-LOC114963522"; 
-    NC_058066.1 StringTie   exon    1962    2119    1000    -   .   gene_id "MSTRG.2"; transcript_id "rna-XR_003825913.2"; exon_number "1"; gene_name "LOC114963522"; ref_gene_id "gene-LOC114963522"; 
-    NC_058066.1 StringTie   exon    18711   18775   1000    -   .   gene_id "MSTRG.2"; transcript_id "rna-XR_003825913.2"; exon_number "2"; gene_name "LOC114963522"; ref_gene_id "gene-LOC114963522"; 
-    NC_058066.1 StringTie   exon    21001   21093   1000    -   .   gene_id "MSTRG.2"; transcript_id "rna-XR_003825913.2"; exon_number "3"; gene_name "LOC114963522"; ref_gene_id "gene-LOC114963522"; 
-    NC_058066.1 StringTie   exon    23085   23221   1000    -   .   gene_id "MSTRG.2"; transcript_id "rna-XR_003825913.2"; exon_number "4"; gene_name "LOC114963522"; ref_gene_id "gene-LOC114963522"; 
-    NC_058066.1 StringTie   transcript  3278    4416    1000    .   .   gene_id "MSTRG.3"; transcript_id "MSTRG.3.1"; 
-    what is possible
-     627332 exon
-     115492 transcript
-
-# 3 GFFcompare
-
-<https://ccb.jhu.edu/software/stringtie/gffcompare.shtml>
-
-``` bash
-/home/shared/gffcompare-0.12.6.Linux_x86_64/gffcompare \
--r ../data/Amil/ncbi_dataset/data/GCF_013753865.1/genomic.gff \
--o ../output/05.33-lncRNA-discovery/gffcompare_merged \
-../output/05.33-lncRNA-discovery/stringtie_merged.gtf
-```
-
-``` bash
-ls ../output/05.33-lncRNA-discovery/gffcompare_merged*
-```
-
-    ../output/05.33-lncRNA-discovery/gffcompare_merged.annotated.gtf
-    ../output/05.33-lncRNA-discovery/gffcompare_merged.loci
-    ../output/05.33-lncRNA-discovery/gffcompare_merged.stats
-    ../output/05.33-lncRNA-discovery/gffcompare_merged.stringtie_merged.gtf.refmap
-    ../output/05.33-lncRNA-discovery/gffcompare_merged.stringtie_merged.gtf.tmap
-    ../output/05.33-lncRNA-discovery/gffcompare_merged.tracking
-
-``` bash
-head -10 ../output/05.33-lncRNA-discovery/gffcompare_merged.annotated.gtf
-```
-
-    NC_058066.1 StringTie   transcript  9330    48114   .   +   .   transcript_id "MSTRG.5.2"; gene_id "MSTRG.5"; gene_name "LOC114963508"; xloc "XLOC_000001"; ref_gene_id "gene-LOC114963508"; cmp_ref "rna-XM_029342736.2"; class_code "j"; tss_id "TSS1";
-    NC_058066.1 StringTie   exon    9330    9651    .   +   .   transcript_id "MSTRG.5.2"; gene_id "MSTRG.5"; exon_number "1";
-    NC_058066.1 StringTie   exon    12840   12886   .   +   .   transcript_id "MSTRG.5.2"; gene_id "MSTRG.5"; exon_number "2";
-    NC_058066.1 StringTie   exon    15503   15664   .   +   .   transcript_id "MSTRG.5.2"; gene_id "MSTRG.5"; exon_number "3";
-    NC_058066.1 StringTie   exon    22159   22443   .   +   .   transcript_id "MSTRG.5.2"; gene_id "MSTRG.5"; exon_number "4";
-    NC_058066.1 StringTie   exon    24771   25067   .   +   .   transcript_id "MSTRG.5.2"; gene_id "MSTRG.5"; exon_number "5";
-    NC_058066.1 StringTie   exon    26653   26913   .   +   .   transcript_id "MSTRG.5.2"; gene_id "MSTRG.5"; exon_number "6";
-    NC_058066.1 StringTie   exon    27072   27359   .   +   .   transcript_id "MSTRG.5.2"; gene_id "MSTRG.5"; exon_number "7";
-    NC_058066.1 StringTie   exon    27659   27952   .   +   .   transcript_id "MSTRG.5.2"; gene_id "MSTRG.5"; exon_number "8";
-    NC_058066.1 StringTie   exon    28248   28535   .   +   .   transcript_id "MSTRG.5.2"; gene_id "MSTRG.5"; exon_number "9";
-
-![gff](http://gannet.fish.washington.edu/seashell/snaps/2023-11-03_09-25-24.png)
-
-# 4 Filter
-
-Filters the combined GTF output from GFFcompare to select only the lines
-representing “transcripts” and excluding lines starting with “\#” (these
-are lines in the output format from GFFcompare that don’t contain
-transcript information). This step further filters for a class code of
-“u”, and keep only those with lengths greater than 199 bases. The “u’
-class code from the GFFcompare step is for”unknown” transcripts, that is
-those that are not previously annotated in our reference GFF as protein
-coding. The size filter of +200nt is a common filtering step for
-isolating lncRNAs.
-
-``` bash
-awk '$3 == "transcript" && $1 !~ /^#/' \
-../output/05.33-lncRNA-discovery/gffcompare_merged.annotated.gtf | grep 'class_code "u"\|class_code "x"|\class_code "i"\|class_code "y"' | awk '($5 - $4 > 199) || ($4 - $5 > 199)' > ../output/05.33-lncRNA-discovery/Apul_lncRNA_candidates.gtf
-```
-
-``` bash
-wc -l ../output/05.33-lncRNA-discovery/Apul_lncRNA_candidates.gtf
-head ../output/05.33-lncRNA-discovery/Apul_lncRNA_candidates.gtf
-```
-
-    16982 ../output/05.33-lncRNA-discovery/Apul_lncRNA_candidates.gtf
-    NC_058066.1 StringTie   transcript  468619  469943  .   +   .   transcript_id "MSTRG.37.1"; gene_id "MSTRG.37"; xloc "XLOC_000019"; class_code "u"; tss_id "TSS42";
-    NC_058066.1 StringTie   transcript  1135316 1144814 .   +   .   transcript_id "MSTRG.112.2"; gene_id "MSTRG.112"; xloc "XLOC_000056"; cmp_ref "rna-XR_003823893.2"; class_code "y"; cmp_ref_gene "LOC114952870"; tss_id "TSS98";
-    NC_058066.1 StringTie   transcript  1144884 1148491 .   +   .   transcript_id "MSTRG.113.1"; gene_id "MSTRG.113"; xloc "XLOC_000057"; class_code "u"; tss_id "TSS99";
-    NC_058066.1 StringTie   transcript  1153399 1165634 .   +   .   transcript_id "MSTRG.115.2"; gene_id "MSTRG.115"; xloc "XLOC_000058"; class_code "u"; tss_id "TSS100";
-    NC_058066.1 StringTie   transcript  1153399 1165634 .   +   .   transcript_id "MSTRG.115.1"; gene_id "MSTRG.115"; xloc "XLOC_000058"; class_code "u"; tss_id "TSS100";
-    NC_058066.1 StringTie   transcript  1153404 1165634 .   +   .   transcript_id "MSTRG.115.3"; gene_id "MSTRG.115"; xloc "XLOC_000058"; class_code "u"; tss_id "TSS100";
-    NC_058066.1 StringTie   transcript  1153410 1165634 .   +   .   transcript_id "MSTRG.115.4"; gene_id "MSTRG.115"; xloc "XLOC_000058"; class_code "u"; tss_id "TSS100";
-    NC_058066.1 StringTie   transcript  1154207 1155609 .   +   .   transcript_id "MSTRG.115.5"; gene_id "MSTRG.115"; xloc "XLOC_000058"; class_code "u"; tss_id "TSS101";
-    NC_058066.1 StringTie   transcript  1155787 1165634 .   +   .   transcript_id "MSTRG.115.6"; gene_id "MSTRG.115"; xloc "XLOC_000058"; class_code "u"; tss_id "TSS102";
-    NC_058066.1 StringTie   transcript  1222540 1225166 .   +   .   transcript_id "MSTRG.120.2"; gene_id "MSTRG.120"; xloc "XLOC_000059"; class_code "u"; tss_id "TSS103";
-
-# 5 Bedtools
-
-Extracts the sequence data from the `$FASTA` reference file based on the
-coordinates from the filtered GTF. The resulting sequences represent
-potential lncRNA candidates.
-
-``` bash
-/home/shared/bedtools2/bin/fastaFromBed \
--fi ../data/GCF_013753865.1_Amil_v2.1_genomic.fna \
--bed ../output/05.33-lncRNA-discovery/Apul_lncRNA_candidates.gtf \
--fo ../output/05.33-lncRNA-discovery/Apul_lncRNA_candidates.fasta \
--name -split
-```
-
-``` bash
-fgrep -c ">" ../output/05.33-lncRNA-discovery/Apul_lncRNA_candidates.fasta
-head ../output/05.33-lncRNA-discovery/Apul_lncRNA_candidates.fasta
-```
-
-# 6 CPC2
-
-Initializes a conda environment (Anaconda) and runs CPC2, a software to
-predict whether a transcript is coding or non-coding. The results are
-saved to the \$OUTPUT_DIR. CPC2 uses ORF (Open Reading Frame) Analysis,
-Isometric Feature Mapping (Isomap), Sequence Homology, RNA Sequence
-Features, and Quality of Translation to assess coding potential and flag
-any transcripts we would want to exclude using the FASTA generated in
-the previous step.
-
-``` bash
-eval "$(/opt/anaconda/anaconda3/bin/conda shell.bash hook)"
-python /home/shared/CPC2_standalone-1.0.1/bin/CPC2.py \
--i ../output/05.33-lncRNA-discovery/Apul_lncRNA_candidates.fasta \
--o ../output/05.33-lncRNA-discovery/Apul_CPC2
-```
-
-``` bash
-wc -l head ../output/05.33-lncRNA-discovery/Apul_CPC2.txt
-head ../output/05.33-lncRNA-discovery/Apul_CPC2.txt
-```
-
-    wc: head: No such file or directory
-      16983 ../output/05.33-lncRNA-discovery/Apul_CPC2.txt
-      16983 total
-    #ID transcript_length   peptide_length  Fickett_score   pI  ORF_integrity   coding_probability  label
-    transcript::NC_058066.1:468618-469943   1325    73  0.3891  11.48389835357666   1   0.0882804   noncoding
-    transcript::NC_058066.1:1135315-1144814 9499    69  0.2705  10.028266716003419  1   0.0399931   noncoding
-    transcript::NC_058066.1:1144883-1148491 3608    75  0.25564000000000003 9.143180274963381   1   0.0451723   noncoding
-    transcript::NC_058066.1:1153398-1165634 12236   134 0.3118  9.09901943206787    1   0.295457    noncoding
-    transcript::NC_058066.1:1153398-1165634 12236   134 0.3118  9.09901943206787    1   0.295457    noncoding
-    transcript::NC_058066.1:1153403-1165634 12231   134 0.3118  9.09901943206787    1   0.295457    noncoding
-    transcript::NC_058066.1:1153409-1165634 12225   134 0.3118  9.09901943206787    1   0.295457    noncoding
-    transcript::NC_058066.1:1154206-1155609 1403    66  0.37373 8.802658271789554   1   0.0495107   noncoding
-    transcript::NC_058066.1:1155786-1165634 9848    134 0.29479 9.09901943206787    1   0.241898    noncoding
-
-\#Filter Filters the CPC2 results to get only noncoding transcripts
-(using the class “noncoding” from the CPC2 results) and extracts their
-IDs and matches these IDs with the sequences from the previous step to
-generate a GTF of long noncoding transcripts.
-
-Matches these IDs with the sequences from the previous step to generate
-a GTF of noncoding transcripts.
-
-``` bash
-awk '$8 == "noncoding" {print $1}' ../output/05.33-lncRNA-discovery/Apul_CPC2.txt > ../output/05.33-lncRNA-discovery/Apul_noncoding_transcripts_ids.txt
-```
-
-``` bash
-wc -l ../output/05.33-lncRNA-discovery/Apul_noncoding_transcripts_ids.txt
-head ../output/05.33-lncRNA-discovery/Apul_noncoding_transcripts_ids.txt
-```
-
-``` bash
-head ../output/05.33-lncRNA-discovery/Apul_lncRNA_candidates.fasta
-fgrep -c ">" ../output/05.33-lncRNA-discovery/Apul_lncRNA_candidates.fasta
-```
-
-    >transcript::NC_058066.1:468618-469943
-    taactgatcaaaacgtatcttcctacaacattaatttgacagtggcgtttctcaactgaccaatcaaaacttacatttgaaaatttggtgATGGTgcgtttacaactcgtgtatctttacgtcacacaaccatgtttgcATACTCTCTTGCaaccacgcctctcggccaatcagagcgcgcgcgtactatcttagttattttataaagatAAATACGCCCTAGGATTAGCACGCACGCTATGGTATAATTATTGATGATAACTTTGCTGGATTTACGTTTGGTTGAAGTTATCATGATATtccatcgtcgtcatcatcaacATTCTTATCGTTTATCTTCATCACAATCACCTGACACAACATGACTAAAAGCAAAGATGAAAACACTCTTACATCACCAGCCCGTGTGTGGCCATCAACGCATGCATGCGCATCACCATATCTCCTGGGTAGTGTCAGCCATGAACAGCAGTTTCGGTGTTGTTAGGTCTCgtctagtctccttcgcagccgtctttcgggacggggagcgttgcgtgacatcccgaaagacggctgcgaaggagactaggtctCGTCAAGAGTGGATCAGGTAGGAGTGTTCCTCAATCACCTTACGGTAATATCCCAGCACTGTCGGAAACCTCACCTTTAACCCAACAGCTTAAGTAATATTATTCAGCCATGTCTCGCTTACCCGGACATACTTCGTCGCTTCAATGTCATTAACAGTACTATTATTTCGGAAATGGACTTTTTGGGGAATCGTTACAGTTACAGCAACTTATTTTCAAGGAATTGTGTATTCTAATTTCCAAAGAAATTGTGGTGTTGCGTCGGTGAGACCGTAacagtgaaacatgaaaattgggtttttatcagacgagttggtaaaggtcgaattaccaccgtgaaagatttggaaagctgacttttcgagcgttagcccttcgtcagagcaagtGAATTATTCTAAAAATATACTGTGCTGGCTAGCCTGCATACATCCAATGGGAACACCCTTACCTGATCCCCTCTCGTTGTCACAGCATAGCCGTTGAACCATCTTCGGAAATGTCATAACCTCAACCTCTTTTTTGAACAAAATGTCTGTCACCACAGAAAcgacaaaataaataaatactcAAGAATTCATCGTTTAAAATAGCGATTCAAGAAGAACAGCTGTTACTGTAGTTGCGCCCACTAGCAAAGCCTCTTTTGTTGAccgctgcatgcagacgaggcttacgggtcaatacaatggaaaacgACCTGTCAGCTTCGTTTATGTGTGAAAACCGCTGTTAACTAGTACAGAATGT
-    >transcript::NC_058066.1:1135315-1144814
-    gtttcgagatagttgacgaggaatatatcgaaaaattaaaggacaagagcgaaaatgaaaacaagaaaaatagcccggagtggtgaaagaacgttttcaaaaaatgggcGAATGAaaaaacttgcaagcaaatttagaagagtacgagaaggatgtcctcgaccaacgattgtcgcagttttaagcattcagaaattcagtaattattTTGCCCtctgttattaacaagtaatcgcagtGGATCCTCGGAAAATTAAGGTTAATATCagttgtgttttcagaagttgctgaaattcccTTCGTCGCTGCGTGACTCTGGCAATTCctgcaacttctgaaaacacaagtgatattaatccttaattttactcgcccccatgcgattacctatactaacaaGCTACTGTGCTTAGGTGCTAGTTACCATGGGAACTATGCAGTACTCGCCCAGGATTGCTTTCATTTAATGTCCTAGCCACTATATTAGAGGACCAAAACAACAAGCGGCTGCCAAGTTGGTGGATCCTCAAAACACAGACTGACATACCAGGTATTATACAGTTGCCATGGTAACTAGCACAAAAACAGAGGCTTACGCAGACTGGGACTGCATATACAGACAGTTTCCAAAAAAACTAGCTGATTACAATTCATTAAGTGAGCCAAGTATtgagtaattattattacaactagGTTTGATGACACTATAGCGAACAGATAAACAAATGCAAGATCTTACTAACATCCCaatgataacaaaaacaataccTCAGACCGCACCATCAAACAATGAGAGCCCATTCAACATTAAAGGTACATAAATGAATTGCCGAGGCTATAATTATTATGCCAAGTAACTGGGAAGGGTGTCTTTTAATAGAATAGCAGGAGGTCAGAAATTTTTGTAGGTGCTTGCAAGTATTGTATCTTCTTTTAGAATTGTCGTACGATTCTGACAAAATGTTTTTGTGGCTGACCATTTTTGCAAGTTTGCCATTGCATCAAACCAGCATGTACAAAACACAgatcacaggtcattgttttgcCAATCCTGAAACAAACCAAATCTTTTACTAATGCTATCCCTAGGCCTTAACACTACTACCATTAGTAAAGGGTTTTGGTTTCAGTATTGGTAACACAATGACTATGAgcaatttagagtgtttcctTCCCAACTTCTGTGCATATAGTCACTGCGTAAATAAAAACATCCAGCAACATTGAGATTAAAAGTTCCCATTGATACATTATGAATAATTGTGCAACCATAGACCATCtactattagtataaatttactcgtagtctatcgtgaatctgacTGGCTATATTACtcatagactatctgctgatagtcaacagttgtgaatagccaatgaaaatcgttctatttattttgaccaatcacgaagcttcagtgcacaccGCACGctgtgtttgaaaccttgaatttgaattgccaacGTAAACACAATTatacacttttaaccatttaaactttactttacatttttatgcaatgagaccgttgtaaatttatactaaaacaattagactactcgccctcgttttctatgagcgatagtcaactcggctgggcctcgttgactatctgctcgtagaaaacgagggcgagtagtctactTGTTAACTAGAAAAATCtaagaaaaaaacataaatttcAGGAAATATTTATAGATCATGAGGTGCAGTCAGTATCAATACAGACTTAAGACATGATGACTGCGGACTACAGACTATGATTGGATGGGTGCTTACTCAGTGAAAATATGAAGTTAAGTTGGCAGACGAAAGACAACATCCCACGGTTAAAAAGCAGTGTTTGACTTTGCATgtttttacaaaacaaaatgatgTCTGTCTCAAAAATTACATGTAGATAAAcacaaatataattattataatcaagtATGAGACTAAAGAACGACAACAAACAGGTAAGAaaagaacagacatttttatGAGGGGTGATCTCCACCACAACTGTGTTTAGAATTGTGTCATGCAGAATctccaatttttctttcaagcaATCAAATTCTTTCCTCAAGAGGTCAGAATGGAAATTGAGgtaccacaaaataaattaaagaaacaGAACAGAATTTAACACAATAGAAGTGAAATAAGGACACTGAAATAGAAATTGAAGCAACAGAACAGAAATTACAAAACAGTTAACAACCATTCCAAATTCAATTCTGATGGCATGTGGCTCAAATGGGGAACCAAGTAGAACCTGGCTAAGAACATTATACTTCATGAACATTACATTTGATGACAAAGTTGCCGTGAAGGGAAAATTTATTCCTCGTTTGAAATGGCCGCTCAAAAGGAATGCACCTGTGAAGAAGGACTTTCAGCTGTTCCTCTGTAATACTGTAGCATGGTCTGCCTTGATGACAGCTTAAGACCACCTTGGCCGTTTGAGCTGAAAGAGCTTCTATGAGCACAAGGACAGTTGCGAGCTTCCCGAAGAAGATAGTGAATTTGGAGGCACAACCCCCTGTCCCAATTACTTCCCACCCATAGTTTGATACACATGTGAGAGACTAGAACGTACTGTAGTGGGATCGAATTTACCATATTTTTGGGTGTATAAGTAATCCTGATACAGTTCCTAATACCCATAAGTTTTCTGTACTGGCAACTAaaggcgcttaccatttgttaAATTGGCTGGCCCGAAAGAACTGGTACTCATAGGTGCAAATGGATGGGTCAAAGGGAGTCCCAACAACTACTCACATGATCTTGCCAGAGAAGGCggaatttctattttttttcagttatttgtATTTGTTCTCAGCCCAAATTAGCAACAATTGCAGACTACTTCAAACTCCCAGTTCCTTGCTGTTGGTTGTGATGGCTTGAGGAGCAATTCCAGATGACATGCTCAACATTCGAGTGACTAACTAACTTGTTAGCACCAAAGGAACTTATACATTTGGTAGGTTGCCCACTAAATAAAGATAACAGAAACTGTAGCTGTGAATGTCTGGGCCCTGGCAAACAAAGAGGCTTGCCATCAGATATCTGATCGCACACTTCTTGTGTTCCGCCTAGGTTTGAGAGAACTGAACAGCCCTATTTCATGAGCAGGTCCAGTTTGGCCAGAACCAGTTCTCTTAGTTCTCAGAGCTTGCATGCTCCATTTATAGACACAACAGTCTGGCCCAGCCAgatctgacaaatggtaagcgccctaagTCATCTTCcaaattagtataggtaatcgcatggcgccgagtaaaattaaggattaatatcacacgtgttttcagaagttgctgaaattgccctcgtcattgcacgactcgggcaatttcagcaacttatgaaaacaaaagtgacattaatccttaattttatgAGGATTCAttgtgattacttgttaataacatagagggcaaaattactgaatttctgaatgcttaactgaaactgtgacaatcgttggtcgaggacattgTTCttgtactcttctaaatttgcttgcaagtttctttcagtAGCACACTTTTAgaaaacgttccttcaccactccgtgttgttcttcatgttttcatatTCGCTATTgtctttaattcttcgatatattcattgttaactatctcgaaacgagacgccattgttgtacAAAAACatcttctcgattgaatgagctgttgctaggcgacctgaggaccaatcgcgagcgagtaattttgccctcttcacaaagcaaaattaagaaaaaatacacgcttcattgaccaatcagcattcagtaattttgccctttgtGTTATTAGTGACCAAAACCATTCCCTACATCCTAACTTTATGTATTGCAATCAAATAAGGTTTCCAAGAAGATTAAGGTTGAGTTGATGTTAAATTCAAAGAGAACATGTCGATATCAACCTCCTTGGATTTTAGGTACCACTGCTCATTAGGTTTTCATAACAAAATTGCTGAGTCACACAATATGGCAGAGTAATTAAAGTGACTTcaatgtttcatgttttttagtgttttgacattttgctCTGCATAAAAGACTTCCAAACATCGCCCAAAAGTTACCAAGTATGTTGAAATACCTACCCTTATGTCCAAGACAATTAGCATCGGATTtttgggattttaagataaatTGCATTGAATTCATATgatttgcatgtttttcttcaCAGGACTGATTCAACAGAATTTTTCAATTAGGTTGTACCCcaataataatatgaaaaatCTCAACTTAAAACTTCAAAAAATGGAGTCGACTTGTACACCAGTTTGACTTATACACCAGAAAATATGGTACGCTTCGAGCAATGGGTGTCATTAAACAGAGTAACAAAGTAACAAGTAAGGAGTAATGAAGTAACGGAAAACTGAGTAATGGGAAAAATTTTTGAAGGGACAAAAATTCTCAAGTCTCTTTAAAAATAATATGTTGAATCGATTATAATCGTTTTTCAGTATTGATATATAAATAGGAACTGCAAAACCAATTCACAAAGCAAGCTTGACATAGACTACAACCCATAAGCTCAGAACTAAGAGTTAAATTAAACATTGTGCCTAGCCCAGCAGACGGGGAGTGTCATTAAAATACTACATAACCGGCAGTCTGAAATTATTCTAGAATTTCATGGAAAAACTTATCCAATCTTTCTTAAAACTGTGGACATTTATTGTAAATGTCAAGGGAATTGAATTGTAATTTTGGCTTTGTGGTTGAGGAAATTTTCGAGCCTTGGTATAATAGAATCTCAATGCTTCGACACTTTGAAAACTGAAGTTGGAAACCTGTGAGAGAATATTTTGTTCAGAAATCTGATTCTAAATGacgttttgcttttgttgtgaGCGAATTCTCTTAGCTTCCGCATactatattgaaaaaaaaaaaaaaaaaaaaaacttcgaATCAGGGGCACGGTCATTCAAAAAAACTTACCAAGGAGTcaagaattcatgaataatCAGTACATTTGAAATCCACTAAAACGATCATTGAAACCTCCTGAGAGTATTTCAGCATTTTGACCTATGATCTGAAACATCAAGTGACGTTTTACATTGTTAGCATTTTGGTTTTGCAAGTTTTTCAAACACTACATAAGCAGCATCCCAAAATTCTTCCTGTTTTTCCCCTAAAATTTACATTTGAACCTGCTGGGATGTTGGTGTAGATATACCAAGCCCTTTTTGGCCTCAACAATTGCCTTGGCAAAGTAGTTCAAATAGCTATATAAACAAAACGCTTGAGGGTTTGGTGACAAAACTACACAACAGAGAAATAATTGGATGTGGTATAACACTTCAGTTGTGTGACAAAGGTTGCAGCGTTGGAAGCGACGAACACGTTGTGGGCTTAGCAATGGAAGCGACAAAGTTCTCAGTTCTCCAACTTATTTATACTGTAAGCTAAACAGCAGAAGTGTTTCCGACAAAAGATCAAAATGCTGAAATGCTCACACAAGGTTTCAGAGATCATTTAAGTGGATATTGTATTGATGTGGCTTAATGCCTGGCAGTCTAAAATCTTCACAGAATTTCCACTGAAAGattctttcaaacttttttttagtgttctttgatgtttttttttttttagaaatgaaGAGAGATTCCAAAAATTATGTTCCTTTGTAAGATAACGAAATATCCAAGCTTGGGCATACTATAAAATAGGCACTTGTCAGGTGATAGATTTCCTACACAACCTGATGAAGATAACATTAATTTCAGGATTAATTTGAGCCGCAATAGTCTTGGGCATTTAACTTGGGCCAATTTGGGtacaattttgaaaaccttggagaacgaaagaaaaaacataCACTATCTGGGTTGTTTCTACAGCGTGGTATTATGTAAACACAGAATGACATAGACCGATTTTAAACCATTTCacacattttaaaataattttgaaattttaacccTTCAACTTTTTTCCCCCGTTACTTTGGTTCTTGTCACTTCTATGACATTAATAGTCATTGCATTATgtattaaagtgcatatgaaatgaaattttttacTAACTTATTCGAAAAAGTGTTCAAAATGAGGAAGAATGGTGTTTACTTTATTGTGATACCACTATTGCTTGCCAAGTTATAGAAgaattttatgcaaattagaggacAATCATGATGccacaatgtggacacaaagtgatgtcaagtcacaaaaaattgaatatctgtgcaaatactacatctacagggttgaaattttgcaggtttgatgtactgcaagaactacacattgtgatgGTGGTTATGATGTTACCATAGCAACCTACTCGTTACCAGATCTCTACctccctaaaatgaaaaatgcctcatTTGTTGCTCCTGAGTTTAatggactttcttgtgcttgggCTGTGAAATGTCCATAtttgctcacacccactgaatgcaCAATAACTGCAAATAACCCtacttgaaggaggaaaactctgattttatcctttgaatggagaggacCTGGAGcacattgtgttgccatggaaatgtcacagtgaaCATgacatggaactttgtgatgagtgtaacaaccgTACAAAGTTTCGgttctttgcagaaaaagtcaatttttttagtttacaTCACTGTGTCcacatttttttgtcacaagtcctctaatttgcataaatcaaaatcttgaataactcaggaaccaagagtgctattaacacaacaaaataaattccATTCTTCATTCATTTGACAGCTATTTTGAATAAGGTAATAAAAagtttcatttcataggcactttaagcaaaaacgttattgcctgatgagtgtggtcacccttcgatcatacgaaacagcgttgtagcaataaaatgatgaactgaaattttgctaccattaatcattattatataaatatatatatatatataatttttctaccactgatcattattattatatatatatatatatatatatatatatatatatatatatatatatatatatatatatatctatatctatatctatatctatatctatatctatatctatagatatctatatctatatctatatctatatatatctatatataaaagcctaagccgtgtattacactgcgataaaacactccggacatttgagaacactcgagaaatgtacaAAACACTCGCCTGGGGCTCATGTcttctacatttctctcgtgttctcaaatgtccattgtgttttatcacagtgtaatacacggcttaggcttctttattttatatatagatatatatagatatagatatagatatctatagatatagatatagatatagatatagatatatatatatatatatatatttataaaatctggatgatgtgctcaacagaaggtatgacttggcattttattactacctagtttcatgccacacaagaagtgcggcactcatcagataaaatagccaaatgcatatatatatataattttgcTACCactgatcattattatatatatatatatatatatatatatatatatatatatatatatatatatatatatatatatatatatatatatatatatatatatatatatatatatatatatatctatatatatatatatatatatatatatatatatatatatatatatatatagtatagaacagcaccgaactcagtaaatacatctgggcactgaagagcaaaaatgaacggTACACAATCGGCTGGAAGATCCTCGAAAAGACGAAACCGTACACAAACCTAACCGGCAAATGCCAGCTGTGTACAGCAGAAAAACACTTTATCATCACCAAACCAGAGCTGGCAACGTTGAACAAGCGCAATGAGCTAGTTTCTGCATGTAGACACCGAAGAAAGTTTATCTTGAGATACTCTATCCAGTAATTGGTTCTTTCGTGCTTTTGCGCGCGCGCTCATGTTAATGTGAATCGCCCAGGTAACGCGGGCACAAGTTTTGTAGTCTTCAACGGTTTCCTAACGGTTCTTGTAacgtatcatgttgtttttgtgtagctttcgaattattgacgacagtttgtatggaggataactgatgagtgggccaaccatgttggcctacgaaacaaatttgtattaaaatccatatggactcaaaaacagagtagttttaccacatattcaattatatatatatatatatatatatatatatatatatatatatatatatatatatatatatatatatatatatatatatatatatctatatctatatctatatctatatctatagatatctatatctatatctatatatatctatatataaaataaagaagcctaagccgtgtattacactttatataataacccaagtaattctcgcattctaattggttctcgcctatgatctattagaggacagacgcacagatgacgacagcgctcgattcaagttttttaaattttttgaattttgaatttgaaccaatgacaattctttgctaagcatagcaaccaatcagttcgcttcatttttttatagacataagatcacgtcagtgctgttttcgtgtctgtcaaagtggcgaaatttgaaataaaagggcattttttccgtgtattttaatttttttattatataaaacaaatagattccatgttgccgtgcgtctgttcagtaatagatcacagaggacatcaaaatgtggtaagaacatcagtgacacactcggctacgtctcgtgtgccacttttttgttcttaccacattttgacgtcatctgtgatctattactgaacagacgcacggcaacatggaatctatttgttaagcgataaaacactccggacatttgagaccACTCGAGAAATGTACAAAACACTCGCCTGGGGCTCATGTcttctacatttctctcgtgttctcaaatgtccattgtgttttatcacagtgtaatacacggcttaggcttctttatttgttagatatatatatataactataaGAGAAGCTTTTGATGATCGTCCTAAAACAAGAATCAAATAGTTGGATGAGAAGTGTTCATTGATTCCAGTAGGACTGAGGATGCCGAGTTGTAAAAcagctttttgttcttttgcagCTTTCTGTATTCCTTTTGTGTTATAGGGAAAGACCacaaacaattattgttatgttAACATTTTAGAAGGTTTCGATACatctttgtcatttttcttgttcTCAACAGCACAAAGTTGTTTGCGAAAGCAATCTACTGGTTTCCTGCCTGTTTCAATTATGTACAGTACCGCTCACAAGTAAGTCACCCCTGTTGCATGCTACGCGAACTACATAGCACACTACAGGAATCACTTGTGCTTCAGTAATCGCATAGCACGCAACGAAAAAGAAACTGCAAGTTTACTAAGAAATTGTGCCTTAGATTTGACAATTAATTGTGAATTCCGAAGAGTGGTTTCATCTCCCAAAACATTTTGCTGGCCAGTATCTGTGCTG
-    >transcript::NC_058066.1:1144883-1148491
-    AATAATCATACTTTCCAGCTCATAGTGAAAAATGAAACATGCGCCAACACTGATCCTAGTGAAAGGAAAATGACTTTCAGCTGGTGAGAGTCCAAAAGCATAATTTACCTAGAAAATCTCATTGAAATCGAAATAAATTATGTCACTTCTCGGCTGAAATTTGCATAATGTACTGGTACTCACAAGGCTTTGAAAATTATTATCAAATTTCAGTCAatataaaatgcagactgcagattTCAGACTcttctcattaattttgtttttggtgGCAGCATTTTGGGTTTTACTGTAAAATATGATGTTCTGTTGGCTTGCAAGGATTGTGAGTTATTTTCATTACAATCTAATCTTTTTAGGCTGTGTaatttttgtgcactgaaaCAAAACCATTTGTAAATGGGCATCTTGCACTAAaagttgaatgtttttttttttttaaatctcaaCTGCACATACTTTTTTAAACTGGCACAATTCCCTGGCTTTGCCccaaaagcaacaaaacaacaaaaggcaaggaacaaaaaaaaaaccttgaaagTTATGTTTACAGAATCAATGAATACTTTTCATTCAACTAACTCTTTCATGTTTTAATAACACCATGTTCCCAGAAGTAGCAGTTCCACCACTTCCTAAATAGGTCAAGAAGAACCCTCACTTACACTATTTGCTCTGATGACGGGCTAACAGCTGAAAGATCATCTTTGcaacttttaataataattattagtaatcTGACCTctatcaacttgtttaataccaaaCCATTGTACTTCACTTTCCCCAATGATGTGACACCACAGTTTCTCAAGAAACTAGACACTTCATTTGTTTGACAATGCTGTAGTCCAATTAAGCAAGATCACTTATCACCAACACATTACTCTGTCACCAATATTTCTGAGCAAGCCCTTGAAATTGAAACTTCAGTCCCACCCACAAATAAGTAAATTGAATCTATAAGTAATAGTGTACATTATGCAGTGCAAAAGGAGAACTGTGCTTAGAGTACAAGTATGATATACATGAGCCCCTTGATGTTCAAAGGTCTGACAGTGCTATTCAGTGGAGAAATGAATATCTATTGGATAAGTAccaccaaaacctattgagttatccagtggatggtgatttatccaatagatagtgctatccaccaTTTGAACATCAGGGACCAAGACAAAAGTACTGACTCTGTCTTTTGAAACTGGTCCAGAAATCCAGAAACCACAAATTCCATTCATGATTGCCATGCATATTTCTTGTCAGGCTTTCTTTGGTCAAAAGTAAGCTAGATAATATGCAATGTCATAAGCCTTTTGCTACAATAAAATACAAGAGAAAACTTCCCTCCACATTCTCACTAATTTGTTGGGGTTTAGAGCTTGTAATTATCATCTTTACTATCCATTATTTCTTGCTTGCTACTATGATTAGTACTGCTGTTCCTTCTTTGTCAGTTTGTTGTGCTGGTGAAATGCATTTGGGTATGAATCTACACAGTTACTGCAAAGATAAAAGATGAGCTGCACCTTcttcaaaaaaattattgtttgaaattgtGCACATGATCCTTTCTTGATGGACATTACATAACAAAGCAGACTTTTAAAGTAACATAGCATTTGTAAGGAAAGGAATTAGATGCAATATTAAAGTAGTTTGCAGTTATGCATTTGTGCGTAtttttgaaggaaaataatattgcagaataattattttctatgCCACTCTGATTTGCAAATTTGTTATGATAATTTTGCAACCATGAAAACATTTTGTATTATTACCATCTTACCATCTCACCATTACCAGGTCACATGACCATGGTTTATTAAAGTAAATGCAAAAATTCTCAATTCCTTTCCATAAAATTAACTGGCATACTAgcacaaagaacaaaaaacatcATCTTGGGACAGTACACAGTTCGCAAAGATCTTTCAATTTTTCGTAATGAAGACTGGTGATCAGCTTTAAACCTAATTCTTTGCTTATTTCTATTGACACAAGTCAAActgcttttttacactgatgaatgGCTCTGCCCGAAatatttgtacattttttaatgtaaatttaactttatttttgtttttatagtGTCACGCactgttttccaattttttgaTGCTTCAAATTTTGTATGTGCTGTCTGCTTTTACAGTGCAATGTTTGACTGGCTGCCAAGAGTAAggttttctttgctttgctttCGTATCATTCCATCAATTTCGTTGAGCTTTCTAATAGTTTGTTAGGTTTGGTTTGCTTTAAGTTTGCATCATTTGATTGATTGTTTGAGCTGTTTATTTGAATGACTACTATTCATTCGATCAGCTGGAGCATTTGAGCctttttttaagtttgtttGAGCGTTGTTTGAATCTGTTCAAAATTTGAATCACTTACTATTTCTTTGATCTTTTTACAGAGAGAACTGATATTTAAGACAAACTGTTCTGTTATGACCTAATACTCTTCACgtggaaaaacaaaagagcaaaattaatgcaCAAATGAAAAGCCAAATTTCccaaattttttctttttttttccccccACATttaataagaaagaaaaatgtttgggaTTCATGGTATTTATTTTTCCCTTGAAAGCTTATTTTTCATACTTCAAAATGATatctatttataaataaatgttgATGATTCTTTTTTCTGCCAACTAGCATTTCTCACAAAAATTAGCACTCATTTAAACTCTCCTTTTTCTGATTCTTCCAGCACAGTTTGTTGCAATCATCACCTTTCAATACATTTCAATCAGGTACTACTAATGTACAGTAGATAAGAATCAGTAGATTGAATAAAATTCAGTTTTCCCTGGACTGAACTGTAAGTTCCCTTGGTTTGAAGGCTTATGCCATTATCCATTTTCCTGACACATGACAATCATAAAATCAAAAACCTCCCAAATAAATCAAGAGCTGCTCAATATCTATCATACTTGTTTCTTGCACAACAGTTTTCCTTTTGTGATATACTTGGCTCACTTatgaaagaacaaaagaaaagatcaTAATTATAGCTACATCATCCTGCTTGCCTTGACTTTTGGATAATGGGTCTCCATCTGTCTGTTGTACCATTCTGTTAATTGAAGCAAATAAAGATTGAAAAGTTGGCATTAAAAGACGAACTTAAGCAAAAGCATTTAAGGCAGTTTTCAGAATGTTCTGAatccatttttttcatttatggcTCTGTTAACTTAATGTATAATTTTCGCAAAGGCTTTAACTAAATTTTGACACACAATTGACTCATATTGATCAGAGGGTACAAAGTTGGCCGCATAGCACTAGTGATTAAtagaatacaccttattccaaagtggcggccaataaattattcttttgtttgcatgttaattagccctcttcgccatgtataaaaaacaaaagaattttgaagcgaaaatgaggcaaagagagctaataaacatgcaaacaaaagattatttattggccgccattttggaataaggtgtatacagtagtcaataattattattagaaggTTTAGCACTTTTGTTCACCACGTTCTCATACACAGATGGATCAcattaaattcatcatc
-    >transcript::NC_058066.1:1153398-1165634
-    GCGAGCGTGATCTTCAGTTCGTTTCGAGGTTCAAAAAAACACATTGCCAACAACAGTGGAGTAAAGGGGTATTATTCTTGCACAGTACCTCAACAGTTCTTGCTTTTGcttcacaaacaataatatgGATTCGTACCAGttggattattattttttgggaAAGAAATGTCGGATGAAACATGAATTACGACCTACTTTGTTTACGGATCTCGTCCGTTGCAACTCAAGCGTTTTCACTGGTTTTCGTCATCAAATAACCGTTCTTGGCTTCGTCGAAATAAACCGTTGGCGAAGAAAATTGTCATGATCCATTGACAGCGTTATGGAAGCGTTATGTAAGCTAAAACAAGTGACACAGGAGGTAAGCACGTAAAGCTTAAACACATTCGATTCATCGCCATGGTTATGAACCTATTATGCgcttaagtttaagttttattgCAAAGGATGTAATCTTTTCCAAAATCTGTGGGAACTCCTCACGACAATTTGCAAGCTCAGGCAAAGCATTTTTGCAACGTTTGTCGTTTGCCAGcattcataatattatttactaTTAAAGATAATGGCAGTGGCATAAAACTGAAGTGTTTCcgaaattttcaaatgtgttgTGTTTCTCTTAAAGCTAACGTCTCACTAATGGAATGTAACACATGTTACTCTGCCCAAGCAATATGAGGAATGTTATTAATGGCTTTGAACCATGAGAGCAATTCCCATGCTGCATCAGCTGGGGCCATAGTGAGAAATGCACCACTTGTTCCATGATAATAGTTGTCAGTTATTCCATTTCGTGTTGGGatgaaagccacagttttgtcaTTGATGATGTAGAGACAAGCTGTCTTGGTCATGTTACGGGCTTGTAGAAAGTAATATGGAAGACATGCTGATTGTATCTGCTCTCTGGTGATACTTGCTGGTAACTCTCCAGACATGTGTATACTGCCAAGAACTCTGGCCTGCTGCATTTTGGTAGCTGAATCTTGGACACCAAACATCTGCCCAGAGTTGCCAGCAAATTTGTCATAGAACTTGTTGCCAATCATAATACCGGCAAGGGTGCGATGCATCCAGGTGTTGCTCAATGGCTGGCTACTGTTGTGAGTTTCAGGCGAGGAGAAATATAGTTTACTGTATGAGAGTGCAATGAAAGTGCATGCATTGCTACCTAATCGGCCAGTCAAAGTAGATTGGGAGTATTGGGGTGGAAAGTGCCAGCTTATGACTCTGTCAGATGTTGAAGGATTTATTAGTAGATGCTGAGTGACGGAATGGATTTCTACTGTTGAGGACTGAGGTTGGTTGTGAGCATGAGAGGCTTGTGCATTTGCATGTTTCGGTTGATCAATGCCCCCAATTCCTGTTAGGATATTGTCTACTTTCTGCTCCCAAACTCCAGGCCCgggttgttcaaacgatggatagcactatccaccggataaatcgctatccacaggataagtaatagcgaaaccaattattgcgatatccaatggatagtgatttatcaggtggatagcgttatccaccttttgaacaactggggccagatgtaTAATACTGCTCAGCATTTGTATCAGTGACTTCATTGTTTCCGTCAATTGTATCATCATCAGTGTCAGACTCACTTAGGTTGTCATCAGTGTCTGTATTTTGTacgtttttaaagcaaatgtcaTTTCTAATTTCGTAGCATGTATCTCCAGTTTACTCAAACAAGGTATACAGTACCTGatgctgtttccttctcttgtagggttgtgtcaagttgtttttcaagagttgGTGCAGAACATTCCCGAGAAgttccaattattttttatagtaattttgtcattgtttcacaTTATATacgattatcattattattattatcatcatcaccattgTGATACTTGTTTATCATTAGGAGATTGACCATTGCTCGTAATGGAGGTTTTAGCTTGTCTCTTAAATCAAATGAGTAGAAAGCTATTTATCGTTGTTTAATCCTGAAATTTTatacatttgtttgtttttgatagtttaATAGTGGCATTGGATAAGCTGTCCTTTTGTATTTATATGCTAAACAAAGATTAGCTAAAAAGACAATAGAAAAAAGTGTGGGCGCAACAAAAGTCCactgtttaattgttttcttttatcttaaaaacCGTGGAAATATTGTCTTGCTTTGGCTTTTTCCCTCAAGACAACAGCCAGGTATGTTATTGACTATTGTTGGTAAAACATAACGTACTTTTGGGGGAGGATTCTAGTCTGGTTCTTGCGAGAAAACAGTATCCGCGATTGTGGCGCACTTGTTGCATCAGCGTGCTCCGGGACGGTAATTGGTGGATATTCGTCCCTATCCTATCAAACAACCTGTTAAGTCTCTTGGGGATTTTCCTTCTTGAAAGTTCACTCGAGTGTTGTTGTAGCGGACAGGAGCAGAAAGCATTAGCCTCTCGGGTGGCTCTCATCAAGTGGCGAGAACAAGTCCGGCAATTTAAGTTCCCACCCACAAAACGGGCAGTTGCATCGTCAAGTCTCCTCATAAGACCTCGGCATTCTCCTCCAGCTCTggtttttttctgaaaccagTAGATCCTCCCTTCAGGTTGAGCATTTGTCCTCAAAAGTATTATCGCGTATGCGGCACAACAGGACATGATTTTATCGCGAACAAAACTTCGGTGTTCGTTCACTTTTTTCACTGCTTGCACAAATTTTAAACCACTTTGTACAAACAACGACAGGATTGGGCTGTTAGGAGGGGCATATGTTCAAAAGTTCAAGCTAGTGTTTACAGGTTAACTCTAGTTTTTCACGAGAAACCGGGGGCTattcacaaaattttgaaatagccGCCATTTTCAATCGAATTGTTGTCATGTCCAATCTTCGCGCGCCATAACTGtgcacatgcgcagacgttattcagccctgtcGATGGGTAGGGCATACTCCCACACTACATGTCAGCTCGCCCCAGATCCTGTGTGCAAGACTTACACGCCTAGCGATCATTTACCATGCACCAACCAGAAGGTTCCATTGTCCACAATAATATATTGACTTCTCATGTCGTATACTTGAACAAGTAGAGCATGAGTTTCCAGCTGTAATTGGCTGATTTTGTATATGTAATAGGACTACATGctgtccaatttggaaataattgaaTGAGAAAAATTCTGAAGACAGCCAAAATTggacgaggccgtaggccgagtccAATTTGGCAATTATTACCAATTATTTCCTAATTTCCCAATTATTTCTTAATTTCCTAATTGGATATTTCAAATTTAGACAGTTGGCAAAAGTTAATAAAAAATAGATCTGTTGGCAATATTGGATTTTGATGCAGCTATATAGATAATTAAGCAAGAGTACAAGAATGTCTCTTGACAATAACATGCACAatgcaaatacccaaatatacTCAAATTAGAACAAAATTCAGACTCAGAAAAGACTAAGAAAACAAATCTGTTACAATGATCCAGGAGCcaacaataatgttattattcTTTTCCTTCCTGTCTGAAAGGGATTGGTGTTTGAAAGCTAGCTAAAAGTACCAGAAACTGATGTATCAGTATCTCAAGATGAATCAGCATAATTTGTACAATCAATGCTCCAGCAAAGCTTATACTGTACTATATACTGTTTCAGCTGCTGGTATCATTATTTTCACCTCAAGGCTAAGGTAAAAATAATTGAGTGATTAACTTTCCTTATTGAAGCAAGCCATAGCTCAATCACTAAGATGTTATTTCCTTTTAGTGTCCTGATAACTTTGTTCTGGTGTACTGTCTTTTACACAGTATCAAATGACTTTCTGTAAATGTTGAAGTTGGTTGCCTTTAGGTTTTACCTACTACTACCTTTATCCTACTTCTTCTCTTAATTATGGCGCCCacatcataataataaattatgtcACCAATGATAATTTATTACTCTTCTTGTAAGTAAAGATACAGTAGAATCTAAATATAAAAGGCCATCATAATCACTGAGGATTATCCTGTACAGTTGTGACATTACAGAACCTAATAAAAGAGTTTTGGTTTTCACATAAATAACACAAGTCAATACattaattgaaggggtgtgtggaataaggccttaagtgacttttgatgcaatgtcaaattctcctagtcattcacaactgaatacaaggaaatttgcaaggagaatctggtaatttatcagaagtcacttaaggcttctctccaggcacccctgcaattgaaggggtgtgtggaataaggccttaagtgacttttgatgcaatgtcaaattctcctagtcgttcacaactgaatacaaggaaatttggaaggagagtctggtaatttatcagaagtcacttaaggcttttctccaggcatcccagcaatttttcttttaaatccaaCAAAAAATTTTACCAACTGAAATTCATCAACGAAAAGTAACACAAATTTAAAGCAGAAACATGCAGACTTCAAAACAGCTTCAGactaaatttaaattaaaatgcTTAAATATTTACAACAAATCATAATTTTCTTGCTCATCACAAAAAAGTGGACATCTTCATCACAAACCATCCTCACAATAATACAGTCATTACCTAGagaagacaacaacaaaaatctCAAATCAtttcacaaaacacaaaacGTTCCAATACTACACCATTCATTTGTAAGAAGGTTAGTGAGGGCATAGAAGCCACACATCACACAAAGAATTTCGTTCCCGTTACAAATCTGGAAACAGTTTATAAGGACTTAGTTCAGCCATATTTTGAATACTGTTTCCCCCCATGGGACAACTGCGACAAATAACTTAAAGATAAGATCCAAAGATTCCAGTCATGTGCTGCTAGAGTTCTTACAGTTGCTACTGTATTATGATATTCACTCCATAGACTTAATTGATTCTCTTTCTTGGGAAACACTAGATGACAGACAGCGCTATGCAAAGTCGATTTTTATGTTTGACAACATTAAATGATGGCACATCCCCAGCCTAAGAAACTCTTTTGTTAGAAGGAAGGTTGTTCAGGTTAATTaccatctaaaaaaaaagtaacaaagatATAAAGACCTGACACTACCTAAATCGTAAAGGGGATTTTtgaaaagaagttttaaatttAGTGGTGCTTATGCAGTGGAACCAGCTCTTGAATTAAACAAAACTTGTGAGTCAATCTCTTCATTTAAGAAGCTGACTACAAAATAGTTGGGTCATGACaagatatatatttttagacTAGTTAACTTTTATctcttttattgttattattattatggttattaTTACTAGCACGAAAACGAGAACAAACAGATGTATACGAGCAGGGTGTTAGAAGTGGAGCAAGGGACTTTCAGCCTATTAATGTTCACCATCACTGGAGGCATGCTGGACAAGTGCAAACACTATCACAGTAGAATCACCAAACTCATGTCTATCAAGAAAGGGAAGGATTACAGCACCACCATGGCATGGATAAGATCTAAAGTATCTTTCAGCTTGCTTACATCTGCTCTCCTCTGCCTACCAGGTTCACACACTACAAGGCGTGTCCCTCTGAACATTCAAGAGCACGACTTTGTTGTGGATAAAGAACTGGTGGGACTGGGggattaataaattattatgaactTTATTATGgcttctgtttttcttttcagattaagtgaaaaattttcataaatacaatttaattttttctatATTCTTAATTACAAAATGACAAGTCAAGTTTTCATTATAAAATCAAAGGTGTCAAACAATGtaacaatattttaaaataataggTATAATTATAGgagtttttatttaaattttttattattagcaataaagtaattggaccgagtggagtacaattcagggagtaatcactccagtaatttcaaaattggaCAAGTGCCAAGCTCGAGGCCaactttgaaattcaaatttgattttgaaaactcAAGTATTACCTCTGTCCCTACCTAACTCCAGTCCTTACCAAAAATCAATCAACAGCTTATTGATTTCATCTATATCTCCTAAAGCACGCTGCTTCAAACCATCATAATCACTTTCCAAACTCTTCTGTGCAATaactaaaaatacaaaattgttAACAACCATTACATCAACTGCATATATGAAGCACAAAATTATACATAAAACTACGTCACTTCCTGTTGGATTACAGAGTAGCTTAAAAGAACTACCTAAATATCTTTGACAACAAAATAAATCAGTTTTTAAAAGGTTAAATTAGTACAAAAATGTTTGTATAATATTTTTTAGTAAattccaactagtggtctattatcaatgctgccttctgattggttgagctactactaggctatattaTGTTATAGCCCCACTAGTTGGGAAAAGCGCCAGCCATAATTGAATGttttgacagaaaaaaaaaggattaaagtccaGCTTTAACTGCAAAAAGATGTTTTgcctcaatatttttttgagcaACTACTTGTATTTTACTacaacaattattcctctcgccctcatggcttCTGAGTAAATAGCCCATCCaaccttcggcctcatgggctattgactcagagcccaggGACAACTTAACTGACACAAACAAAGGATCCCTTTGAAATTCCAACATCAAAAAAGTGTGATTATATATGAAAAGTGTTATcatcaaaaaattgcaaaaacaacACATACATTCCTTCATGACAAAATTATTCTGCTCTAGGTGACACCATTTCCTCTCCAAATTCccaagctgaaaaaaaaagctcattattgaaaaaatacacatgaaaatgaaaacaacaaaacgtcATGCAACAACtaaatttataaaataataattattagaatagTATGCactctctcattggtcaatggGTGTGCTCAGATGAGAGTATATAGACACAGTTGTGACTTGATTGGTTGTGACTTGTTTCATGCACATTTGGTTGGCTGGTAGGAAATATGAACGCATATCCAAAAAATCTATTTCAATCAAGAAGTAAAATAAACAGCATTATCCTTCATTtgccgaatttttttttttatgagagaAGTAtcttacaaaaattaatgctaCACAGAACGTTTTTCTGTGTTGACATAGACTCTAAACACACAGGAAGTTGGAAGAACTATCAACAGTTACCAACACTGTGAACTGCGTCTgaggtttgcataactgtctcaaaCTCGGTGTTTggatgaggctatgtaaacacagaAAAAGACCTCTATTGCTTAAATTCAAACTTCCAACAACAAAACCTACCTGAGAATGAGTCTCATTTTCAATCAATTTACTCCTTGATGCATCATAAACAGCAGACAGCTTTTTAACATctgcaaggaaacaaaaaataataataaaaataataattgttaattaacctatagttcaattcaatttttcacAAGAACGcaattttacaaaaaaatttacatttcaTGTCTAGGTTTGTCCAGTAGTCcacacttctttttgtttttgttctcacttgtttcttagttcctcaataaactctaCGTCGGGttcaacaaaacgggaagccgTATTTGCAGAAGATTGTAATGAacaacaaatcttagcaataaccttgttgctaagcaactttaaaccaatcaggatcaagtaatCATCCCCTCTTGATTACTAAAAGTGCCTCATGTGATTAGgaaaaaaatgccctctgtctcagccagtCAGCCACTCAGTCATTTTTAAatgagtaaaattaaggattaatatcacgcgtgttttcagaagttgctgaaattacccgagtcgcgcatccttaattttacgaggatccattgcgattactgtaattttgccctcttcacgaagcaaaattaagaaaaaatactctcttcattgaccaatcagcattcagtaattttgtcctctatgttattaaaaaTCTAACAGGTTCAGTTGTTTCTTCTATATGCATTAAAACGTTGTTtatcattttacattttcagCAGAAccctcgaccaatcagattgctggaataAGGACATGTGACGGTCATACAGAGCGGGACAAATATTTTACTCAACTTGAAAACAGTGGATCCACTTTTCTTGCTGGCGCCAAAGCCAATCATATTACAGGATTTAGCGCACGTGACTTTTgattttgaaaggaaaacaaggaaaaacaataCATGGACTAAATGAGAAACAATGGTGTCTTCCCGAGGTAGGTGTTACACTATTGTTATATATTATgtattatgaaagaaatgttatatgcagtgcggtgtttgaaatcaaatgaagatatgatcctcgcacttgctggacaatttaagcaaatgtctcatgaacctgaaaaattcaggtgactcaacgggatttgaacccatgacctctgcgatgccggtgcagtgctctaaccaactgagctatgaagtcacacggtcatgttttcccgtgaaaggaatgtcatatgaaagaaatgttatatgcagcaagtgcgaggatcatatcttcatatttgatttcaaacaccgcactgcatataacatttctttcatagaaaaaaaattattgataaaaatTCCTAAAGAGCAAATTGTTTCACATACATGTAACTTGCAACAAGAGAAATAATACCTCTGACTTGAAGGAGATAATTCCTCTCTGCctttttcctgaaaaaaattaaaacaatacttTTTCAATACTTTCCCACAACCTAACTTGTGCAAGGCCGCTGTATTTGTTAAAATTATTTACCAACATATGCCCCTTACATAAAGTTTTACTTCCTTGACCTTTTCTTGGACTACTTTCACCCCTCACAATACAAGTGGACCTTTAAGAGGCCGATATATTAAGGTATTTTTCGTTatcatttgaatttttttcgtaaaaaCCAGTCAGATTGCGGTATATAGATCACCTGATTTTGACTGACCAATATTAAAGCGAGAAAATTACAATTGATGTTCTATACGGTTTTAAGTCTGGTTTcctcattgtttacattttctaTCTAATTTATGCATAgtccaaccaatcagattaaAGCATTTACCAATCAGGAAGCAGGAATTTTAATTGATGTACCATACGGTTTTTCACTCGTTTTCCCTGTTTCCTAATTGTTTACGTTTTCTCGACAATTTATGCATAATCGATCCAATCAGATTTGAGCATTTAGATGTGATcaaaactgaccaatcagaaagcgtgaattttgcttccttcatcggtagcaaaaaaaaaatgcaaattccagatttctcgctttctgatTGGCCAGTTTCTGggcacatgatttttttttcttacacttTTCGTATGTTTTTCCACATTTTTCTCCTCCCCTCCTTCACCCCTCCACCCCTTCTTCACCCCTTCACCCCTCCACCCTTGCGTCTTGGTCTTGGCACTAACCgtaaaccaataataataataataataataataataataactttattagcGAGTCAAGTAAAATAGAAGTTTCCCACTAAGTAAGGACAcctatctaaaaaaaaaaactagaagtACCCGTATAATCCCTATATGATCCCCTCAATAATCCCAcccacaatttaaaattaattacaatgttaAGAAAGACAAAGAGTACAGTTAATACAATTATTAGCTAAAATATGTTTAGCAAGATCTACCATCCTAATATAACGTTTTTAgttctctgaatttcctatcaATCTTAGACCAGAGCACCGGTCCTAAGTATCTGACTGAATGCTTACCATAACCCGTGGTGTTAACTCTAGGAACTACAAAATCGTTATTTCTTAAGTTATACTGATTACTTCTAAAAATAAACAACCTATAAAGATAATTTGGACATAAGCCGTTCTTAATCTTATACATTAAAATTGCAATGTCTTGTAACCTTCTATTGTATAAGGTTGGTAATTTCGCCCTTTTACTTCATGTCCTCTGTCTTCAACTGTCGTTCACTCAATGTGCGCTGTACTTACTTGCTATTTTCTTCGTATCCATTGTTCTTTCATGTTGTTTACTTCATGTCCTCTGTCTTCCCTTGCCCTTTTCTTCCTGTACACTGTTCACTTGCTTGAACACTTGACATTGGAATGAAATTTCGAAATGTCAGCAAAGCAacacattcatttttttttttgcctggaGACTGTGGAAAATTTTAACAGATGTACAGTATTGGCATGTACCAAGCCTAAACCATCTATATTCCTTGAGGTATATCATGCCTTAAATGTTGAAACTGTTTGTTTATTATTGAATTGCAGATGTGGGAATGTTGCAGCTATTTTAGAGTTGGACCAGTGTTCTCCcaaagttttagctcagcaggtaagggacaattcctgaccggtatatTTTTTATACAACTGATATAGTTtgagtaaaccttcaagaggttgcaggcggtaagaacagACTgttactgttgcttgaggcggtaaattttactggttaccgcttgataaggagaacactggttGGATGAGCATTTAAAAAGAGAATTTACAATCTTCGAAGCAGCGCCACAGGTTGGGGTTGGTTTTTACAAAAGGGGTTCATATTACTGAGAGTTCTTAGTCGGTCAAAAGAAAATCAGGGAACAGCATATTTGACTTtaagtgaaaaatgaatctttccAAAGGCCTGCGATTTGCAGAAGCAAGCACCTTTTAGTAGTAGTATTGGGGGAGGGGGCCTTGCATTTATATTTGTGCAGCTACTGCTTTTAGCACGTGATGGTATACTTTTTATGTGaatattgtttgttttggtttgtgaCTTTCAATTCTGCGTGAAGACttttaaaatagttttctttaTATAAATAGTGCCCTTCTACTTTGCTCGCCCATAGTGTCAGGAACATGATACCATGCTTTTGAACGAAGGGCTTTTCTCATCTATGGTACACTTTTATTGAATACTTCATACTCTTTATAATcatgatattaataattatttgattttattcCATAGGAGGTGAGAGGTATGCCAACTATTTCTAGGAATCCGCAGCCACATTACTTCCTTTGAATCTGCTACAGAAGTGTCCTTGGTCAACTTTTTTTGGAGATTTCCTTTCCTCTAAGCCACCGTTCAGCTATTAGGTGTGGATACTTCAGTGAACCGTGGGATCCGAGATATTGAGCATTGCACAGACGTCGAATATAGCTTGCAAGGCAATACAAATGGCTTTCGAGAGCACAAGCATAACTACATGGTGGTCttaaaagaacaataattgaTAGGCCttttgtggttttgtttttcttttttatatttagttttggaaaaagaaattcataGTTACAATTAGGAGATAACTGTATAATATACAACtacccgaaggggaggtgaatagtggtggatatatatatagtgaatagtggtggatatacatatccaccactcttcaccgaccctgagggaatagttgttttagtatttaccaaatcagatggataaaaaaacgcttcttcaatttcttcttctgaaactttcgcgaaacgacatttttctctccgttcgcaaaacagtgaatatccaaggatattccgagttacgggagccaatcagaacgcgcgaaaattgctatccactgatttggtagaTACTAAACTTGATTATTTGGGCTAACATTGTATATACCATACACTTTTATAATTGAAGtgaaaacattaatttattttacaaataaCTCAGTCATATGTTCTGCTCGTGGGAAACGTGCGACCAGGGTTACCTCCTGTTGAAAGACTAGTATCTAGTTTTGATTTGCTGGAAAGCCTGATACGCTGTATTCTTTTAATGCAAAGTGCTTAGTCTTCAATCCTTCTGTTGTTATCTGAGTCAATCATAAAACGTGTTCGAGTTTAGTATAGGAAGTGAAGCGATGCTTGAAAGACTTCTTAGGTTCTTTGGGGGAAATACTCATTTTTGAAAAATTCCCATCTCGATTCATTCTTGTTGTGAAGACTTTGAGAATAGCTAAGTGATGTCACTTGAATGGTACACAAAAAAAGCCTGAAGGGCAAGTTATTTCGCGATACGCACGCAGACGAGCAGGGCAACACGTCTCTCGAGGTGATACAGTGGTCTCGCGAGAAGGAAGTAACTTACTTTGGAGTGTACGGATTACTGGTTAAAAACTTATTTCTTGTAATAAAGGCTGTGATCGTCAGCTTGTGATTATTGCTCCAATATATAATGaacagtacatttttttt
-    >transcript::NC_058066.1:1153398-1165634
-    GCGAGCGTGATCTTCAGTTCGTTTCGAGGTTCAAAAAAACACATTGCCAACAACAGTGGAGTAAAGGGGTATTATTCTTGCACAGTACCTCAACAGTTCTTGCTTTTGcttcacaaacaataatatgGATTCGTACCAGttggattattattttttgggaAAGAAATGTCGGATGAAACATGAATTACGACCTACTTTGTTTACGGATCTCGTCCGTTGCAACTCAAGCGTTTTCACTGGTTTTCGTCATCAAATAACCGTTCTTGGCTTCGTCGAAATAAACCGTTGGCGAAGAAAATTGTCATGATCCATTGACAGCGTTATGGAAGCGTTATGTAAGCTAAAACAAGTGACACAGGAGGTAAGCACGTAAAGCTTAAACACATTCGATTCATCGCCATGGTTATGAACCTATTATGCgcttaagtttaagttttattgCAAAGGATGTAATCTTTTCCAAAATCTGTGGGAACTCCTCACGACAATTTGCAAGCTCAGGCAAAGCATTTTTGCAACGTTTGTCGTTTGCCAGcattcataatattatttactaTTAAAGATAATGGCAGTGGCATAAAACTGAAGTGTTTCcgaaattttcaaatgtgttgTGTTTCTCTTAAAGCTAACGTCTCACTAATGGAATGTAACACATGTTACTCTGCCCAAGCAATATGAGGAATGTTATTAATGGCTTTGAACCATGAGAGCAATTCCCATGCTGCATCAGCTGGGGCCATAGTGAGAAATGCACCACTTGTTCCATGATAATAGTTGTCAGTTATTCCATTTCGTGTTGGGatgaaagccacagttttgtcaTTGATGATGTAGAGACAAGCTGTCTTGGTCATGTTACGGGCTTGTAGAAAGTAATATGGAAGACATGCTGATTGTATCTGCTCTCTGGTGATACTTGCTGGTAACTCTCCAGACATGTGTATACTGCCAAGAACTCTGGCCTGCTGCATTTTGGTAGCTGAATCTTGGACACCAAACATCTGCCCAGAGTTGCCAGCAAATTTGTCATAGAACTTGTTGCCAATCATAATACCGGCAAGGGTGCGATGCATCCAGGTGTTGCTCAATGGCTGGCTACTGTTGTGAGTTTCAGGCGAGGAGAAATATAGTTTACTGTATGAGAGTGCAATGAAAGTGCATGCATTGCTACCTAATCGGCCAGTCAAAGTAGATTGGGAGTATTGGGGTGGAAAGTGCCAGCTTATGACTCTGTCAGATGTTGAAGGATTTATTAGTAGATGCTGAGTGACGGAATGGATTTCTACTGTTGAGGACTGAGGTTGGTTGTGAGCATGAGAGGCTTGTGCATTTGCATGTTTCGGTTGATCAATGCCCCCAATTCCTGTTAGGATATTGTCTACTTTCTGCTCCCAAACTCCAGGCCCgggttgttcaaacgatggatagcactatccaccggataaatcgctatccacaggataagtaatagcgaaaccaattattgcgatatccaatggatagtgatttatcaggtggatagcgttatccaccttttgaacaactggggccagatgtaTAATACTGCTCAGCATTTGTATCAGTGACTTCATTGTTTCCGTCAATTGTATCATCATCAGTGTCAGACTCACTTAGGTTGTCATCAGTGTCTGTATTTTGTacgtttttaaagcaaatgtcaTTTCTAATTTCGTAGCATGTATCTCCAGTTTACTCAAACAAGGTATACAGTACCTGatgctgtttccttctcttgtagggttgtgtcaagttgtttttcaagagttgGTGCAGAACATTCCCGAGAAgttccaattattttttatagtaattttgtcattgtttcacaTTATATacgattatcattattattattatcatcatcaccattgTGATACTTGTTTATCATTAGGAGATTGACCATTGCTCGTAATGGAGGTTTTAGCTTGTCTCTTAAATCAAATGAGTAGAAAGCTATTTATCGTTGTTTAATCCTGAAATTTTatacatttgtttgtttttgatagtttaATAGTGGCATTGGATAAGCTGTCCTTTTGTATTTATATGCTAAACAAAGATTAGCTAAAAAGACAATAGAAAAAAGTGTGGGCGCAACAAAAGTCCactgtttaattgttttcttttatcttaaaaacCGTGGAAATATTGTCTTGCTTTGGCTTTTTCCCTCAAGACAACAGCCAGGTATGTTATTGACTATTGTTGGTAAAACATAACGTACTTTTGGGGGAGGATTCTAGTCTGGTTCTTGCGAGAAAACAGTATCCGCGATTGTGGCGCACTTGTTGCATCAGCGTGCTCCGGGACGGTAATTGGTGGATATTCGTCCCTATCCTATCAAACAACCTGTTAAGTCTCTTGGGGATTTTCCTTCTTGAAAGTTCACTCGAGTGTTGTTGTAGCGGACAGGAGCAGAAAGCATTAGCCTCTCGGGTGGCTCTCATCAAGTGGCGAGAACAAGTCCGGCAATTTAAGTTCCCACCCACAAAACGGGCAGTTGCATCGTCAAGTCTCCTCATAAGACCTCGGCATTCTCCTCCAGCTCTggtttttttctgaaaccagTAGATCCTCCCTTCAGGTTGAGCATTTGTCCTCAAAAGTATTATCGCGTATGCGGCACAACAGGACATGATTTTATCGCGAACAAAACTTCGGTGTTCGTTCACTTTTTTCACTGCTTGCACAAATTTTAAACCACTTTGTACAAACAACGACAGGATTGGGCTGTTAGGAGGGGCATATGTTCAAAAGTTCAAGCTAGTGTTTACAGGTTAACTCTAGTTTTTCACGAGAAACCGGGGGCTattcacaaaattttgaaatagccGCCATTTTCAATCGAATTGTTGTCATGTCCAATCTTCGCGCGCCATAACTGtgcacatgcgcagacgttattcagccctgtcGATGGGTAGGGCATACTCCCACACTACATGTCAGCTCGCCCCAGATCCTGTGTGCAAGACTTACACGCCTAGCGATCATTTACCATGCACCAACCAGAAGGTTCCATTGTCCACAATAATATATTGACTTCTCATGTCGTATACTTGAACAAGTAGAGCATGAGTTTCCAGCTGTAATTGGCTGATTTTGTATATGTAATAGGACTACATGctgtccaatttggaaataattgaaTGAGAAAAATTCTGAAGACAGCCAAAATTggacgaggccgtaggccgagtccAATTTGGCAATTATTACCAATTATTTCCTAATTTCCCAATTATTTCTTAATTTCCTAATTGGATATTTCAAATTTAGACAGTTGGCAAAAGTTAATAAAAAATAGATCTGTTGGCAATATTGGATTTTGATGCAGCTATATAGATAATTAAGCAAGAGTACAAGAATGTCTCTTGACAATAACATGCACAatgcaaatacccaaatatacTCAAATTAGAACAAAATTCAGACTCAGAAAAGACTAAGAAAACAAATCTGTTACAATGATCCAGGAGCcaacaataatgttattattcTTTTCCTTCCTGTCTGAAAGGGATTGGTGTTTGAAAGCTAGCTAAAAGTACCAGAAACTGATGTATCAGTATCTCAAGATGAATCAGCATAATTTGTACAATCAATGCTCCAGCAAAGCTTATACTGTACTATATACTGTTTCAGCTGCTGGTATCATTATTTTCACCTCAAGGCTAAGGTAAAAATAATTGAGTGATTAACTTTCCTTATTGAAGCAAGCCATAGCTCAATCACTAAGATGTTATTTCCTTTTAGTGTCCTGATAACTTTGTTCTGGTGTACTGTCTTTTACACAGTATCAAATGACTTTCTGTAAATGTTGAAGTTGGTTGCCTTTAGGTTTTACCTACTACTACCTTTATCCTACTTCTTCTCTTAATTATGGCGCCCacatcataataataaattatgtcACCAATGATAATTTATTACTCTTCTTGTAAGTAAAGATACAGTAGAATCTAAATATAAAAGGCCATCATAATCACTGAGGATTATCCTGTACAGTTGTGACATTACAGAACCTAATAAAAGAGTTTTGGTTTTCACATAAATAACACAAGTCAATACattaattgaaggggtgtgtggaataaggccttaagtgacttttgatgcaatgtcaaattctcctagtcattcacaactgaatacaaggaaatttgcaaggagaatctggtaatttatcagaagtcacttaaggcttctctccaggcacccctgcaattgaaggggtgtgtggaataaggccttaagtgacttttgatgcaatgtcaaattctcctagtcgttcacaactgaatacaaggaaatttggaaggagagtctggtaatttatcagaagtcacttaaggcttttctccaggcatcccagcaatttttcttttaaatccaaCAAAAAATTTTACCAACTGAAATTCATCAACGAAAAGTAACACAAATTTAAAGCAGAAACATGCAGACTTCAAAACAGCTTCAGactaaatttaaattaaaatgcTTAAATATTTACAACAAATCATAATTTTCTTGCTCATCACAAAAAAGTGGACATCTTCATCACAAACCATCCTCACAATAATACAGTCATTACCTAGagaagacaacaacaaaaatctCAAATCAtttcacaaaacacaaaacGTTCCAATACTACACCATTCATTTGTAAGAAGGTTAGTGAGGGCATAGAAGCCACACATCACACAAAGAATTTCGTTCCCGTTACAAATCTGGAAACAGTTTATAAGGACTTAGTTCAGCCATATTTTGAATACTGTTTCCCCCCATGGGACAACTGCGACAAATAACTTAAAGATAAGATCCAAAGATTCCAGTCATGTGCTGCTAGAGTTCTTACAGTTGCTACTGTATTATGATATTCACTCCATAGACTTAATTGATTCTCTTTCTTGGGAAACACTAGATGACAGACAGCGCTATGCAAAGTCGATTTTTATGTTTGACAACATTAAATGATGGCACATCCCCAGCCTAAGAAACTCTTTTGTTAGAAGGAAGGTTGTTCAGGTTAATTaccatctaaaaaaaaagtaacaaagatATAAAGACCTGACACTACCTAAATCGTAAAGGGGATTTTtgaaaagaagttttaaatttAGTGGTGCTTATGCAGTGGAACCAGCTCTTGAATTAAACAAAACTTGTGAGTCAATCTCTTCATTTAAGAAGCTGACTACAAAATAGTTGGGTCATGACaagatatatatttttagacTAGTTAACTTTTATctcttttattgttattattattatggttattaTTACTAGCACGAAAACGAGAACAAACAGATGTATACGAGCAGGGTGTTAGAAGTGGAGCAAGGGACTTTCAGCCTATTAATGTTCACCATCACTGGAGGCATGCTGGACAAGTGCAAACACTATCACAGTAGAATCACCAAACTCATGTCTATCAAGAAAGGGAAGGATTACAGCACCACCATGGCATGGATAAGATCTAAAGTATCTTTCAGCTTGCTTACATCTGCTCTCCTCTGCCTACCAGGTTCACACACTACAAGGCGTGTCCCTCTGAACATTCAAGAGCACGACTTTGTTGTGGATAAAGAACTGGTGGGACTGGGggattaataaattattatgaactTTATTATGgcttctgtttttcttttcagattaagtgaaaaattttcataaatacaatttaattttttctatATTCTTAATTACAAAATGACAAGTCAAGTTTTCATTATAAAATCAAAGGTGTCAAACAATGtaacaatattttaaaataataggTATAATTATAGgagtttttatttaaattttttattattagcaataaagtaattggaccgagtggagtacaattcagggagtaatcactccagtaatttcaaaattggaCAAGTGCCAAGCTCGAGGCCaactttgaaattcaaatttgattttgaaaactcAAGTATTACCTCTGTCCCTACCTAACTCCAGTCCTTACCAAAAATCAATCAACAGCTTATTGATTTCATCTATATCTCCTAAAGCACGCTGCTTCAAACCATCATAATCACTTTCCAAACTCTTCTGTGCAATaactaaaaatacaaaattgttAACAACCATTACATCAACTGCATATATGAAGCACAAAATTATACATAAAACTACGTCACTTCCTGTTGGATTACAGAGTAGCTTAAAAGAACTACCTAAATATCTTTGACAACAAAATAAATCAGTTTTTAAAAGGTTAAATTAGTACAAAAATGTTTGTATAATATTTTTTAGTAAattccaactagtggtctattatcaatgctgccttctgattggttgagctactactaggctatattaTGTTATAGCCCCACTAGTTGGGAAAAGCGCCAGCCATAATTGAATGttttgacagaaaaaaaaaggattaaagtccaGCTTTAACTGCAAAAAGATGTTTTgcctcaatatttttttgagcaACTACTTGTATTTTACTacaacaattattcctctcgccctcatggcttCTGAGTAAATAGCCCATCCaaccttcggcctcatgggctattgactcagagcccaggGACAACTTAACTGACACAAACAAAGGATCCCTTTGAAATTCCAACATCAAAAAAGTGTGATTATATATGAAAAGTGTTATcatcaaaaaattgcaaaaacaacACATACATTCCTTCATGACAAAATTATTCTGCTCTAGGTGACACCATTTCCTCTCCAAATTCccaagctgaaaaaaaaagctcattattgaaaaaatacacatgaaaatgaaaacaacaaaacgtcATGCAACAACtaaatttataaaataataattattagaatagTATGCactctctcattggtcaatggGTGTGCTCAGATGAGAGTATATAGACACAGTTGTGACTTGATTGGTTGTGACTTGTTTCATGCACATTTGGTTGGCTGGTAGGAAATATGAACGCATATCCAAAAAATCTATTTCAATCAAGAAGTAAAATAAACAGCATTATCCTTCATTtgccgaatttttttttttatgagagaAGTAtcttacaaaaattaatgctaCACAGAACGTTTTTCTGTGTTGACATAGACTCTAAACACACAGGAAGTTGGAAGAACTATCAACAGTTACCAACACTGTGAACTGCGTCTgaggtttgcataactgtctcaaaCTCGGTGTTTggatgaggctatgtaaacacagaAAAAGACCTCTATTGCTTAAATTCAAACTTCCAACAACAAAACCTACCTGAGAATGAGTCTCATTTTCAATCAATTTACTCCTTGATGCATCATAAACAGCAGACAGCTTTTTAACATctgcaaggaaacaaaaaataataataaaaataataattgttaattaacctatagttcaattcaatttttcacAAGAACGcaattttacaaaaaaatttacatttcaTGTCTAGGTTTGTCCAGTAGTCcacacttctttttgtttttgttctcacttgtttcttagttcctcaataaactctaCGTCGGGttcaacaaaacgggaagccgTATTTGCAGAAGATTGTAATGAacaacaaatcttagcaataaccttgttgctaagcaactttaaaccaatcaggatcaagtaatCATCCCCTCTTGATTACTAAAAGTGCCTCATGTGATTAGgaaaaaaatgccctctgtctcagccagtCAGCCACTCAGTCATTTTTAAatgagtaaaattaaggattaatatcacgcgtgttttcagaagttgctgaaattacccgagtcgcgcatccttaattttacgaggatccattgcgattactgtaattttgccctcttcacgaagcaaaattaagaaaaaatactctcttcattgaccaatcagcattcagtaattttgtcctctatgttattaaaaaTCTAACAGGTTCAGTTGTTTCTTCTATATGCATTAAAACGTTGTTtatcattttacattttcagCAGAAccctcgaccaatcagattgctggaataAGGACATGTGACGGTCATACAGAGCGGGACAAATATTTTACTCAACTTGAAAACAGTGGATCCACTTTTCTTGCTGGCGCCAAAGCCAATCATATTACAGGATTTAGCGCACGTGACTTTTgattttgaaaggaaaacaaggaaaaacaataCATGGACTAAATGAGAAACAATGGTGTCTTCCCGAGGTAGGTGTTACACTATTGTTATATATTATgtattatgaaagaaatgttatatgcagtgcggtgtttgaaatcaaatgaagatatgatcctcgcacttgctggacaatttaagcaaatgtctcatgaacctgaaaaattcaggtgactcaacgggatttgaacccatgacctctgcgatgccggtgcagtgctctaaccaactgagctatgaagtcacacggtcatgttttcccgtgaaaggaatgtcatatgaaagaaatgttatatgcagcaagtgcgaggatcatatcttcatatttgatttcaaacaccgcactgcatataacatttctttcatagaaaaaaaattattgataaaaatTCCTAAAGAGCAAATTGTTTCACATACATGTAACTTGCAACAAGAGAAATAATACCTCTGACTTGAAGGAGATAATTCCTCTCTGCctttttcctgaaaaaaattaaaacaatacttTTTCAATACTTTCCCACAACCTAACTTGTGCAAGGCCGCTGTATTTGTTAAAATTATTTACCAACATATGCCCCTTACATAAAGTTTTACTTCCTTGACCTTTTCTTGGACTACTTTCACCCCTCACAATACAAGTGGACCTTTAAGAGGCCGATATATTAAGGTATTTTTCGTTatcatttgaatttttttcgtaaaaaCCAGTCAGATTGCGGTATATAGATCACCTGATTTTGACTGACCAATATTAAAGCGAGAAAATTACAATTGATGTTCTATACGGTTTTAAGTCTGGTTTcctcattgtttacattttctaTCTAATTTATGCATAgtccaaccaatcagattaaAGCATTTACCAATCAGGAAGCAGGAATTTTAATTGATGTACCATACGGTTTTTCACTCGTTTTCCCTGTTTCCTAATTGTTTACGTTTTCTCGACAATTTATGCATAATCGATCCAATCAGATTTGAGCATTTAGATGTGATcaaaactgaccaatcagaaagcgtgaattttgcttccttcatcggtagcaaaaaaaaaatgcaaattccagatttctcgctttctgatTGGCCAGTTTCTGggcacatgatttttttttcttacacttTTCGTATGTTTTTCCACATTTTTCTCCTCCCCTCCTTCACCCCTCCACCCCTTCTTCACCCCTTCACCCCTCCACCCTTGCGTCTTGGTCTTGGCACTAACCgtaaaccaataataataataataataataataataataactttattagcGAGTCAAGTAAAATAGAAGTTTCCCACTAAGTAAGGACAcctatctaaaaaaaaaaactagaagtACCCGTATAATCCCTATATGATCCCCTCAATAATCCCAcccacaatttaaaattaattacaatgttaAGAAAGACAAAGAGTACAGTTAATACAATTATTAGCTAAAATATGTTTAGCAAGATCTACCATCCTAATATAACGTTTTTAgttctctgaatttcctatcaATCTTAGACCAGAGCACCGGTCCTAAGTATCTGACTGAATGCTTACCATAACCCGTGGTGTTAACTCTAGGAACTACAAAATCGTTATTTCTTAAGTTATACTGATTACTTCTAAAAATAAACAACCTATAAAGATAATTTGGACATAAGCCGTTCTTAATCTTATACATTAAAATTGCAATGTCTTGTAACCTTCTATTGTATAAGGTTGGTAATTTCGCCCTTTTACTTCATGTCCTCTGTCTTCAACTGTCGTTCACTCAATGTGCGCTGTACTTACTTGCTATTTTCTTCGTATCCATTGTTCTTTCATGTTGTTTACTTCATGTCCTCTGTCTTCCCTTGCCCTTTTCTTCCTGTACACTGTTCACTTGCTTGAACACTTGACATTGGAATGAAATTTCGAAATGTCAGCAAAGCAacacattcatttttttttttgcctggaGACTGTGGAAAATTTTAACAGATGTACAGTATTGGCATGTACCAAGCCTAAACCATCTATATTCCTTGAGGTATATCATGCCTTAAATGTTGAAACTGTTTGTTTATTATTGAATTGCAGATGTGGGAATGTTGCAGCTATTTTAGAGTTGGACCAGTGTTCTCCcaaagttttagctcagcaggtaagggacaattcctgaccggtatatTTTTTATACAACTGATATAGTTtgagtaaaccttcaagaggttgcaggcggtaagaacagACTgttactgttgcttgaggcggtaaattttactggttaccgcttgataaggagaacactggttGGATGAGCATTTAAAAAGAGAATTTACAATCTTCGAAGCAGCGCCACAGGTTGGGGTTGGTTTTTACAAAAGGGGTTCATATTACTGAGAGTTCTTAGTCGGTCAAAAGAAAATCAGGGAACAGCATATTTGACTTtaagtgaaaaatgaatctttccAAAGGCCTGCGATTTGCAGAAGCAAGCACCTTTTAGTAGTAGTATTGGGGGAGGGGGCCTTGCATTTATATTTGTGCAGCTACTGCTTTTAGCACGTGATGGTATACTTTTTATGTGaatattgtttgttttggtttgtgaCTTTCAATTCTGCGTGAAGACttttaaaatagttttctttaTATAAATAGTGCCCTTCTACTTTGCTCGCCCATAGTGTCAGGAACATGATACCATGCTTTTGAACGAAGGGCTTTTCTCATCTATGGTACACTTTTATTGAATACTTCATACTCTTTATAATcatgatattaataattatttgattttattcCATAGGAGGTGAGAGGTATGCCAACTATTTCTAGGAATCCGCAGCCACATTACTTCCTTTGAATCTGCTACAGAAGTGTCCTTGGTCAACTTTTTTTGGAGATTTCCTTTCCTCTAAGCCACCGTTCAGCTATTAGGTGTGGATACTTCAGTGAACCGTGGGATCCGAGATATTGAGCATTGCACAGACGTCGAATATAGCTTGCAAGGCAATACAAATGGCTTTCGAGAGCACAAGCATAACTACATGGTGGTCttaaaagaacaataattgaTAGGCCttttgtggttttgtttttcttttttatatttagttttggaaaaagaaattcataGTTACAATTAGGAGATAACTGTATAATATACAACtacccgaaggggaggtgaatagtggtggatatatatatagtgaatagtggtggatatacatatccaccactcttcaccgaccctgagggaatagttgttttagtatttaccaaatcagatggataaaaaaacgcttcttcaatttcttcttctgaaactttcgcgaaacgacatttttctctccgttcgcaaaacagtgaatatccaaggatattccgagttacgggagccaatcagaacgcgcgaaaattgctatccactgatttggtagaTACTAAACTTGATTATTTGGGCTAACATTGTATATACCATACACTTTTATAATTGAAGtgaaaacattaatttattttacaaataaCTCAGTCATATGTTCTGCTCGTGGGAAACGTGCGACCAGGGTTACCTCCTGTTGAAAGACTAGTATCTAGTTTTGATTTGCTGGAAAGCCTGATACGCTGTATTCTTTTAATGCAAAGTGCTTAGTCTTCAATCCTTCTGTTGTTATCTGAGTCAATCATAAAACGTGTTCGAGTTTAGTATAGGAAGTGAAGCGATGCTTGAAAGACTTCTTAGGTTCTTTGGGGGAAATACTCATTTTTGAAAAATTCCCATCTCGATTCATTCTTGTTGTGAAGACTTTGAGAATAGCTAAGTGATGTCACTTGAATGGTACACAAAAAAAGCCTGAAGGGCAAGTTATTTCGCGATACGCACGCAGACGAGCAGGGCAACACGTCTCTCGAGGTGATACAGTGGTCTCGCGAGAAGGAAGTAACTTACTTTGGAGTGTACGGATTACTGGTTAAAAACTTATTTCTTGTAATAAAGGCTGTGATCGTCAGCTTGTGATTATTGCTCCAATATATAATGaacagtacatttttttt
-    16982
-
-17098 original number
-
-# 7 subsetting fasta
-
-``` bash
-/home/shared/samtools-1.12/samtools faidx ../output/05.33-lncRNA-discovery/Apul_lncRNA_candidates.fasta \
--r ../output/05.33-lncRNA-discovery/Apul_noncoding_transcripts_ids.txt > ../output/05.33-lncRNA-discovery/Apul_lncRNA.fasta
-```
-
-``` bash
-fgrep -c ">" ../output/05.33-lncRNA-discovery/Apul_lncRNA.fasta
-fgrep ">" ../output/05.33-lncRNA-discovery/Apul_lncRNA.fasta | head -5
-
-head ../output/05.33-lncRNA-discovery/Apul_lncRNA.fasta
-```
-
-    16206
-    >transcript::NC_058066.1:468618-469943
-    >transcript::NC_058066.1:1135315-1144814
-    >transcript::NC_058066.1:1144883-1148491
-    >transcript::NC_058066.1:1153398-1165634
-    >transcript::NC_058066.1:1153398-1165634
-    >transcript::NC_058066.1:468618-469943
-    taactgatcaaaacgtatcttcctacaacattaatttgacagtggcgtttctcaactgac
-    caatcaaaacttacatttgaaaatttggtgATGGTgcgtttacaactcgtgtatctttac
-    gtcacacaaccatgtttgcATACTCTCTTGCaaccacgcctctcggccaatcagagcgcg
-    cgcgtactatcttagttattttataaagatAAATACGCCCTAGGATTAGCACGCACGCTA
-    TGGTATAATTATTGATGATAACTTTGCTGGATTTACGTTTGGTTGAAGTTATCATGATAT
-    tccatcgtcgtcatcatcaacATTCTTATCGTTTATCTTCATCACAATCACCTGACACAA
-    CATGACTAAAAGCAAAGATGAAAACACTCTTACATCACCAGCCCGTGTGTGGCCATCAAC
-    GCATGCATGCGCATCACCATATCTCCTGGGTAGTGTCAGCCATGAACAGCAGTTTCGGTG
-    TTGTTAGGTCTCgtctagtctccttcgcagccgtctttcgggacggggagcgttgcgtga
-
-# 8 Getting genome feature track
-
-``` python
-# Open the input file and the output file
-with open('../output/05.33-lncRNA-discovery/Apul_noncoding_transcripts_ids.txt', 'r') as infile, open('../output/05.33-lncRNA-discovery/Apul_lncRNA.bed', 'w') as outfile:
-    # Process each line in the input file
-    for line in infile:
-        # Remove 'transcript::' and then split the line by ':' to extract the relevant parts
-        parts = line.strip().replace('transcript::', '').split(':')
-        chromosome = parts[0]
-        # Split the position part by '-' to get start and end positions
-        start, end = parts[1].split('-')
-        
-        # BED format requires the start position to be 0-based
-        # Convert the start position to 0-based by subtracting 1
-        start = str(int(start) - 1)
-        
-        # Write the chromosome, start, and end positions to the output file
-        # Separate each field with a tab character
-        outfile.write(f'{chromosome}\t{start}\t{end}\n')
-
-# After running this script, 'output.bed' will contain the converted data in BED format.
-```
-
-``` bash
-head ../output/05.33-lncRNA-discovery/Apul_lncRNA.bed 
-```
-
-    NC_058066.1 468617  469943
-    NC_058066.1 1135314 1144814
-    NC_058066.1 1144882 1148491
-    NC_058066.1 1153397 1165634
-    NC_058066.1 1153397 1165634
-    NC_058066.1 1153402 1165634
-    NC_058066.1 1153408 1165634
-    NC_058066.1 1154205 1155609
-    NC_058066.1 1155785 1165634
-    NC_058066.1 1222538 1225166
