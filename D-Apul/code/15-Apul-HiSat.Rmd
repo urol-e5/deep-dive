@@ -195,8 +195,7 @@ This simplified protocol has only 3 steps (depicted below) as it bypasses the in
 
 \
 
-The R package [**IsoformSwitchAnalyzeR**](https://bioconductor.org/packages/devel/bioc/html/IsoformSwitchAnalyzeR.html) can be used to assign gene names to transcripts assembled by StringTie, which can be particularly helpful in cases where StringTie could not perform this assignment unambigiously.
-\
+The R package [**IsoformSwitchAnalyzeR**](https://bioconductor.org/packages/devel/bioc/html/IsoformSwitchAnalyzeR.html) can be used to assign gene names to transcripts assembled by StringTie, which can be particularly helpful in cases where StringTie could not perform this assignment unambigiously.\
 The `importIsoformExpression() + importRdata()` function of the package can be used to import the expression and annotation data into R.
 During this import the package will attempt to clean up and recover isoform annotations where possible.
 From the resulting `switchAnalyzeRlist` object, *IsoformSwitchAnalyzeR* can detect isoform switches along with predicted functional consequences.
@@ -211,18 +210,18 @@ StringTie uses the sorted BAM files to assemble transcripts for each sample, out
 And then merges all individual GTF assemblies into a single merged GTF file.
 This step extracts transcript information and merges GTFs from all samples--an important step in creating a canonical list of across all samples included in the pipeline.
 
-|             |                                                                                                                                                                                                                                                                                                                                             |
-|-------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
++-------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | -b \<path\> | Just like -B this option enables the output of \*.ctab files for Ballgown, but these files will be created in the provided directory \<path\> instead of the directory specified by the -o option. Note: adding the -e option is recommended with the -B/-b options, unless novel transcripts are still wanted in the StringTie GTF output. |
++-------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
-+----+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| \  | this option directs StringTie to operate in [expression estimation mode](https://ccb.jhu.edu/software/stringtie/index.shtml?t=manual#emode); this limits the processing of read alignments to estimating the coverage of the transcripts given with the -G option (hence this option requires -G). |
-| -e |                                                                                                                                                                                                                                                                                                    |
-+----+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
++--------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| \      | this option directs StringTie to operate in [expression estimation mode](https://ccb.jhu.edu/software/stringtie/index.shtml?t=manual#emode); this limits the processing of read alignments to estimating the coverage of the transcripts given with the -G option (hence this option requires -G). |
+| -e     |                                                                                                                                                                                                                                                                                                    |
++--------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
-|                    |                                                                                                                                                                                                                                                                                                                                                                                              |
-|--------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
++--------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | -G \<ref_ann.gff\> | Use a [reference annotation file](https://ccb.jhu.edu/software/stringtie/index.shtml?t=manual#refann) (in [GTF or GFF3 format](https://ccb.jhu.edu/software/stringtie/gff.shtml)) to guide the assembly process. The output will include expressed reference transcripts as well as any novel transcripts that are assembled. This option is required by options -B, -b, -e, -C (see below). |
++--------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 ```{r, engine='bash'}
 find ../output/15-Apul-hisat/*sorted.bam \
@@ -235,8 +234,177 @@ find ../output/15-Apul-hisat/*sorted.bam \
 ../output/15-Apul-hisat/{}.sorted.bam
 ```
 
-```{r, engine='bash'}
+```{r, engine='bash', eval=TRUE}
 wc -l ../output/15-Apul-hisat/RNA*.gtf
 ls ../output/15-Apul-hisat/RNA*.gtf
 #head ../output/15-Apul-hisat/RNA*.gtf
 ```
+
+The R package [**IsoformSwitchAnalyzeR**](https://bioconductor.org/packages/devel/bioc/html/IsoformSwitchAnalyzeR.html) can be used to assign gene names to transcripts assembled by StringTie, which can be particularly helpful in cases where StringTie could not perform this assignment unambigiously.
+\
+The `importIsoformExpression() + importRdata()` function of the package can be used to import the expression and annotation data into R.
+During this import the package will attempt to clean up and recover isoform annotations where possible.
+From the resulting `switchAnalyzeRlist` object, *IsoformSwitchAnalyzeR* can detect isoform switches along with predicted functional consequences.
+The `extractGeneExpression()` function can be used to get a gene expression (read count) matrix for analysis with other tools.
+\
+More information and code examples can be found [here](https://bioconductor.org/packages/devel/bioc/vignettes/IsoformSwitchAnalyzeR/inst/doc/IsoformSwitchAnalyzeR.html#examples-visualizations).
+
+\-\--
+
+### **Using StringTie with DESeq2 and edgeR**
+
+\
+
+[DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html) and [edgeR](https://bioconductor.org/packages/release/bioc/html/edgeR.html) are two popular [Bioconductor](https://www.bioconductor.org/) packages for analyzing differential expression, which take as input a matrix of read counts mapped to particular genomic features (e.g., genes).
+We provide a Python script ([prepDE.py](https://ccb.jhu.edu/software/stringtie/dl/prepDE.py), or the Python 3 version: [prepDE.py3](https://ccb.jhu.edu/software/stringtie/dl/prepDE.py3) ) that can be used to extract this read count information directly from the files generated by StringTie (run with the -e parameter).
+
+*prepDE.py* derives hypothetical read counts for each transcript from the coverage values estimated by StringTie for each transcript, by using this simple formula: *reads_per_transcript = coverage \* transcript_len / read_len*
+
+There are two ways to provide input to the prepDE.py script:
+
+-   one option is to provide a path to a directory containing all sample sub-directories, with the same structure as the *ballgown*directory in the [StringTie protocol paper](http://www.nature.com/nprot/journal/v11/n9/full/nprot.2016.095.html) in preparation for Ballgown.
+    By default (no -i option), the script is going to look in the current directory for all sub-directories having .gtf files in them, as in this example:
+
+    ```         
+        ./sample1/sample1.gtf
+        ./sample2/sample2.gtf
+        ./sample3/sample3.gtf
+       
+    ```
+
+-   Alternatively, one can provide a text file listing sample IDs and their respective paths ([sample_lst.txt](https://ccb.jhu.edu/software/stringtie/dl/sample_lst.txt)).
+
+Usage: prepDE.py [options] \
+generates two CSV files containing the count matrices for genes and transcripts, using the coverage values found in the output of stringtie -e\
+
+Options:
+
+|                                       |                                                                                                                                   |
+|---------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
+|                                       |                                                                                                                                   |
+| -h, \--help                           | show this help message and exit                                                                                                   |
+| -i INPUT, \--input=INPUT, \--in=INPUT | a folder containing all sample sub-directories, or a text file with sample ID and path to its GTF file on each line [default: . ] |
+| -g G                                  | where to output the gene count matrix [default: gene_count_matrix.csv]                                                            |
+| -t T                                  | where to output the transcript count matrix [default: transcript_count_matrix.csv]                                                |
+| -l LENGTH, \--length=LENGTH           | the average read length [default: 75]                                                                                             |
+| -p PATTERN, \--pattern=PATTERN        | a regular expression that selects the sample subdirectories                                                                       |
+| -c, \--cluster                        | whether to cluster genes that overlap with different gene IDs, ignoring ones with geneID pattern (see below)                      |
+| -s STRING, \--string=STRING           | if a different prefix is used for geneIDs assigned by StringTie [default: MSTRG]                                                  |
+| -k KEY, \--key=KEY                    | if clustering, what prefix to use for geneIDs assigned by this script [default: prepG]                                            |
+| \--legend=LEGEND                      | if clustering, where to output the legend file mapping transcripts to assigned geneIDs [default: legend.csv]                      |
+
+\
+
+These count matrices (CSV files) can then be imported into R for use by DESeq2 and edgeR (using the *DESeqDataSetFromMatrix* and *DGEList* functions, respectively).
+
+##### **Protocol: Using StringTie with DESeq2**
+
+Given a list of GTFs, which were re-estimated upon merging, users can follow the below protocol to use DESeq2 for differential expression analysis.
+To generate GTFs from raw reads follow the [StringTie protocol paper](http://www.nature.com/nprot/journal/v11/n9/full/nprot.2016.095.html) (up to the Ballgown step).
+
+As described above, prepDE.py either accepts a .txt ([sample_lst.txt](https://ccb.jhu.edu/software/stringtie/dl/sample_lst.txt)) file listing the sample IDs and the GTFs' paths or by default expects a ballgown directory produced by StringTie run with the -B option.
+The following steps leads us through generating count matrices for genes and transcripts, importing this data into DESeq2, and conducting some basic analysis.
+
+1.  Generate count matrices using prepDE.py\
+
+    a.  Assuming default ballgown directory structure produced by StringTie \
+        \$ python prepDE.py
+
+    b.  List of GTFs sample IDs and paths ([sample_lst.txt](https://ccb.jhu.edu/software/stringtie/dl/sample_lst.txt))\
+        \$ python prepDE.py -i sample_lst.txt
+
+2.  [Install R](https://cran.r-project.org/) and DESeq2.
+    Upon installing R, install DESeq2 on R:\
+    `> source("https://bioconductor.org/biocLite.R")> biocLite("DESeq2")`
+
+3.  Import DESeq2 library in R\
+    `> library("DESeq2")`
+
+4.  Load gene(/transcript) count matrix and labels\
+    `> countData <- as.matrix(read.csv("gene_count_matrix.csv", row.names="gene_id"))> colData <- read.csv(PHENO_DATA, sep="\t", row.names=1)`\
+    Note: The PHENO_DATA file contains information on each sample, e.g., sex or population.
+    The exact way to import this depends on the format of the file.
+
+5.  Check all sample IDs in colData are also in CountData and match their orders\
+    `> all(rownames(colData) %in% colnames(countData))`[1] TRUE\
+    `> countData <- countData[, rownames(colData)]> all(rownames(colData) == colnames(countData))`[1] TRUE
+
+6.  Create a DESeqDataSet from count matrix and labels\
+    `> dds <- DESeqDataSetFromMatrix(countData = countData,         colData = colData, design = ~ CHOOSE_FEATURE)`
+
+7.  Run the default analysis for DESeq2 and generate results table\
+    `> dds <- DESeq(dds)> res <- results(dds)`
+
+8.  Sort by adjusted p-value and display\
+    `> (resOrdered <- res[order(res$padj), ])`
+
+
+---
+
+```{bash}
+python /home/shared/stringtie-2.2.1.Linux_x86_64/prepDE.py 
+```
+
+
+```{bash}
+python /home/shared/stringtie-2.2.1.Linux_x86_64/prepDE.py \
+-i ../data/list01.txt \
+-g ../output/15-Apul-hisat/gene_count_matrix.csv \
+-t ../output/15-Apul-hisat/transcript_count_matrix.csv
+```
+
+
+
+# DESeq
+
+```{r, eval=TRUE}
+library(DESeq2)
+```
+
+
+```{r, eval=TRUE}
+# Load gene(/transcript) count matrix and labels
+countData <- as.matrix(read.csv("../output/15-Apul-hisat/gene_count_matrix.csv", row.names="gene_id"))
+colData <- read.csv("../data/conditions.txt", sep="\t", row.names=1)
+
+# Note: The PHENO_DATA file contains information on each sample, e.g., sex or population.
+# The exact way to import this depends on the format of the file.
+
+# Check all sample IDs in colData are also in CountData and match their orders
+all(rownames(colData) %in% colnames(countData)) # This should return TRUE
+countData <- countData[, rownames(colData)]
+all(rownames(colData) == colnames(countData)) # This should also return TRUE
+
+# Create a DESeqDataSet from count matrix and labels
+dds <- DESeqDataSetFromMatrix(countData = countData,
+                              colData = colData, design = ~ Condition)
+
+# Run the default analysis for DESeq2 and generate results table
+dds <- DESeq(dds)
+deseq2.res <- results(dds)
+
+# Sort by adjusted p-value and display
+resOrdered <- deseq2.res[order(deseq2.res$padj), ]
+
+```
+
+
+
+```{r, eval=TRUE}
+vsd <- vst(dds, blind = FALSE)
+plotPCA(vsd, intgroup = "Condition")
+```
+```{r, eval=TRUE}
+tmp <- deseq2.res
+# The main plot
+plot(tmp$baseMean, tmp$log2FoldChange, pch=20, cex=0.45, ylim=c(-3, 3), log="x", col="darkgray",
+     main="DEG Dessication  (pval <= 0.05)",
+     xlab="mean of normalized counts",
+     ylab="Log2 Fold Change")
+# Getting the significant points and plotting them again so they're a different color
+tmp.sig <- deseq2.res[!is.na(deseq2.res$padj) & deseq2.res$padj <= 0.05, ]
+points(tmp.sig$baseMean, tmp.sig$log2FoldChange, pch=20, cex=0.45, col="red")
+# 2 FC lines
+abline(h=c(-1,1), col="blue")
+```
+
