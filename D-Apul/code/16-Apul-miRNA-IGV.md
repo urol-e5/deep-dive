@@ -12,9 +12,25 @@ Apul
 
 <https://gannet.fish.washington.edu/seashell/bu-github/deep-dive/D-Apul/data/GCF_013753865.1_Amil_v2.1_genomic.fna>
 
+Get stuff from NCBI
+
+<https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_013753865.1/>
+
+``` bash
+/home/shared/datasets download genome accession GCF_013753865.1 --include gff3,gtf,gbff
+```
+
+``` bash
+
+unzip ../data/ncbi_dataset.zip
+```
+
 # 2 short stack
 
 /seashell/bu-github/deep-dive/D-Apul/output/13.2.1-Apul-sRNAseq-ShortStack-31bp-fastp-merged-cnidarian_miRBase/ShortStack_out
+
+See:
+<https://gannet.fish.washington.edu/seashell/bu-github/deep-dive/D-Apul/output/13.2.1-Apul-sRNAseq-ShortStack-31bp-fastp-merged-cnidarian_miRBase/ShortStack_out/>
 
 ``` bash
 head ../output/13.2.1-Apul-sRNAseq-ShortStack-31bp-fastp-merged-cnidarian_miRBase/ShortStack_out/*
