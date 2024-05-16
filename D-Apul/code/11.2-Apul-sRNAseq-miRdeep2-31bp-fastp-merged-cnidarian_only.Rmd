@@ -144,9 +144,10 @@ head ${output_dir_top}/${concatenated_trimmed_reads_fasta}
 # Load bash variables into memory
 source .bashvars
 
-
-sed '/^>/ s/ /_/g' "${output_dir_top}/${concatenated_trimmed_reads_fasta}" \
-> "${output_dir_top}/${concatenated_trimmed_reads_fasta_no_spaces}"
+if [ ! -f "${output_dir_top}/${concatenated_trimmed_reads_fasta_no_spaces}" ]; then
+  sed '/^>/ s/ /_/g' "${output_dir_top}/${concatenated_trimmed_reads_fasta}" \
+  > "${output_dir_top}/${concatenated_trimmed_reads_fasta_no_spaces}"
+fi
 
 grep "^>" ${output_dir_top}/${concatenated_trimmed_reads_fasta} \
 | head
@@ -218,6 +219,10 @@ as their `perl5` installation.
 # Load bash variables into memory
 source .bashvars
 
+# Move to output directory
+# miRDeep2 puts output files in current working directory
+cd ${output_dir_top}
+
 # Append miRDeep2 to system PATH and set PERL5LIB
 export PATH=$PATH:/home/shared/mirdeep2/bin
 export PERL5LIB=$PERL5LIB:/home/shared/mirdeep2/lib/perl5
@@ -225,13 +230,13 @@ export PERL5LIB=$PERL5LIB:/home/shared/mirdeep2/lib/perl5
 # Run miRDeep2 mapping
 time \
 ${mirdeep2_mapper} \
-${output_dir_top}/${concatenated_trimmed_reads_fasta_no_spaces} \
+${concatenated_trimmed_reads_fasta_no_spaces} \
 -c \
 -m \
 -l 18 \
 -p ${genome_fasta_dir}/${genome_fasta_no_spaces%.*} \
--s ${output_dir_top}/${collapsed_reads_gt17bp_mirdeep2} \
--t ${output_dir_top}/${mirdeep2_mapping_file} \
+-s ${collapsed_reads_gt17bp_mirdeep2} \
+-t ${mirdeep2_mapping_file} \
 -o ${threads}
 ```
 
@@ -244,6 +249,7 @@ is always more accurate when at least a species is provided.
 The options provided to the command are as follows:
 
 - `none`: Known miRNAs of the species being analyzed.
+- `cnidarian_mirna_fasta_name`: Related species miRNAs.
 - `none`: Known miRNA precursors in this species.
 - `-P`: Specifies miRBase version > 18.
 - `-v`: Remove temporary files after completion.
@@ -258,23 +264,26 @@ excluding `randfold` analysis.
 # Load bash variables into memory
 source .bashvars
 
+# Move to output directory
+# miRDeep2 puts output files in current working directory
+cd ${output_dir_top}
+
 # Append miRDeep2 to system PATH and set PERL5LIB
 export PATH=$PATH:/home/shared/mirdeep2/bin
 export PERL5LIB=$PERL5LIB:/home/shared/mirdeep2/lib/perl5
 
 time \
 ${mirdeep2} \
-${output_dir_top}/${collapsed_reads_gt17bp_mirdeep2} \
+${collapsed_reads_gt17bp_mirdeep2} \
 ${genome_fasta_dir}/${genome_fasta_no_spaces} \
-${output_dir_top}/${mirdeep2_mapping_file} \
+${mirdeep2_mapping_file} \
 none \
-${deep_dive_data_dir}/${mirbase_mature_fasta_no_spaces} \
+${deep_dive_data_dir}/${cnidarian_mirna_fasta_name} \
 none \
--t S.purpuratus \
 -P \
 -v \
 -g -1 \
-2>${output_dir_top}/miRDeep2-S.purpuratus-report.log
+2>miRDeep2-report.log
 ```
 
 ## Check runtime
@@ -283,7 +292,7 @@ none \
 # Load bash variables into memory
 source .bashvars
 
-tail -n 6 ${output_dir_top}/miRDeep2-S.purpuratus-report.log
+tail -n 6 ${output_dir_top}/miRDeep2-report.log
 ```
 
 # Move output files to output directory
@@ -299,7 +308,7 @@ Output files will be in the format of `result_*` and `error_*`
 # Load bash variables into memory
 source .bashvars
 
-for file in result_* error_*
+for file in result_* error_* bowtie.log
 do
   mv "${file}" "${output_dir_top}/"
 done
