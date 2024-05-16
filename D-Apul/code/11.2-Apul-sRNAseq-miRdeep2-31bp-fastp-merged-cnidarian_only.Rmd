@@ -225,7 +225,7 @@ export PERL5LIB=$PERL5LIB:/home/shared/mirdeep2/lib/perl5
 # Run miRDeep2 mapping
 time \
 ${mirdeep2_mapper} \
-${output_dir_top}/${concatenated_trimmed_reads_fasta} \
+${output_dir_top}/${concatenated_trimmed_reads_fasta_no_spaces} \
 -c \
 -m \
 -l 18 \
@@ -244,7 +244,6 @@ is always more accurate when at least a species is provided.
 The options provided to the command are as follows:
 
 - `none`: Known miRNAs of the species being analyzed.
-- `-t S.pupuratus`: Related species.
 - `none`: Known miRNA precursors in this species.
 - `-P`: Specifies miRBase version > 18.
 - `-v`: Remove temporary files after completion.
