@@ -188,27 +188,6 @@ grep "^>" ${genome_fasta_dir}/${genome_fasta_no_spaces} \
 | head
 ```
 
-# Reformat cnidarian miRBase FastA description lines
-
-```{r remove-spaces-cnidarian-mirbase-FastA, eval=TRUE, engine='bash'}
-# Load bash variables into memory
-source .bashvars
-
-
-sed '/^>/ s/ /_/g' "${deep_dive_data_dir}/${mirbase_mature_fasta_name}" \
-| sed '/^>/ s/,//g' \
-> "${deep_dive_data_dir}/${mirbase_mature_fasta_no_spaces}"
-
-grep "^>" ${deep_dive_data_dir}/${mirbase_mature_fasta_name} \
-| head
-
-echo ""
-echo "--------------------------------------------------"
-echo ""
-
-grep "^>" ${deep_dive_data_dir}/${mirbase_mature_fasta_no_spaces} \
-| head
-```
 
 # Bowtie v1 genome index
 
@@ -219,7 +198,7 @@ miRDeep2 requires a Bowtie v1 genome index - cannot use Bowtie2 index
 source .bashvars
 
 # Check for existence of genome index first
-if [ ! -f "${genome_fasta_no_spaces%.*}.[0-9].ebwt" ]; then
+if [ ! -f "${genome_fasta_no_spaces%.*}.1.ebwt" ]; then
   ${bowtie_build} \
   ${genome_fasta_dir}/${genome_fasta_no_spaces} \
   ${genome_fasta_dir}/${genome_fasta_no_spaces%.*} \
