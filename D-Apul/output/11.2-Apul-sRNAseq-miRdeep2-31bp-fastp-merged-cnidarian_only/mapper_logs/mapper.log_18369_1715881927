@@ -1,0 +1,21 @@
+current dir:	/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/D-Apul/output/11.2-Apul-sRNAseq-miRdeep2-31bp-fastp-merged-cnidarian_only
+mapper command:	/home/shared/mirdeep2/bin/mapper.pl concatenated-trimmed-reads-all-no_spaces.fasta -c -m -l 18 -p /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/D-Apul/data/Amil/ncbi_dataset/data/GCF_013753865.1/GCF_013753865.1_Amil_v2.1_genomic-no_spaces -s collapsed_reads_gt17bp_mirdeep2.fasta -t Apul-mirdeep2-mapping.arf -o 40
+
+timestamp:	16_05_2024_t_10_52_07
+
+discarding short reads
+fastaparse.pl concatenated-trimmed-reads-all-no_spaces.fasta -a 18 > dir_mapper_seq_concatenated-trimmed-reads-all-no_spaces.fasta_4608838749_16_05_2024_t_10_52_07/reads_no_short.fa 2>dir_mapper_seq_concatenated-trimmed-reads-all-no_spaces.fasta_4608838749_16_05_2024_t_10_52_07/reads_too_short
+collapsing reads
+collapse_reads_md.pl dir_mapper_seq_concatenated-trimmed-reads-all-no_spaces.fasta_4608838749_16_05_2024_t_10_52_07/reads_no_short.fa seq > dir_mapper_seq_concatenated-trimmed-reads-all-no_spaces.fasta_4608838749_16_05_2024_t_10_52_07/reads_nr.fa
+mapping reads to genome index
+bowtie -p 40 -f -n 0 -e 80 -l 18 -a -m 5 --best --strata  /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/D-Apul/data/Amil/ncbi_dataset/data/GCF_013753865.1/GCF_013753865.1_Amil_v2.1_genomic-no_spaces  --al dir_mapper_seq_concatenated-trimmed-reads-all-no_spaces.fasta_4608838749_16_05_2024_t_10_52_07/concatenated-trimmed-reads-all-no_spaces.fasta_mapped --un dir_mapper_seq_concatenated-trimmed-reads-all-no_spaces.fasta_4608838749_16_05_2024_t_10_52_07/concatenated-trimmed-reads-all-no_spaces.fasta_not_mapped  dir_mapper_seq_concatenated-trimmed-reads-all-no_spaces.fasta_4608838749_16_05_2024_t_10_52_07/reads_nr.fa dir_mapper_seq_concatenated-trimmed-reads-all-no_spaces.fasta_4608838749_16_05_2024_t_10_52_07/mappings.bwt 2>bowtie.log
+
+convert_bowtie_output.pl dir_mapper_seq_concatenated-trimmed-reads-all-no_spaces.fasta_4608838749_16_05_2024_t_10_52_07/mappings.bwt > dir_mapper_seq_concatenated-trimmed-reads-all-no_spaces.fasta_4608838749_16_05_2024_t_10_52_07/mappings.arf
+trimming unmapped nts in the 3' ends
+parse_mappings.pl dir_mapper_seq_concatenated-trimmed-reads-all-no_spaces.fasta_4608838749_16_05_2024_t_10_52_07/mappings.arf -j > dir_mapper_seq_concatenated-trimmed-reads-all-no_spaces.fasta_4608838749_16_05_2024_t_10_52_07/mappings_trim.arf
+
+remove tmp dir
+rmtree(dir_mapper_seq_concatenated-trimmed-reads-all-no_spaces.fasta_4608838749_16_05_2024_t_10_52_07)
+
+############################################################
+
