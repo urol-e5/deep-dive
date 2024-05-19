@@ -5,6 +5,7 @@ Steven Roberts
 
 - <a href="#1-genome" id="toc-1-genome">1 Genome</a>
 - <a href="#2-short-stack" id="toc-2-short-stack">2 short stack</a>
+- <a href="#3-igv" id="toc-3-igv">3 IGV</a>
 
 Apul
 
@@ -130,3 +131,33 @@ grep -c ">" ../output/13.2.1-Apul-sRNAseq-ShortStack-31bp-fastp-merged-cnidarian
     ../output/13.2.1-Apul-sRNAseq-ShortStack-31bp-fastp-merged-cnidarian_miRBase/ShortStack_out/mir.fasta:114
     ../output/13.2.1-Apul-sRNAseq-ShortStack-31bp-fastp-merged-cnidarian_miRBase/ShortStack_out/Results.gff3:0
     ../output/13.2.1-Apul-sRNAseq-ShortStack-31bp-fastp-merged-cnidarian_miRBase/ShortStack_out/Results.txt:0
+
+# 3 IGV
+
+![igv](https://gannet.fish.washington.edu/seashell/snaps/IGV_2024-05-16_09-56-45.png)
+
+IGV session file:
+<https://raw.githubusercontent.com/urol-e5/deep-dive/main/D-Apul/code/16.1.ivg_session.xml>
+
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+    <Session genome="https://gannet.fish.washington.edu/seashell/bu-github/deep-dive/D-Apul/data/GCF_013753865.1_Amil_v2.1_genomic.fna" hasGeneTrack="false" hasSequenceTrack="true" locus="NC_058068.1:0-19500522" version="8">
+        <Resources>
+            <Resource path="https://raw.githubusercontent.com/urol-e5/deep-dive/main/D-Apul/output/05.33-lncRNA-discovery/Apul_lncRNA.bed" type="bed"/>
+            <Resource path="https://gannet.fish.washington.edu/seashell/bu-github/deep-dive/D-Apul/output/13.2.1-Apul-sRNAseq-ShortStack-31bp-fastp-merged-cnidarian_miRBase/ShortStack_out/Results.gff3" type="gff3"/>
+            <Resource path="http://gannet.fish.washington.edu/seashell/snaps/GCF_013753865.1_Amil_v2.1_genomic.gff" type="gff"/>
+            <Resource path="https://gannet.fish.washington.edu/seashell/bu-github/deep-dive/D-Apul/output/13.2.1-Apul-sRNAseq-ShortStack-31bp-fastp-merged-cnidarian_miRBase/ShortStack_out/known_miRNAs.gff3" type="gff3"/>
+        </Resources>
+        <Panel height="792" name="FeaturePanel" width="1752">
+            <Track attributeKey="Reference sequence" clazz="org.broad.igv.track.SequenceTrack" fontSize="10" id="Reference sequence" name="Reference sequence" sequenceTranslationStrandValue="POSITIVE" shouldShowTranslation="false" visible="true"/>
+            <Track attributeKey="GCF_013753865.1_Amil_v2.1_genomic.gff" clazz="org.broad.igv.track.FeatureTrack" displayMode="EXPANDED" fontSize="20" groupByStrand="false" height="100" id="http://gannet.fish.washington.edu/seashell/snaps/GCF_013753865.1_Amil_v2.1_genomic.gff" name="GCF_013753865.1_Amil_v2.1_genomic.gff" visible="true"/>
+            <Track attributeKey="Results.gff3" clazz="org.broad.igv.track.FeatureTrack" colorScale="ContinuousColorScale;0.0;69.0;255,255,255;0,0,178" displayMode="EXPANDED" fontSize="20" groupByStrand="false" id="https://gannet.fish.washington.edu/seashell/bu-github/deep-dive/D-Apul/output/13.2.1-Apul-sRNAseq-ShortStack-31bp-fastp-merged-cnidarian_miRBase/ShortStack_out/Results.gff3" name="Results.gff3" visible="true"/>
+            <Track attributeKey="known_miRNAs.gff3" clazz="org.broad.igv.track.FeatureTrack" fontSize="20" groupByStrand="false" id="https://gannet.fish.washington.edu/seashell/bu-github/deep-dive/D-Apul/output/13.2.1-Apul-sRNAseq-ShortStack-31bp-fastp-merged-cnidarian_miRBase/ShortStack_out/known_miRNAs.gff3" name="known_miRNAs.gff3" visible="true"/>
+            <Track attributeKey="Apul_lncRNA.bed" clazz="org.broad.igv.track.FeatureTrack" fontSize="20" groupByStrand="false" id="https://raw.githubusercontent.com/urol-e5/deep-dive/main/D-Apul/output/05.33-lncRNA-discovery/Apul_lncRNA.bed" name="Apul_lncRNA.bed" visible="true"/>
+        </Panel>
+        <PanelLayout dividerFractions="0.007471980074719801"/>
+        <HiddenAttributes>
+            <Attribute name="DATA FILE"/>
+            <Attribute name="DATA TYPE"/>
+            <Attribute name="NAME"/>
+        </HiddenAttributes>
+    </Session>
