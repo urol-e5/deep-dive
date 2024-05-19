@@ -3,6 +3,9 @@ title: "11.2-Apul-sRNAseq-miRdeep2-31bp-fastp-merged-cnidarian_only"
 author: "Sam White"
 date: "2024-05-16"
 output: 
+  github_document:
+    toc: true
+    number_sections: true
   bookdown::html_document2:
     theme: cosmo
     toc: true
@@ -10,9 +13,6 @@ output:
     number_sections: true
     code_folding: show
     code_download: true
-  github_document:
-    toc: true
-    number_sections: true
   html_document:
     theme: cosmo
     toc: true
@@ -36,7 +36,7 @@ Inputs:
 
 - [Cnidarian-only miRNA FastA](../../data/cnidarian_miRNAs.fasta)
 
-  - Cnidarian miRNA culled from literature by Jill Ashley.
+  - Cnidarian miRNA culled from literature by Jill Ashey.
 
 Outputs:
 
@@ -144,9 +144,10 @@ head ${output_dir_top}/${concatenated_trimmed_reads_fasta}
 # Load bash variables into memory
 source .bashvars
 
-
-sed '/^>/ s/ /_/g' "${output_dir_top}/${concatenated_trimmed_reads_fasta}" \
-> "${output_dir_top}/${concatenated_trimmed_reads_fasta_no_spaces}"
+if [ ! -f "${output_dir_top}/${concatenated_trimmed_reads_fasta_no_spaces}" ]; then
+  sed '/^>/ s/ /_/g' "${output_dir_top}/${concatenated_trimmed_reads_fasta}" \
+  > "${output_dir_top}/${concatenated_trimmed_reads_fasta_no_spaces}"
+fi
 
 grep "^>" ${output_dir_top}/${concatenated_trimmed_reads_fasta} \
 | head
@@ -218,6 +219,10 @@ as their `perl5` installation.
 # Load bash variables into memory
 source .bashvars
 
+# Move to output directory
+# miRDeep2 puts output files in current working directory
+cd ${output_dir_top}
+
 # Append miRDeep2 to system PATH and set PERL5LIB
 export PATH=$PATH:/home/shared/mirdeep2/bin
 export PERL5LIB=$PERL5LIB:/home/shared/mirdeep2/lib/perl5
@@ -225,13 +230,13 @@ export PERL5LIB=$PERL5LIB:/home/shared/mirdeep2/lib/perl5
 # Run miRDeep2 mapping
 time \
 ${mirdeep2_mapper} \
-${output_dir_top}/${concatenated_trimmed_reads_fasta_no_spaces} \
+${concatenated_trimmed_reads_fasta_no_spaces} \
 -c \
 -m \
 -l 18 \
 -p ${genome_fasta_dir}/${genome_fasta_no_spaces%.*} \
--s ${output_dir_top}/${collapsed_reads_gt17bp_mirdeep2} \
--t ${output_dir_top}/${mirdeep2_mapping_file} \
+-s ${collapsed_reads_gt17bp_mirdeep2} \
+-t ${mirdeep2_mapping_file} \
 -o ${threads}
 ```
 
@@ -244,6 +249,7 @@ is always more accurate when at least a species is provided.
 The options provided to the command are as follows:
 
 - `none`: Known miRNAs of the species being analyzed.
+- `cnidarian_mirna_fasta_name`: Related species miRNAs.
 - `none`: Known miRNA precursors in this species.
 - `-P`: Specifies miRBase version > 18.
 - `-v`: Remove temporary files after completion.
@@ -258,23 +264,26 @@ excluding `randfold` analysis.
 # Load bash variables into memory
 source .bashvars
 
+# Move to output directory
+# miRDeep2 puts output files in current working directory
+cd ${output_dir_top}
+
 # Append miRDeep2 to system PATH and set PERL5LIB
 export PATH=$PATH:/home/shared/mirdeep2/bin
 export PERL5LIB=$PERL5LIB:/home/shared/mirdeep2/lib/perl5
 
 time \
 ${mirdeep2} \
-${output_dir_top}/${collapsed_reads_gt17bp_mirdeep2} \
+${collapsed_reads_gt17bp_mirdeep2} \
 ${genome_fasta_dir}/${genome_fasta_no_spaces} \
-${output_dir_top}/${mirdeep2_mapping_file} \
+${mirdeep2_mapping_file} \
 none \
-${deep_dive_data_dir}/${mirbase_mature_fasta_no_spaces} \
+${deep_dive_data_dir}/${cnidarian_mirna_fasta_name} \
 none \
--t S.purpuratus \
 -P \
 -v \
 -g -1 \
-2>${output_dir_top}/miRDeep2-S.purpuratus-report.log
+2>miRDeep2-report.log
 ```
 
 ## Check runtime
@@ -283,86 +292,13 @@ none \
 # Load bash variables into memory
 source .bashvars
 
-tail -n 6 ${output_dir_top}/miRDeep2-S.purpuratus-report.log
+tail -n 6 ${output_dir_top}/miRDeep2-report.log
 ```
 
-# Move output files to output directory
-
-MiRDeep2 outputs all files to the current working directly with no way
-to redirect so want to move to intended output directory.
-
-## Move output files
-
-Output files will be in the format of `result_*` and `error_*`
-
-```{r move-mirdeep2-output-files, eval=FALSE, engine='bash'}
-# Load bash variables into memory
-source .bashvars
-
-for file in result_* error_*
-do
-  mv "${file}" "${output_dir_top}/"
-done
-```
-
-## Identify directories
-
-```{r identify-mirdeep2-output-dirs, eval=TRUE, engine='bash'}
-# Load bash variables into memory
-source .bashvars
-
-ls -l | grep "^d"
-```
-
-## Rsync directories
-
-```{r rsync-mirdeep2-output-files, eval=FALSE, engine='bash'}
-# Load bash variables into memory
-source .bashvars
-
-rsync -aP . --include='dir***' --exclude='*' --quiet "${output_dir_top}/"
-
-rsync -aP . --include='map***' --exclude='*' --quiet "${output_dir_top}/"
-
-rsync -aP . --exclude='mirgene*' --include='mir***' --exclude='*' --quiet "${output_dir_top}/"
-
-rsync -aP . --include='pdfs***' --exclude='*' --quiet "${output_dir_top}/"
-
-echo ""
-echo "Check new location:"
-echo ""
-
-ls -l "${output_dir_top}/" | grep "^d"
-
-
-```
-
-## Confirm deletion patterns work *before* deletion!
-
-FYI - `eval=FALSE` is set because the following command will only work
-once...
-
-```{r test-deletion-patterns, eval=FALSE, engine='bash'}
-ls --directory dir_* mapper_logs mirdeep_runs mirna_results* pdfs_*
-```
-
-## Remove directories from code directory
-
-```{r remove-mirdeep2-output-dirs, eval=FALSE, engine='bash'}
-# Load bash variables into memory
-source .bashvars
-
-rm -rf dir_* mapper_logs mirdeep_runs mirna_results* pdfs_*
-
-```
-
-## Check to make sure they're gone
-
-```{r check-deletion-success, eval=TRUE, engine='bash', error=TRUE}
-ls --directory dir_* mapper_logs mirdeep_runs mirna_results* pdfs_*
-```
 
 # Results
+
+REMEMBER - You'll need to set the name of your results file before running the chunks below.
 
 ## Peep output file format
 
@@ -375,7 +311,7 @@ format.
 source .bashvars
 
 
-head -n 30 "${output_dir_top}/result_03_04_2024_t_13_00_39.csv"
+head -n 30 "${output_dir_top}/result_16_05_2024_t_11_15_00.csv"
 ```
 
 ## Create more easily parasable results file
@@ -388,10 +324,10 @@ the end of the file (represented by the `$p`. `$` = end, `p` = print)
 source .bashvars
 
 
-sed --quiet '/provisional id/,$p' "${output_dir_top}/result_03_04_2024_t_13_00_39.csv" \
-> "${output_dir_top}/parsable-result_03_04_2024_t_13_00_39.csv"
+sed --quiet '/provisional id/,$p' "${output_dir_top}/result_16_05_2024_t_11_15_00.csv" \
+> "${output_dir_top}/parsable-result_16_05_2024_t_11_15_00.csv"
 
-head "${output_dir_top}/parsable-result_03_04_2024_t_13_00_39.csv"
+head "${output_dir_top}/parsable-result_16_05_2024_t_11_15_00.csv"
 ```
 
 ## Read in output CSV
@@ -401,7 +337,7 @@ columns.
 
 ```{r read-in-result-csv, eval=TRUE}
 
-mirdeep_result.df <- read.csv("../output/11.1-Apul-sRNAseq-miRdeep2-31bp-fastp-merged/parsable-result_03_04_2024_t_13_00_39.csv",
+mirdeep_result.df <- read.csv("../output/11.2-Apul-sRNAseq-miRdeep2-31bp-fastp-merged-cnidarian_only/parsable-result_16_05_2024_t_11_15_00.csv",
                               header = TRUE,
                               sep = "\t")
 
@@ -421,7 +357,7 @@ families, etc.
 source .bashvars
 
 # Total predicted miRNAS
-total_miRNAs=$(awk 'NR > 1' ${output_dir_top}/parsable-result_03_04_2024_t_13_00_39.csv \
+total_miRNAs=$(awk 'NR > 1' ${output_dir_top}/parsable-result_16_05_2024_t_11_15_00.csv \
 | wc -l
 )
 
@@ -429,7 +365,7 @@ echo "Total of predicted miRNAs: ${total_miRNAs}"
 echo ""
 
 # Matches to known mature miRNAs
-mature_miRNAs=$(awk -F'\t' '$11 != "-" && $11 != "" {print $11}' ${output_dir_top}/parsable-result_03_04_2024_t_13_00_39.csv \
+mature_miRNAs=$(awk -F'\t' '$11 != "-" && $11 != "" {print $11}' ${output_dir_top}/parsable-result_16_05_2024_t_11_15_00.csv \
 | wc -l
 )
 
@@ -437,7 +373,7 @@ echo "Number of seed matches to known miRNAS: ${mature_miRNAs}"
 echo ""
 
 # Novel miRNAs
-novel_miRNAs=$(awk -F "\t" '$11 == "-" || $11 == "" {print $11}' ${output_dir_top}/parsable-result_03_04_2024_t_13_00_39.csv \
+novel_miRNAs=$(awk -F "\t" '$11 == "-" || $11 == "" {print $11}' ${output_dir_top}/parsable-result_16_05_2024_t_11_15_00.csv \
 | awk 'NR > 1' \
 | wc -l
 )
