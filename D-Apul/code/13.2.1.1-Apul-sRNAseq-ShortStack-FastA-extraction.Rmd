@@ -54,7 +54,7 @@ echo "# Trimmed FastQ naming pattern"
 
 echo "# Data directories"
 echo 'export deep_dive_dir=/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive'
-echo 'export shortstack_dir="${deep_dive_dir}/13.2.1-Apul-sRNAseq-ShortStack-31bp-fastp-merged-cnidarian_miRBase/ShortStack_out"'
+echo 'export shortstack_dir="${deep_dive_dir}/D-Apul/output/13.2.1-Apul-sRNAseq-ShortStack-31bp-fastp-merged-cnidarian_miRBase/ShortStack_out"'
 echo 'export output_dir_top=${deep_dive_dir}/D-Apul/output/13.2.1.1-Apul-sRNAseq-ShortStack-FastA-extraction'
 echo ""
 
@@ -63,6 +63,7 @@ echo 'export output_fasta="mature-miRBase-matches.fasta"'
 echo 'export shortstack_fasta="mir.fasta"'
 echo 'export shortstack_fast_index="mir.fasta.fai"'
 echo 'export shortstack_results_file="Results.txt"'
+echo 'export regions="mature-miRBase-regions.txt"'
 
 echo ""
 
@@ -79,3 +80,45 @@ echo 'export samtools=/home/shared/samtools-1.12/samtools'
 cat .bashvars
 ```
 
+# Examine `Results.txt`
+
+## Head
+```{r head-results.txt, engine='bash', eval=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+head "${shortstack_dir}/${shortstack_results_file}" | column -t
+```
+
+## Columns of interest
+
+Column 1: Region of miRNA match
+
+Column 20: ShortStack miRNA? Y/N
+
+Column 21: Match to miRBase? NA or miRBase match
+
+```{r cols-of-interest, engine='bash', eval=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+awk '{print $1"\t"$20"\t"$21}' "${shortstack_dir}/${shortstack_results_file}" | head | column -t
+```
+
+## miRNAs of interest
+```{r miRNAs-of-interest, engine='bash', eval=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+awk '$20 == "Y" && $21 != "NA" {print $1"\t"$20"\t"$21}' "${shortstack_dir}/${shortstack_results_file}" | head | column -t
+```
+
+# Examine ShortStack miRNA FastA
+
+## Head FastA
+```{r examine-results.txt, engine='bash', eval=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+awk '$20 == "Y" && $21 != "NA" {print $1"\t"$20"\t"$21}' "${shortstack_dir}/${shortstack_results_file}" | head | column -t
+```
