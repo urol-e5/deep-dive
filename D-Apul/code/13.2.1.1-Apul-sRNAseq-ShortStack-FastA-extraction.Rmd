@@ -141,24 +141,27 @@ grep "^>" "${shortstack_dir}/${shortstack_fasta}" | head
 source .bashvars
 
 awk '
-# Function to increment the starting coordinate by 1
-function increment_start(start) {
-    return start + 1
-}
-
-# Process description lines starting with ">"
 /^>/ {
-    # Split the line into the main parts based on "::" delimiter
+    # Split the line into main parts based on "::" delimiter
     split($0, main_parts, "::")
     
-    # Split the coordinate part by colon and dash to separate out the start and end coordinates
-    split(main_parts[2], coord_parts, "[:-]")
+    # Extract the coordinate part and strand information separately
+    coordinates_strand = main_parts[2]
+    split(coordinates_strand, coord_parts, "[:-]")
+    
+    # Determine if the strand information is present and extract it
+    strand = ""
+    if (substr(coordinates_strand, length(coordinates_strand)) ~ /[\(\)\-\+]/) {
+        strand = substr(coordinates_strand, length(coordinates_strand) - 1)
+        coordinates_strand = substr(coordinates_strand, 1, length(coordinates_strand) - 2)
+        split(coordinates_strand, coord_parts, "[:-]")
+    }
     
     # Increment the starting coordinate by 1
-    new_start = increment_start(coord_parts[2])
+    new_start = coord_parts[2] + 1
     
     # Reconstruct the description line with the new starting coordinate
-    new_description = main_parts[1] "::" coord_parts[1] ":" new_start "-" coord_parts[3] coord_parts[4]
+    new_description = main_parts[1] "::" coord_parts[1] ":" new_start "-" coord_parts[3] strand
     
     # Print the modified description line
     print new_description
@@ -189,12 +192,10 @@ diff "${shortstack_dir}/${shortstack_fasta}" \
 # Load bash variables into memory
 source .bashvars
 
-# If FastA index doesn't exist, create it
-if [ ! -f "${shortstack_dir}/${shortstack_fasta_index}" ]; then
-  "${samtools} faidx" "${shortstack_dir}/${shortstack_fixed_fasta}"
-fi
+${samtools} faidx "${shortstack_dir}/${shortstack_fixed_fasta}"
 
-head "${shortstack_dir}/${shortstack_fixed_fasta}"
+
+head "${shortstack_dir}/${shortstack_fixed_fasta_index}"
 ```
 
 ## Construct regions of miRBase matches for FastA index
@@ -207,7 +208,11 @@ source .bashvars
 # Make output directory, if it doesn't exist
 mkdir --parents "${output_dir_top}"
 
-awk '$20 == "Y" && $21 != "NA" {print $2 ".mature" "::" $1 "(" $10 ")" }' "${shortstack_dir}/${shortstack_results_file}" \
+{
+   awk '$20 == "Y" && $21 != "NA" {print $2}' "${shortstack_dir}/${shortstack_results_file}" \
+   | grep --fixed-strings --file - "${shortstack_dir}/${shortstack_fixed_fasta_index}" \
+   | awk '{print $1}'
+} \
 > "${output_dir_top}/${regions}"
 
 head "${output_dir_top}/${regions}"
@@ -222,8 +227,16 @@ head "${output_dir_top}/${regions}"
 # Load bash variables into memory
 source .bashvars
 
-"${output_dir_top}/${regions}"
+${samtools} faidx "${shortstack_dir}/${shortstack_fixed_fasta}" \
+--region-file "${output_dir_top}/${regions}" \
+> "${output_dir_top}/${output_fasta}"
 
-head "${output_dir_top}/${regions}"
+head "${output_dir_top}/${output_fasta}"
+
+echo ""
+echo ""
+echo ""
+echo "Number of FastA sequences:"
+grep "^>" --count "${output_dir_top}/${output_fasta}"
 
 ```
