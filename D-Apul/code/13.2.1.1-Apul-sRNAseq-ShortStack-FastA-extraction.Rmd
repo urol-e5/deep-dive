@@ -61,7 +61,7 @@ echo ""
 echo "# Input/Output files"
 echo 'export output_fasta="mature-miRBase-matches.fasta"'
 echo 'export shortstack_fasta="mir.fasta"'
-echo 'export shortstack_fast_index="mir.fasta.fai"'
+echo 'export shortstack_fasta_index="mir.fasta.fai"'
 echo 'export shortstack_results_file="Results.txt"'
 echo 'export regions="mature-miRBase-regions.txt"'
 
@@ -111,14 +111,55 @@ awk '{print $1"\t"$20"\t"$21}' "${shortstack_dir}/${shortstack_results_file}" | 
 source .bashvars
 
 awk '$20 == "Y" && $21 != "NA" {print $1"\t"$20"\t"$21}' "${shortstack_dir}/${shortstack_results_file}" | head | column -t
+
+echo ""
+echo "------------------------------------------"
+echo ""
+echo "Number of miRNAs matching miRBase:"
+
+awk '$20 == "Y" && $21 != "NA" {print $1"\t"$20"\t"$21}' "${shortstack_dir}/${shortstack_results_file}" | wc -l 
 ```
 
 # Examine ShortStack miRNA FastA
 
 ## Head FastA
-```{r examine-results.txt, engine='bash', eval=TRUE}
+
+```{r head-FastA, engine='bash', eval=TRUE}
 # Load bash variables into memory
 source .bashvars
 
-awk '$20 == "Y" && $21 != "NA" {print $1"\t"$20"\t"$21}' "${shortstack_dir}/${shortstack_results_file}" | head | column -t
+grep "^>" "${shortstack_dir}/${shortstack_fasta}" | head
+```
+
+# Create regions file for use with `samtools`
+
+## Make FastA index
+
+```{r FastA-index, engine='bash', eval=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+# If FastA index doesn't exist, create it
+if [ ! -f "${shortstack_dir}/${shortstack_fasta_index}" ]; then
+  "${samtools} faidx" "${shortstack_dir}/${shortstack_fasta}"
+fi
+
+head "${shortstack_dir}/${shortstack_fasta_index}"
+```
+
+## Construct miRBase matches for FastA index
+
+
+```{r FastA-index, engine='bash', eval=TRUE}
+# Load bash variables into memory
+source .bashvars
+
+# Make output directory, if it doesn't exist
+mkdir --parents "${output_dir_top}"
+
+awk '$20 == "Y" && $21 != "NA" {print $2".mature""::"$1"("$10")"}' "${shortstack_dir}/${shortstack_results_file}" \
+> "${output_dir_top}/${regions}"
+
+head "${output_dir_top}/${regions}"
+
 ```
