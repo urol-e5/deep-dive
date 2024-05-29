@@ -32,6 +32,7 @@ library(kableExtra)
 library(DT)
 library(Biostrings)
 library(tm)
+library(ggvenn)
 knitr::opts_chunk$set(
   echo = TRUE,         # Display code chunks
   eval = TRUE,         # Evaluate code chunks
@@ -291,3 +292,92 @@ head(present_in_peve_pmea, nrow(present_in_peve_pmea))
 # Count the number of miRNAs conserved across the two species
 paste("Number of miRNAs conserved in Peve and Pmea:", nrow(distinct(present_in_peve_pmea, sseqid)))
 ```
+
+
+# Visualize
+
+## Data munging of the results
+
+```{r, engine='bash'}
+cd ../data/10-shortRNA-ShortStack-comparison
+grep "^>"  merged_all_ShortStack_mature.fasta | sed 's/^>//' > merged_all_ShortStack_mature_IDs.txt
+
+head -5 merged_all_ShortStack_mature_IDs.txt
+```
+```{r}
+# Read in and separate the ids of all miRNAs from the three species
+merged_IDs <- readLines("../data/10-shortRNA-ShortStack-comparison/merged_all_ShortStack_mature_IDs.txt")
+
+apul_IDs <- merged_IDs[grep("mature::N", merged_IDs)]
+peve_IDs <- merged_IDs[grep("Porites_evermani", merged_IDs)]
+pmea_IDs <- merged_IDs[grep("Pocillopora_meandrina", merged_IDs)]
+length(apul_IDs)
+length(peve_IDs)
+length(pmea_IDs)
+```
+
+```{r}
+# Assign shared miRNA IDs to conserved miRNAs
+
+# Function to append IDs of matching miRNAs to the original query miRNA
+append_IDs <- function(IDs_list, df) {
+  appended_IDs_list <- vector("list", length(IDs_list))
+  for (i in seq_along(IDs_list)) {
+    matching_entries <- df$qseqid[df$sseqid == IDs_list[i]]
+    if (length(matching_entries) > 0) {
+      appended_IDs_list[[i]] <- paste(IDs_list[i], paste(matching_entries, collapse = "|"), sep = "|")
+    } else {
+      appended_IDs_list[[i]] <- IDs_list[i]
+    }
+  }
+  return(appended_IDs_list)
+}
+
+# Apply the function to each set of conserved miRNAs
+appendedIDs_apul_peve_pmea <- append_IDs(unique(present_in_all$sseqid), present_in_all)
+
+appendedIDs_apul_peve <- append_IDs(unique(present_in_apul_peve$sseqid), present_in_apul_peve)
+appendedIDs_apul_pmea <- append_IDs(unique(present_in_apul_pmea$sseqid), present_in_apul_pmea)
+appendedIDs_peve_pmea <- append_IDs(unique(present_in_peve_pmea$sseqid), present_in_peve_pmea)
+
+print(appendedIDs_apul_peve_pmea[1])
+print(appendedIDs_apul_peve)
+print(appendedIDs_apul_pmea)
+print(appendedIDs_peve_pmea)
+
+# combine the new appended IDs into a single list of conserved miRNAs
+conserved_miRNAs_all_IDs <- c(appendedIDs_apul_peve_pmea, appendedIDs_apul_peve, appendedIDs_apul_pmea, appendedIDs_peve_pmea)
+```
+
+```{r}
+# For each species list of miRNA IDs, replace species-specific IDs of conserved miRNAs with our newly generated appended IDs. This will created lists of miRNA IDs that have shared IDs for the conserved mRNAs
+replace_entries <- function(spec_list, new_conserved_IDs) {
+  # Iterate over each entry in spec_list
+  for (i in seq_along(spec_list)) {
+    # Check if the current entry in spec_list exists in any entry in new_conserved_IDs
+    matching_entry <- new_conserved_IDs[grep(spec_list[i], new_conserved_IDs, fixed = TRUE)]
+    # If a match is found, replace the entry in spec_list with the matching entry from new_conserved_IDs
+    if (length(matching_entry) > 0) {
+      spec_list[i] <- matching_entry[[1]]  # Replace with the first element of matching_entry
+    }
+  }
+  return(spec_list)  # Return the modified spec_list
+}
+
+apul_mature_newconservedID <- replace_entries(apul_IDs, conserved_miRNAs_all_IDs)
+peve_mature_newconservedID <- replace_entries(peve_IDs, conserved_miRNAs_all_IDs)
+pmea_mature_newconservedID <- replace_entries(pmea_IDs, conserved_miRNAs_all_IDs)
+```
+
+
+## Venn diagram
+
+```{r}
+a <- list("A.pulchra" = apul_mature_newconservedID, 
+          "P.evermanni" = peve_mature_newconservedID,
+          "P.meandrina" = pmea_mature_newconservedID)
+
+ggvenn(a)
+```
+
+

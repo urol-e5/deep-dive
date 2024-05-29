@@ -31,6 +31,11 @@ Kathleen Durkin
       Pmea</a>
     - <a href="#323-peve-and-pmea" id="toc-323-peve-and-pmea">3.2.3 Peve and
       Pmea</a>
+- <a href="#4-visualize" id="toc-4-visualize">4 Visualize</a>
+  - <a href="#41-data-munging-of-the-results"
+    id="toc-41-data-munging-of-the-results">4.1 Data munging of the
+    results</a>
+  - <a href="#42-venn-diagram" id="toc-42-venn-diagram">4.2 Venn diagram</a>
 
 I want to find miRNAs that are conserved among either a subset of or all
 three species of interest (*A.pulchra*, *P.evermanni*, and
@@ -108,14 +113,14 @@ Apul
 -out ../output/10-shortRNA-ShortStack-comparison/blasts/Apul-db/Apul_ShortStack_mature
 ```
 
-    Building a new DB, current time: 05/29/2024 12:34:56
+    Building a new DB, current time: 05/29/2024 13:43:05
     New DB name:   /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Apul-db/Apul_ShortStack_mature
     New DB title:  ../data/10-shortRNA-ShortStack-comparison/Apul_ShortStack_mature.fasta
     Sequence type: Nucleotide
     Deleted existing Nucleotide BLAST database named /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Apul-db/Apul_ShortStack_mature
     Keep MBits: T
     Maximum file size: 1000000000B
-    Adding sequences from FASTA; added 38 sequences in 0.00743389 seconds.
+    Adding sequences from FASTA; added 38 sequences in 0.00246096 seconds.
 
 Peve
 
@@ -126,14 +131,14 @@ Peve
 -out ../output/10-shortRNA-ShortStack-comparison/blasts/Peve-db/Peve_ShortStack_mature
 ```
 
-    Building a new DB, current time: 05/29/2024 12:34:57
+    Building a new DB, current time: 05/29/2024 13:43:06
     New DB name:   /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Peve-db/Peve_ShortStack_mature
     New DB title:  ../data/10-shortRNA-ShortStack-comparison/Peve_ShortStack_mature.fasta
     Sequence type: Nucleotide
     Deleted existing Nucleotide BLAST database named /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Peve-db/Peve_ShortStack_mature
     Keep MBits: T
     Maximum file size: 1000000000B
-    Adding sequences from FASTA; added 46 sequences in 0.00186086 seconds.
+    Adding sequences from FASTA; added 46 sequences in 0.00227714 seconds.
 
 Pmea
 
@@ -144,14 +149,14 @@ Pmea
 -out ../output/10-shortRNA-ShortStack-comparison/blasts/Pmea-db/Pmea_ShortStack_mature
 ```
 
-    Building a new DB, current time: 05/29/2024 12:34:58
+    Building a new DB, current time: 05/29/2024 13:43:07
     New DB name:   /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Pmea-db/Pmea_ShortStack_mature
     New DB title:  ../data/10-shortRNA-ShortStack-comparison/Pmea_ShortStack_mature.fasta
     Sequence type: Nucleotide
     Deleted existing Nucleotide BLAST database named /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Pmea-db/Pmea_ShortStack_mature
     Keep MBits: T
     Maximum file size: 1000000000B
-    Adding sequences from FASTA; added 36 sequences in 0.00192285 seconds.
+    Adding sequences from FASTA; added 36 sequences in 0.00243187 seconds.
 
 ### 1.3.2 Run Blastn
 
@@ -434,3 +439,132 @@ paste("Number of miRNAs conserved in Peve and Pmea:", nrow(distinct(present_in_p
 ```
 
     [1] "Number of miRNAs conserved in Peve and Pmea: 1"
+
+# 4 Visualize
+
+## 4.1 Data munging of the results
+
+``` bash
+cd ../data/10-shortRNA-ShortStack-comparison
+grep "^>"  merged_all_ShortStack_mature.fasta | sed 's/^>//' > merged_all_ShortStack_mature_IDs.txt
+
+head -5 merged_all_ShortStack_mature_IDs.txt
+```
+
+    Cluster_316.mature::NC_058066.1:12757146-12757168(-)
+    Cluster_514.mature::NC_058066.1:20088678-20088700(+)
+    Cluster_548.mature::NC_058066.1:20346248-20346271(-)
+    Cluster_1506.mature::NC_058067.1:5656213-5656236(-)
+    Cluster_1900.mature::NC_058067.1:16118269-16118291(-)
+
+``` r
+# Read in and separate the ids of all miRNAs from the three species
+merged_IDs <- readLines("../data/10-shortRNA-ShortStack-comparison/merged_all_ShortStack_mature_IDs.txt")
+
+apul_IDs <- merged_IDs[grep("mature::N", merged_IDs)]
+peve_IDs <- merged_IDs[grep("Porites_evermani", merged_IDs)]
+pmea_IDs <- merged_IDs[grep("Pocillopora_meandrina", merged_IDs)]
+length(apul_IDs)
+```
+
+    [1] 38
+
+``` r
+length(peve_IDs)
+```
+
+    [1] 46
+
+``` r
+length(pmea_IDs)
+```
+
+    [1] 36
+
+``` r
+# Assign shared miRNA IDs to conserved miRNAs
+
+# Function to append IDs of matching miRNAs to the original query miRNA
+append_IDs <- function(IDs_list, df) {
+  appended_IDs_list <- vector("list", length(IDs_list))
+  for (i in seq_along(IDs_list)) {
+    matching_entries <- df$qseqid[df$sseqid == IDs_list[i]]
+    if (length(matching_entries) > 0) {
+      appended_IDs_list[[i]] <- paste(IDs_list[i], paste(matching_entries, collapse = "|"), sep = "|")
+    } else {
+      appended_IDs_list[[i]] <- IDs_list[i]
+    }
+  }
+  return(appended_IDs_list)
+}
+
+# Apply the function to each set of conserved miRNAs
+appendedIDs_apul_peve_pmea <- append_IDs(unique(present_in_all$sseqid), present_in_all)
+
+appendedIDs_apul_peve <- append_IDs(unique(present_in_apul_peve$sseqid), present_in_apul_peve)
+appendedIDs_apul_pmea <- append_IDs(unique(present_in_apul_pmea$sseqid), present_in_apul_pmea)
+appendedIDs_peve_pmea <- append_IDs(unique(present_in_peve_pmea$sseqid), present_in_peve_pmea)
+
+print(appendedIDs_apul_peve_pmea[1])
+```
+
+    [[1]]
+    [1] "Cluster_6977.mature::NC_058073.1:12437102-12437124(+)|Cluster_1153.mature::Porites_evermani_scaffold_49:151639-151661(-)|Cluster_1292.mature::Pocillopora_meandrina_HIv1___Sc0000003:10366054-10366076(+)"
+
+``` r
+print(appendedIDs_apul_peve)
+```
+
+    [[1]]
+    [1] "Cluster_7077.mature::NC_058074.1:2966522-2966545(+)|Cluster_6211.mature::Porites_evermani_scaffold_502:58996-59018(-)"
+
+``` r
+print(appendedIDs_apul_pmea)
+```
+
+    [[1]]
+    [1] "Cluster_514.mature::NC_058066.1:20088678-20088700(+)|Cluster_1066.mature::Pocillopora_meandrina_HIv1___Sc0000002:15749309-15749331(+)"
+
+``` r
+print(appendedIDs_peve_pmea)
+```
+
+    [[1]]
+    [1] "Cluster_786.mature::Porites_evermani_scaffold_26:382571-382593(-)|Cluster_4459.mature::Pocillopora_meandrina_HIv1___Sc0000016:7555691-7555713(+)"
+
+``` r
+# combine the new appended IDs into a single list of conserved miRNAs
+conserved_miRNAs_all_IDs <- c(appendedIDs_apul_peve_pmea, appendedIDs_apul_peve, appendedIDs_apul_pmea, appendedIDs_peve_pmea)
+```
+
+``` r
+# For each species list of miRNA IDs, replace species-specific IDs of conserved miRNAs with our newly generated appended IDs. This will created lists of miRNA IDs that have shared IDs for the conserved mRNAs
+replace_entries <- function(spec_list, new_conserved_IDs) {
+  # Iterate over each entry in spec_list
+  for (i in seq_along(spec_list)) {
+    # Check if the current entry in spec_list exists in any entry in new_conserved_IDs
+    matching_entry <- new_conserved_IDs[grep(spec_list[i], new_conserved_IDs, fixed = TRUE)]
+    # If a match is found, replace the entry in spec_list with the matching entry from new_conserved_IDs
+    if (length(matching_entry) > 0) {
+      spec_list[i] <- matching_entry[[1]]  # Replace with the first element of matching_entry
+    }
+  }
+  return(spec_list)  # Return the modified spec_list
+}
+
+apul_mature_newconservedID <- replace_entries(apul_IDs, conserved_miRNAs_all_IDs)
+peve_mature_newconservedID <- replace_entries(peve_IDs, conserved_miRNAs_all_IDs)
+pmea_mature_newconservedID <- replace_entries(pmea_IDs, conserved_miRNAs_all_IDs)
+```
+
+## 4.2 Venn diagram
+
+``` r
+a <- list("A.pulchra" = apul_mature_newconservedID, 
+          "P.evermanni" = peve_mature_newconservedID,
+          "P.meandrina" = pmea_mature_newconservedID)
+
+ggvenn(a)
+```
+
+<img src="10-shortRNA-ShortStack-comparison_files/figure-gfm/unnamed-chunk-19-1.png" style="display: block; margin: auto;" />
