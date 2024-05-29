@@ -1,0 +1,293 @@
+---
+title: "10-shortRNA-ShortStack-comparison"
+author: "Kathleen Durkin"
+date: "2024-05-28"
+output: 
+  bookdown::html_document2:
+    theme: cosmo
+    toc: true
+    toc_float: true
+    number_sections: true
+    code_folding: show
+    code_download: true
+  github_document:
+    toc: true
+    number_sections: true
+  html_document:
+    theme: cosmo
+    toc: true
+    toc_float: true
+    number_sections: true
+    code_folding: show
+    code_download: true
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(tidyverse)
+library(kableExtra)
+library(DT)
+library(Biostrings)
+library(tm)
+knitr::opts_chunk$set(
+  echo = TRUE,         # Display code chunks
+  eval = TRUE,         # Evaluate code chunks
+  warning = FALSE,     # Hide warnings
+  message = FALSE,     # Hide messages
+  fig.width = 6,       # Set plot width in inches
+  fig.height = 4,      # Set plot height in inches
+  fig.align = "center", # Align plots to the center
+  comment = ""         # Prevents appending '##' to beginning of lines in code output
+)
+```
+
+I want to find miRNAs that are conserved among either a subset of or all three species of interest (*A.pulchra*, *P.evermanni*, and *P.meandrina*) using Blastn. 
+
+# Prep data
+
+## Isolate mature miRNA sequences
+
+Our ShortStack output contains sequences for the mature, star, and precursor sequences for each identified miRNA. We just want to look at the mature miRNA sequences right now, so let's isolate those.
+
+```{r, engine='bash'}
+cd ../data/10-shortRNA-ShortStack-comparison
+
+# Copy all sequences whose headers contain "mature"
+awk '/^>/ {p = /mature/} p' ../../../D-Apul/output/13.2.1-Apul-sRNAseq-ShortStack-31bp-fastp-merged-cnidarian_miRBase/ShortStack_out/mir.fasta > Apul_ShortStack_mature.fasta
+
+awk '/^>/ {p = /mature/} p' ../../../E-Peve/output/08.2-Peve-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/mir.fasta > Peve_ShortStack_mature.fasta
+
+awk '/^>/ {p = /mature/} p' ../../../F-Pmea/output/13.2.1-Pmea-sRNAseq-ShortStack-31bp-fastp-merged-cnidarian_miRBase/ShortStack_out/mir.fasta > Pmea_ShortStack_mature.fasta
+
+grep "^>" Apul_ShortStack_mature.fasta | wc -l 
+grep "^>" Peve_ShortStack_mature.fasta | wc -l
+grep "^>" Pmea_ShortStack_mature.fasta | wc -l
+```
+
+## Merge the three mature miRNA FASTAs
+
+```{bash}
+cd ../data/10-shortRNA-ShortStack-comparison
+
+cat Apul_ShortStack_mature.fasta Peve_ShortStack_mature.fasta Pmea_ShortStack_mature.fasta > merged_all_ShortStack_mature.fasta
+
+head merged_all_ShortStack_mature.fasta
+tail merged_all_ShortStack_mature.fasta
+```
+
+## BLASTs
+
+### Make database for each species:
+
+Apul
+
+```{r, engine='bash'}
+/home/shared/ncbi-blast-2.11.0+/bin/makeblastdb \
+-in ../data/10-shortRNA-ShortStack-comparison/Apul_ShortStack_mature.fasta \
+-dbtype nucl \
+-out ../output/10-shortRNA-ShortStack-comparison/blasts/Apul-db/Apul_ShortStack_mature
+```
+
+Peve
+
+```{r, engine='bash'}
+/home/shared/ncbi-blast-2.11.0+/bin/makeblastdb \
+-in ../data/10-shortRNA-ShortStack-comparison/Peve_ShortStack_mature.fasta \
+-dbtype nucl \
+-out ../output/10-shortRNA-ShortStack-comparison/blasts/Peve-db/Peve_ShortStack_mature
+```
+
+Pmea
+
+```{r, engine='bash'}
+/home/shared/ncbi-blast-2.11.0+/bin/makeblastdb \
+-in ../data/10-shortRNA-ShortStack-comparison/Pmea_ShortStack_mature.fasta \
+-dbtype nucl \
+-out ../output/10-shortRNA-ShortStack-comparison/blasts/Pmea-db/Pmea_ShortStack_mature
+```
+
+### Run Blastn
+
+Apul to all
+```{r, engine='bash'}
+
+/home/shared/ncbi-blast-2.11.0+/bin/blastn \
+-task blastn \
+-query ../data/10-shortRNA-ShortStack-comparison/merged_all_ShortStack_mature.fasta \
+-db ../output/10-shortRNA-ShortStack-comparison/blasts/Apul-db/Apul_ShortStack_mature \
+-out ../output/10-shortRNA-ShortStack-comparison/Apul_to_all_blastn.tab \
+-evalue 1E-2 \
+-num_threads 40 \
+-max_target_seqs 1 \
+-max_hsps 1 \
+-outfmt 6
+
+wc -l ../output/10-shortRNA-ShortStack-comparison/Apul_to_all_blastn.tab
+```
+
+Peve to all
+```{r, engine='bash'}
+
+/home/shared/ncbi-blast-2.11.0+/bin/blastn \
+-task blastn \
+-query ../data/10-shortRNA-ShortStack-comparison/merged_all_ShortStack_mature.fasta \
+-db ../output/10-shortRNA-ShortStack-comparison/blasts/Peve-db/Peve_ShortStack_mature \
+-out ../output/10-shortRNA-ShortStack-comparison/Peve_to_all_blastn.tab \
+-evalue 1E-2 \
+-num_threads 40 \
+-max_target_seqs 1 \
+-max_hsps 1 \
+-outfmt 6
+
+wc -l ../output/10-shortRNA-ShortStack-comparison/Peve_to_all_blastn.tab
+```
+
+Pmea to all
+```{r, engine='bash'}
+
+/home/shared/ncbi-blast-2.11.0+/bin/blastn \
+-task blastn \
+-query ../data/10-shortRNA-ShortStack-comparison/merged_all_ShortStack_mature.fasta \
+-db ../output/10-shortRNA-ShortStack-comparison/blasts/Pmea-db/Pmea_ShortStack_mature \
+-out ../output/10-shortRNA-ShortStack-comparison/Pmea_to_all_blastn.tab \
+-evalue 1E-2 \
+-num_threads 40 \
+-max_target_seqs 1 \
+-max_hsps 1 \
+-outfmt 6
+
+wc -l ../output/10-shortRNA-ShortStack-comparison/Pmea_to_all_blastn.tab
+```
+
+# Join BLAST tables
+
+```{r}
+apul_to_all_blastn <- read.table("../output/10-shortRNA-ShortStack-comparison/Apul_to_all_blastn.tab", sep="\t", header=FALSE)
+peve_to_all_blastn <- read.table("../output/10-shortRNA-ShortStack-comparison/Peve_to_all_blastn.tab", sep="\t", header=FALSE)
+pmea_to_all_blastn <- read.table("../output/10-shortRNA-ShortStack-comparison/Pmea_to_all_blastn.tab", sep="\t", header=FALSE)
+```
+
+Column labels: 
+qseqid: Query sequence ID 
+sseqid: Subject (database)
+sequence ID pident: Percentage of identical matches 
+length: Alignment length (number of base pairs or amino acids) 
+mismatch: Number of mismatches 
+gapopen: Number of gap openings 
+qstart: Start of alignment in the query 
+qend: End of alignment in the query 
+sstart: Start of alignment in the subject 
+send: End of alignment in the subject 
+evalue: Expect value (number of hits expected by chance) 
+bitscore: Bit score
+
+```{r}
+# Combine the three blast tables
+combined_blastn <- rbind(apul_to_all_blastn, peve_to_all_blastn, pmea_to_all_blastn)
+
+# Assign informative column labels
+colnames(combined_blastn) <- c("qseqid", "sseqid", "pident", "length", "mismatch", "gapopen", "qstart", "qend", "sstart", "send", "evalue", "bitscore")
+
+# Remove instances where a sequence matched to itself (e.g. from querying an Apul sequence against our combined database which contained all Apul sequences)
+corrected_combined_blastn <- filter(combined_blastn, qseqid != sseqid)
+
+# Remove any hits that have mismatches
+filtered_combined_blastn <- filter(corrected_combined_blastn, mismatch==0)
+
+# View
+nrow(filtered_combined_blastn)
+head(filtered_combined_blastn)
+
+write.table(filtered_combined_blastn, "../output/10-shortRNA-ShortStack-comparison/filtered_combined_blast.tab", sep="\t", row.names=FALSE, quote=FALSE)
+```
+
+# Identify conserved miRNAs
+
+Ok now we can start identifying conserved miRNAs. Keep in mind that this list of filtered, combined blastn hits contains duplicates because, for example, querying Apul sequences against a database containing Peve sequences is functionally the same as querying those Peve sequences against a databse which contains Apul. So, for example, this list would contain a hit matching Apul.seq1 to Peve.seq2, *and* a hit matching Peve.seq2 to Apul.seq1.
+
+
+## Conserved across all three species (Apul, Peve, and Pmea)
+
+First, lets find miRNAs conserved among all three species. These would show up as an miRNA from one species that has hits from both other species (e.g., Apul.seq1 has a hit from Peve *and* a hit from Pmea).
+```{r}
+# Find Apul miRNAs that have matches from both Peve and Pmea
+present_in_all <- filtered_combined_blastn %>%
+  # isolate Apul miRNAs with hits
+  filter(!grepl("Porites_evermani|Pocillopora_meandrina", sseqid)) %>%
+  group_by(sseqid) %>%
+  filter(any(grepl("Porites_evermani", qseqid)) & any(grepl("Pocillopora_meandrina", qseqid)))
+
+# View the miRNAs that match across all three species
+# (recall this will include two entries for each conserved miRNA, it's Apul match in Peve, and its Apul match to Pmea)
+head(present_in_all, nrow(present_in_all))
+ 
+# Count the number of miRNAs conserved across all three species
+paste("Number of miRNAs conserved across all three species:", nrow(distinct(present_in_all, sseqid)))
+```
+
+## Conserved among subsets of the three species
+
+Now we want to find miRNAs that are conserved withing subsets of the three species
+
+### Apul and Peve
+
+Find Apul miRNAs that have hits to Peve miRNAs but *not* hits to Pmea miRNAs (that would make them conserved among all three species, which we've already identified)
+```{r}
+# Find Apul miRNAs that have matches from only Peve
+present_in_apul_peve <- filtered_combined_blastn %>%
+  # isolate Apul miRNAs with hits
+  filter(!grepl("Porites_evermani|Pocillopora_meandrina", sseqid)) %>%
+  group_by(sseqid) %>%
+  # filter for hits to Peve only
+  filter(any(grepl("Porites_evermani", qseqid)) & !any(grepl("Pocillopora_meandrina", qseqid)))
+
+# View the miRNAs that match between Apul and Peve
+head(present_in_apul_peve, nrow(present_in_apul_peve))
+ 
+# Count the number of miRNAs conserved across the two species
+paste("Number of miRNAs conserved in Apul and Peve:", nrow(distinct(present_in_apul_peve, sseqid)))
+```
+
+
+### Apul and Pmea
+
+Find Apul miRNAs that have hits to Pmea miRNAs but *not* hits to Peve miRNAs
+
+```{r}
+# Find Apul miRNAs that have matches from only Pmea
+present_in_apul_pmea <- filtered_combined_blastn %>%
+  # isolate Apul miRNAs with hits
+  filter(!grepl("Porites_evermani|Pocillopora_meandrina", sseqid)) %>%
+  group_by(sseqid) %>%
+  # filter for hits to Pmea only
+  filter(!any(grepl("Porites_evermani", qseqid)) & any(grepl("Pocillopora_meandrina", qseqid)))
+
+# View the miRNAs that match between Apul and Pmea
+head(present_in_apul_pmea, nrow(present_in_apul_pmea))
+ 
+# Count the number of miRNAs conserved across the two species
+paste("Number of miRNAs conserved in Apul and Pmea:", nrow(distinct(present_in_apul_pmea, sseqid)))
+```
+
+### Peve and Pmea
+
+Find Peve miRNAs that have hits to Pmea miRNAs but *not* hits to Apul miRNAs
+
+```{r}
+# Find Peve miRNAs that have matches from only Pmea
+present_in_peve_pmea <- filtered_combined_blastn %>%
+  # isolate Peve miRNAs with hits
+  filter(grepl("Porites_evermani", sseqid)) %>%
+  group_by(sseqid) %>%
+  # filter for hits to Pmea only (note the Apul sequence IDs don't contain the species name, so we have to use a non-descriptive unique identifier for filtering)
+  filter(!any(grepl("mature::N", qseqid)) & any(grepl("Pocillopora_meandrina", qseqid)))
+
+# View the miRNAs that match between Peve and Pmea
+head(present_in_peve_pmea, nrow(present_in_peve_pmea))
+ 
+# Count the number of miRNAs conserved across the two species
+paste("Number of miRNAs conserved in Peve and Pmea:", nrow(distinct(present_in_peve_pmea, sseqid)))
+```
