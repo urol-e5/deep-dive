@@ -1,0 +1,95 @@
+---
+title: "18-Apul-piRNA-proTRAC"
+author: "Javier Rodriguez-Casariego"
+date: "`r Sys.Date()`"
+output: html
+---
+
+```{r, engine='bash'}
+
+# Remove redundant reads from trimmed fastqs, keep reads between 25 and 35 nt, remove low complexity reads and change the format for SeqMap alignment
+
+for f in /scratch/jeirinlo/jrodr979/sncRNA_E5_corals/20240513_PIWI_pipeline/APUL/*.fq
+do
+perl NGSToolbox/TBr2_collapse.pl -i ${f} -o ${f}.collapsed
+perl NGSToolbox/TBr2_length-filter.pl -i ${f}.collapsed -o ${f}.collapsed.filt -min 25 -max 35
+perl NGSToolbox/TBr2_duster.pl -i ${f}.collapsed.filt
+done
+
+```
+
+```{r, engine='bash'}
+
+# concatenate reads in a single file 
+cat /scratch/jeirinlo/jrodr979/sncRNA_E5_corals/20240513_PIWI_pipeline/APUL/*.collapsed.filt.no-dust > /scratch/jeirinlo/jrodr979/sncRNA_E5_corals/20240513_PIWI_pipeline/APUL_filt_merged.fq
+
+```
+
+```{r, engine='bash'}
+
+# Filter annotated rRNA, tRNA, snRNAs, miRNAs, and snoRNAs reads (based in annotations on gff file non of these are piwi or related. 
+## build a reference dataset of annotated non-codingRNAs
+
+grep $'\tsnoRNA\t' GCF_013753865.1_Amil_v2.1_genomic.gff > AMIL.GFFannotation.snoRNA.gff
+grep $'\tsnRNA\t' GCF_013753865.1_Amil_v2.1_genomic.gff > AMIL.GFFannotation.snRNA.gff
+grep $'\ttRNA\t' GCF_013753865.1_Amil_v2.1_genomic.gff > AMIL.GFFannotation.tRNA.gff
+grep $'\trRNA\t' GCF_013753865.1_Amil_v2.1_genomic.gff > AMIL.GFFannotation.rRNA.gff
+
+bedtools getfasta -fi GCF_013753865.1_Amil_v2.1_genomic.fna -bed AMIL.GFFannotation.snoRNA.gff -fo AMIL_snoRNA.fasta
+bedtools getfasta -fi GCF_013753865.1_Amil_v2.1_genomic.fna -bed AMIL.GFFannotation.snRNA.gff -fo AMIL_snRNA.fasta
+bedtools getfasta -fi GCF_013753865.1_Amil_v2.1_genomic.fna -bed AMIL.GFFannotation.tRNA.gff -fo AMIL_tRNA.fasta
+bedtools getfasta -fi GCF_013753865.1_Amil_v2.1_genomic.fna -bed AMIL.GFFannotation.rRNA.gff -fo AMIL_rRNA.fasta
+mv APUL_known_miRNAs.fasta .
+
+cat *fasta > APUL_otherSmallRNAs.fasta
+
+```
+
+```{r, engine='bash'}
+## use sortmerna to clear reads that match the fasta
+sortmerna \
+--ref /scratch/jeirinlo/jrodr979/sncRNA_E5_corals/genomes/APUL/APUL_otherSmallRNAs.filt.fasta \
+--reads /scratch/jeirinlo/jrodr979/sncRNA_E5_corals/20240513_PIWI_pipeline/APUL_filt_merged.fq \
+--workdir /scratch/jeirinlo/jrodr979/sncRNA_E5_corals/20240514_sortMerna/APUL/ \
+--fastx \
+--other
+
+# about 1-3% of reads mapped to known small RNAs. Move unmapped reads to work folder. 
+```
+```{r, engine='bash'}
+# align "clean" reads to the genome
+
+cp 20240514_sortMerna/APUL/other.fq 20240513_PIWI_pipeline/APUL_merged_preproc
+
+# simplify fasta headers on genome to include only the scaffold or chr name. proTRAC dont go well with long headers
+
+sed 's/^>\([^ ]*\).*/>\1/' GCF_013753865.1_Amil_v2.1_genomic.fna > GCF_013753865.1_Amil_v2.1_genomic.fna 
+
+
+perl code/NGSToolbox/sRNAmapper.pl \
+-input 20240513_PIWI_pipeline/APUL_merged_preproc \
+-genome /scratch/jeirinlo/jrodr979/sncRNA_E5_corals/genomes/APUL/GCF_013753865.1_Amil_v2.1_genomic.fna \
+-alignments best
+
+```
+
+```{r, engine='bash'}
+# define origin for multiple mapping reads using reallocate
+
+perl code/NGSToolbox/reallocate.pl APUL_merged_preproc.map 10000 1000 b 0 
+
+
+```
+
+```{r, engine='bash'}
+# run proTRAC using the gene tracks and the RepeatMasker output
+ 
+perl ../code/NGSToolbox/proTRAC_2.4.2.pl \
+-map APUL_merged_preproc.map.weighted-10000-1000-b-0 \
+-genome ../genomes/APUL/GCF_013753865.1_Amil_v2.1_genomic.fna \
+-repeatmasker ../genomes/APUL/GCF_013753865.1_Amil_v2.1_genomic.fna.out \
+-geneset ../genomes/APUL/genomic.gtf
+
+# Output folder is proTRAC_APUL_merged_preproc.map.weighted-10000-1000-b-0_2024y5m20d9h58m12s
+```
+
