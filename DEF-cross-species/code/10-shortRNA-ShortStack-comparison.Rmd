@@ -68,6 +68,55 @@ grep "^>" Peve_ShortStack_mature.fasta | wc -l
 grep "^>" Pmea_ShortStack_mature.fasta | wc -l
 ```
 
+Let's do a quick investigation of our mature miRNAs.
+Apul:
+```{r, engine='bash'}
+# Extract sequence lengths and calculate statistics
+lengths=$(awk '/^>/ {if (seqlen) print seqlen; seqlen=0; next} {seqlen += length($0)} END {print seqlen}' ../data/10-shortRNA-ShortStack-comparison/Apul_ShortStack_mature.fasta)
+min_length=$(echo "$lengths" | sort -n | head -n 1)
+max_length=$(echo "$lengths" | sort -n | tail -n 1)
+total_length=$(echo "$lengths" | awk '{sum += $1} END {print sum}')
+num_sequences=$(grep -c '^>' ../data/10-shortRNA-ShortStack-comparison/Apul_ShortStack_mature.fasta)
+average_length=$(echo "scale=2; $total_length / $num_sequences" | bc)
+
+# Output results
+echo "Minimum sequence length: $min_length"
+echo "Maximum sequence length: $max_length"
+echo "Average sequence length: $average_length"
+```
+
+Peve:
+```{r, engine='bash'}
+# Extract sequence lengths and calculate statistics
+lengths=$(awk '/^>/ {if (seqlen) print seqlen; seqlen=0; next} {seqlen += length($0)} END {print seqlen}' ../data/10-shortRNA-ShortStack-comparison/Peve_ShortStack_mature.fasta)
+min_length=$(echo "$lengths" | sort -n | head -n 1)
+max_length=$(echo "$lengths" | sort -n | tail -n 1)
+total_length=$(echo "$lengths" | awk '{sum += $1} END {print sum}')
+num_sequences=$(grep -c '^>' ../data/10-shortRNA-ShortStack-comparison/Peve_ShortStack_mature.fasta)
+average_length=$(echo "scale=2; $total_length / $num_sequences" | bc)
+
+# Output results
+echo "Minimum sequence length: $min_length"
+echo "Maximum sequence length: $max_length"
+echo "Average sequence length: $average_length"
+```
+
+Pmea:
+```{r, engine='bash'}
+# Extract sequence lengths and calculate statistics
+lengths=$(awk '/^>/ {if (seqlen) print seqlen; seqlen=0; next} {seqlen += length($0)} END {print seqlen}' ../data/10-shortRNA-ShortStack-comparison/Pmea_ShortStack_mature.fasta)
+min_length=$(echo "$lengths" | sort -n | head -n 1)
+max_length=$(echo "$lengths" | sort -n | tail -n 1)
+total_length=$(echo "$lengths" | awk '{sum += $1} END {print sum}')
+num_sequences=$(grep -c '^>' ../data/10-shortRNA-ShortStack-comparison/Pmea_ShortStack_mature.fasta)
+average_length=$(echo "scale=2; $total_length / $num_sequences" | bc)
+
+# Output results
+echo "Minimum sequence length: $min_length"
+echo "Maximum sequence length: $max_length"
+echo "Average sequence length: $average_length"
+```
+
 ## Merge the three mature miRNA FASTAs
 
 ```{bash}
@@ -116,11 +165,11 @@ Apul to all
 ```{r, engine='bash'}
 
 /home/shared/ncbi-blast-2.11.0+/bin/blastn \
--task blastn \
+-task blastn-short \
 -query ../data/10-shortRNA-ShortStack-comparison/merged_all_ShortStack_mature.fasta \
 -db ../output/10-shortRNA-ShortStack-comparison/blasts/Apul-db/Apul_ShortStack_mature \
 -out ../output/10-shortRNA-ShortStack-comparison/Apul_to_all_blastn.tab \
--evalue 1E-2 \
+-evalue 1E+1 \
 -num_threads 40 \
 -max_target_seqs 1 \
 -max_hsps 1 \
@@ -133,11 +182,11 @@ Peve to all
 ```{r, engine='bash'}
 
 /home/shared/ncbi-blast-2.11.0+/bin/blastn \
--task blastn \
+-task blastn-short \
 -query ../data/10-shortRNA-ShortStack-comparison/merged_all_ShortStack_mature.fasta \
 -db ../output/10-shortRNA-ShortStack-comparison/blasts/Peve-db/Peve_ShortStack_mature \
 -out ../output/10-shortRNA-ShortStack-comparison/Peve_to_all_blastn.tab \
--evalue 1E-2 \
+-evalue 1E+1 \
 -num_threads 40 \
 -max_target_seqs 1 \
 -max_hsps 1 \
@@ -150,11 +199,11 @@ Pmea to all
 ```{r, engine='bash'}
 
 /home/shared/ncbi-blast-2.11.0+/bin/blastn \
--task blastn \
+-task blastn-short \
 -query ../data/10-shortRNA-ShortStack-comparison/merged_all_ShortStack_mature.fasta \
 -db ../output/10-shortRNA-ShortStack-comparison/blasts/Pmea-db/Pmea_ShortStack_mature \
 -out ../output/10-shortRNA-ShortStack-comparison/Pmea_to_all_blastn.tab \
--evalue 1E-2 \
+-evalue 1E+1 \
 -num_threads 40 \
 -max_target_seqs 1 \
 -max_hsps 1 \
@@ -195,8 +244,11 @@ colnames(combined_blastn) <- c("qseqid", "sseqid", "pident", "length", "mismatch
 # Remove instances where a sequence matched to itself (e.g. from querying an Apul sequence against our combined database which contained all Apul sequences)
 corrected_combined_blastn <- filter(combined_blastn, qseqid != sseqid)
 
-# Remove any hits that have mismatches
-filtered_combined_blastn <- filter(corrected_combined_blastn, mismatch==0)
+# Remove any hits that have an alignment length of less than 20. This is done because alignment lengths shorter than the input miRNA sequences (21-24 nucleotides) would functionally mean multiple mismatches between the two full sequences.
+# Remove any hits that have more than 1 mismatch
+filtered_combined_blastn <- corrected_combined_blastn %>%
+  filter(length>=20) %>%
+  filter(mismatch<2)
 
 # View
 nrow(filtered_combined_blastn)
@@ -304,6 +356,7 @@ grep "^>"  merged_all_ShortStack_mature.fasta | sed 's/^>//' > merged_all_ShortS
 
 head -5 merged_all_ShortStack_mature_IDs.txt
 ```
+
 ```{r}
 # Read in and separate the ids of all miRNAs from the three species
 merged_IDs <- readLines("../data/10-shortRNA-ShortStack-comparison/merged_all_ShortStack_mature_IDs.txt")
@@ -503,4 +556,104 @@ head(pmea_identical_miRNAs)
 There are 0 sets of identical miRNAs identified by ShortStack in P.meandrina
 
 
+# Look at the database matches
 
+```{r, engine=bash}
+# isolate the full "Results" annotation for each mature miRNA, which includes sequence detail and database matches
+
+# Apul
+awk -F'\t' 'NR==1 || $20 == "Y"' ../../D-Apul/output/13.2.1-Apul-sRNAseq-ShortStack-31bp-fastp-merged-cnidarian_miRBase/ShortStack_out/Results.txt > ../output/10-shortRNA-ShortStack-comparison/Apul_results_mature.txt
+
+# Peve
+awk -F'\t' 'NR==1 || $20 == "Y"' ../../E-Peve/output/08.2-Peve-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/Results.txt > ../output/10-shortRNA-ShortStack-comparison/Peve_results_mature.txt
+
+# Pmea
+awk -F'\t' 'NR==1 || $20 == "Y"' ../../F-Pmea/output/13.2.1-Pmea-sRNAseq-ShortStack-31bp-fastp-merged-cnidarian_miRBase/ShortStack_out/Results.txt > ../output/10-shortRNA-ShortStack-comparison/Pmea_results_mature.txt
+
+```
+
+Annotate our mature miRNA fasta files with associated database matches
+
+Apul
+```{r, engine='bash'}
+cd ../output/10-shortRNA-ShortStack-comparison
+
+while IFS= read -r line; do
+    if [[ $line == ">"* ]]; then
+        # Extract sequence header (without ">") and the accession string
+        header="${line:1}"
+        accession=$(echo "$header" | awk -F '.' '{print $1}')
+
+        # Search for the accession string in the metadata file
+        metadata_line=$(grep -i "$accession" Apul_results_mature.txt)
+
+        # Extract the last column entry from the metadata line
+        last_column=$(echo "$metadata_line" | awk '{print $NF}')
+
+        # Append the last column entry to the sequence header
+        new_header="$header $last_column"
+
+        # Output the new header
+        echo ">$new_header"
+    else
+        # Output the sequence line unchanged
+        echo "$line"
+    fi
+done < ../../data/10-shortRNA-ShortStack-comparison/Apul_ShortStack_mature.fasta > Apul_ShortStack_mature_annotated.fasta
+```
+
+Peve
+```{r, engine='bash'}
+cd ../output/10-shortRNA-ShortStack-comparison
+
+while IFS= read -r line; do
+    if [[ $line == ">"* ]]; then
+        # Extract sequence header (without ">") and the accession string
+        header="${line:1}"
+        accession=$(echo "$header" | awk -F '.' '{print $1}')
+
+        # Search for the accession string in the metadata file
+        metadata_line=$(grep -i "$accession" Peve_results_mature.txt)
+
+        # Extract the last column entry from the metadata line
+        last_column=$(echo "$metadata_line" | awk '{print $NF}')
+
+        # Append the last column entry to the sequence header
+        new_header="$header $last_column"
+
+        # Output the new header
+        echo ">$new_header"
+    else
+        # Output the sequence line unchanged
+        echo "$line"
+    fi
+done < ../../data/10-shortRNA-ShortStack-comparison/Peve_ShortStack_mature.fasta > Peve_ShortStack_mature_annotated.fasta
+```
+
+Pmea
+```{r, engine='bash'}
+cd ../output/10-shortRNA-ShortStack-comparison
+
+while IFS= read -r line; do
+    if [[ $line == ">"* ]]; then
+        # Extract sequence header (without ">") and the accession string
+        header="${line:1}"
+        accession=$(echo "$header" | awk -F '.' '{print $1}')
+
+        # Search for the accession string in the metadata file
+        metadata_line=$(grep -i "$accession" Pmea_results_mature.txt)
+
+        # Extract the last column entry from the metadata line
+        last_column=$(echo "$metadata_line" | awk '{print $NF}')
+
+        # Append the last column entry to the sequence header
+        new_header="$header $last_column"
+
+        # Output the new header
+        echo ">$new_header"
+    else
+        # Output the sequence line unchanged
+        echo "$line"
+    fi
+done < ../../data/10-shortRNA-ShortStack-comparison/Pmea_ShortStack_mature.fasta > Pmea_ShortStack_mature_annotated.fasta
+```
