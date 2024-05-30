@@ -79,9 +79,9 @@ head merged_all_ShortStack_mature.fasta
 tail merged_all_ShortStack_mature.fasta
 ```
 
-## BLASTs
+# BLASTs
 
-### Make database for each species:
+## Make database for each species:
 
 Apul
 
@@ -110,7 +110,7 @@ Pmea
 -out ../output/10-shortRNA-ShortStack-comparison/blasts/Pmea-db/Pmea_ShortStack_mature
 ```
 
-### Run Blastn
+## Run Blastn
 
 Apul to all
 ```{r, engine='bash'}
@@ -379,5 +379,128 @@ a <- list("A.pulchra" = apul_mature_newconservedID,
 
 ggvenn(a)
 ```
+
+# Identify miRNAs with identical mature miRNAs
+
+It's possible for identical mature miRNAs to arise from non-identical precursor miRNAs. These would be classified by ShortStack as different miRNAs, but could still have similar/identical functions. Let's see if we have any of those in our data.
+
+We've already eliminated instances of miRNAs matching to themselves, so to identify distinct miRNAs from with identical mature sequences we can just look for hits within the same species (e.g. Apul.seq1 matching Apul.seq4)
+
+## Apul
+
+```{r}
+# Identify sets of identical miRNAs
+apul_identical_miRNAs <- filtered_combined_blastn %>%
+  filter(grepl("mature::N", sseqid)) %>%
+  filter(grepl("mature::N", qseqid))
+         
+head(apul_identical_miRNAs)
+
+# Save
+write.table(apul_identical_miRNAs, "../output/10-shortRNA-ShortStack-comparison/Apul_identical_miRNAs.tab", sep="\t", row.names = FALSE, col.names = TRUE)
+```
+
+```{r, engine='bash'}
+# First pair
+head -2 ../output/10-shortRNA-ShortStack-comparison/Apul_identical_miRNAs.tab | tail -1
+
+seq1=$(awk 'NR==2 {print $1}' FS='\t' ../output/10-shortRNA-ShortStack-comparison/Apul_identical_miRNAs.tab | sed 's/.mature::.*//' | sed 's/"//g')
+seq2=$(awk 'NR==2 {print $2}' FS='\t' ../output/10-shortRNA-ShortStack-comparison/Apul_identical_miRNAs.tab | sed 's/.mature::.*//' | sed 's/"//g')
+
+echo ""
+echo $seq1
+echo $seq2
+echo ""
+
+# grab the precursor, star, and mature fasta sequences for the two miRNAs
+awk -v seq="$seq1" 'BEGIN {RS=">"; FS="\n"} $1 ~ seq {print ">"$0}' ../../D-Apul/output/13.2.1-Apul-sRNAseq-ShortStack-31bp-fastp-merged-cnidarian_miRBase/ShortStack_out/mir.fasta
+
+awk -v seq="$seq2" 'BEGIN {RS=">"; FS="\n"} $1 ~ seq {print ">"$0}' ../../D-Apul/output/13.2.1-Apul-sRNAseq-ShortStack-31bp-fastp-merged-cnidarian_miRBase/ShortStack_out/mir.fasta
+```
+
+```{r, engine='bash'}
+# Second pair
+head -3 ../output/10-shortRNA-ShortStack-comparison/Apul_identical_miRNAs.tab | tail -1
+
+seq1=$(awk 'NR==3 {print $1}' FS='\t' ../output/10-shortRNA-ShortStack-comparison/Apul_identical_miRNAs.tab | sed 's/.mature::.*//' | sed 's/"//g')
+seq2=$(awk 'NR==3 {print $2}' FS='\t' ../output/10-shortRNA-ShortStack-comparison/Apul_identical_miRNAs.tab | sed 's/.mature::.*//' | sed 's/"//g')
+
+echo ""
+echo $seq1
+echo $seq2
+echo ""
+
+# grab the precursor, star, and mature fasta sequences for the two miRNAs
+awk -v seq="$seq1" 'BEGIN {RS=">"; FS="\n"} $1 ~ seq {print ">"$0}' ../../D-Apul/output/13.2.1-Apul-sRNAseq-ShortStack-31bp-fastp-merged-cnidarian_miRBase/ShortStack_out/mir.fasta
+
+awk -v seq="$seq2" 'BEGIN {RS=">"; FS="\n"} $1 ~ seq {print ">"$0}' ../../D-Apul/output/13.2.1-Apul-sRNAseq-ShortStack-31bp-fastp-merged-cnidarian_miRBase/ShortStack_out/mir.fasta
+```
+
+```{r, engine='bash'}
+# Third pair
+head -4 ../output/10-shortRNA-ShortStack-comparison/Apul_identical_miRNAs.tab | tail -1
+
+seq1=$(awk 'NR==4 {print $1}' FS='\t' ../output/10-shortRNA-ShortStack-comparison/Apul_identical_miRNAs.tab | sed 's/.mature::.*//' | sed 's/"//g')
+seq2=$(awk 'NR==4 {print $2}' FS='\t' ../output/10-shortRNA-ShortStack-comparison/Apul_identical_miRNAs.tab | sed 's/.mature::.*//' | sed 's/"//g')
+
+echo ""
+echo $seq1
+echo $seq2
+echo ""
+
+# grab the precursor, star, and mature fasta sequences for the two miRNAs
+awk -v seq="$seq1" 'BEGIN {RS=">"; FS="\n"} $1 ~ seq {print ">"$0}' ../../D-Apul/output/13.2.1-Apul-sRNAseq-ShortStack-31bp-fastp-merged-cnidarian_miRBase/ShortStack_out/mir.fasta
+
+awk -v seq="$seq2" 'BEGIN {RS=">"; FS="\n"} $1 ~ seq {print ">"$0}' ../../D-Apul/output/13.2.1-Apul-sRNAseq-ShortStack-31bp-fastp-merged-cnidarian_miRBase/ShortStack_out/mir.fasta
+```
+
+For all three of these sets of identical miRNAs, the mature and star sequences are identical but the precursors have a couple of mismatches, in addition to being located in different places on the chromosome.
+
+## Peve
+
+```{r}
+# Identify sets of identical miRNAs
+peve_identical_miRNAs <- filtered_combined_blastn %>%
+  filter(grepl("Porites_evermani", sseqid)) %>%
+  filter(grepl("Porites_evermani", qseqid))
+         
+head(peve_identical_miRNAs)
+
+# Save
+write.table(peve_identical_miRNAs, "../output/10-shortRNA-ShortStack-comparison/Peve_identical_miRNAs.tab", sep="\t", row.names = FALSE, col.names = TRUE)
+```
+
+```{r, engine='bash'}
+# First pair
+head -2 ../output/10-shortRNA-ShortStack-comparison/Peve_identical_miRNAs.tab | tail -1
+
+seq1=$(awk 'NR==2 {print $1}' FS='\t' ../output/10-shortRNA-ShortStack-comparison/Peve_identical_miRNAs.tab | sed 's/.mature::.*//' | sed 's/"//g')
+seq2=$(awk 'NR==2 {print $2}' FS='\t' ../output/10-shortRNA-ShortStack-comparison/Peve_identical_miRNAs.tab | sed 's/.mature::.*//' | sed 's/"//g')
+
+echo ""
+echo $seq1
+echo $seq2
+echo ""
+
+# grab the precursor, star, and mature fasta sequences for the two miRNAs
+awk -v seq="$seq1" 'BEGIN {RS=">"; FS="\n"} $1 ~ seq {print ">"$0}' ../../E-Peve/output/08.2-Peve-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/mir.fasta
+
+awk -v seq="$seq2" 'BEGIN {RS=">"; FS="\n"} $1 ~ seq {print ">"$0}' ../../E-Peve/output/08.2-Peve-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/mir.fasta
+```
+For this set of identical miRNAs, the mature and star sequences are identical and the precursors only have a single mismatch, despite being located in different places on the chromosome.
+
+
+## Pmea
+
+```{r}
+# Identify sets of identical miRNAs
+pmea_identical_miRNAs <- filtered_combined_blastn %>%
+  filter(grepl("Pocillopora_meandrina", sseqid)) %>%
+  filter(grepl("Pocillopora_meandrina", qseqid))
+         
+head(pmea_identical_miRNAs)
+```
+There are 0 sets of identical miRNAs identified by ShortStack in P.meandrina
+
 
 
