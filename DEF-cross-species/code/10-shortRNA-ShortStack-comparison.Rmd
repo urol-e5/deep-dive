@@ -33,6 +33,10 @@ library(DT)
 library(Biostrings)
 library(tm)
 library(ggvenn)
+library(ape)
+library(pheatmap)
+library(ggpubr)
+
 knitr::opts_chunk$set(
   echo = TRUE,         # Display code chunks
   eval = TRUE,         # Evaluate code chunks
@@ -169,7 +173,7 @@ Apul to all
 -query ../data/10-shortRNA-ShortStack-comparison/merged_all_ShortStack_mature.fasta \
 -db ../output/10-shortRNA-ShortStack-comparison/blasts/Apul-db/Apul_ShortStack_mature \
 -out ../output/10-shortRNA-ShortStack-comparison/Apul_to_all_blastn.tab \
--evalue 1E+1 \
+-evalue 1E-5 \
 -num_threads 40 \
 -max_target_seqs 1 \
 -max_hsps 1 \
@@ -186,7 +190,7 @@ Peve to all
 -query ../data/10-shortRNA-ShortStack-comparison/merged_all_ShortStack_mature.fasta \
 -db ../output/10-shortRNA-ShortStack-comparison/blasts/Peve-db/Peve_ShortStack_mature \
 -out ../output/10-shortRNA-ShortStack-comparison/Peve_to_all_blastn.tab \
--evalue 1E+1 \
+-evalue 1E-5 \
 -num_threads 40 \
 -max_target_seqs 1 \
 -max_hsps 1 \
@@ -203,7 +207,7 @@ Pmea to all
 -query ../data/10-shortRNA-ShortStack-comparison/merged_all_ShortStack_mature.fasta \
 -db ../output/10-shortRNA-ShortStack-comparison/blasts/Pmea-db/Pmea_ShortStack_mature \
 -out ../output/10-shortRNA-ShortStack-comparison/Pmea_to_all_blastn.tab \
--evalue 1E+1 \
+-evalue 1E-5 \
 -num_threads 40 \
 -max_target_seqs 1 \
 -max_hsps 1 \
@@ -242,13 +246,7 @@ combined_blastn <- rbind(apul_to_all_blastn, peve_to_all_blastn, pmea_to_all_bla
 colnames(combined_blastn) <- c("qseqid", "sseqid", "pident", "length", "mismatch", "gapopen", "qstart", "qend", "sstart", "send", "evalue", "bitscore")
 
 # Remove instances where a sequence matched to itself (e.g. from querying an Apul sequence against our combined database which contained all Apul sequences)
-corrected_combined_blastn <- filter(combined_blastn, qseqid != sseqid)
-
-# Remove any hits that have an alignment length of less than 20. This is done because alignment lengths shorter than the input miRNA sequences (21-24 nucleotides) would functionally mean multiple mismatches between the two full sequences.
-# Remove any hits that have more than 1 mismatch
-filtered_combined_blastn <- corrected_combined_blastn %>%
-  filter(length>=20) %>%
-  filter(mismatch<2)
+filtered_combined_blastn <- filter(combined_blastn, qseqid != sseqid)
 
 # View
 nrow(filtered_combined_blastn)
@@ -346,9 +344,9 @@ paste("Number of miRNAs conserved in Peve and Pmea:", nrow(distinct(present_in_p
 ```
 
 
-# Visualize
+## Visualize
 
-## Data munging of the results
+### Data munging of the results
 
 ```{r, engine='bash'}
 cd ../data/10-shortRNA-ShortStack-comparison
@@ -423,7 +421,7 @@ pmea_mature_newconservedID <- replace_entries(pmea_IDs, conserved_miRNAs_all_IDs
 ```
 
 
-## Venn diagram
+### Venn diagram
 
 ```{r}
 a <- list("A.pulchra" = apul_mature_newconservedID, 
@@ -431,6 +429,139 @@ a <- list("A.pulchra" = apul_mature_newconservedID,
           "P.meandrina" = pmea_mature_newconservedID)
 
 ggvenn(a)
+```
+
+
+# Compare sequence similarity across all species
+Aligned all mature miRNA sequences from all three species in MEGA using MUSCLE, then generated pairwise distance matrix 
+
+```{r, engine='bash'}
+# Remove description text at bottom of file
+head -120 ../output/10-shortRNA-ShortStack-comparison/mature_miRNA_all_to_all_distance.csv > ../output/10-shortRNA-ShortStack-comparison/mature_miRNA_all_to_all_distance_nodescription.csv
+
+# For some reason the last line was saved as just the row name, with no comma-delimitation to mark each empty column. We need to reintroduce the (empty) comma-delimited columns in the final row.
+# Create the string of commas
+append_string=$(printf ', %.0s' {1..120})
+
+# Remove the last comma and add a space at the end
+append_string="${append_string%,}"
+
+# Use sed to remove existing trailing whitespace and then append the string of commas to row 120
+sed -i 's/\s*$//' ../output/10-shortRNA-ShortStack-comparison/mature_miRNA_all_to_all_distance_nodescription.csv
+sed -i '120s/$/ '"$append_string"'/' ../output/10-shortRNA-ShortStack-comparison/mature_miRNA_all_to_all_distance_nodescription.csv
+
+# For a couple sequence pairs, MEGA couldn't compute a pairwise distance for statistical reasons, and these are noted in the file as "?" entries. Non-numeric entries will mess with our analysis down the line, so we need to replace those.
+# Replace all "?" entries with 0s
+sed -i 's/?/0/g' ../output/10-shortRNA-ShortStack-comparison/mature_miRNA_all_to_all_distance_nodescription.csv
+
+```
+
+```{r}
+# load data
+all_to_all <- read.table("../output/10-shortRNA-ShortStack-comparison/mature_miRNA_all_to_all_distance_nodescription.csv", sep=",", header = FALSE, na.strings = "")
+
+# Assign column 1 entries to row names and column names (pairwise matrices have identical row and column names)
+rownames(all_to_all) <- all_to_all[, 1]
+all_to_all <- all_to_all[, -1]
+colnames(all_to_all) <- rownames(all_to_all)
+
+# Convert this upper triangular matrix to a full, symmetric distance matrix
+all_to_all_full <- t(all_to_all)
+all_to_all_full[upper.tri(all_to_all_full)] <- all_to_all[upper.tri(all_to_all)]
+# Check the new distance matrix is symmetric
+isSymmetric(all_to_all_full)
+
+# Convert matrix back to data frame
+all_to_all_full <- as.data.frame(all_to_all_full)
+
+
+# Replace the "NA" values with 0s (along the axis)
+all_to_all_full <- replace(all_to_all_full, is.na(all_to_all_full), 0)
+```
+
+```{r, engine='bash'}
+cd ../output/10-shortRNA-ShortStack-comparison
+# Isolate sequence names
+awk -F ',' '{print $1}' mature_miRNA_all_to_all_distance_nodescription.csv > miRNA_names.txt
+
+# Add full species name in second column based on the seq ID
+sed -i 's/\s*$//' miRNA_names.txt
+sed '/mature::N/s/$/,A_pulchra/' miRNA_names.txt > miRNA_species.csv
+sed -i '/mature::Porites/s/$/,P_evermanni/' miRNA_species.csv
+sed -i '/mature::Pocillopora/s/$/,P_meandrina/' miRNA_species.csv
+```
+
+```{r}
+# Read in
+miRNA_species <- read.csv("../output/10-shortRNA-ShortStack-comparison/miRNA_species.csv", header = FALSE)
+
+# Make the miRNA labels row names
+rownames(miRNA_species) <- miRNA_species[, "V1"]
+```
+
+## PCoA
+
+ Principal Coordinates Analysis -- similar to PCA, but can take a distance matrix as input
+ 
+```{r}
+pcoa <- pcoa(all_to_all_full, correction="none", rn=NULL)
+pcoa_vec <- as.data.frame(pcoa$vectors)
+pcoa_vec$rownames <- rownames(pcoa_vec)
+pcoa_vec_annot <- left_join(pcoa_vec, miRNA_species, by = c("rownames" = "V1"))
+rownames(pcoa_vec_annot) <- pcoa_vec_annot$rownames
+
+percent_var <- round(pcoa[["values"]][["Relative_eig"]]*100)
+
+pcoa_plot <- ggplot(pcoa_vec_annot, aes(Axis.1, Axis.2, color=V2)) + 
+  geom_point(size=4, alpha = 5/10) +
+  ggtitle("PCoA of  pairwise genetic distance (all to all)") +
+  xlab(paste0("PC1: ",percent_var[1],"% variance")) +
+  ylab(paste0("PC2: ",percent_var[2],"% variance")) + 
+  coord_fixed() +
+  stat_ellipse()
+
+pcoa_plot
+
+# Save plot
+ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/PCoA_all_species_sequence_similarity.png",
+         plot   = pcoa_plot,
+         res    = 600,
+         width  = 5000,
+         height = 5000)
+```
+
+## Heatmap
+
+```{r}
+# # Annotate heatmap
+specID <- miRNA_species %>% 
+  select(V2)
+# 
+# # Set a color palette
+# heat_colors <- rev(brewer.pal(12, "RdYlBu"))
+
+all_to_all_full_shortnames <- all_to_all_full
+colnames(all_to_all_full_shortnames) <- substr(colnames(all_to_all_full), 1, 20)
+rownames(all_to_all_full_shortnames) <- colnames(all_to_all_full_shortnames)
+
+# Run pheatmap
+all.spec.seqsim.heat <- pheatmap(all_to_all_full_shortnames, 
+                     #color = heat_colors, 
+                     cluster_rows = T, 
+                     show_rownames = T,
+                     annotation = specID, 
+                     border_color = NA, 
+                     fontsize = 5,
+                     #scale = "row", 
+                     fontsize_row = 5, 
+                     height = 20)
+
+# Save plot
+ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/heatmap_all_species_sequence_similarity.png",
+         plot   = all.spec.seqsim.heat,
+         res    = 600,
+         width  = 5000,
+         height = 5000)
 ```
 
 # Identify miRNAs with identical mature miRNAs
@@ -558,7 +689,7 @@ There are 0 sets of identical miRNAs identified by ShortStack in P.meandrina
 
 # Look at the database matches
 
-```{r, engine=bash}
+```{r, engine='bash'}
 # isolate the full "Results" annotation for each mature miRNA, which includes sequence detail and database matches
 
 # Apul
