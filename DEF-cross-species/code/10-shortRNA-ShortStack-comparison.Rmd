@@ -173,14 +173,14 @@ All to Apul:
 -task blastn-short \
 -query ../data/10-shortRNA-ShortStack-comparison/merged_all_ShortStack_mature.fasta \
 -db ../output/10-shortRNA-ShortStack-comparison/blasts/Apul-db/Apul_ShortStack_mature \
--out ../output/10-shortRNA-ShortStack-comparison/Apul_to_all_blastn.tab \
+-out ../output/10-shortRNA-ShortStack-comparison/blasts/Apul_to_all_blastn.tab \
 -num_threads 40 \
 -word_size 4 \
 -max_target_seqs 1 \
 -max_hsps 1 \
 -outfmt 6
 
-wc -l ../output/10-shortRNA-ShortStack-comparison/Apul_to_all_blastn.tab
+wc -l ../output/10-shortRNA-ShortStack-comparison/blasts/Apul_to_all_blastn.tab
 ```
 
 
@@ -190,14 +190,14 @@ All to Peve:
 -task blastn-short \
 -query ../data/10-shortRNA-ShortStack-comparison/merged_all_ShortStack_mature.fasta \
 -db ../output/10-shortRNA-ShortStack-comparison/blasts/Peve-db/Peve_ShortStack_mature \
--out ../output/10-shortRNA-ShortStack-comparison/Peve_to_all_blastn.tab \
+-out ../output/10-shortRNA-ShortStack-comparison/blasts/Peve_to_all_blastn.tab \
 -num_threads 40 \
 -word_size 4 \
 -max_target_seqs 1 \
 -max_hsps 1 \
 -outfmt 6
 
-wc -l ../output/10-shortRNA-ShortStack-comparison/Peve_to_all_blastn.tab
+wc -l ../output/10-shortRNA-ShortStack-comparison/blasts/Peve_to_all_blastn.tab
 ```
 
 All to Pmea:
@@ -206,22 +206,22 @@ All to Pmea:
 -task blastn-short \
 -query ../data/10-shortRNA-ShortStack-comparison/merged_all_ShortStack_mature.fasta \
 -db ../output/10-shortRNA-ShortStack-comparison/blasts/Pmea-db/Pmea_ShortStack_mature \
--out ../output/10-shortRNA-ShortStack-comparison/Pmea_to_all_blastn.tab \
+-out ../output/10-shortRNA-ShortStack-comparison/blasts/Pmea_to_all_blastn.tab \
 -num_threads 40 \
 -word_size 4 \
 -max_target_seqs 1 \
 -max_hsps 1 \
 -outfmt 6
 
-wc -l ../output/10-shortRNA-ShortStack-comparison/Pmea_to_all_blastn.tab
+wc -l ../output/10-shortRNA-ShortStack-comparison/blasts/Pmea_to_all_blastn.tab
 ```
 
 ## Join BLAST tables
 
 ```{r}
-apul_to_all_blastn <- read.table("../output/10-shortRNA-ShortStack-comparison/Apul_to_all_blastn.tab", sep="\t", header=FALSE)
-peve_to_all_blastn <- read.table("../output/10-shortRNA-ShortStack-comparison/Peve_to_all_blastn.tab", sep="\t", header=FALSE)
-pmea_to_all_blastn <- read.table("../output/10-shortRNA-ShortStack-comparison/Pmea_to_all_blastn.tab", sep="\t", header=FALSE)
+apul_to_all_blastn <- read.table("../output/10-shortRNA-ShortStack-comparison/blasts/Apul_to_all_blastn.tab", sep="\t", header=FALSE)
+peve_to_all_blastn <- read.table("../output/10-shortRNA-ShortStack-comparison/blasts/Peve_to_all_blastn.tab", sep="\t", header=FALSE)
+pmea_to_all_blastn <- read.table("../output/10-shortRNA-ShortStack-comparison/blasts/Pmea_to_all_blastn.tab", sep="\t", header=FALSE)
 ```
 
 Column labels: 
@@ -437,7 +437,13 @@ a <- list("A.pulchra" = apul_mature_newconservedID,
           "P.evermanni" = peve_mature_newconservedID,
           "P.meandrina" = pmea_mature_newconservedID)
 
-ggvenn(a)
+venn_conserved <- ggvenn(a)
+
+ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/figures/venn_conserved_miRNA.png",
+         plot   = venn_conserved,
+         res    = 600,
+         width  = 5000,
+         height = 5000)
 ```
 
 
@@ -532,7 +538,7 @@ pcoa_plot <- ggplot(pcoa_vec_annot, aes(Axis.1, Axis.2, color=V2)) +
 pcoa_plot
 
 # Save plot
-ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/PCoA_all_species_sequence_similarity.png",
+ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/figures/PCoA_all_species_sequence_similarity.png",
          plot   = pcoa_plot,
          res    = 600,
          width  = 5000,
@@ -566,7 +572,7 @@ all.spec.seqsim.heat <- pheatmap(all_to_all_full_shortnames,
                      height = 20)
 
 # Save plot
-ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/heatmap_all_species_sequence_similarity.png",
+ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/figures/heatmap_all_species_sequence_similarity.png",
          plot   = all.spec.seqsim.heat,
          res    = 600,
          width  = 5000,

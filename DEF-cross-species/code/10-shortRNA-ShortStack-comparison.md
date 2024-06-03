@@ -15,41 +15,41 @@ Kathleen Durkin
     id="toc-21-make-database-for-each-species">2.1 Make database for each
     species:</a>
   - <a href="#22-run-blastn" id="toc-22-run-blastn">2.2 Run Blastn</a>
-- <a href="#3-join-blast-tables" id="toc-3-join-blast-tables">3 Join BLAST
-  tables</a>
-- <a href="#4-identify-conserved-mirnas"
-  id="toc-4-identify-conserved-mirnas">4 Identify conserved miRNAs</a>
-  - <a href="#41-conserved-across-all-three-species-apul-peve-and-pmea"
-    id="toc-41-conserved-across-all-three-species-apul-peve-and-pmea">4.1
+  - <a href="#23-join-blast-tables" id="toc-23-join-blast-tables">2.3 Join
+    BLAST tables</a>
+- <a href="#3-identify-conserved-mirnas"
+  id="toc-3-identify-conserved-mirnas">3 Identify conserved miRNAs</a>
+  - <a href="#31-conserved-across-all-three-species-apul-peve-and-pmea"
+    id="toc-31-conserved-across-all-three-species-apul-peve-and-pmea">3.1
     Conserved across all three species (Apul, Peve, and Pmea)</a>
-  - <a href="#42-conserved-among-subsets-of-the-three-species"
-    id="toc-42-conserved-among-subsets-of-the-three-species">4.2 Conserved
+  - <a href="#32-conserved-among-subsets-of-the-three-species"
+    id="toc-32-conserved-among-subsets-of-the-three-species">3.2 Conserved
     among subsets of the three species</a>
-    - <a href="#421-apul-and-peve" id="toc-421-apul-and-peve">4.2.1 Apul and
+    - <a href="#321-apul-and-peve" id="toc-321-apul-and-peve">3.2.1 Apul and
       Peve</a>
-    - <a href="#422-apul-and-pmea" id="toc-422-apul-and-pmea">4.2.2 Apul and
+    - <a href="#322-apul-and-pmea" id="toc-322-apul-and-pmea">3.2.2 Apul and
       Pmea</a>
-    - <a href="#423-peve-and-pmea" id="toc-423-peve-and-pmea">4.2.3 Peve and
+    - <a href="#323-peve-and-pmea" id="toc-323-peve-and-pmea">3.2.3 Peve and
       Pmea</a>
-  - <a href="#43-visualize" id="toc-43-visualize">4.3 Visualize</a>
-    - <a href="#431-data-munging-of-the-results"
-      id="toc-431-data-munging-of-the-results">4.3.1 Data munging of the
+  - <a href="#33-visualize" id="toc-33-visualize">3.3 Visualize</a>
+    - <a href="#331-data-munging-of-the-results"
+      id="toc-331-data-munging-of-the-results">3.3.1 Data munging of the
       results</a>
-    - <a href="#432-venn-diagram" id="toc-432-venn-diagram">4.3.2 Venn
+    - <a href="#332-venn-diagram" id="toc-332-venn-diagram">3.3.2 Venn
       diagram</a>
-- <a href="#5-compare-sequence-similarity-across-all-species"
-  id="toc-5-compare-sequence-similarity-across-all-species">5 Compare
+- <a href="#4-compare-sequence-similarity-across-all-species"
+  id="toc-4-compare-sequence-similarity-across-all-species">4 Compare
   sequence similarity across all species</a>
-  - <a href="#51-pcoa" id="toc-51-pcoa">5.1 PCoA</a>
-  - <a href="#52-heatmap" id="toc-52-heatmap">5.2 Heatmap</a>
-- <a href="#6-identify-mirnas-with-identical-mature-mirnas"
-  id="toc-6-identify-mirnas-with-identical-mature-mirnas">6 Identify
+  - <a href="#41-pcoa" id="toc-41-pcoa">4.1 PCoA</a>
+  - <a href="#42-heatmap" id="toc-42-heatmap">4.2 Heatmap</a>
+- <a href="#5-identify-mirnas-with-identical-mature-mirnas"
+  id="toc-5-identify-mirnas-with-identical-mature-mirnas">5 Identify
   miRNAs with identical mature miRNAs</a>
-  - <a href="#61-apul" id="toc-61-apul">6.1 Apul</a>
-  - <a href="#62-peve" id="toc-62-peve">6.2 Peve</a>
-  - <a href="#63-pmea" id="toc-63-pmea">6.3 Pmea</a>
-- <a href="#7-look-at-the-database-matches"
-  id="toc-7-look-at-the-database-matches">7 Look at the database
+  - <a href="#51-apul" id="toc-51-apul">5.1 Apul</a>
+  - <a href="#52-peve" id="toc-52-peve">5.2 Peve</a>
+  - <a href="#53-pmea" id="toc-53-pmea">5.3 Pmea</a>
+- <a href="#6-look-at-the-database-matches"
+  id="toc-6-look-at-the-database-matches">6 Look at the database
   matches</a>
 
 I want to find miRNAs that are conserved among either a subset of or all
@@ -191,14 +191,14 @@ Apul
 -out ../output/10-shortRNA-ShortStack-comparison/blasts/Apul-db/Apul_ShortStack_mature
 ```
 
-    Building a new DB, current time: 05/31/2024 08:22:19
+    Building a new DB, current time: 06/03/2024 11:33:41
     New DB name:   /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Apul-db/Apul_ShortStack_mature
     New DB title:  ../data/10-shortRNA-ShortStack-comparison/Apul_ShortStack_mature.fasta
     Sequence type: Nucleotide
     Deleted existing Nucleotide BLAST database named /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Apul-db/Apul_ShortStack_mature
     Keep MBits: T
     Maximum file size: 1000000000B
-    Adding sequences from FASTA; added 38 sequences in 0.00197816 seconds.
+    Adding sequences from FASTA; added 38 sequences in 0.00172997 seconds.
 
 Peve
 
@@ -209,14 +209,14 @@ Peve
 -out ../output/10-shortRNA-ShortStack-comparison/blasts/Peve-db/Peve_ShortStack_mature
 ```
 
-    Building a new DB, current time: 05/31/2024 08:22:20
+    Building a new DB, current time: 06/03/2024 11:33:41
     New DB name:   /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Peve-db/Peve_ShortStack_mature
     New DB title:  ../data/10-shortRNA-ShortStack-comparison/Peve_ShortStack_mature.fasta
     Sequence type: Nucleotide
     Deleted existing Nucleotide BLAST database named /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Peve-db/Peve_ShortStack_mature
     Keep MBits: T
     Maximum file size: 1000000000B
-    Adding sequences from FASTA; added 46 sequences in 0.00291204 seconds.
+    Adding sequences from FASTA; added 46 sequences in 0.00251102 seconds.
 
 Pmea
 
@@ -227,86 +227,89 @@ Pmea
 -out ../output/10-shortRNA-ShortStack-comparison/blasts/Pmea-db/Pmea_ShortStack_mature
 ```
 
-    Building a new DB, current time: 05/31/2024 08:22:21
+    Building a new DB, current time: 06/03/2024 11:33:42
     New DB name:   /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Pmea-db/Pmea_ShortStack_mature
     New DB title:  ../data/10-shortRNA-ShortStack-comparison/Pmea_ShortStack_mature.fasta
     Sequence type: Nucleotide
     Deleted existing Nucleotide BLAST database named /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Pmea-db/Pmea_ShortStack_mature
     Keep MBits: T
     Maximum file size: 1000000000B
-    Adding sequences from FASTA; added 36 sequences in 0.00208187 seconds.
+    Adding sequences from FASTA; added 36 sequences in 0.00202203 seconds.
 
 ## 2.2 Run Blastn
 
-Apul to all
+Generate a list of blast results that, for each miRNA, shows the top hit
+in each of two other species. We want to see the top hits no matter how
+poor the match is, so we will not filter by e-value at this stage. We’ll
+also include the “-word_size 4” option, which reduces the required
+length of the initial match.
+
+All to Apul:
 
 ``` bash
-
 /home/shared/ncbi-blast-2.11.0+/bin/blastn \
 -task blastn-short \
 -query ../data/10-shortRNA-ShortStack-comparison/merged_all_ShortStack_mature.fasta \
 -db ../output/10-shortRNA-ShortStack-comparison/blasts/Apul-db/Apul_ShortStack_mature \
--out ../output/10-shortRNA-ShortStack-comparison/Apul_to_all_blastn.tab \
--evalue 1E-5 \
+-out ../output/10-shortRNA-ShortStack-comparison/blasts/Apul_to_all_blastn.tab \
 -num_threads 40 \
+-word_size 4 \
 -max_target_seqs 1 \
 -max_hsps 1 \
 -outfmt 6
 
-wc -l ../output/10-shortRNA-ShortStack-comparison/Apul_to_all_blastn.tab
+wc -l ../output/10-shortRNA-ShortStack-comparison/blasts/Apul_to_all_blastn.tab
 ```
 
     Warning: [blastn] Examining 5 or more matches is recommended
-    48 ../output/10-shortRNA-ShortStack-comparison/Apul_to_all_blastn.tab
+    120 ../output/10-shortRNA-ShortStack-comparison/blasts/Apul_to_all_blastn.tab
 
-Peve to all
+All to Peve:
 
 ``` bash
-
 /home/shared/ncbi-blast-2.11.0+/bin/blastn \
 -task blastn-short \
 -query ../data/10-shortRNA-ShortStack-comparison/merged_all_ShortStack_mature.fasta \
 -db ../output/10-shortRNA-ShortStack-comparison/blasts/Peve-db/Peve_ShortStack_mature \
--out ../output/10-shortRNA-ShortStack-comparison/Peve_to_all_blastn.tab \
--evalue 1E-5 \
+-out ../output/10-shortRNA-ShortStack-comparison/blasts/Peve_to_all_blastn.tab \
 -num_threads 40 \
+-word_size 4 \
 -max_target_seqs 1 \
 -max_hsps 1 \
 -outfmt 6
 
-wc -l ../output/10-shortRNA-ShortStack-comparison/Peve_to_all_blastn.tab
+wc -l ../output/10-shortRNA-ShortStack-comparison/blasts/Peve_to_all_blastn.tab
 ```
 
     Warning: [blastn] Examining 5 or more matches is recommended
-    56 ../output/10-shortRNA-ShortStack-comparison/Peve_to_all_blastn.tab
+    120 ../output/10-shortRNA-ShortStack-comparison/blasts/Peve_to_all_blastn.tab
 
-Pmea to all
+All to Pmea:
 
 ``` bash
-
 /home/shared/ncbi-blast-2.11.0+/bin/blastn \
 -task blastn-short \
 -query ../data/10-shortRNA-ShortStack-comparison/merged_all_ShortStack_mature.fasta \
 -db ../output/10-shortRNA-ShortStack-comparison/blasts/Pmea-db/Pmea_ShortStack_mature \
--out ../output/10-shortRNA-ShortStack-comparison/Pmea_to_all_blastn.tab \
--evalue 1E-5 \
+-out ../output/10-shortRNA-ShortStack-comparison/blasts/Pmea_to_all_blastn.tab \
 -num_threads 40 \
+-word_size 4 \
 -max_target_seqs 1 \
 -max_hsps 1 \
 -outfmt 6
 
-wc -l ../output/10-shortRNA-ShortStack-comparison/Pmea_to_all_blastn.tab
+wc -l ../output/10-shortRNA-ShortStack-comparison/blasts/Pmea_to_all_blastn.tab
 ```
 
     Warning: [blastn] Examining 5 or more matches is recommended
-    46 ../output/10-shortRNA-ShortStack-comparison/Pmea_to_all_blastn.tab
+    120 ../output/10-shortRNA-ShortStack-comparison/blasts/Pmea_to_all_blastn.tab
 
-# 3 Join BLAST tables
+## 2.3 Join BLAST tables
 
 ``` r
-apul_to_all_blastn <- read.table("../output/10-shortRNA-ShortStack-comparison/Apul_to_all_blastn.tab", sep="\t", header=FALSE)
-peve_to_all_blastn <- read.table("../output/10-shortRNA-ShortStack-comparison/Peve_to_all_blastn.tab", sep="\t", header=FALSE)
-pmea_to_all_blastn <- read.table("../output/10-shortRNA-ShortStack-comparison/Pmea_to_all_blastn.tab", sep="\t", header=FALSE)
+apul_to_all_blastn <- read.table("../output/10-shortRNA-ShortStack-comparison/blasts/Apul_to_all_blastn.tab", sep="\t", header=FALSE)
+peve_to_all_blastn <- read.table("../output/10-shortRNA-ShortStack-comparison/blasts/Peve_to_all_blastn.tab", sep="\t", header=FALSE)
+pmea_to_all_blastn <- read.table("../output/10-shortRNA-ShortStack-comparison/blasts/Pmea_to_all_blastn.tab", sep="\t", header=FALSE)
 ```
 
 Column labels: qseqid: Query sequence ID sseqid: Subject (database)
@@ -324,8 +327,22 @@ combined_blastn <- rbind(apul_to_all_blastn, peve_to_all_blastn, pmea_to_all_bla
 # Assign informative column labels
 colnames(combined_blastn) <- c("qseqid", "sseqid", "pident", "length", "mismatch", "gapopen", "qstart", "qend", "sstart", "send", "evalue", "bitscore")
 
-# Remove instances where a sequence matched to itself (e.g. from querying an Apul sequence against our combined database which contained all Apul sequences)
-filtered_combined_blastn <- filter(combined_blastn, qseqid != sseqid)
+# Save this original, unfiltered blast table.
+write.table(combined_blastn, "../output/10-shortRNA-ShortStack-comparison/combined_blast.tab", sep="\t", row.names=FALSE, quote=FALSE)
+```
+
+# 3 Identify conserved miRNAs
+
+Filter our list of blast hits to remove instances where sequences match
+themselves (e.g. from querying an Apul sequence against our combined
+database which contained all Apul sequences), and to retain only the
+significant hits (We’ll set this at eval \> 1E-5)
+
+``` r
+# Filter
+filtered_combined_blastn <- combined_blastn %>%
+  filter(qseqid != sseqid) %>%
+  filter(evalue < 0.00001)
 
 # View
 nrow(filtered_combined_blastn)
@@ -363,8 +380,6 @@ head(filtered_combined_blastn)
 write.table(filtered_combined_blastn, "../output/10-shortRNA-ShortStack-comparison/filtered_combined_blast.tab", sep="\t", row.names=FALSE, quote=FALSE)
 ```
 
-# 4 Identify conserved miRNAs
-
 Ok now we can start identifying conserved miRNAs. Keep in mind that this
 list of filtered, combined blastn hits contains duplicates because, for
 example, querying Apul sequences against a database containing Peve
@@ -373,7 +388,7 @@ against a databse which contains Apul. So, for example, this list would
 contain a hit matching Apul.seq1 to Peve.seq2, *and* a hit matching
 Peve.seq2 to Apul.seq1.
 
-## 4.1 Conserved across all three species (Apul, Peve, and Pmea)
+## 3.1 Conserved across all three species (Apul, Peve, and Pmea)
 
 First, lets find miRNAs conserved among all three species. These would
 show up as an miRNA from one species that has hits from both other
@@ -413,12 +428,12 @@ paste("Number of miRNAs conserved across all three species:", nrow(distinct(pres
 
     [1] "Number of miRNAs conserved across all three species: 4"
 
-## 4.2 Conserved among subsets of the three species
+## 3.2 Conserved among subsets of the three species
 
 Now we want to find miRNAs that are conserved withing subsets of the
 three species
 
-### 4.2.1 Apul and Peve
+### 3.2.1 Apul and Peve
 
 Find Apul miRNAs that have hits to Peve miRNAs but *not* hits to Pmea
 miRNAs (that would make them conserved among all three species, which
@@ -451,7 +466,7 @@ paste("Number of miRNAs conserved in Apul and Peve:", nrow(distinct(present_in_a
 
     [1] "Number of miRNAs conserved in Apul and Peve: 1"
 
-### 4.2.2 Apul and Pmea
+### 3.2.2 Apul and Pmea
 
 Find Apul miRNAs that have hits to Pmea miRNAs but *not* hits to Peve
 miRNAs
@@ -483,7 +498,7 @@ paste("Number of miRNAs conserved in Apul and Pmea:", nrow(distinct(present_in_a
 
     [1] "Number of miRNAs conserved in Apul and Pmea: 1"
 
-### 4.2.3 Peve and Pmea
+### 3.2.3 Peve and Pmea
 
 Find Peve miRNAs that have hits to Pmea miRNAs but *not* hits to Apul
 miRNAs
@@ -515,9 +530,9 @@ paste("Number of miRNAs conserved in Peve and Pmea:", nrow(distinct(present_in_p
 
     [1] "Number of miRNAs conserved in Peve and Pmea: 1"
 
-## 4.3 Visualize
+## 3.3 Visualize
 
-### 4.3.1 Data munging of the results
+### 3.3.1 Data munging of the results
 
 ``` bash
 cd ../data/10-shortRNA-ShortStack-comparison
@@ -632,19 +647,23 @@ peve_mature_newconservedID <- replace_entries(peve_IDs, conserved_miRNAs_all_IDs
 pmea_mature_newconservedID <- replace_entries(pmea_IDs, conserved_miRNAs_all_IDs)
 ```
 
-### 4.3.2 Venn diagram
+### 3.3.2 Venn diagram
 
 ``` r
 a <- list("A.pulchra" = apul_mature_newconservedID, 
           "P.evermanni" = peve_mature_newconservedID,
           "P.meandrina" = pmea_mature_newconservedID)
 
-ggvenn(a)
+venn_conserved <- ggvenn(a)
+
+ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/figures/venn_conserved_miRNA.png",
+         plot   = venn_conserved,
+         res    = 600,
+         width  = 5000,
+         height = 5000)
 ```
 
-<img src="10-shortRNA-ShortStack-comparison_files/figure-gfm/unnamed-chunk-22-1.png" style="display: block; margin: auto;" />
-
-# 5 Compare sequence similarity across all species
+# 4 Compare sequence similarity across all species
 
 Aligned all mature miRNA sequences from all three species in MEGA using
 MUSCLE, then generated pairwise distance matrix
@@ -716,7 +735,7 @@ miRNA_species <- read.csv("../output/10-shortRNA-ShortStack-comparison/miRNA_spe
 rownames(miRNA_species) <- miRNA_species[, "V1"]
 ```
 
-## 5.1 PCoA
+## 4.1 PCoA
 
 Principal Coordinates Analysis – similar to PCA, but can take a distance
 matrix as input
@@ -732,7 +751,7 @@ percent_var <- round(pcoa[["values"]][["Relative_eig"]]*100)
 
 pcoa_plot <- ggplot(pcoa_vec_annot, aes(Axis.1, Axis.2, color=V2)) + 
   geom_point(size=4, alpha = 5/10) +
-  ggtitle("PCoA of  pairwise genetic distance (all to all)") +
+  ggtitle("PCoA of mature miRNA pairwise genetic distance (all to all)") +
   xlab(paste0("PC1: ",percent_var[1],"% variance")) +
   ylab(paste0("PC2: ",percent_var[2],"% variance")) + 
   coord_fixed() +
@@ -741,18 +760,18 @@ pcoa_plot <- ggplot(pcoa_vec_annot, aes(Axis.1, Axis.2, color=V2)) +
 pcoa_plot
 ```
 
-<img src="10-shortRNA-ShortStack-comparison_files/figure-gfm/unnamed-chunk-27-1.png" style="display: block; margin: auto;" />
+<img src="10-shortRNA-ShortStack-comparison_files/figure-gfm/unnamed-chunk-28-1.png" style="display: block; margin: auto;" />
 
 ``` r
 # Save plot
-ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/PCoA_all_species_sequence_similarity.png",
+ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/figures/PCoA_all_species_sequence_similarity.png",
          plot   = pcoa_plot,
          res    = 600,
          width  = 5000,
          height = 5000)
 ```
 
-## 5.2 Heatmap
+## 4.2 Heatmap
 
 ``` r
 # # Annotate heatmap
@@ -779,18 +798,18 @@ all.spec.seqsim.heat <- pheatmap(all_to_all_full_shortnames,
                      height = 20)
 ```
 
-<img src="10-shortRNA-ShortStack-comparison_files/figure-gfm/unnamed-chunk-28-1.png" style="display: block; margin: auto;" />
+<img src="10-shortRNA-ShortStack-comparison_files/figure-gfm/unnamed-chunk-29-1.png" style="display: block; margin: auto;" />
 
 ``` r
 # Save plot
-ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/heatmap_all_species_sequence_similarity.png",
+ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/figures/heatmap_all_species_sequence_similarity.png",
          plot   = all.spec.seqsim.heat,
          res    = 600,
          width  = 5000,
          height = 5000)
 ```
 
-# 6 Identify miRNAs with identical mature miRNAs
+# 5 Identify miRNAs with identical mature miRNAs
 
 It’s possible for identical mature miRNAs to arise from non-identical
 precursor miRNAs. These would be classified by ShortStack as different
@@ -802,7 +821,7 @@ to identify distinct miRNAs from with identical mature sequences we can
 just look for hits within the same species (e.g. Apul.seq1 matching
 Apul.seq4)
 
-## 6.1 Apul
+## 5.1 Apul
 
 ``` r
 # Identify sets of identical miRNAs
@@ -958,7 +977,7 @@ For all three of these sets of identical miRNAs, the mature and star
 sequences are identical but the precursors have a couple of mismatches,
 in addition to being located in different places on the chromosome.
 
-## 6.2 Peve
+## 5.2 Peve
 
 ``` r
 # Identify sets of identical miRNAs
@@ -1026,7 +1045,7 @@ For this set of identical miRNAs, the mature and star sequences are
 identical and the precursors only have a single mismatch, despite being
 located in different places on the chromosome.
 
-## 6.3 Pmea
+## 5.3 Pmea
 
 ``` r
 # Identify sets of identical miRNAs
@@ -1044,7 +1063,7 @@ head(pmea_identical_miRNAs)
 There are 0 sets of identical miRNAs identified by ShortStack in
 P.meandrina
 
-# 7 Look at the database matches
+# 6 Look at the database matches
 
 ``` bash
 # isolate the full "Results" annotation for each mature miRNA, which includes sequence detail and database matches
