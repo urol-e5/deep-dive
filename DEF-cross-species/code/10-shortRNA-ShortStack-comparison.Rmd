@@ -49,7 +49,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-I want to find miRNAs that are conserved among either a subset of or all three species of interest (*A.pulchra*, *P.evermanni*, and *P.meandrina*) using Blastn. 
+I want to find miRNAs that are conserved among either a subset of or all three species of interest (*A.pulchra*, *P.evermanni*, and *P.meandrina*) using Blastn. I want to generally investigate sequence similarity across and within species.
 
 # Prep data
 
@@ -57,7 +57,7 @@ I want to find miRNAs that are conserved among either a subset of or all three s
 
 Our ShortStack output contains sequences for the mature, star, and precursor sequences for each identified miRNA. We just want to look at the mature miRNA sequences right now, so let's isolate those.
 
-```{r, engine='bash'}
+```{r isolate-mature-miRNA, engine='bash'}
 cd ../data/10-shortRNA-ShortStack-comparison
 
 # Copy all sequences whose headers contain "mature"
@@ -72,58 +72,9 @@ grep "^>" Peve_ShortStack_mature.fasta | wc -l
 grep "^>" Pmea_ShortStack_mature.fasta | wc -l
 ```
 
-Let's do a quick investigation of our mature miRNAs.
-Apul:
-```{r, engine='bash'}
-# Extract sequence lengths and calculate statistics
-lengths=$(awk '/^>/ {if (seqlen) print seqlen; seqlen=0; next} {seqlen += length($0)} END {print seqlen}' ../data/10-shortRNA-ShortStack-comparison/Apul_ShortStack_mature.fasta)
-min_length=$(echo "$lengths" | sort -n | head -n 1)
-max_length=$(echo "$lengths" | sort -n | tail -n 1)
-total_length=$(echo "$lengths" | awk '{sum += $1} END {print sum}')
-num_sequences=$(grep -c '^>' ../data/10-shortRNA-ShortStack-comparison/Apul_ShortStack_mature.fasta)
-average_length=$(echo "scale=2; $total_length / $num_sequences" | bc)
-
-# Output results
-echo "Minimum sequence length: $min_length"
-echo "Maximum sequence length: $max_length"
-echo "Average sequence length: $average_length"
-```
-
-Peve:
-```{r, engine='bash'}
-# Extract sequence lengths and calculate statistics
-lengths=$(awk '/^>/ {if (seqlen) print seqlen; seqlen=0; next} {seqlen += length($0)} END {print seqlen}' ../data/10-shortRNA-ShortStack-comparison/Peve_ShortStack_mature.fasta)
-min_length=$(echo "$lengths" | sort -n | head -n 1)
-max_length=$(echo "$lengths" | sort -n | tail -n 1)
-total_length=$(echo "$lengths" | awk '{sum += $1} END {print sum}')
-num_sequences=$(grep -c '^>' ../data/10-shortRNA-ShortStack-comparison/Peve_ShortStack_mature.fasta)
-average_length=$(echo "scale=2; $total_length / $num_sequences" | bc)
-
-# Output results
-echo "Minimum sequence length: $min_length"
-echo "Maximum sequence length: $max_length"
-echo "Average sequence length: $average_length"
-```
-
-Pmea:
-```{r, engine='bash'}
-# Extract sequence lengths and calculate statistics
-lengths=$(awk '/^>/ {if (seqlen) print seqlen; seqlen=0; next} {seqlen += length($0)} END {print seqlen}' ../data/10-shortRNA-ShortStack-comparison/Pmea_ShortStack_mature.fasta)
-min_length=$(echo "$lengths" | sort -n | head -n 1)
-max_length=$(echo "$lengths" | sort -n | tail -n 1)
-total_length=$(echo "$lengths" | awk '{sum += $1} END {print sum}')
-num_sequences=$(grep -c '^>' ../data/10-shortRNA-ShortStack-comparison/Pmea_ShortStack_mature.fasta)
-average_length=$(echo "scale=2; $total_length / $num_sequences" | bc)
-
-# Output results
-echo "Minimum sequence length: $min_length"
-echo "Maximum sequence length: $max_length"
-echo "Average sequence length: $average_length"
-```
-
 ## Merge the three mature miRNA FASTAs
 
-```{bash}
+```{r merge-miRNA-FASTAs, engine='bash'}
 cd ../data/10-shortRNA-ShortStack-comparison
 
 cat Apul_ShortStack_mature.fasta Peve_ShortStack_mature.fasta Pmea_ShortStack_mature.fasta > merged_all_ShortStack_mature.fasta
@@ -132,13 +83,29 @@ head merged_all_ShortStack_mature.fasta
 tail merged_all_ShortStack_mature.fasta
 ```
 
+Let's do a quick investigation of our mature miRNAs.
+
+```{r calculate-miRNA-length-stats, engine='bash'}
+# Extract sequence lengths and calculate statistics
+lengths=$(awk '/^>/ {if (seqlen) print seqlen; seqlen=0; next} {seqlen += length($0)} END {print seqlen}' ../data/10-shortRNA-ShortStack-comparison/merged_all_ShortStack_mature.fasta)
+min_length=$(echo "$lengths" | sort -n | head -n 1)
+max_length=$(echo "$lengths" | sort -n | tail -n 1)
+total_length=$(echo "$lengths" | awk '{sum += $1} END {print sum}')
+num_sequences=$(grep -c '^>' ../data/10-shortRNA-ShortStack-comparison/merged_all_ShortStack_mature.fasta)
+average_length=$(echo "scale=2; $total_length / $num_sequences" | bc)
+
+# Output results
+echo "Minimum sequence length: $min_length"
+echo "Maximum sequence length: $max_length"
+echo "Average sequence length: $average_length"
+```
+
 # BLASTs
 
 ## Make database for each species:
 
 Apul
-
-```{r, engine='bash'}
+```{r Apul-blast-db, engine='bash'}
 /home/shared/ncbi-blast-2.11.0+/bin/makeblastdb \
 -in ../data/10-shortRNA-ShortStack-comparison/Apul_ShortStack_mature.fasta \
 -dbtype nucl \
@@ -146,8 +113,7 @@ Apul
 ```
 
 Peve
-
-```{r, engine='bash'}
+```{r Peve-blast-db, engine='bash'}
 /home/shared/ncbi-blast-2.11.0+/bin/makeblastdb \
 -in ../data/10-shortRNA-ShortStack-comparison/Peve_ShortStack_mature.fasta \
 -dbtype nucl \
@@ -155,8 +121,7 @@ Peve
 ```
 
 Pmea
-
-```{r, engine='bash'}
+```{r Pmea-blast-db, engine='bash'}
 /home/shared/ncbi-blast-2.11.0+/bin/makeblastdb \
 -in ../data/10-shortRNA-ShortStack-comparison/Pmea_ShortStack_mature.fasta \
 -dbtype nucl \
@@ -168,7 +133,7 @@ Pmea
 Generate a list of blast results that, for each miRNA, shows the top hit in each of two other species. We want to see the top hits no matter how poor the match is, so we will not filter by e-value at this stage. We'll also include the "-word_size 4" option, which reduces the required length of the initial match.
 
 All to Apul:
-```{r, engine='bash'}
+```{r blastn-all-to-Apul, engine='bash'}
 /home/shared/ncbi-blast-2.11.0+/bin/blastn \
 -task blastn-short \
 -query ../data/10-shortRNA-ShortStack-comparison/merged_all_ShortStack_mature.fasta \
@@ -185,7 +150,7 @@ wc -l ../output/10-shortRNA-ShortStack-comparison/blasts/Apul_to_all_blastn.tab
 
 
 All to Peve:
-```{r, engine='bash'}
+```{r blastn-all-to-Peve, engine='bash'}
 /home/shared/ncbi-blast-2.11.0+/bin/blastn \
 -task blastn-short \
 -query ../data/10-shortRNA-ShortStack-comparison/merged_all_ShortStack_mature.fasta \
@@ -201,7 +166,7 @@ wc -l ../output/10-shortRNA-ShortStack-comparison/blasts/Peve_to_all_blastn.tab
 ```
 
 All to Pmea:
-```{r, engine='bash'}
+```{r blastn-all-to-Pmea, engine='bash'}
 /home/shared/ncbi-blast-2.11.0+/bin/blastn \
 -task blastn-short \
 -query ../data/10-shortRNA-ShortStack-comparison/merged_all_ShortStack_mature.fasta \
@@ -218,7 +183,7 @@ wc -l ../output/10-shortRNA-ShortStack-comparison/blasts/Pmea_to_all_blastn.tab
 
 ## Join BLAST tables
 
-```{r}
+```{r load-blast-tables}
 apul_to_all_blastn <- read.table("../output/10-shortRNA-ShortStack-comparison/blasts/Apul_to_all_blastn.tab", sep="\t", header=FALSE)
 peve_to_all_blastn <- read.table("../output/10-shortRNA-ShortStack-comparison/blasts/Peve_to_all_blastn.tab", sep="\t", header=FALSE)
 pmea_to_all_blastn <- read.table("../output/10-shortRNA-ShortStack-comparison/blasts/Pmea_to_all_blastn.tab", sep="\t", header=FALSE)
@@ -238,7 +203,7 @@ send: End of alignment in the subject
 evalue: Expect value (number of hits expected by chance) 
 bitscore: Bit score
 
-```{r}
+```{r join-blast-tables}
 # Combine the three blast tables
 combined_blastn <- rbind(apul_to_all_blastn, peve_to_all_blastn, pmea_to_all_blastn)
 
@@ -253,7 +218,7 @@ write.table(combined_blastn, "../output/10-shortRNA-ShortStack-comparison/combin
 # Identify conserved miRNAs
 
 Filter our list of blast hits to remove instances where sequences match themselves (e.g. from querying an Apul sequence against our combined database which contained all Apul sequences), and to retain only the significant hits (We'll set this at eval > 1E-5)
-```{r}
+```{r filter-blast-combined}
 # Filter
 filtered_combined_blastn <- combined_blastn %>%
   filter(qseqid != sseqid) %>%
@@ -272,7 +237,7 @@ Ok now we can start identifying conserved miRNAs. Keep in mind that this list of
 ## Conserved across all three species (Apul, Peve, and Pmea)
 
 First, lets find miRNAs conserved among all three species. These would show up as an miRNA from one species that has hits from both other species (e.g., Apul.seq1 has a hit from Peve *and* a hit from Pmea).
-```{r}
+```{r id-conserved-three-species}
 # Find Apul miRNAs that have matches from both Peve and Pmea
 present_in_all <- filtered_combined_blastn %>%
   # isolate Apul miRNAs with hits
@@ -295,7 +260,7 @@ Now we want to find miRNAs that are conserved withing subsets of the three speci
 ### Apul and Peve
 
 Find Apul miRNAs that have hits to Peve miRNAs but *not* hits to Pmea miRNAs (that would make them conserved among all three species, which we've already identified)
-```{r}
+```{r id-conserved-apul-peve}
 # Find Apul miRNAs that have matches from only Peve
 present_in_apul_peve <- filtered_combined_blastn %>%
   # isolate Apul miRNAs with hits
@@ -316,7 +281,7 @@ paste("Number of miRNAs conserved in Apul and Peve:", nrow(distinct(present_in_a
 
 Find Apul miRNAs that have hits to Pmea miRNAs but *not* hits to Peve miRNAs
 
-```{r}
+```{r id-conserved-apul-pmea}
 # Find Apul miRNAs that have matches from only Pmea
 present_in_apul_pmea <- filtered_combined_blastn %>%
   # isolate Apul miRNAs with hits
@@ -336,7 +301,7 @@ paste("Number of miRNAs conserved in Apul and Pmea:", nrow(distinct(present_in_a
 
 Find Peve miRNAs that have hits to Pmea miRNAs but *not* hits to Apul miRNAs
 
-```{r}
+```{r id-conserved-peve-pmea}
 # Find Peve miRNAs that have matches from only Pmea
 present_in_peve_pmea <- filtered_combined_blastn %>%
   # isolate Peve miRNAs with hits
@@ -357,14 +322,14 @@ paste("Number of miRNAs conserved in Peve and Pmea:", nrow(distinct(present_in_p
 
 ### Data munging of the results
 
-```{r, engine='bash'}
+```{r grab-fasta-headers, engine='bash'}
 cd ../data/10-shortRNA-ShortStack-comparison
 grep "^>"  merged_all_ShortStack_mature.fasta | sed 's/^>//' > merged_all_ShortStack_mature_IDs.txt
 
 head -5 merged_all_ShortStack_mature_IDs.txt
 ```
 
-```{r}
+```{r separate-ids-by-species}
 # Read in and separate the ids of all miRNAs from the three species
 merged_IDs <- readLines("../data/10-shortRNA-ShortStack-comparison/merged_all_ShortStack_mature_IDs.txt")
 
@@ -376,7 +341,7 @@ length(peve_IDs)
 length(pmea_IDs)
 ```
 
-```{r}
+```{r create-shared-conserved-ids}
 # Assign shared miRNA IDs to conserved miRNAs
 
 # Function to append IDs of matching miRNAs to the original query miRNA
@@ -409,7 +374,7 @@ print(appendedIDs_peve_pmea)
 conserved_miRNAs_all_IDs <- c(appendedIDs_apul_peve_pmea, appendedIDs_apul_peve, appendedIDs_apul_pmea, appendedIDs_peve_pmea)
 ```
 
-```{r}
+```{r replace-entries}
 # For each species list of miRNA IDs, replace species-specific IDs of conserved miRNAs with our newly generated appended IDs. This will created lists of miRNA IDs that have shared IDs for the conserved mRNAs
 replace_entries <- function(spec_list, new_conserved_IDs) {
   # Iterate over each entry in spec_list
@@ -432,12 +397,13 @@ pmea_mature_newconservedID <- replace_entries(pmea_IDs, conserved_miRNAs_all_IDs
 
 ### Venn diagram
 
-```{r}
+```{r venn-diagram}
 a <- list("A.pulchra" = apul_mature_newconservedID, 
           "P.evermanni" = peve_mature_newconservedID,
           "P.meandrina" = pmea_mature_newconservedID)
 
 venn_conserved <- ggvenn(a)
+venn_conserved
 
 ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/figures/venn_conserved_miRNA.png",
          plot   = venn_conserved,
@@ -450,7 +416,7 @@ ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/figures/venn_co
 # Compare sequence similarity across all species
 Aligned all mature miRNA sequences from all three species in MEGA using MUSCLE, then generated pairwise distance matrix 
 
-```{r, engine='bash'}
+```{r format-distance-matrix, engine='bash'}
 # Remove description text at bottom of file
 head -120 ../output/10-shortRNA-ShortStack-comparison/mature_miRNA_all_to_all_distance.csv > ../output/10-shortRNA-ShortStack-comparison/mature_miRNA_all_to_all_distance_nodescription.csv
 
@@ -471,7 +437,7 @@ sed -i 's/?/0/g' ../output/10-shortRNA-ShortStack-comparison/mature_miRNA_all_to
 
 ```
 
-```{r}
+```{r format-distance-matrix-cont}
 # load data
 all_to_all <- read.table("../output/10-shortRNA-ShortStack-comparison/mature_miRNA_all_to_all_distance_nodescription.csv", sep=",", header = FALSE, na.strings = "")
 
@@ -494,7 +460,7 @@ all_to_all_full <- as.data.frame(all_to_all_full)
 all_to_all_full <- replace(all_to_all_full, is.na(all_to_all_full), 0)
 ```
 
-```{r, engine='bash'}
+```{r annotate-species-name, engine='bash'}
 cd ../output/10-shortRNA-ShortStack-comparison
 # Isolate sequence names
 awk -F ',' '{print $1}' mature_miRNA_all_to_all_distance_nodescription.csv > miRNA_names.txt
@@ -506,7 +472,7 @@ sed -i '/mature::Porites/s/$/,P_evermanni/' miRNA_species.csv
 sed -i '/mature::Pocillopora/s/$/,P_meandrina/' miRNA_species.csv
 ```
 
-```{r}
+```{r species-list}
 # Read in
 miRNA_species <- read.csv("../output/10-shortRNA-ShortStack-comparison/miRNA_species.csv", header = FALSE)
 
@@ -518,7 +484,7 @@ rownames(miRNA_species) <- miRNA_species[, "V1"]
 
  Principal Coordinates Analysis -- similar to PCA, but can take a distance matrix as input
  
-```{r}
+```{r pcoa-plot}
 pcoa <- pcoa(all_to_all_full, correction="none", rn=NULL)
 pcoa_vec <- as.data.frame(pcoa$vectors)
 pcoa_vec$rownames <- rownames(pcoa_vec)
@@ -547,7 +513,7 @@ ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/figures/PCoA_al
 
 ## Heatmap
 
-```{r}
+```{r heatmap-plot}
 # # Annotate heatmap
 specID <- miRNA_species %>% 
   select(V2)
@@ -587,7 +553,7 @@ We've already eliminated instances of miRNAs matching to themselves, so to ident
 
 ## Apul
 
-```{r}
+```{r apul-identical-mirna}
 # Identify sets of identical miRNAs
 apul_identical_miRNAs <- filtered_combined_blastn %>%
   filter(grepl("mature::N", sseqid)) %>%
@@ -599,7 +565,7 @@ head(apul_identical_miRNAs)
 write.table(apul_identical_miRNAs, "../output/10-shortRNA-ShortStack-comparison/Apul_identical_miRNAs.tab", sep="\t", row.names = FALSE, col.names = TRUE)
 ```
 
-```{r, engine='bash'}
+```{r apul-identical-first, engine='bash'}
 # First pair
 head -2 ../output/10-shortRNA-ShortStack-comparison/Apul_identical_miRNAs.tab | tail -1
 
@@ -617,7 +583,7 @@ awk -v seq="$seq1" 'BEGIN {RS=">"; FS="\n"} $1 ~ seq {print ">"$0}' ../../D-Apul
 awk -v seq="$seq2" 'BEGIN {RS=">"; FS="\n"} $1 ~ seq {print ">"$0}' ../../D-Apul/output/13.2.1-Apul-sRNAseq-ShortStack-31bp-fastp-merged-cnidarian_miRBase/ShortStack_out/mir.fasta
 ```
 
-```{r, engine='bash'}
+```{r apul-identical-second, engine='bash'}
 # Second pair
 head -3 ../output/10-shortRNA-ShortStack-comparison/Apul_identical_miRNAs.tab | tail -1
 
@@ -635,7 +601,7 @@ awk -v seq="$seq1" 'BEGIN {RS=">"; FS="\n"} $1 ~ seq {print ">"$0}' ../../D-Apul
 awk -v seq="$seq2" 'BEGIN {RS=">"; FS="\n"} $1 ~ seq {print ">"$0}' ../../D-Apul/output/13.2.1-Apul-sRNAseq-ShortStack-31bp-fastp-merged-cnidarian_miRBase/ShortStack_out/mir.fasta
 ```
 
-```{r, engine='bash'}
+```{r apul-identical-third, engine='bash'}
 # Third pair
 head -4 ../output/10-shortRNA-ShortStack-comparison/Apul_identical_miRNAs.tab | tail -1
 
@@ -657,7 +623,7 @@ For all three of these sets of identical miRNAs, the mature and star sequences a
 
 ## Peve
 
-```{r}
+```{r peve-identical-mirna}
 # Identify sets of identical miRNAs
 peve_identical_miRNAs <- filtered_combined_blastn %>%
   filter(grepl("Porites_evermani", sseqid)) %>%
@@ -669,7 +635,7 @@ head(peve_identical_miRNAs)
 write.table(peve_identical_miRNAs, "../output/10-shortRNA-ShortStack-comparison/Peve_identical_miRNAs.tab", sep="\t", row.names = FALSE, col.names = TRUE)
 ```
 
-```{r, engine='bash'}
+```{r peve-identical-first, engine='bash'}
 # First pair
 head -2 ../output/10-shortRNA-ShortStack-comparison/Peve_identical_miRNAs.tab | tail -1
 
@@ -691,7 +657,7 @@ For this set of identical miRNAs, the mature and star sequences are identical an
 
 ## Pmea
 
-```{r}
+```{r pmea-identical-mirna}
 # Identify sets of identical miRNAs
 pmea_identical_miRNAs <- filtered_combined_blastn %>%
   filter(grepl("Pocillopora_meandrina", sseqid)) %>%
@@ -704,7 +670,7 @@ There are 0 sets of identical miRNAs identified by ShortStack in P.meandrina
 
 # Look at the database matches
 
-```{r, engine='bash'}
+```{r isolate-mirna-from-resultstxt, engine='bash'}
 # isolate the full "Results" annotation for each mature miRNA, which includes sequence detail and database matches
 
 # Apul
@@ -721,7 +687,7 @@ awk -F'\t' 'NR==1 || $20 == "Y"' ../../F-Pmea/output/13.2.1-Pmea-sRNAseq-ShortSt
 Annotate our mature miRNA fasta files with associated database matches
 
 Apul
-```{r, engine='bash'}
+```{r apul-annotate-with-db-matches, engine='bash'}
 cd ../output/10-shortRNA-ShortStack-comparison
 
 while IFS= read -r line; do
@@ -749,7 +715,7 @@ done < ../../data/10-shortRNA-ShortStack-comparison/Apul_ShortStack_mature.fasta
 ```
 
 Peve
-```{r, engine='bash'}
+```{r peve-annotate-with-db-matches, engine='bash'}
 cd ../output/10-shortRNA-ShortStack-comparison
 
 while IFS= read -r line; do
@@ -777,7 +743,7 @@ done < ../../data/10-shortRNA-ShortStack-comparison/Peve_ShortStack_mature.fasta
 ```
 
 Pmea
-```{r, engine='bash'}
+```{r pmea-annotate-with-db-matches, engine='bash'}
 cd ../output/10-shortRNA-ShortStack-comparison
 
 while IFS= read -r line; do

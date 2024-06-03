@@ -54,7 +54,8 @@ Kathleen Durkin
 
 I want to find miRNAs that are conserved among either a subset of or all
 three species of interest (*A.pulchra*, *P.evermanni*, and
-*P.meandrina*) using Blastn.
+*P.meandrina*) using Blastn. I want to generally investigate sequence
+similarity across and within species.
 
 # 1 Prep data
 
@@ -82,69 +83,6 @@ grep "^>" Pmea_ShortStack_mature.fasta | wc -l
     38
     46
     36
-
-Let’s do a quick investigation of our mature miRNAs. Apul:
-
-``` bash
-# Extract sequence lengths and calculate statistics
-lengths=$(awk '/^>/ {if (seqlen) print seqlen; seqlen=0; next} {seqlen += length($0)} END {print seqlen}' ../data/10-shortRNA-ShortStack-comparison/Apul_ShortStack_mature.fasta)
-min_length=$(echo "$lengths" | sort -n | head -n 1)
-max_length=$(echo "$lengths" | sort -n | tail -n 1)
-total_length=$(echo "$lengths" | awk '{sum += $1} END {print sum}')
-num_sequences=$(grep -c '^>' ../data/10-shortRNA-ShortStack-comparison/Apul_ShortStack_mature.fasta)
-average_length=$(echo "scale=2; $total_length / $num_sequences" | bc)
-
-# Output results
-echo "Minimum sequence length: $min_length"
-echo "Maximum sequence length: $max_length"
-echo "Average sequence length: $average_length"
-```
-
-    Minimum sequence length: 21
-    Maximum sequence length: 24
-    Average sequence length: 22.15
-
-Peve:
-
-``` bash
-# Extract sequence lengths and calculate statistics
-lengths=$(awk '/^>/ {if (seqlen) print seqlen; seqlen=0; next} {seqlen += length($0)} END {print seqlen}' ../data/10-shortRNA-ShortStack-comparison/Peve_ShortStack_mature.fasta)
-min_length=$(echo "$lengths" | sort -n | head -n 1)
-max_length=$(echo "$lengths" | sort -n | tail -n 1)
-total_length=$(echo "$lengths" | awk '{sum += $1} END {print sum}')
-num_sequences=$(grep -c '^>' ../data/10-shortRNA-ShortStack-comparison/Peve_ShortStack_mature.fasta)
-average_length=$(echo "scale=2; $total_length / $num_sequences" | bc)
-
-# Output results
-echo "Minimum sequence length: $min_length"
-echo "Maximum sequence length: $max_length"
-echo "Average sequence length: $average_length"
-```
-
-    Minimum sequence length: 21
-    Maximum sequence length: 23
-    Average sequence length: 21.91
-
-Pmea:
-
-``` bash
-# Extract sequence lengths and calculate statistics
-lengths=$(awk '/^>/ {if (seqlen) print seqlen; seqlen=0; next} {seqlen += length($0)} END {print seqlen}' ../data/10-shortRNA-ShortStack-comparison/Pmea_ShortStack_mature.fasta)
-min_length=$(echo "$lengths" | sort -n | head -n 1)
-max_length=$(echo "$lengths" | sort -n | tail -n 1)
-total_length=$(echo "$lengths" | awk '{sum += $1} END {print sum}')
-num_sequences=$(grep -c '^>' ../data/10-shortRNA-ShortStack-comparison/Pmea_ShortStack_mature.fasta)
-average_length=$(echo "scale=2; $total_length / $num_sequences" | bc)
-
-# Output results
-echo "Minimum sequence length: $min_length"
-echo "Maximum sequence length: $max_length"
-echo "Average sequence length: $average_length"
-```
-
-    Minimum sequence length: 21
-    Maximum sequence length: 23
-    Average sequence length: 21.91
 
 ## 1.2 Merge the three mature miRNA FASTAs
 
@@ -178,6 +116,27 @@ tail merged_all_ShortStack_mature.fasta
     >Cluster_6425.mature::Pocillopora_meandrina_HIv1___Sc0000035:1989841-1989863(+)
     TATTTACAACTCTCAAAACAAC
 
+Let’s do a quick investigation of our mature miRNAs.
+
+``` bash
+# Extract sequence lengths and calculate statistics
+lengths=$(awk '/^>/ {if (seqlen) print seqlen; seqlen=0; next} {seqlen += length($0)} END {print seqlen}' ../data/10-shortRNA-ShortStack-comparison/merged_all_ShortStack_mature.fasta)
+min_length=$(echo "$lengths" | sort -n | head -n 1)
+max_length=$(echo "$lengths" | sort -n | tail -n 1)
+total_length=$(echo "$lengths" | awk '{sum += $1} END {print sum}')
+num_sequences=$(grep -c '^>' ../data/10-shortRNA-ShortStack-comparison/merged_all_ShortStack_mature.fasta)
+average_length=$(echo "scale=2; $total_length / $num_sequences" | bc)
+
+# Output results
+echo "Minimum sequence length: $min_length"
+echo "Maximum sequence length: $max_length"
+echo "Average sequence length: $average_length"
+```
+
+    Minimum sequence length: 21
+    Maximum sequence length: 24
+    Average sequence length: 21.99
+
 # 2 BLASTs
 
 ## 2.1 Make database for each species:
@@ -191,14 +150,14 @@ Apul
 -out ../output/10-shortRNA-ShortStack-comparison/blasts/Apul-db/Apul_ShortStack_mature
 ```
 
-    Building a new DB, current time: 06/03/2024 11:33:41
+    Building a new DB, current time: 06/03/2024 11:58:08
     New DB name:   /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Apul-db/Apul_ShortStack_mature
     New DB title:  ../data/10-shortRNA-ShortStack-comparison/Apul_ShortStack_mature.fasta
     Sequence type: Nucleotide
     Deleted existing Nucleotide BLAST database named /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Apul-db/Apul_ShortStack_mature
     Keep MBits: T
     Maximum file size: 1000000000B
-    Adding sequences from FASTA; added 38 sequences in 0.00172997 seconds.
+    Adding sequences from FASTA; added 38 sequences in 0.00214005 seconds.
 
 Peve
 
@@ -209,14 +168,14 @@ Peve
 -out ../output/10-shortRNA-ShortStack-comparison/blasts/Peve-db/Peve_ShortStack_mature
 ```
 
-    Building a new DB, current time: 06/03/2024 11:33:41
+    Building a new DB, current time: 06/03/2024 11:58:09
     New DB name:   /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Peve-db/Peve_ShortStack_mature
     New DB title:  ../data/10-shortRNA-ShortStack-comparison/Peve_ShortStack_mature.fasta
     Sequence type: Nucleotide
     Deleted existing Nucleotide BLAST database named /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Peve-db/Peve_ShortStack_mature
     Keep MBits: T
     Maximum file size: 1000000000B
-    Adding sequences from FASTA; added 46 sequences in 0.00251102 seconds.
+    Adding sequences from FASTA; added 46 sequences in 0.00286388 seconds.
 
 Pmea
 
@@ -227,14 +186,14 @@ Pmea
 -out ../output/10-shortRNA-ShortStack-comparison/blasts/Pmea-db/Pmea_ShortStack_mature
 ```
 
-    Building a new DB, current time: 06/03/2024 11:33:42
+    Building a new DB, current time: 06/03/2024 11:58:09
     New DB name:   /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Pmea-db/Pmea_ShortStack_mature
     New DB title:  ../data/10-shortRNA-ShortStack-comparison/Pmea_ShortStack_mature.fasta
     Sequence type: Nucleotide
     Deleted existing Nucleotide BLAST database named /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Pmea-db/Pmea_ShortStack_mature
     Keep MBits: T
     Maximum file size: 1000000000B
-    Adding sequences from FASTA; added 36 sequences in 0.00202203 seconds.
+    Adding sequences from FASTA; added 36 sequences in 0.0019269 seconds.
 
 ## 2.2 Run Blastn
 
@@ -655,7 +614,12 @@ a <- list("A.pulchra" = apul_mature_newconservedID,
           "P.meandrina" = pmea_mature_newconservedID)
 
 venn_conserved <- ggvenn(a)
+venn_conserved
+```
 
+<img src="10-shortRNA-ShortStack-comparison_files/figure-gfm/venn-diagram-1.png" style="display: block; margin: auto;" />
+
+``` r
 ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/figures/venn_conserved_miRNA.png",
          plot   = venn_conserved,
          res    = 600,
@@ -760,7 +724,7 @@ pcoa_plot <- ggplot(pcoa_vec_annot, aes(Axis.1, Axis.2, color=V2)) +
 pcoa_plot
 ```
 
-<img src="10-shortRNA-ShortStack-comparison_files/figure-gfm/unnamed-chunk-28-1.png" style="display: block; margin: auto;" />
+<img src="10-shortRNA-ShortStack-comparison_files/figure-gfm/pcoa-plot-1.png" style="display: block; margin: auto;" />
 
 ``` r
 # Save plot
@@ -798,7 +762,7 @@ all.spec.seqsim.heat <- pheatmap(all_to_all_full_shortnames,
                      height = 20)
 ```
 
-<img src="10-shortRNA-ShortStack-comparison_files/figure-gfm/unnamed-chunk-29-1.png" style="display: block; margin: auto;" />
+<img src="10-shortRNA-ShortStack-comparison_files/figure-gfm/heatmap-plot-1.png" style="display: block; margin: auto;" />
 
 ``` r
 # Save plot
