@@ -490,6 +490,7 @@ rownames(miRNA_species) <- miRNA_species[, "miRNA_ID"]
 pcoa <- pcoa(all_to_all_full, correction="none", rn=NULL)
 pcoa_vec <- as.data.frame(pcoa$vectors)
 pcoa_vec$rownames <- rownames(pcoa_vec)
+pcoa_vec <- mutate(pcoa_vec, rownames = trimws(as.character(rownames)))
 pcoa_vec_annot <- left_join(pcoa_vec, miRNA_species, by = c("rownames" = "miRNA_ID"))
 rownames(pcoa_vec_annot) <- pcoa_vec_annot$rownames
 
