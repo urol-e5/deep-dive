@@ -150,14 +150,14 @@ Apul
 -out ../output/10-shortRNA-ShortStack-comparison/blasts/Apul-db/Apul_ShortStack_mature
 ```
 
-    Building a new DB, current time: 06/03/2024 11:58:08
+    Building a new DB, current time: 06/03/2024 13:55:00
     New DB name:   /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Apul-db/Apul_ShortStack_mature
     New DB title:  ../data/10-shortRNA-ShortStack-comparison/Apul_ShortStack_mature.fasta
     Sequence type: Nucleotide
     Deleted existing Nucleotide BLAST database named /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Apul-db/Apul_ShortStack_mature
     Keep MBits: T
     Maximum file size: 1000000000B
-    Adding sequences from FASTA; added 38 sequences in 0.00214005 seconds.
+    Adding sequences from FASTA; added 38 sequences in 0.00180984 seconds.
 
 Peve
 
@@ -168,14 +168,14 @@ Peve
 -out ../output/10-shortRNA-ShortStack-comparison/blasts/Peve-db/Peve_ShortStack_mature
 ```
 
-    Building a new DB, current time: 06/03/2024 11:58:09
+    Building a new DB, current time: 06/03/2024 13:55:01
     New DB name:   /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Peve-db/Peve_ShortStack_mature
     New DB title:  ../data/10-shortRNA-ShortStack-comparison/Peve_ShortStack_mature.fasta
     Sequence type: Nucleotide
     Deleted existing Nucleotide BLAST database named /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Peve-db/Peve_ShortStack_mature
     Keep MBits: T
     Maximum file size: 1000000000B
-    Adding sequences from FASTA; added 46 sequences in 0.00286388 seconds.
+    Adding sequences from FASTA; added 46 sequences in 0.00294805 seconds.
 
 Pmea
 
@@ -186,14 +186,14 @@ Pmea
 -out ../output/10-shortRNA-ShortStack-comparison/blasts/Pmea-db/Pmea_ShortStack_mature
 ```
 
-    Building a new DB, current time: 06/03/2024 11:58:09
+    Building a new DB, current time: 06/03/2024 13:55:01
     New DB name:   /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Pmea-db/Pmea_ShortStack_mature
     New DB title:  ../data/10-shortRNA-ShortStack-comparison/Pmea_ShortStack_mature.fasta
     Sequence type: Nucleotide
     Deleted existing Nucleotide BLAST database named /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Pmea-db/Pmea_ShortStack_mature
     Keep MBits: T
     Maximum file size: 1000000000B
-    Adding sequences from FASTA; added 36 sequences in 0.0019269 seconds.
+    Adding sequences from FASTA; added 36 sequences in 0.0025301 seconds.
 
 ## 2.2 Run Blastn
 
@@ -647,9 +647,9 @@ append_string="${append_string%,}"
 sed -i 's/\s*$//' ../output/10-shortRNA-ShortStack-comparison/mature_miRNA_all_to_all_distance_nodescription.csv
 sed -i '120s/$/ '"$append_string"'/' ../output/10-shortRNA-ShortStack-comparison/mature_miRNA_all_to_all_distance_nodescription.csv
 
-# For a couple sequence pairs, MEGA couldn't compute a pairwise distance for statistical reasons, and these are noted in the file as "?" entries. Non-numeric entries will mess with our analysis down the line, so we need to replace those.
-# Replace all "?" entries with 0s
-sed -i 's/?/0/g' ../output/10-shortRNA-ShortStack-comparison/mature_miRNA_all_to_all_distance_nodescription.csv
+# For a couple sequence pairs, MEGA couldn't compute a pairwise distance for statistical reasons, and these are noted in the file as "?" entries. MEGA documentation indicates this notation is associated with being unable to identify any shared sites (i.e., the sequences are too different to even compare). Non-numeric entries will mess with our analysis down the line, so we need to replace those. Since they're associated with no shared sites, we'll replace them with 1s (indicating very high sequence distance).
+# Replace all "?" entries with 1s
+sed -i 's/?/1/g' ../output/10-shortRNA-ShortStack-comparison/mature_miRNA_all_to_all_distance_nodescription.csv
 ```
 
 ``` r
@@ -696,7 +696,8 @@ sed -i '/mature::Pocillopora/s/$/,P_meandrina/' miRNA_species.csv
 miRNA_species <- read.csv("../output/10-shortRNA-ShortStack-comparison/miRNA_species.csv", header = FALSE)
 
 # Make the miRNA labels row names
-rownames(miRNA_species) <- miRNA_species[, "V1"]
+colnames(miRNA_species) <- c("miRNA_ID", "Species")
+rownames(miRNA_species) <- miRNA_species[, "miRNA_ID"]
 ```
 
 ## 4.1 PCoA
@@ -708,12 +709,12 @@ matrix as input
 pcoa <- pcoa(all_to_all_full, correction="none", rn=NULL)
 pcoa_vec <- as.data.frame(pcoa$vectors)
 pcoa_vec$rownames <- rownames(pcoa_vec)
-pcoa_vec_annot <- left_join(pcoa_vec, miRNA_species, by = c("rownames" = "V1"))
+pcoa_vec_annot <- left_join(pcoa_vec, miRNA_species, by = c("rownames" = "miRNA_ID"))
 rownames(pcoa_vec_annot) <- pcoa_vec_annot$rownames
 
 percent_var <- round(pcoa[["values"]][["Relative_eig"]]*100)
 
-pcoa_plot <- ggplot(pcoa_vec_annot, aes(Axis.1, Axis.2, color=V2)) + 
+pcoa_plot <- ggplot(pcoa_vec_annot, aes(Axis.1, Axis.2, color=Species)) + 
   geom_point(size=4, alpha = 5/10) +
   ggtitle("PCoA of mature miRNA pairwise genetic distance (all to all)") +
   xlab(paste0("PC1: ",percent_var[1],"% variance")) +
@@ -740,10 +741,7 @@ ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/figures/PCoA_al
 ``` r
 # # Annotate heatmap
 specID <- miRNA_species %>% 
-  select(V2)
-# 
-# # Set a color palette
-# heat_colors <- rev(brewer.pal(12, "RdYlBu"))
+  select(Species)
 
 all_to_all_full_shortnames <- all_to_all_full
 colnames(all_to_all_full_shortnames) <- substr(colnames(all_to_all_full), 1, 20)
@@ -751,13 +749,11 @@ rownames(all_to_all_full_shortnames) <- colnames(all_to_all_full_shortnames)
 
 # Run pheatmap
 all.spec.seqsim.heat <- pheatmap(all_to_all_full_shortnames, 
-                     #color = heat_colors, 
                      cluster_rows = T, 
                      show_rownames = T,
                      annotation = specID, 
                      border_color = NA, 
-                     fontsize = 5,
-                     #scale = "row", 
+                     fontsize = 5, 
                      fontsize_row = 5, 
                      height = 20)
 ```
