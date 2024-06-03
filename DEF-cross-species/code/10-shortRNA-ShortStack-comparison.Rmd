@@ -165,16 +165,17 @@ Pmea
 
 ## Run Blastn
 
-Apul to all
-```{r, engine='bash'}
+Generate a list of blast results that, for each miRNA, shows the top hit in each of two other species. We want to see the top hits no matter how poor the match is, so we will not filter by e-value at this stage. We'll also include the "-word_size 4" option, which reduces the required length of the initial match.
 
+All to Apul:
+```{r, engine='bash'}
 /home/shared/ncbi-blast-2.11.0+/bin/blastn \
 -task blastn-short \
 -query ../data/10-shortRNA-ShortStack-comparison/merged_all_ShortStack_mature.fasta \
 -db ../output/10-shortRNA-ShortStack-comparison/blasts/Apul-db/Apul_ShortStack_mature \
 -out ../output/10-shortRNA-ShortStack-comparison/Apul_to_all_blastn.tab \
--evalue 1E-5 \
 -num_threads 40 \
+-word_size 4 \
 -max_target_seqs 1 \
 -max_hsps 1 \
 -outfmt 6
@@ -182,16 +183,16 @@ Apul to all
 wc -l ../output/10-shortRNA-ShortStack-comparison/Apul_to_all_blastn.tab
 ```
 
-Peve to all
-```{r, engine='bash'}
 
+All to Peve:
+```{r, engine='bash'}
 /home/shared/ncbi-blast-2.11.0+/bin/blastn \
 -task blastn-short \
 -query ../data/10-shortRNA-ShortStack-comparison/merged_all_ShortStack_mature.fasta \
 -db ../output/10-shortRNA-ShortStack-comparison/blasts/Peve-db/Peve_ShortStack_mature \
 -out ../output/10-shortRNA-ShortStack-comparison/Peve_to_all_blastn.tab \
--evalue 1E-5 \
 -num_threads 40 \
+-word_size 4 \
 -max_target_seqs 1 \
 -max_hsps 1 \
 -outfmt 6
@@ -199,16 +200,15 @@ Peve to all
 wc -l ../output/10-shortRNA-ShortStack-comparison/Peve_to_all_blastn.tab
 ```
 
-Pmea to all
+All to Pmea:
 ```{r, engine='bash'}
-
 /home/shared/ncbi-blast-2.11.0+/bin/blastn \
 -task blastn-short \
 -query ../data/10-shortRNA-ShortStack-comparison/merged_all_ShortStack_mature.fasta \
 -db ../output/10-shortRNA-ShortStack-comparison/blasts/Pmea-db/Pmea_ShortStack_mature \
 -out ../output/10-shortRNA-ShortStack-comparison/Pmea_to_all_blastn.tab \
--evalue 1E-5 \
 -num_threads 40 \
+-word_size 4 \
 -max_target_seqs 1 \
 -max_hsps 1 \
 -outfmt 6
@@ -216,7 +216,7 @@ Pmea to all
 wc -l ../output/10-shortRNA-ShortStack-comparison/Pmea_to_all_blastn.tab
 ```
 
-# Join BLAST tables
+## Join BLAST tables
 
 ```{r}
 apul_to_all_blastn <- read.table("../output/10-shortRNA-ShortStack-comparison/Apul_to_all_blastn.tab", sep="\t", header=FALSE)
@@ -245,8 +245,19 @@ combined_blastn <- rbind(apul_to_all_blastn, peve_to_all_blastn, pmea_to_all_bla
 # Assign informative column labels
 colnames(combined_blastn) <- c("qseqid", "sseqid", "pident", "length", "mismatch", "gapopen", "qstart", "qend", "sstart", "send", "evalue", "bitscore")
 
-# Remove instances where a sequence matched to itself (e.g. from querying an Apul sequence against our combined database which contained all Apul sequences)
-filtered_combined_blastn <- filter(combined_blastn, qseqid != sseqid)
+# Save this original, unfiltered blast table.
+write.table(combined_blastn, "../output/10-shortRNA-ShortStack-comparison/combined_blast.tab", sep="\t", row.names=FALSE, quote=FALSE)
+```
+
+
+# Identify conserved miRNAs
+
+Filter our list of blast hits to remove instances where sequences match themselves (e.g. from querying an Apul sequence against our combined database which contained all Apul sequences), and to retain only the significant hits (We'll set this at eval > 1E-5)
+```{r}
+# Filter
+filtered_combined_blastn <- combined_blastn %>%
+  filter(qseqid != sseqid) %>%
+  filter(evalue < 0.00001)
 
 # View
 nrow(filtered_combined_blastn)
@@ -254,8 +265,6 @@ head(filtered_combined_blastn)
 
 write.table(filtered_combined_blastn, "../output/10-shortRNA-ShortStack-comparison/filtered_combined_blast.tab", sep="\t", row.names=FALSE, quote=FALSE)
 ```
-
-# Identify conserved miRNAs
 
 Ok now we can start identifying conserved miRNAs. Keep in mind that this list of filtered, combined blastn hits contains duplicates because, for example, querying Apul sequences against a database containing Peve sequences is functionally the same as querying those Peve sequences against a databse which contains Apul. So, for example, this list would contain a hit matching Apul.seq1 to Peve.seq2, *and* a hit matching Peve.seq2 to Apul.seq1.
 
@@ -514,7 +523,7 @@ percent_var <- round(pcoa[["values"]][["Relative_eig"]]*100)
 
 pcoa_plot <- ggplot(pcoa_vec_annot, aes(Axis.1, Axis.2, color=V2)) + 
   geom_point(size=4, alpha = 5/10) +
-  ggtitle("PCoA of  pairwise genetic distance (all to all)") +
+  ggtitle("PCoA of mature miRNA pairwise genetic distance (all to all)") +
   xlab(paste0("PC1: ",percent_var[1],"% variance")) +
   ylab(paste0("PC2: ",percent_var[2],"% variance")) + 
   coord_fixed() +
