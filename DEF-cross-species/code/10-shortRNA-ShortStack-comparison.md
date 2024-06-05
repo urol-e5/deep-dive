@@ -151,14 +151,14 @@ Apul
 -out ../output/10-shortRNA-ShortStack-comparison/blasts/Apul-db/Apul_ShortStack_mature
 ```
 
-    Building a new DB, current time: 06/05/2024 14:15:17
+    Building a new DB, current time: 06/05/2024 14:24:44
     New DB name:   /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Apul-db/Apul_ShortStack_mature
     New DB title:  ../data/10-shortRNA-ShortStack-comparison/Apul_ShortStack_mature.fasta
     Sequence type: Nucleotide
     Deleted existing Nucleotide BLAST database named /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Apul-db/Apul_ShortStack_mature
     Keep MBits: T
     Maximum file size: 1000000000B
-    Adding sequences from FASTA; added 38 sequences in 0.00750804 seconds.
+    Adding sequences from FASTA; added 38 sequences in 0.00759912 seconds.
 
 Peve
 
@@ -169,14 +169,14 @@ Peve
 -out ../output/10-shortRNA-ShortStack-comparison/blasts/Peve-db/Peve_ShortStack_mature
 ```
 
-    Building a new DB, current time: 06/05/2024 14:15:18
+    Building a new DB, current time: 06/05/2024 14:24:45
     New DB name:   /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Peve-db/Peve_ShortStack_mature
     New DB title:  ../data/10-shortRNA-ShortStack-comparison/Peve_ShortStack_mature.fasta
     Sequence type: Nucleotide
     Deleted existing Nucleotide BLAST database named /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Peve-db/Peve_ShortStack_mature
     Keep MBits: T
     Maximum file size: 1000000000B
-    Adding sequences from FASTA; added 46 sequences in 0.00237799 seconds.
+    Adding sequences from FASTA; added 46 sequences in 0.00327492 seconds.
 
 Pmea
 
@@ -187,14 +187,14 @@ Pmea
 -out ../output/10-shortRNA-ShortStack-comparison/blasts/Pmea-db/Pmea_ShortStack_mature
 ```
 
-    Building a new DB, current time: 06/05/2024 14:15:18
+    Building a new DB, current time: 06/05/2024 14:24:46
     New DB name:   /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Pmea-db/Pmea_ShortStack_mature
     New DB title:  ../data/10-shortRNA-ShortStack-comparison/Pmea_ShortStack_mature.fasta
     Sequence type: Nucleotide
     Deleted existing Nucleotide BLAST database named /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Pmea-db/Pmea_ShortStack_mature
     Keep MBits: T
     Maximum file size: 1000000000B
-    Adding sequences from FASTA; added 36 sequences in 0.00165701 seconds.
+    Adding sequences from FASTA; added 36 sequences in 0.00160193 seconds.
 
 ## 2.2 Run Blastn
 
@@ -615,7 +615,7 @@ a <- list("A. pulchra" = apul_mature_newconservedID,
           "P. evermanni" = peve_mature_newconservedID,
           "P. tuahiniensis" = pmea_mature_newconservedID)
 
-venn_conserved <- ggvenn(a)
+venn_conserved <- ggvenn(a, show_percentage = FALSE)
 venn_conserved
 ```
 
