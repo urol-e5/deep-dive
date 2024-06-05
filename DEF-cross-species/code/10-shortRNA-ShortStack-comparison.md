@@ -150,14 +150,14 @@ Apul
 -out ../output/10-shortRNA-ShortStack-comparison/blasts/Apul-db/Apul_ShortStack_mature
 ```
 
-    Building a new DB, current time: 06/03/2024 14:13:07
+    Building a new DB, current time: 06/05/2024 13:06:22
     New DB name:   /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Apul-db/Apul_ShortStack_mature
     New DB title:  ../data/10-shortRNA-ShortStack-comparison/Apul_ShortStack_mature.fasta
     Sequence type: Nucleotide
     Deleted existing Nucleotide BLAST database named /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Apul-db/Apul_ShortStack_mature
     Keep MBits: T
     Maximum file size: 1000000000B
-    Adding sequences from FASTA; added 38 sequences in 0.00262308 seconds.
+    Adding sequences from FASTA; added 38 sequences in 0.00255203 seconds.
 
 Peve
 
@@ -168,14 +168,14 @@ Peve
 -out ../output/10-shortRNA-ShortStack-comparison/blasts/Peve-db/Peve_ShortStack_mature
 ```
 
-    Building a new DB, current time: 06/03/2024 14:13:08
+    Building a new DB, current time: 06/05/2024 13:06:22
     New DB name:   /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Peve-db/Peve_ShortStack_mature
     New DB title:  ../data/10-shortRNA-ShortStack-comparison/Peve_ShortStack_mature.fasta
     Sequence type: Nucleotide
     Deleted existing Nucleotide BLAST database named /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Peve-db/Peve_ShortStack_mature
     Keep MBits: T
     Maximum file size: 1000000000B
-    Adding sequences from FASTA; added 46 sequences in 0.0023191 seconds.
+    Adding sequences from FASTA; added 46 sequences in 0.00279093 seconds.
 
 Pmea
 
@@ -186,14 +186,14 @@ Pmea
 -out ../output/10-shortRNA-ShortStack-comparison/blasts/Pmea-db/Pmea_ShortStack_mature
 ```
 
-    Building a new DB, current time: 06/03/2024 14:13:09
+    Building a new DB, current time: 06/05/2024 13:06:23
     New DB name:   /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Pmea-db/Pmea_ShortStack_mature
     New DB title:  ../data/10-shortRNA-ShortStack-comparison/Pmea_ShortStack_mature.fasta
     Sequence type: Nucleotide
     Deleted existing Nucleotide BLAST database named /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Pmea-db/Pmea_ShortStack_mature
     Keep MBits: T
     Maximum file size: 1000000000B
-    Adding sequences from FASTA; added 36 sequences in 0.00250196 seconds.
+    Adding sequences from FASTA; added 36 sequences in 0.00222111 seconds.
 
 ## 2.2 Run Blastn
 
@@ -609,9 +609,10 @@ pmea_mature_newconservedID <- replace_entries(pmea_IDs, conserved_miRNAs_all_IDs
 ### 3.3.2 Venn diagram
 
 ``` r
-a <- list("A.pulchra" = apul_mature_newconservedID, 
-          "P.evermanni" = peve_mature_newconservedID,
-          "P.meandrina" = pmea_mature_newconservedID)
+# Note that mtORF data indicates our P.meandrina samples are actually P.tuahiniensis, so that's the species name we'll be using in figures
+a <- list("A. pulchra" = apul_mature_newconservedID, 
+          "P. evermanni" = peve_mature_newconservedID,
+          "P. tuahiniensis" = pmea_mature_newconservedID)
 
 venn_conserved <- ggvenn(a)
 venn_conserved
@@ -685,10 +686,11 @@ cd ../output/10-shortRNA-ShortStack-comparison
 awk -F ',' '{print $1}' mature_miRNA_all_to_all_distance_nodescription.csv > miRNA_names.txt
 
 # Add full species name in second column based on the seq ID
+# Note that mtORF data indicates our P.meandrina samples are actually P.tuahiniensis, so that's the species name we'll be using in figures
 sed -i 's/\s*$//' miRNA_names.txt
 sed '/mature::N/s/$/,A_pulchra/' miRNA_names.txt > miRNA_species.csv
 sed -i '/mature::Porites/s/$/,P_evermanni/' miRNA_species.csv
-sed -i '/mature::Pocillopora/s/$/,P_meandrina/' miRNA_species.csv
+sed -i '/mature::Pocillopora/s/$/,P_tuahiniensis/' miRNA_species.csv
 ```
 
 ``` r
@@ -715,11 +717,13 @@ rownames(pcoa_vec_annot) <- pcoa_vec_annot$rownames
 
 percent_var <- round(pcoa[["values"]][["Relative_eig"]]*100)
 
+# Note that mtORF data indicates our P.meandrina samples are actually P.tuahiniensis, so that's the species name we'll be using in figures
 pcoa_plot <- ggplot(pcoa_vec_annot, aes(Axis.1, Axis.2, color=Species)) + 
   geom_point(size=4, alpha = 5/10) +
   ggtitle("PCoA of mature miRNA pairwise genetic distance (all to all)") +
   xlab(paste0("PC1: ",percent_var[1],"% variance")) +
   ylab(paste0("PC2: ",percent_var[2],"% variance")) + 
+  scale_color_manual(labels = c("A. pulchra", "P. evermanni", "P. tuahiniensis"), values = c("red", "green", "blue")) +
   coord_fixed() +
   stat_ellipse()
 
