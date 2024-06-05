@@ -130,14 +130,18 @@ find ../data/fastq/*R2_001.fastp-trim.20230519.fastq.gz \
 > ../output/05.99-lncRNA/{}_hisat.stdout 2> ../output/05.99-lncRNA/{}_hisat.stderr'
 ```
 
-```{r, engine='bash', eval=TRUE}
-cat ../output/05.33-lncRNA-discovery/hisat.out
-```
+
 
 ## convert to bams
 
 ```{r, engine='bash'}
-for samfile in ../output/05.33-lncRNA-discovery/*.sam; do
+echo "05.99-lncRNA/*bam" >> ../output/.gitignore
+echo "05.99-lncRNA/*bam*" >> ../output/.gitignore
+```
+
+
+```{r, engine='bash'}
+for samfile in ../output/05.99-lncRNA/*.sam; do
   bamfile="${samfile%.sam}.bam"
   sorted_bamfile="${samfile%.sam}.sorted.bam"
   
