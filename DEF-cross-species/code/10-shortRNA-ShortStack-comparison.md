@@ -51,6 +51,7 @@ Kathleen Durkin
 - <a href="#6-look-at-the-database-matches"
   id="toc-6-look-at-the-database-matches">6 Look at the database
   matches</a>
+  - <a href="#61-table" id="toc-61-table">6.1 Table</a>
 
 I want to find miRNAs that are conserved among either a subset of or all
 three species of interest (*A.pulchra*, *P.evermanni*, and
@@ -150,14 +151,14 @@ Apul
 -out ../output/10-shortRNA-ShortStack-comparison/blasts/Apul-db/Apul_ShortStack_mature
 ```
 
-    Building a new DB, current time: 06/05/2024 13:06:22
+    Building a new DB, current time: 06/05/2024 14:24:44
     New DB name:   /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Apul-db/Apul_ShortStack_mature
     New DB title:  ../data/10-shortRNA-ShortStack-comparison/Apul_ShortStack_mature.fasta
     Sequence type: Nucleotide
     Deleted existing Nucleotide BLAST database named /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Apul-db/Apul_ShortStack_mature
     Keep MBits: T
     Maximum file size: 1000000000B
-    Adding sequences from FASTA; added 38 sequences in 0.00255203 seconds.
+    Adding sequences from FASTA; added 38 sequences in 0.00759912 seconds.
 
 Peve
 
@@ -168,14 +169,14 @@ Peve
 -out ../output/10-shortRNA-ShortStack-comparison/blasts/Peve-db/Peve_ShortStack_mature
 ```
 
-    Building a new DB, current time: 06/05/2024 13:06:22
+    Building a new DB, current time: 06/05/2024 14:24:45
     New DB name:   /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Peve-db/Peve_ShortStack_mature
     New DB title:  ../data/10-shortRNA-ShortStack-comparison/Peve_ShortStack_mature.fasta
     Sequence type: Nucleotide
     Deleted existing Nucleotide BLAST database named /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Peve-db/Peve_ShortStack_mature
     Keep MBits: T
     Maximum file size: 1000000000B
-    Adding sequences from FASTA; added 46 sequences in 0.00279093 seconds.
+    Adding sequences from FASTA; added 46 sequences in 0.00327492 seconds.
 
 Pmea
 
@@ -186,14 +187,14 @@ Pmea
 -out ../output/10-shortRNA-ShortStack-comparison/blasts/Pmea-db/Pmea_ShortStack_mature
 ```
 
-    Building a new DB, current time: 06/05/2024 13:06:23
+    Building a new DB, current time: 06/05/2024 14:24:46
     New DB name:   /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Pmea-db/Pmea_ShortStack_mature
     New DB title:  ../data/10-shortRNA-ShortStack-comparison/Pmea_ShortStack_mature.fasta
     Sequence type: Nucleotide
     Deleted existing Nucleotide BLAST database named /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Pmea-db/Pmea_ShortStack_mature
     Keep MBits: T
     Maximum file size: 1000000000B
-    Adding sequences from FASTA; added 36 sequences in 0.00222111 seconds.
+    Adding sequences from FASTA; added 36 sequences in 0.00160193 seconds.
 
 ## 2.2 Run Blastn
 
@@ -614,7 +615,7 @@ a <- list("A. pulchra" = apul_mature_newconservedID,
           "P. evermanni" = peve_mature_newconservedID,
           "P. tuahiniensis" = pmea_mature_newconservedID)
 
-venn_conserved <- ggvenn(a)
+venn_conserved <- ggvenn(a, show_percentage = FALSE)
 venn_conserved
 ```
 
@@ -1130,4 +1131,48 @@ while IFS= read -r line; do
         echo "$line"
     fi
 done < ../../data/10-shortRNA-ShortStack-comparison/Pmea_ShortStack_mature.fasta > Pmea_ShortStack_mature_annotated.fasta
+```
+
+## 6.1 Table
+
+``` r
+Apul_shortstack_results <- read.csv("../../D-Apul/output/13.2.1-Apul-sRNAseq-ShortStack-31bp-fastp-merged-cnidarian_miRBase/ShortStack_out/Results.txt", sep="\t")
+
+Peve_shortstack_results <- read.csv("../../E-Peve/output/08.2-Peve-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/Results.txt", sep="\t")
+
+Pmea_shortstack_results <- read.csv("../../F-Pmea/output/13.2.1-Pmea-sRNAseq-ShortStack-31bp-fastp-merged-cnidarian_miRBase/ShortStack_out/Results.txt", sep="\t")
+
+Apul_num_miRNA <- Apul_shortstack_results %>% filter(MIRNA == "Y") %>% nrow()
+Apul_num_miRNAmatch <- Apul_shortstack_results %>% filter(MIRNA == "Y" ) %>% filter(!is.na(known_miRNAs)) %>% nrow()
+
+Peve_num_miRNA <- Peve_shortstack_results %>% filter(MIRNA == "Y") %>% nrow()
+Peve_num_miRNAmatch <- Peve_shortstack_results %>% filter(MIRNA == "Y" ) %>% filter(!is.na(known_miRNAs)) %>% nrow()
+
+Pmea_num_miRNA <- Pmea_shortstack_results %>% filter(MIRNA == "Y") %>% nrow()
+Pmea_num_miRNAmatch <- Pmea_shortstack_results %>% filter(MIRNA == "Y" ) %>% filter(!is.na(known_miRNAs)) %>% nrow()
+
+table_data <- data.frame(
+  Species = c("A. pulchra", "P. evermanni", "P. tuaheniensis"),
+  miRNA = c(Apul_num_miRNA, Peve_num_miRNA, Pmea_num_miRNA),
+  miRNAmatch = c(Apul_num_miRNAmatch, Peve_num_miRNAmatch, Pmea_num_miRNAmatch)
+)
+colnames(table_data) <- c("Species", "miRNA", "miRNA with database match(es)")
+```
+
+``` r
+table <- tableGrob(table_data, rows=NULL)
+miRNA_matches_table <- grid.arrange(table)
+```
+
+<img src="10-shortRNA-ShortStack-comparison_files/figure-gfm/make-summary-table-1.png" style="display: block; margin: auto;" />
+
+``` r
+png("../output/10-shortRNA-ShortStack-comparison/figures/table_miRNA_matches.png", width = 400, height = 100)
+grid.arrange(table)
+
+# ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/figures/table_miRNA_matches.png",
+#          plot   = miRNA_matches_table,
+#          res    = 600,
+#          width  = 5000,
+#          height = 5000)
 ```

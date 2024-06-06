@@ -36,6 +36,7 @@ library(ggvenn)
 library(ape)
 library(pheatmap)
 library(ggpubr)
+library(gridExtra)
 
 knitr::opts_chunk$set(
   echo = TRUE,         # Display code chunks
@@ -403,7 +404,7 @@ a <- list("A. pulchra" = apul_mature_newconservedID,
           "P. evermanni" = peve_mature_newconservedID,
           "P. tuahiniensis" = pmea_mature_newconservedID)
 
-venn_conserved <- ggvenn(a)
+venn_conserved <- ggvenn(a, show_percentage = FALSE)
 venn_conserved
 
 ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/figures/venn_conserved_miRNA.png",
@@ -770,4 +771,44 @@ while IFS= read -r line; do
         echo "$line"
     fi
 done < ../../data/10-shortRNA-ShortStack-comparison/Pmea_ShortStack_mature.fasta > Pmea_ShortStack_mature_annotated.fasta
+```
+
+## Table
+
+```{r data-summary-compare-dbmatch}
+Apul_shortstack_results <- read.csv("../../D-Apul/output/13.2.1-Apul-sRNAseq-ShortStack-31bp-fastp-merged-cnidarian_miRBase/ShortStack_out/Results.txt", sep="\t")
+
+Peve_shortstack_results <- read.csv("../../E-Peve/output/08.2-Peve-sRNAseq-ShortStack-31bp-fastp-merged/ShortStack_out/Results.txt", sep="\t")
+
+Pmea_shortstack_results <- read.csv("../../F-Pmea/output/13.2.1-Pmea-sRNAseq-ShortStack-31bp-fastp-merged-cnidarian_miRBase/ShortStack_out/Results.txt", sep="\t")
+
+Apul_num_miRNA <- Apul_shortstack_results %>% filter(MIRNA == "Y") %>% nrow()
+Apul_num_miRNAmatch <- Apul_shortstack_results %>% filter(MIRNA == "Y" ) %>% filter(!is.na(known_miRNAs)) %>% nrow()
+
+Peve_num_miRNA <- Peve_shortstack_results %>% filter(MIRNA == "Y") %>% nrow()
+Peve_num_miRNAmatch <- Peve_shortstack_results %>% filter(MIRNA == "Y" ) %>% filter(!is.na(known_miRNAs)) %>% nrow()
+
+Pmea_num_miRNA <- Pmea_shortstack_results %>% filter(MIRNA == "Y") %>% nrow()
+Pmea_num_miRNAmatch <- Pmea_shortstack_results %>% filter(MIRNA == "Y" ) %>% filter(!is.na(known_miRNAs)) %>% nrow()
+
+table_data <- data.frame(
+  Species = c("A. pulchra", "P. evermanni", "P. tuaheniensis"),
+  miRNA = c(Apul_num_miRNA, Peve_num_miRNA, Pmea_num_miRNA),
+  miRNAmatch = c(Apul_num_miRNAmatch, Peve_num_miRNAmatch, Pmea_num_miRNAmatch)
+)
+colnames(table_data) <- c("Species", "miRNA", "miRNA with database match(es)")
+```
+
+```{r make-summary-table}
+table <- tableGrob(table_data, rows=NULL)
+miRNA_matches_table <- grid.arrange(table)
+
+png("../output/10-shortRNA-ShortStack-comparison/figures/table_miRNA_matches.png", width = 400, height = 100)
+grid.arrange(table)
+
+# ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/figures/table_miRNA_matches.png",
+#          plot   = miRNA_matches_table,
+#          res    = 600,
+#          width  = 5000,
+#          height = 5000)
 ```
