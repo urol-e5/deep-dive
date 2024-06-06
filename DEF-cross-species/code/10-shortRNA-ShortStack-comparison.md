@@ -83,7 +83,7 @@ grep "^>" Pmea_ShortStack_mature.fasta | wc -l
 
     38
     46
-    36
+    37
 
 ## 1.2 Merge the three mature miRNA FASTAs
 
@@ -106,15 +106,15 @@ tail merged_all_ShortStack_mature.fasta
     TTTGCTAGTTGCTTTTGTCCCGT
     >Cluster_1900.mature::NC_058067.1:16118269-16118291(-)
     aaaaatgtcggttgcttaagct
-    >Cluster_4838.mature::Pocillopora_meandrina_HIv1___Sc0000018:6855520-6855542(+)
+    >Cluster_4846.mature::Pocillopora_meandrina_HIv1___Sc0000018:6855520-6855542(+)
     TCACCCAACAGTTTTAATCTGA
-    >Cluster_5273.mature::Pocillopora_meandrina_HIv1___Sc0000021:4351838-4351860(+)
+    >Cluster_5275.mature::Pocillopora_meandrina_HIv1___Sc0000021:4351838-4351860(+)
     ACTGATATTCACCAAGTGATTA
-    >Cluster_5633.mature::Pocillopora_meandrina_HIv1___Sc0000024:4808687-4808708(+)
+    >Cluster_5642.mature::Pocillopora_meandrina_HIv1___Sc0000024:4808687-4808708(+)
     AGAACCCAAGAATCTCGAAGG
-    >Cluster_5761.mature::Pocillopora_meandrina_HIv1___Sc0000026:1154771-1154793(-)
+    >Cluster_5770.mature::Pocillopora_meandrina_HIv1___Sc0000026:1154771-1154793(-)
     TGTACTATGTTCATGATCTTGC
-    >Cluster_6425.mature::Pocillopora_meandrina_HIv1___Sc0000035:1989841-1989863(+)
+    >Cluster_6429.mature::Pocillopora_meandrina_HIv1___Sc0000035:1989841-1989863(+)
     TATTTACAACTCTCAAAACAAC
 
 Let’s do a quick investigation of our mature miRNAs.
@@ -151,14 +151,14 @@ Apul
 -out ../output/10-shortRNA-ShortStack-comparison/blasts/Apul-db/Apul_ShortStack_mature
 ```
 
-    Building a new DB, current time: 06/05/2024 14:24:44
+    Building a new DB, current time: 06/06/2024 10:27:04
     New DB name:   /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Apul-db/Apul_ShortStack_mature
     New DB title:  ../data/10-shortRNA-ShortStack-comparison/Apul_ShortStack_mature.fasta
     Sequence type: Nucleotide
     Deleted existing Nucleotide BLAST database named /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Apul-db/Apul_ShortStack_mature
     Keep MBits: T
     Maximum file size: 1000000000B
-    Adding sequences from FASTA; added 38 sequences in 0.00759912 seconds.
+    Adding sequences from FASTA; added 38 sequences in 0.002177 seconds.
 
 Peve
 
@@ -169,14 +169,14 @@ Peve
 -out ../output/10-shortRNA-ShortStack-comparison/blasts/Peve-db/Peve_ShortStack_mature
 ```
 
-    Building a new DB, current time: 06/05/2024 14:24:45
+    Building a new DB, current time: 06/06/2024 10:27:04
     New DB name:   /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Peve-db/Peve_ShortStack_mature
     New DB title:  ../data/10-shortRNA-ShortStack-comparison/Peve_ShortStack_mature.fasta
     Sequence type: Nucleotide
     Deleted existing Nucleotide BLAST database named /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Peve-db/Peve_ShortStack_mature
     Keep MBits: T
     Maximum file size: 1000000000B
-    Adding sequences from FASTA; added 46 sequences in 0.00327492 seconds.
+    Adding sequences from FASTA; added 46 sequences in 0.00254607 seconds.
 
 Pmea
 
@@ -187,14 +187,14 @@ Pmea
 -out ../output/10-shortRNA-ShortStack-comparison/blasts/Pmea-db/Pmea_ShortStack_mature
 ```
 
-    Building a new DB, current time: 06/05/2024 14:24:46
+    Building a new DB, current time: 06/06/2024 10:27:05
     New DB name:   /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Pmea-db/Pmea_ShortStack_mature
     New DB title:  ../data/10-shortRNA-ShortStack-comparison/Pmea_ShortStack_mature.fasta
     Sequence type: Nucleotide
     Deleted existing Nucleotide BLAST database named /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Pmea-db/Pmea_ShortStack_mature
     Keep MBits: T
     Maximum file size: 1000000000B
-    Adding sequences from FASTA; added 36 sequences in 0.00160193 seconds.
+    Adding sequences from FASTA; added 37 sequences in 0.00251293 seconds.
 
 ## 2.2 Run Blastn
 
@@ -222,7 +222,7 @@ wc -l ../output/10-shortRNA-ShortStack-comparison/blasts/Apul_to_all_blastn.tab
 ```
 
     Warning: [blastn] Examining 5 or more matches is recommended
-    120 ../output/10-shortRNA-ShortStack-comparison/blasts/Apul_to_all_blastn.tab
+    121 ../output/10-shortRNA-ShortStack-comparison/blasts/Apul_to_all_blastn.tab
 
 All to Peve:
 
@@ -242,7 +242,7 @@ wc -l ../output/10-shortRNA-ShortStack-comparison/blasts/Peve_to_all_blastn.tab
 ```
 
     Warning: [blastn] Examining 5 or more matches is recommended
-    120 ../output/10-shortRNA-ShortStack-comparison/blasts/Peve_to_all_blastn.tab
+    121 ../output/10-shortRNA-ShortStack-comparison/blasts/Peve_to_all_blastn.tab
 
 All to Pmea:
 
@@ -262,7 +262,7 @@ wc -l ../output/10-shortRNA-ShortStack-comparison/blasts/Pmea_to_all_blastn.tab
 ```
 
     Warning: [blastn] Examining 5 or more matches is recommended
-    120 ../output/10-shortRNA-ShortStack-comparison/blasts/Pmea_to_all_blastn.tab
+    121 ../output/10-shortRNA-ShortStack-comparison/blasts/Pmea_to_all_blastn.tab
 
 ## 2.3 Join BLAST tables
 
@@ -375,10 +375,10 @@ head(present_in_all, nrow(present_in_all))
     2 Cluster_5540.… Clust…    100     23        0       0      1    23      1    23
     3 Cluster_6875.… Clust…    100     21        0       0      1    21      1    21
     4 Cluster_14865… Clust…    100     22        0       0      1    22      1    22
-    5 Cluster_1116.… Clust…    100     22        0       0      1    22      1    22
-    6 Cluster_1292.… Clust…    100     21        0       0      2    22      2    22
-    7 Cluster_1794.… Clust…    100     21        0       0      1    21      1    21
-    8 Cluster_4049.… Clust…    100     22        0       0      1    22      1    22
+    5 Cluster_1108.… Clust…    100     22        0       0      1    22      1    22
+    6 Cluster_1279.… Clust…    100     21        0       0      2    22      2    22
+    7 Cluster_1783.… Clust…    100     21        0       0      1    21      1    21
+    8 Cluster_4059.… Clust…    100     22        0       0      1    22      1    22
     # ℹ 2 more variables: evalue <dbl>, bitscore <dbl>
 
 ``` r
@@ -448,7 +448,7 @@ head(present_in_apul_pmea, nrow(present_in_apul_pmea))
     # Groups:   sseqid [1]
       qseqid         sseqid pident length mismatch gapopen qstart  qend sstart  send
       <chr>          <chr>   <dbl>  <int>    <int>   <int>  <int> <int>  <int> <int>
-    1 Cluster_1066.… Clust…    100     22        0       0      1    22      1    22
+    1 Cluster_1056.… Clust…    100     22        0       0      1    22      1    22
     # ℹ 2 more variables: evalue <dbl>, bitscore <dbl>
 
 ``` r
@@ -529,7 +529,7 @@ length(peve_IDs)
 length(pmea_IDs)
 ```
 
-    [1] 36
+    [1] 37
 
 ``` r
 # Assign shared miRNA IDs to conserved miRNAs
@@ -559,7 +559,7 @@ print(appendedIDs_apul_peve_pmea[1])
 ```
 
     [[1]]
-    [1] "Cluster_6977.mature::NC_058073.1:12437102-12437124(+)|Cluster_1153.mature::Porites_evermani_scaffold_49:151639-151661(-)|Cluster_1292.mature::Pocillopora_meandrina_HIv1___Sc0000003:10366054-10366076(+)"
+    [1] "Cluster_6977.mature::NC_058073.1:12437102-12437124(+)|Cluster_1153.mature::Porites_evermani_scaffold_49:151639-151661(-)|Cluster_1279.mature::Pocillopora_meandrina_HIv1___Sc0000003:10366054-10366076(+)"
 
 ``` r
 print(appendedIDs_apul_peve)
@@ -573,14 +573,14 @@ print(appendedIDs_apul_pmea)
 ```
 
     [[1]]
-    [1] "Cluster_514.mature::NC_058066.1:20088678-20088700(+)|Cluster_1066.mature::Pocillopora_meandrina_HIv1___Sc0000002:15749309-15749331(+)"
+    [1] "Cluster_514.mature::NC_058066.1:20088678-20088700(+)|Cluster_1056.mature::Pocillopora_meandrina_HIv1___Sc0000002:15749309-15749331(+)"
 
 ``` r
 print(appendedIDs_peve_pmea)
 ```
 
     [[1]]
-    [1] "Cluster_8824.mature::Porites_evermani_scaffold_910:99254-99275(+)|Cluster_2788.mature::Pocillopora_meandrina_HIv1___Sc0000008:1783823-1783844(+)"
+    [1] "Cluster_8824.mature::Porites_evermani_scaffold_910:99254-99275(+)|Cluster_2786.mature::Pocillopora_meandrina_HIv1___Sc0000008:1783823-1783844(+)"
 
 ``` r
 # combine the new appended IDs into a single list of conserved miRNAs
@@ -636,27 +636,27 @@ MUSCLE, then generated pairwise distance matrix
 
 ``` bash
 # Remove description text at bottom of file
-head -120 ../output/10-shortRNA-ShortStack-comparison/mature_miRNA_all_to_all_distance.csv > ../output/10-shortRNA-ShortStack-comparison/mature_miRNA_all_to_all_distance_nodescription.csv
+head -121 ../output/10-shortRNA-ShortStack-comparison/mature_miRNA_all_to_all_distance_06062024.csv > ../output/10-shortRNA-ShortStack-comparison/mature_miRNA_all_to_all_distance_06062024_nodescription.csv
 
 # For some reason the last line was saved as just the row name, with no comma-delimitation to mark each empty column. We need to reintroduce the (empty) comma-delimited columns in the final row.
 # Create the string of commas
-append_string=$(printf ', %.0s' {1..120})
+append_string=$(printf ', %.0s' {1..121})
 
 # Remove the last comma and add a space at the end
 append_string="${append_string%,}"
 
 # Use sed to remove existing trailing whitespace and then append the string of commas to row 120
-sed -i 's/\s*$//' ../output/10-shortRNA-ShortStack-comparison/mature_miRNA_all_to_all_distance_nodescription.csv
-sed -i '120s/$/ '"$append_string"'/' ../output/10-shortRNA-ShortStack-comparison/mature_miRNA_all_to_all_distance_nodescription.csv
+sed -i 's/\s*$//' ../output/10-shortRNA-ShortStack-comparison/mature_miRNA_all_to_all_distance_06062024_nodescription.csv
+sed -i '121s/$/ '"$append_string"'/' ../output/10-shortRNA-ShortStack-comparison/mature_miRNA_all_to_all_distance_06062024_nodescription.csv
 
-# For a couple sequence pairs, MEGA couldn't compute a pairwise distance for statistical reasons, and these are noted in the file as "?" entries. MEGA documentation indicates this notation is associated with being unable to identify any shared sites (i.e., the sequences are too different to even compare). Non-numeric entries will mess with our analysis down the line, so we need to replace those. Since they're associated with no shared sites, we'll replace them with 1s (indicating very high sequence distance).
+# MEGA sometimes can't compute a pairwise distance for statistical reasons, and these are noted in the file as "?" entries. MEGA documentation indicates this notation is associated with being unable to identify any shared sites (i.e., the sequences are too different to even compare). Non-numeric entries will mess with our analysis down the line, so we need to replace those. Since they're associated with no shared sites, we'll replace them with 1s (indicating very high sequence distance).
 # Replace all "?" entries with 1s
-sed -i 's/?/1/g' ../output/10-shortRNA-ShortStack-comparison/mature_miRNA_all_to_all_distance_nodescription.csv
+sed -i 's/?/1/g' ../output/10-shortRNA-ShortStack-comparison/mature_miRNA_all_to_all_distance_06062024_nodescription.csv
 ```
 
 ``` r
 # load data
-all_to_all <- read.table("../output/10-shortRNA-ShortStack-comparison/mature_miRNA_all_to_all_distance_nodescription.csv", sep=",", header = FALSE, na.strings = "")
+all_to_all <- read.table("../output/10-shortRNA-ShortStack-comparison/mature_miRNA_all_to_all_distance_06062024_nodescription.csv", sep=",", header = FALSE, na.strings = "")
 
 # Assign column 1 entries to row names and column names (pairwise matrices have identical row and column names)
 rownames(all_to_all) <- all_to_all[, 1]
@@ -684,7 +684,7 @@ all_to_all_full <- replace(all_to_all_full, is.na(all_to_all_full), 0)
 ``` bash
 cd ../output/10-shortRNA-ShortStack-comparison
 # Isolate sequence names
-awk -F ',' '{print $1}' mature_miRNA_all_to_all_distance_nodescription.csv > miRNA_names.txt
+awk -F ',' '{print $1}' mature_miRNA_all_to_all_distance_06062024_nodescription.csv > miRNA_names.txt
 
 # Add full species name in second column based on the seq ID
 # Note that mtORF data indicates our P.meandrina samples are actually P.tuahiniensis, so that's the species name we'll be using in figures
@@ -1169,10 +1169,4 @@ miRNA_matches_table <- grid.arrange(table)
 ``` r
 png("../output/10-shortRNA-ShortStack-comparison/figures/table_miRNA_matches.png", width = 400, height = 100)
 grid.arrange(table)
-
-# ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/figures/table_miRNA_matches.png",
-#          plot   = miRNA_matches_table,
-#          res    = 600,
-#          width  = 5000,
-#          height = 5000)
 ```

@@ -420,28 +420,28 @@ Aligned all mature miRNA sequences from all three species in MEGA using MUSCLE, 
 
 ```{r format-distance-matrix, engine='bash'}
 # Remove description text at bottom of file
-head -120 ../output/10-shortRNA-ShortStack-comparison/mature_miRNA_all_to_all_distance.csv > ../output/10-shortRNA-ShortStack-comparison/mature_miRNA_all_to_all_distance_nodescription.csv
+head -121 ../output/10-shortRNA-ShortStack-comparison/mature_miRNA_all_to_all_distance_06062024.csv > ../output/10-shortRNA-ShortStack-comparison/mature_miRNA_all_to_all_distance_06062024_nodescription.csv
 
 # For some reason the last line was saved as just the row name, with no comma-delimitation to mark each empty column. We need to reintroduce the (empty) comma-delimited columns in the final row.
 # Create the string of commas
-append_string=$(printf ', %.0s' {1..120})
+append_string=$(printf ', %.0s' {1..121})
 
 # Remove the last comma and add a space at the end
 append_string="${append_string%,}"
 
 # Use sed to remove existing trailing whitespace and then append the string of commas to row 120
-sed -i 's/\s*$//' ../output/10-shortRNA-ShortStack-comparison/mature_miRNA_all_to_all_distance_nodescription.csv
-sed -i '120s/$/ '"$append_string"'/' ../output/10-shortRNA-ShortStack-comparison/mature_miRNA_all_to_all_distance_nodescription.csv
+sed -i 's/\s*$//' ../output/10-shortRNA-ShortStack-comparison/mature_miRNA_all_to_all_distance_06062024_nodescription.csv
+sed -i '121s/$/ '"$append_string"'/' ../output/10-shortRNA-ShortStack-comparison/mature_miRNA_all_to_all_distance_06062024_nodescription.csv
 
-# For a couple sequence pairs, MEGA couldn't compute a pairwise distance for statistical reasons, and these are noted in the file as "?" entries. MEGA documentation indicates this notation is associated with being unable to identify any shared sites (i.e., the sequences are too different to even compare). Non-numeric entries will mess with our analysis down the line, so we need to replace those. Since they're associated with no shared sites, we'll replace them with 1s (indicating very high sequence distance).
+# MEGA sometimes can't compute a pairwise distance for statistical reasons, and these are noted in the file as "?" entries. MEGA documentation indicates this notation is associated with being unable to identify any shared sites (i.e., the sequences are too different to even compare). Non-numeric entries will mess with our analysis down the line, so we need to replace those. Since they're associated with no shared sites, we'll replace them with 1s (indicating very high sequence distance).
 # Replace all "?" entries with 1s
-sed -i 's/?/1/g' ../output/10-shortRNA-ShortStack-comparison/mature_miRNA_all_to_all_distance_nodescription.csv
+sed -i 's/?/1/g' ../output/10-shortRNA-ShortStack-comparison/mature_miRNA_all_to_all_distance_06062024_nodescription.csv
 
 ```
 
 ```{r format-distance-matrix-cont}
 # load data
-all_to_all <- read.table("../output/10-shortRNA-ShortStack-comparison/mature_miRNA_all_to_all_distance_nodescription.csv", sep=",", header = FALSE, na.strings = "")
+all_to_all <- read.table("../output/10-shortRNA-ShortStack-comparison/mature_miRNA_all_to_all_distance_06062024_nodescription.csv", sep=",", header = FALSE, na.strings = "")
 
 # Assign column 1 entries to row names and column names (pairwise matrices have identical row and column names)
 rownames(all_to_all) <- all_to_all[, 1]
@@ -465,7 +465,7 @@ all_to_all_full <- replace(all_to_all_full, is.na(all_to_all_full), 0)
 ```{r annotate-species-name, engine='bash'}
 cd ../output/10-shortRNA-ShortStack-comparison
 # Isolate sequence names
-awk -F ',' '{print $1}' mature_miRNA_all_to_all_distance_nodescription.csv > miRNA_names.txt
+awk -F ',' '{print $1}' mature_miRNA_all_to_all_distance_06062024_nodescription.csv > miRNA_names.txt
 
 # Add full species name in second column based on the seq ID
 # Note that mtORF data indicates our P.meandrina samples are actually P.tuahiniensis, so that's the species name we'll be using in figures
@@ -806,9 +806,4 @@ miRNA_matches_table <- grid.arrange(table)
 png("../output/10-shortRNA-ShortStack-comparison/figures/table_miRNA_matches.png", width = 400, height = 100)
 grid.arrange(table)
 
-# ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/figures/table_miRNA_matches.png",
-#          plot   = miRNA_matches_table,
-#          res    = 600,
-#          width  = 5000,
-#          height = 5000)
 ```
