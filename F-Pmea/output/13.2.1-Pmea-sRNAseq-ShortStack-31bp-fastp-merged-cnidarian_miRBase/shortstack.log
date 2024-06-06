@@ -16,7 +16,7 @@ Options:
     'dicermin': 21,
     'dn_mirna': True,
     'genomefile': '/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/data/Pocillopora_meandrina_HIv1.assembly.fa',
-    'known_miRNAs': '/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/data/cnidarian_miRNAs.fasta',
+    'known_miRNAs': '/home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/data/cnidarian-mirbase-mature-v22.1.fasta',
     'locifile': None,
     'locus': None,
     'mincov': 1,
@@ -42,7 +42,7 @@ Required executable samtools : /home/sam/programs/mambaforge/envs/ShortStack-4.0
 
 Beginning alignment phase
 
-Fri 16 Feb 2024 14:55:55 -0800 PST
+Thu 06 Jun 2024 08:15:56 -0700 PDT
 Aligning /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/08.2-Pmea-sRNAseq-trimming-31bp-fastp-merged/trimmed-reads/sRNA-POC-47-S1-TP2-fastp-adapters-polyG-31bp-merged.fq.gz
 First pass alignment with bowtie using 46 threads
 Second pass - placing multimappers using 46 threads to process 13 chunks
@@ -59,7 +59,7 @@ Multi-mapped reads randomly (R) placed: 1913920/12066776 (15.9%)
 Very highly (H) multi-mapped reads (>=50 hits): 76750/12066776 (0.6%)
 Not mapped (N) reads (no hits): 4531711/12066776 (37.6%)
 
-Fri 16 Feb 2024 15:01:19 -0800 PST
+Thu 06 Jun 2024 08:20:20 -0700 PDT
 Aligning /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/08.2-Pmea-sRNAseq-trimming-31bp-fastp-merged/trimmed-reads/sRNA-POC-48-S1-TP2-fastp-adapters-polyG-31bp-merged.fq.gz
 First pass alignment with bowtie using 46 threads
 Second pass - placing multimappers using 46 threads to process 15 chunks
@@ -76,7 +76,7 @@ Multi-mapped reads randomly (R) placed: 2250675/14045042 (16.0%)
 Very highly (H) multi-mapped reads (>=50 hits): 77601/14045042 (0.6%)
 Not mapped (N) reads (no hits): 5282131/14045042 (37.6%)
 
-Fri 16 Feb 2024 15:07:01 -0800 PST
+Thu 06 Jun 2024 08:25:17 -0700 PDT
 Aligning /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/08.2-Pmea-sRNAseq-trimming-31bp-fastp-merged/trimmed-reads/sRNA-POC-50-S1-TP2-fastp-adapters-polyG-31bp-merged.fq.gz
 First pass alignment with bowtie using 46 threads
 Second pass - placing multimappers using 46 threads to process 13 chunks
@@ -93,7 +93,7 @@ Multi-mapped reads randomly (R) placed: 1507938/12141955 (12.4%)
 Very highly (H) multi-mapped reads (>=50 hits): 87488/12141955 (0.7%)
 Not mapped (N) reads (no hits): 5355595/12141955 (44.1%)
 
-Fri 16 Feb 2024 15:12:02 -0800 PST
+Thu 06 Jun 2024 08:29:43 -0700 PDT
 Aligning /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/08.2-Pmea-sRNAseq-trimming-31bp-fastp-merged/trimmed-reads/sRNA-POC-53-S1-TP2-fastp-adapters-polyG-31bp-merged.fq.gz
 First pass alignment with bowtie using 46 threads
 Second pass - placing multimappers using 46 threads to process 16 chunks
@@ -110,7 +110,7 @@ Multi-mapped reads randomly (R) placed: 4167280/15732665 (26.5%)
 Very highly (H) multi-mapped reads (>=50 hits): 98199/15732665 (0.6%)
 Not mapped (N) reads (no hits): 3806233/15732665 (24.2%)
 
-Fri 16 Feb 2024 15:18:29 -0800 PST
+Thu 06 Jun 2024 08:35:18 -0700 PDT
 Aligning /home/shared/8TB_HDD_01/sam/gitrepos/deep-dive/F-Pmea/output/08.2-Pmea-sRNAseq-trimming-31bp-fastp-merged/trimmed-reads/sRNA-POC-57-S1-TP2-fastp-adapters-polyG-31bp-merged.fq.gz
 First pass alignment with bowtie using 46 threads
 Second pass - placing multimappers using 46 threads to process 15 chunks
@@ -199,28 +199,29 @@ Multi-mapped reads randomly (R) placed: 3688290/14136486 (26.1%)
 Very highly (H) multi-mapped reads (>=50 hits): 101421/14136486 (0.7%)
 Not mapped (N) reads (no hits): 2371464/14136486 (16.8%)
 
-Fri 16 Feb 2024 15:24:07 -0800 PST
+Thu 06 Jun 2024 08:40:10 -0700 PDT
 Merging and indexing alignments
 
 Creating browser tracks by readgroup using ShortTracks
 
 Creating browser tracks by readlength and strand using ShortTracks
 
-Fri 16 Feb 2024 15:37:11 -0800 PST
+Thu 06 Jun 2024 08:52:50 -0700 PDT
 Defining small RNA clusters de novo
 With 68122924 total reads and mincov of 1 reads per million, the min read depth is 68
 
-Fri 16 Feb 2024 15:37:33 -0800 PST
+Thu 06 Jun 2024 08:53:10 -0700 PDT
 Analyzing cluster properties using 46 threads
-# reads processed: 530
-# reads with at least one alignment: 60 (11.32%)
-# reads that failed to align: 470 (88.68%)
-Reported 142 alignments
+# reads processed: 49415
+# reads with at least one alignment: 171 (0.35%)
+# reads that failed to align: 49244 (99.65%)
+Reported 1856 alignments
+[bam_sort_core] merging from 0 files and 46 in-memory blocks...
 
-Fri 16 Feb 2024 15:39:15 -0800 PST
+Thu 06 Jun 2024 08:54:48 -0700 PDT
  Completed
 
-Fri 16 Feb 2024 15:39:15 -0800 PST
+Thu 06 Jun 2024 08:54:48 -0700 PDT
 Searching for valid microRNA loci
 Aligning known_miRNAs sequences to genome
 
@@ -228,23 +229,23 @@ Screening of possible microRNAs from user provided known_miRNAs
 
 Screening of possible de novo microRNAs
 
-Fri 16 Feb 2024 15:39:44 -0800 PST
+Thu 06 Jun 2024 08:55:21 -0700 PDT
 Analyzing cluster properties using 46 threads
 
-Fri 16 Feb 2024 15:39:49 -0800 PST
+Thu 06 Jun 2024 08:55:25 -0700 PDT
  Completed
 
 Writing final files
 
-Found a total of 36 MIRNA loci
+Found a total of 37 MIRNA loci
 
 
 Non-MIRNA loci by DicerCall:
-N 7088
-22 36
+N 7087
+22 33
 23 33
-21 16
-24 14
+24 15
+21 15
 
 Creating visualizations of microRNA loci with strucVis
 <<< WARNING >>>
@@ -253,9 +254,9 @@ The false positive rate for de novo MIRNA identification is low, but NOT ZERO
 Insepct each mirna locus, especially the strucVis output, and see
 https://doi.org/10.1105/tpc.17.00851 , https://doi.org/10.1093/nar/gky1141
 
-Fri 16 Feb 2024 15:40:13 -0800 PST
+Thu 06 Jun 2024 08:55:50 -0700 PDT
 Run Completed!
 
-real	44m18.602s
-user	805m46.145s
-sys	284m7.125s
+real	39m54.805s
+user	726m24.259s
+sys	252m56.657s

@@ -231,7 +231,7 @@ source .bashvars
 tail -n 25 ${output_dir_top}/shortstack.log
 ```
 
-ShortStack identified 36 miRNAs.
+ShortStack identified 37 miRNAs.
 
 ## Inspect `Results.txt`
 
@@ -271,7 +271,6 @@ awk '$20=="N" {print $0}' ${output_dir_top}/ShortStack_out/Results.txt \
 
 Column 21 of the `Results.txt` file identifies if a cluster aligned to a known miRNA (miRBase) or not (`Y` or `NA`).
 
-Since there are no miRNAs, the following code will *not* print any output.
 
 The `echo` command after the `awk` command is simply there to prove that the chunk executed.
 
