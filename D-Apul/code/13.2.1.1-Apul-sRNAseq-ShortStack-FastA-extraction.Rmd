@@ -136,6 +136,10 @@ grep "^>" "${shortstack_dir}/${shortstack_fasta}" | head
 
 # Fix FastA description starting coordinates
 
+Needed, due to [bug in code](https://github.com/MikeAxtell/ShortStack/issues/153#issuecomment-2122897486) (GitHub Issue) which incorrectly calculates the starting coordinates in the FastA output. All other files where start/stop coordinates are conveyed are correct.
+
+The incorrect starting coordinates cause an issue in downstream manipulation, because the FastA headers need to match the ShortStack results file.
+
 ```{r fix-FastA-coordinates, engine='bash', eval=TRUE}
 # Load bash variables into memory
 source .bashvars
