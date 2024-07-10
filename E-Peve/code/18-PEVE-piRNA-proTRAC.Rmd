@@ -1,0 +1,175 @@
+---
+title: "18-PEVE-piRNA-proTRAC"
+author: "Javier Rodriguez-Casariego"
+date: "`r Sys.Date()`"
+output: html
+---
+
+```{r, engine='bash'}
+
+# Remove redundant reads from trimmed fastqs, keep reads between 25 and 35 nt, remove low complexity reads and change the format for SeqMap alignment
+
+for f in /scratch/jeirinlo/jrodr979/sncRNA_E5_corals/20240513_PIWI_pipeline/PEVE/*.fq
+do
+perl NGSToolbox/TBr2_collapse.pl -i ${f} -o ${f}.collapsed
+perl NGSToolbox/TBr2_length-filter.pl -i ${f}.collapsed -o ${f}.collapsed.filt -min 25 -max 35
+perl NGSToolbox/TBr2_duster.pl -i ${f}.collapsed.filt
+done
+
+```
+
+```{r, engine='bash'}
+
+# concatenate reads in a single file per species
+cat /scratch/jeirinlo/jrodr979/sncRNA_E5_corals/20240513_PIWI_pipeline/PEVE/*.collapsed.filt.no-dust > /scratch/jeirinlo/jrodr979/sncRNA_E5_corals/20240513_PIWI_pipeline/PEVE_filt_merged.fq
+
+
+```
+
+```{r, engine='bash'}
+
+# Filter rRNA, tRNA, snRNAs, miRNAs, and snoRNAs reads (based in annotations on gff file non of these are piwi or related. 
+## There are no annotations of small RNAs for any porites, performed de novo tRNA and rRNA prediction based on the available reference genome assemblies
+
+cd /scrach/jeirinlo/javirodr/snRNA_E5_corals/genomes/PEVE
+
+# for tRNA annotation I used tRNAscan-SE with default settings
+conda activate trnascan_env
+
+tRNAscan-SE \
+-o PEVE-tRNA.out \
+-f PEVE-tRNA_struct.out \
+-s PEVE-tRNA_isospecific.out \
+-m PEVE-tRNA_stats.out \
+-b PEVE-tRNA.bed \
+-j PEVE-tRNA.gff3 \
+-a PEVE-tRNA.fasta \
+-d \
+--thread 8 \
+Porites_evermanni_v1.fa
+
+conda deactivate
+
+# for rRNA, RNAmmer is not available through conda and has not been supported for a while. Therefore I used barRNAp https://github.com/tseemann/barrnap
+conda activate barrnap_env
+
+barrnap \
+--kingdom euk \
+--threads 8 \
+--outseq PEVE-rRNA.fasta \
+Porites_evermanni_v1.fa
+
+conda deactivate
+
+# extract hairpin-miRNA, siRNA and other annotations from ShortStack results
+
+grep -v '^#' PEVE_shortStackResults.gff3 | cut -s -f 3 | sort | uniq -c | sort -rn 
+grep $'\tsiRNA' PEVE_shortStackResults.gff3 > PEVE.GFFannotation.siRNA.gff
+grep $'\tMIRNA_hairpin\t' PEVE_shortStackResults.gff3 > PEVE.GFFannotation.precursor_miRNA.gff
+
+bedtools getfasta -fi Porites_evermanni_v1.fa -bed PEVE.GFFannotation.siRNA.gff -fo PEVE_siRNA.fasta
+bedtools getfasta -fi Porites_evermanni_v1.fa -bed PEVE.GFFannotation.precursor_miRNA.gff -fo PEVE_precursor_miRNA.fasta
+
+cat PEVE-rRNA.fasta PEVE-tRNA.fasta PEVE_siRNA.fasta PEVE_precursor_miRNA.fasta > PEVE_otherSmallRNAs.filt.fasta
+
+```
+
+```{r, engine='bash'}
+## use sortmerna to clear reads that match the fasta
+sortmerna \
+--ref /scratch/jeirinlo/javirodr/sncRNA_E5_corals/genomes/PEVE/PEVE_otherSmallRNAs.filt.fasta \
+--reads /scratch/jeirinlo/javirodr/sncRNA_E5_corals/20240513_PIWI_pipeline/PEVE_filt_merged.fq \
+--workdir /scratch/jeirinlo/javirodr/sncRNA_E5_corals/20240514_sortMerna/PEVE/ \
+--fastx \
+--other
+
+# about 1-3% of reads mapped to known small RNAs. Move unmapped reads to work folder. 
+```
+```{r, engine='bash'}
+# align "clean" reads to the genome
+
+cp 20240514_sortMerna/PEVE/out/other.fq 20240513_PIWI_pipeline/PEVE_merged_preproc
+
+# simplify fasta headers on genome to include only the scaffold or chr name. proTRAC dont go well with long headers
+
+sed 's/^>\([^ ]*\).*/>\1/' Porites_evermanni_v1.fa > Porites_evermanni_v1.fasta 
+
+perl code/NGSToolbox/sRNAmapper.pl \
+-input 20240513_PIWI_pipeline/PEVE_merged_preproc \
+-genome /scratch/jeirinlo/javirodr/sncRNA_E5_corals/genomes/PEVE/Porites_evermanni_v1.fasta \
+-alignments best
+
+
+```
+
+```{r, engine='bash'}
+# define origin for multiple mapping reads using reallocate
+
+perl code/NGSToolbox/reallocate.pl PEVE_merged_preproc.map 10000 1000 b 0 
+
+
+```
+
+```{r, engine='bash'}
+# run proTRAC on merged mapped reads using the gene tracks and the RepeatMasker output
+ 
+perl ../code/NGSToolbox/proTRAC_2.4.2.pl \
+-map PEVE_merged_preproc.map.weighted-10000-1000-b-0 \
+-genome ../genomes/PEVE/Porites_evermanni_v1.fasta \
+-repeatmasker ../genomes/PEVE/Porites_evermanni_v1.fa.out \
+-geneset ../genomes/PEVE/Porites_evermanni_v1.annot.gff
+
+# Output folder is proTRAC_PEVE_merged_preproc.map.weighted-10000-1000-b-0_2024y6m11d12h56m30s
+```
+
+## I wanted to also run proTRAC on individual datasets and then merge clusters. This has been done by the authors of the software and it produces different clusters. 
+
+```{r, enging='bash'}
+#PEVE all samples individually for re-cluster, genomic features, and ping/pong analysis starting from the dusted reads 
+
+for f in *no-dust
+do
+mkdir /scratch/jeirinlo/javirodr/sncRNA_E5_corals/20240617_ProTRAC_individual_samples/PEVE/sortmerna/${f/-S1-TP2-fastp-adapters-polyG-31bp-merged.fq.collapsed.filt.no-dust}
+sortmerna \
+--ref /scratch/jeirinlo/javirodr/sncRNA_E5_corals/genomes/PEVE/PEVE_otherSmallRNAs.filt.fasta \
+--reads /scratch/jeirinlo/javirodr/sncRNA_E5_corals/20240617_ProTRAC_individual_samples/PEVE/${f} \
+--workdir /scratch/jeirinlo/javirodr/sncRNA_E5_corals/20240617_ProTRAC_individual_samples/PEVE/sortmerna/${f/-S1-TP2-fastp-adapters-polyG-31bp-merged.fq.collapsed.filt.no-dust} \
+--fastx \
+--other
+done
+
+for f in *preproc
+do
+perl /scratch/jeirinlo/javirodr/sncRNA_E5_corals/code/NGSToolbox/sRNAmapper.pl \
+-input ${f} \
+-genome /scratch/jeirinlo/javirodr/sncRNA_E5_corals/genomes/PMEA/Pocillopora_meandrina_HIv1.assembly.fa \
+-alignments best
+done
+
+for f in *map
+do
+perl /scratch/jeirinlo/javirodr/sncRNA_E5_corals/code/NGSToolbox/reallocate.pl ${f} 10000 1000 b 0
+done
+
+for f in *.weighted-10000-1000-b-0
+do
+perl /scratch/jeirinlo/javirodr/sncRNA_E5_corals/code/NGSToolbox/proTRAC_2.4.2.pl \
+-map ${f} \
+-genome /scratch/jeirinlo/javirodr/sncRNA_E5_corals/genomes/PEVE/Porites_evermanni_v1.fasta \
+-repeatmasker /scratch/jeirinlo/javirodr/sncRNA_E5_corals/genomes/PEVE/Porites_evermanni_v1.fa.out \
+-geneset /scratch/jeirinlo/javirodr/sncRNA_E5_corals/genomes/PEVE/Porites_evermanni_v1.annot.gff
+done
+
+# Merge Clusters for PEVE
+# You have to modify the script merge_cluster.pl adding the folder names of the proTRAC outputs you are merging. 
+# After modifying it, you just need to run the script in the location of the proTRAC outputs
+
+perl /scratch/jeirinlo/javirodr/sncRNA_E5_corals/code/NGSToolbox/merge_clusters.pl
+
+# individual cluster results are in the folders:
+## proTRAC_POR-73_preproc.map.weighted-10000-1000-b-0_2024y6m20d10h40m27s 
+## proTRAC_POR-79_preproc.map.weighted-10000-1000-b-0_2024y6m20d10h43m52s
+## proTRAC_POR-82_preproc.map.weighted-10000-1000-b-0_2024y6m20d10h47m50s
+# Merged cluster coordinates are in the file merged_cluster_coordinated.txt
+```
+

@@ -1,0 +1,94 @@
+---
+title: "12-piRNA-PingPong_signature"
+author: "Javier Rodriguez-Casariego"
+date: "`r Sys.Date()`"
+output: html
+---
+
+```{r, engine='bash'}
+# Run ping-pong evaluation of piRNA reads using PPmeter < Julia Jehn, Daniel Gebert, Frank Pipilescu, Sarah Stern, Julian Simon Thilo Kiefer, Charlotte Hewel, David Rosenkranz. Conserved and dynamic expression of piRNAs and PIWI genes in germline and soma of mollusks. Communications Biology 2018.>
+
+## Check ping/pong signature and compare APUL vs PEVE 
+
+perl /scratch/jeirinlo/javirodr/sncRNA_E5_corals/code/NGSToolbox/PPmeter.pl \
+-i sRNA-ACR-140_preproc.map \
+-i sRNA-ACR-145_preproc.map \
+-i sRNA-ACR-150_preproc.map \
+-i sRNA-ACR-173_preproc.map \
+-i sRNA-ACR-178_preproc.map \
+-i POR-73_preproc.map \
+-i POR-79_preproc.map \
+-i POR-82_preproc.map \
+-o 'DeepDive_APULvsPEVE_PPmeterResults.txt' \
+-t 8 \
+-c \
+-g1 sRNA-ACR-140_preproc.map \
+-g1 sRNA-ACR-145_preproc.map \
+-g1 sRNA-ACR-150_preproc.map \
+-g1 sRNA-ACR-173_preproc.map \
+-g1 sRNA-ACR-178_preproc.map \
+-g2 POR-73_preproc.map \
+-g2 POR-79_preproc.map \
+-g2 POR-82_preproc.map \
+-more_output
+
+## Check ping/pong signature APUL vs PMEA 
+
+perl /scratch/jeirinlo/javirodr/sncRNA_E5_corals/code/NGSToolbox/PPmeter.pl \
+-i sRNA-ACR-140_preproc.map \
+-i sRNA-ACR-145_preproc.map \
+-i sRNA-ACR-150_preproc.map \
+-i sRNA-ACR-173_preproc.map \
+-i sRNA-ACR-178_preproc.map \
+-i sRNA-POC-47_preproc.map \
+-i sRNA-POC-48_preproc.map \
+-i sRNA-POC-50_preproc.map \
+-i sRNA-POC-53_preproc.map \
+-i sRNA-POC-57_preproc.map \
+-o 'DeepDive_APULvsPMEA_PPmeterResults.txt' \
+-t 8 \
+-c \
+-g1 sRNA-ACR-140_preproc.map \
+-g1 sRNA-ACR-145_preproc.map \
+-g1 sRNA-ACR-150_preproc.map \
+-g1 sRNA-ACR-173_preproc.map \
+-g1 sRNA-ACR-178_preproc.map \
+-g2 sRNA-POC-47_preproc.map \
+-g2 sRNA-POC-48_preproc.map \
+-g2 sRNA-POC-50_preproc.map \
+-g2 sRNA-POC-53_preproc.map \
+-g2 sRNA-POC-57_preproc.map \
+-more_output \
+
+## Check ping/pong signature PMEA vs PEVE 
+
+perl /scratch/jeirinlo/javirodr/sncRNA_E5_corals/code/NGSToolbox/PPmeter.pl \
+-i sRNA-POC-47_preproc.map \
+-i sRNA-POC-48_preproc.map \
+-i sRNA-POC-50_preproc.map \
+-i sRNA-POC-53_preproc.map \
+-i sRNA-POC-57_preproc.map \
+-i POR-73_preproc.map \
+-i POR-79_preproc.map \
+-i POR-82_preproc.map \
+-o 'DeepDive_PMEAvsPEVE_PPmeterResults.txt' \
+-t 8 \
+-c \
+-g1 sRNA-POC-47_preproc.map \
+-g1 sRNA-POC-48_preproc.map \
+-g1 sRNA-POC-50_preproc.map \
+-g1 sRNA-POC-53_preproc.map \
+-g1 sRNA-POC-57_preproc.map \
+-g2 POR-73_preproc.map \
+-g2 POR-79_preproc.map \
+-g2 POR-82_preproc.map \
+-more_output \
+
+```
+
+
+```{r}
+
+
+```
+

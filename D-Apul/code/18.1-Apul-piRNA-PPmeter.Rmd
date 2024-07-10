@@ -1,0 +1,135 @@
+---
+title: "18.1_Apul-piRNA-PPmeter"
+author: "Javier Rodriguez Casariego"
+date: '`r Sys.Date()`'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, cache = TRUE)
+knitr::opts_knit$set(root.dir = '/Users/jarcasariego/Dropbox/Other_projects/E5_work/deep-dive/D-Apul/')
+```
+
+```{r, engine='bash'}
+
+# All Species ping-pong analyses
+
+## Check ping/pong signature APUL vs PEVE 
+
+perl /scratch/jeirinlo/javirodr/sncRNA_E5_corals/code/NGSToolbox/PPmeter.pl \
+-i sRNA-ACR-140_preproc.map \
+-i sRNA-ACR-145_preproc.map \
+-i sRNA-ACR-150_preproc.map \
+-i sRNA-ACR-173_preproc.map \
+-i sRNA-ACR-178_preproc.map \
+-i POR-73_preproc.map \
+-i POR-79_preproc.map \
+-i POR-82_preproc.map \
+-o 'output/18-Apul-piRNA/1_PPmeter/DeepDive_APULvsPEVE_PPmeterResults.txt' \
+-t 8 \
+-c \
+-g1 sRNA-ACR-140_preproc.map \
+-g1 sRNA-ACR-145_preproc.map \
+-g1 sRNA-ACR-150_preproc.map \
+-g1 sRNA-ACR-173_preproc.map \
+-g1 sRNA-ACR-178_preproc.map \
+-g2 POR-73_preproc.map \
+-g2 POR-79_preproc.map \
+-g2 POR-82_preproc.map \
+-more_output
+
+## Check ping/pong signature APUL vs PMEA 
+
+perl /scratch/jeirinlo/javirodr/sncRNA_E5_corals/code/NGSToolbox/PPmeter.pl \
+-i sRNA-ACR-140_preproc.map \
+-i sRNA-ACR-145_preproc.map \
+-i sRNA-ACR-150_preproc.map \
+-i sRNA-ACR-173_preproc.map \
+-i sRNA-ACR-178_preproc.map \
+-i sRNA-POC-47_preproc.map \
+-i sRNA-POC-48_preproc.map \
+-i sRNA-POC-50_preproc.map \
+-i sRNA-POC-53_preproc.map \
+-i sRNA-POC-57_preproc.map \
+-o 'output/18-Apul-piRNA/1_PPmeter/DeepDive_APULvsPMEA_PPmeterResults.txt' \
+-t 8 \
+-c \
+-g1 sRNA-ACR-140_preproc.map \
+-g1 sRNA-ACR-145_preproc.map \
+-g1 sRNA-ACR-150_preproc.map \
+-g1 sRNA-ACR-173_preproc.map \
+-g1 sRNA-ACR-178_preproc.map \
+-g2 sRNA-POC-47_preproc.map \
+-g2 sRNA-POC-48_preproc.map \
+-g2 sRNA-POC-50_preproc.map \
+-g2 sRNA-POC-53_preproc.map \
+-g2 sRNA-POC-57_preproc.map \
+-more_output \
+
+## Check ping/pong signature PMEA vs PEVE 
+
+perl /scratch/jeirinlo/javirodr/sncRNA_E5_corals/code/NGSToolbox/PPmeter.pl \
+-i sRNA-POC-47_preproc.map \
+-i sRNA-POC-48_preproc.map \
+-i sRNA-POC-50_preproc.map \
+-i sRNA-POC-53_preproc.map \
+-i sRNA-POC-57_preproc.map \
+-i POR-73_preproc.map \
+-i POR-79_preproc.map \
+-i POR-82_preproc.map \
+-o 'output/18-Apul-piRNA/1_PPmeter/DeepDive_PMEAvsPEVE_PPmeterResults.txt' \
+-t 8 \
+-c \
+-g1 sRNA-POC-47_preproc.map \
+-g1 sRNA-POC-48_preproc.map \
+-g1 sRNA-POC-50_preproc.map \
+-g1 sRNA-POC-53_preproc.map \
+-g1 sRNA-POC-57_preproc.map \
+-g2 POR-73_preproc.map \
+-g2 POR-79_preproc.map \
+-g2 POR-82_preproc.map \
+-more_output \
+
+
+```
+
+```{r}
+#Ping-pong analysis using the output of Ping-Pong Meter
+
+#set prefix
+my.outprefix <- paste(Sys.Date(),"ppr_Apul_analysis",sep="_")
+
+#load list of file names
+L = list.files(path = "output/18-Apul-piRNA/1_PPmeter/ppr_Apul/", pattern=".txt", recursive = T)
+names <- gsub("_ppr.txt", "", L)
+
+#this function keeps only the instances of 10 bp overlaps per million read pairs
+DFs = lapply(L, function(x) {
+  data <- read.table(paste0("output/18-Apul-piRNA/1_PPmeter/ppr_Apul/", x), skip = 2, nrows = 100)
+  data <- data[,c(1,33)]
+  colnames(data) <- c("rep", "score")
+  score <- median(data$score)
+  return(score)
+})
+
+#run for loop to get median ppm per replicate
+med_ppm <- data.frame()
+for(i in 1:length(L)) {
+  total <- cbind(names[i], DFs[[i]])
+  med_ppm <- rbind(med_ppm, total)
+}
+colnames(med_ppm) <- c("group", "score")
+med_ppm$score <- as.numeric(med_ppm$score)
+
+#divide ppr-mbr score by 10e5 for plotting
+med_ppm$score <- med_ppm$score/100000
+
+
+my.boxplot.out <- paste0("output/18-Apul-piRNA/1_PPmeter/", my.outprefix,"_PP_Percentages.pdf")
+pdf(my.boxplot.out, height = 5, width = 5)
+boxplot(score ~ group, data = med_ppm, 
+        col = c("deeppink", "deeppink3", "deeppink4","deepskyblue", "deepskyblue3"),
+        ylab = "Median x10e5 ppr-mbr (100 bootstraps")
+dev.off()
+```
+
