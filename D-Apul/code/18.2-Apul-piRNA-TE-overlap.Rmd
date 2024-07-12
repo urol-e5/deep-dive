@@ -23,8 +23,8 @@ my.outprefix <- paste(Sys.Date(),"Cluster",sep="_")
 #read in the outfile from repeatmasker
 out_file <- read.table("data/Amil/GCF_013753865.1_Amil_v2.1_genomic.fna.out", comment.char = "", header = F, fill = T, skip = 2)
 
-#retains only 1)chromosome 2)start 3)stop 4)TE name 5)Family Name
-bed_file <- out_file[,c(5:7,10:11)]
+#retains only 1)chromosome 2)start 3)stop 4)TE name 5)Family Name and 6)percent divergence
+bed_file <- out_file[,c(5:7,11,2)]
 
 #Assess how the families breakdown for the whole genome
 #remove empty lines 
@@ -32,9 +32,10 @@ bed_file <- bed_file %>%
   drop_na(.)
 
 #output bed file
-write.table(bed_file, file = "output/18.2-Apul-piRNA-TE-overlap/APUL_repeatmasker_bedfile.bed", sep = "\t", col.names = F, row.names = F, quote = F)
+write.table(bed_file, file = "output/18-Apul-piRNA/2_TE_piRNA_cluster_overlap/APUL_repeatmasker_bedfile.bed", sep = "\t", col.names = F, row.names = F, quote = F)
 
 #retain only major family name and combine unclear and Unknown
+bed_file$V11 <- factor(bed_file$V11)
 bed_file$V11 <- gsub("/.*","",bed_file$V11)
 bed_file$V11 <- gsub("unclear","Unknown",bed_file$V11)
 
@@ -60,7 +61,7 @@ bedtools intersect -wo -a APUL_merged_cluster.bed -b APUL_repeatmasker_bedfile.b
 
 ```{r}
 #read in the output of bedtools intersect
-cluster_TEs <- read.table("output/18.2-Apul-piRNA-TE-overlap/APUL_piRNA_clusters_TEs_intersect.txt")
+cluster_TEs <- read.table("output/18-Apul-piRNA/0_piRNA_pipeline_proTRAC/APUL_piRNA_clusters_TEs_intersect.txt")
 
 #repeat analysis as above with piRNA cluster TEs
 cluster_TEs$V8 <- gsub("/.*","",cluster_TEs$V8)
@@ -87,9 +88,39 @@ ggplot(all, aes(fill=family, y=percent, x=origin)) +
   geom_bar(position="stack", stat="identity") + theme_bw()
 dev.off()
 
-#######################
-sink(file = paste("output/18.2-Apul-piRNA-TE-overlap/", my.outprefix,"_session_Info.txt", sep =""))
-sessionInfo()
-sink()
+```
+This figure only shows the proportional enrichment of specific transposable element families respective to other families either in the genome or in the clusters, but does not describe the enrichment of a specific family in piRNA clusters respective to that of the entire genome (% of genome or % of cluster). I need to obtain the fraction of coverage of each family respective to the genome and to the piRNA clusters full lengths
+
+
+```{r}
+
+# calculate representative fraction of genome (475381253 bases) corresponding to TE families
+cov_file.g <- bed_file %>%
+  mutate(bases = V7-V6) %>%
+  select(V11, bases) %>%
+  group_by(V11) %>%
+  summarise(total = sum(bases)) %>%
+  mutate(perc = total/475381253*100)
+
+# calculate representative fraction of piRNA clusters ( bases) corresponding to TE families
+cov_file.c <- cluster_TEs %>%
+  select(V8, V9) %>%
+  group_by(V8) %>%
+  summarise(total = sum(V9)) %>%
+  mutate(perc = total/788650*100)  
+
+
+
+```
+
+
+```{r, engine='bash'}
+# create a scaffold lengths file "chr" "start(all zeros)" "end(length)"
+
+cat GCF_013753865.1_Amil_v2.1_genomic.fna | awk '$0 ~ ">" {if (NR > 1) {print c;} c=0;printf substr($0,2,100) "\t"; } $0 !~ ">" {c+=length($0);} END { print c; }' | awk 'BEGIN{ FS = OFS = "\t" } { $1 = $1 FS ("0") }1' > Amil.extents.bed
+
+
+bedmap --echo --bases-uniq --delim '\t' Amil.extents.bed APUL_repeatmasker_bedfile.bed | awk '{ print $0"\t"100*$4/($3 - $2); }' - > Genome_TE_coverage.bed
+
 ```
 

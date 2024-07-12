@@ -1,94 +1,247 @@
 ---
-title: "12-piRNA-PingPong_signature"
+title: "12-piRNA-comparizon"
 author: "Javier Rodriguez-Casariego"
 date: "`r Sys.Date()`"
 output: html
 ---
 
-```{r, engine='bash'}
-# Run ping-pong evaluation of piRNA reads using PPmeter < Julia Jehn, Daniel Gebert, Frank Pipilescu, Sarah Stern, Julian Simon Thilo Kiefer, Charlotte Hewel, David Rosenkranz. Conserved and dynamic expression of piRNAs and PIWI genes in germline and soma of mollusks. Communications Biology 2018.>
-
-## Check ping/pong signature and compare APUL vs PEVE 
-
-perl /scratch/jeirinlo/javirodr/sncRNA_E5_corals/code/NGSToolbox/PPmeter.pl \
--i sRNA-ACR-140_preproc.map \
--i sRNA-ACR-145_preproc.map \
--i sRNA-ACR-150_preproc.map \
--i sRNA-ACR-173_preproc.map \
--i sRNA-ACR-178_preproc.map \
--i POR-73_preproc.map \
--i POR-79_preproc.map \
--i POR-82_preproc.map \
--o 'DeepDive_APULvsPEVE_PPmeterResults.txt' \
--t 8 \
--c \
--g1 sRNA-ACR-140_preproc.map \
--g1 sRNA-ACR-145_preproc.map \
--g1 sRNA-ACR-150_preproc.map \
--g1 sRNA-ACR-173_preproc.map \
--g1 sRNA-ACR-178_preproc.map \
--g2 POR-73_preproc.map \
--g2 POR-79_preproc.map \
--g2 POR-82_preproc.map \
--more_output
-
-## Check ping/pong signature APUL vs PMEA 
-
-perl /scratch/jeirinlo/javirodr/sncRNA_E5_corals/code/NGSToolbox/PPmeter.pl \
--i sRNA-ACR-140_preproc.map \
--i sRNA-ACR-145_preproc.map \
--i sRNA-ACR-150_preproc.map \
--i sRNA-ACR-173_preproc.map \
--i sRNA-ACR-178_preproc.map \
--i sRNA-POC-47_preproc.map \
--i sRNA-POC-48_preproc.map \
--i sRNA-POC-50_preproc.map \
--i sRNA-POC-53_preproc.map \
--i sRNA-POC-57_preproc.map \
--o 'DeepDive_APULvsPMEA_PPmeterResults.txt' \
--t 8 \
--c \
--g1 sRNA-ACR-140_preproc.map \
--g1 sRNA-ACR-145_preproc.map \
--g1 sRNA-ACR-150_preproc.map \
--g1 sRNA-ACR-173_preproc.map \
--g1 sRNA-ACR-178_preproc.map \
--g2 sRNA-POC-47_preproc.map \
--g2 sRNA-POC-48_preproc.map \
--g2 sRNA-POC-50_preproc.map \
--g2 sRNA-POC-53_preproc.map \
--g2 sRNA-POC-57_preproc.map \
--more_output \
-
-## Check ping/pong signature PMEA vs PEVE 
-
-perl /scratch/jeirinlo/javirodr/sncRNA_E5_corals/code/NGSToolbox/PPmeter.pl \
--i sRNA-POC-47_preproc.map \
--i sRNA-POC-48_preproc.map \
--i sRNA-POC-50_preproc.map \
--i sRNA-POC-53_preproc.map \
--i sRNA-POC-57_preproc.map \
--i POR-73_preproc.map \
--i POR-79_preproc.map \
--i POR-82_preproc.map \
--o 'DeepDive_PMEAvsPEVE_PPmeterResults.txt' \
--t 8 \
--c \
--g1 sRNA-POC-47_preproc.map \
--g1 sRNA-POC-48_preproc.map \
--g1 sRNA-POC-50_preproc.map \
--g1 sRNA-POC-53_preproc.map \
--g1 sRNA-POC-57_preproc.map \
--g2 POR-73_preproc.map \
--g2 POR-79_preproc.map \
--g2 POR-82_preproc.map \
--more_output \
-
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, cache = TRUE)
+knitr::opts_knit$set(root.dir = '/Users/jarcasariego/Dropbox/Other_projects/E5_work/deep-dive/DEF-cross-species/')
 ```
-
 
 ```{r}
+#load libraries
+library(Biostrings) # Biostrings_2.62.0 
+require(ggplot2)    # ggplot2_3.3.6
+library(ggseqlogo)  # install.packages("ggseqlogo")
+library(reshape2)   # reshape2_1.4.4
+library(data.table)
+library(gghighlight) #install.packages("gghighlight")
+
+```
+
+# piRNA reads size distribution
+```{r}
+my.outprefix <- paste(Sys.Date(),"all_species",sep="_")
+
+#load list of file names
+APUL_L = list.files(path = "../D-Apul/output/18-Apul-piRNA/0_piRNA_pipeline_proTRAC/piRNA_length_data", pattern=".txt", recursive = T, full.names = T)
+
+PMEA_L = list.files(path = "../F-Pmea/output/18-Pmea-piRNA/0_piRNA_pipeline_proTRAC/piRNA_length_data", pattern=".txt", recursive = T, full.names = T)
+
+PEVE_L = list.files(path = "../E-Peve/output/18-Peve-piRNA/0_piRNA_pipeline_proTRAC/piRNA_length_data", pattern=".txt", recursive = T, full.names = T)
+
+L = c(APUL_L,PMEA_L,PEVE_L)
+names <- L %>%
+  substring(.,75) %>%
+  gsub("_piRNA_length.txt", "", .)
+
+DFs = lapply(L, function(x) {
+  data <- read.table(paste0(x), comment.char = "")
+  colnames(data) <- c("freq", "length")
+  return(data)
+})
+
+combo = Reduce(function(...) merge(..., by = "length", all=T), DFs)
+colnames(combo) <- c("length", names)
+combo <- combo %>%
+  mutate(ACR_sums = rowSums(combo[,2:6])) %>%
+  mutate(POC_sums = rowSums(combo[,7:11])) %>%
+  mutate(POR_sums = rowSums(combo[,12:14])) %>%
+  select(length,ACR_sums,POC_sums,POR_sums)
+
+p1 <- ggplot(combo) + geom_bar(aes(x=length, y=ACR_sums), stat="identity") +
+ scale_x_continuous(name = "Length (bp)", breaks = c(24,25,26,27,28,29,30,31,32)) + 
+ scale_y_continuous(name = "Acropora cervicornis") +
+  theme_pubclean() +
+  theme(axis.ticks.y.left = element_blank(),
+        axis.text.y.left = element_blank(),
+        axis.title.y = element_text(face = "italic",size = 7))
+p2 <- ggplot(combo) + geom_bar(aes(x=length, y=POC_sums), stat="identity") +
+ scale_x_continuous(name = "Length (bp)", breaks = c(24,25,26,27,28,29,30,31,32)) + 
+ scale_y_continuous(name = "Pocillopora meandrina") +
+  theme_pubclean() +
+  theme(axis.ticks.y.left = element_blank(),
+        axis.text.y.left = element_blank(),
+        axis.title.y = element_text(face = "italic", size = 7),
+        axis.title.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.x = element_blank())
+p3 <- ggplot(combo) + geom_bar(aes(x=length, y=POR_sums), stat="identity") +
+ scale_x_continuous(name = "Length (bp)", breaks = c(24,25,26,27,28,29,30,31,32)) + 
+ scale_y_continuous(name = "Porites evermanni") +
+  theme_pubclean() +
+  theme(axis.ticks.y.left = element_blank(),
+        axis.text.y.left = element_blank(),
+        axis.title.y = element_text(face = "italic",size = 7),
+        axis.title.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.x = element_blank())
+
+length_plot <- plot_grid(p2, p3, p1, nrow = 3, align = "hv", rel_heights = c(1,1,0.9))
+
+ggsave(filename = paste0("output/12-piwiRNA_comparizon/", my.outprefix,"piRNA_length_plot.png"), length_plot, width = 5, height = 4)
+
+```
+
+# ping pong signatures
+```{r}
+#Graph comparing ping pong per million bootstrapped reads across species
+
+my.outprefix <- paste(Sys.Date(),"ppr_mbr_analysis",sep="_")
+
+#load list of file names
+APUL_L = list.files(path = "../D-Apul/output/18-Apul-piRNA/1_PPmeter/ppr_Apul", pattern=".txt", recursive = T, full.names = T)
+
+PMEA_L = list.files(path = "../F-Pmea/output/18-Pmea-piRNA/1_PPmeter/ppr_Pmea", pattern=".txt", recursive = T, full.names = T)
+
+PEVE_L = list.files(path = "../E-Peve/output/18-Peve-piRNA/1_PPmeter/ppr_Peve", pattern=".txt", recursive = T, full.names = T)
+
+L = c(APUL_L,PMEA_L,PEVE_L)
+names <- L %>%
+  substring(.,51) %>%
+  gsub("_ppr.txt", "", .)
+
+#this function keeps only the instances of 10 bp overlaps per million read pairs
+DFs = lapply(L, function(x) {
+  data <- read.table(x, skip = 2, nrows = 100)
+  data <- data[,c(1,34)]
+  colnames(data) <- c("rep", "score")
+  score <- median(data$score)
+  return(score)
+})
+L[[1]]
+data <- read.table("../D-Apul/output/18-Apul-piRNA/1_PPmeter/ppr_Apul/sRNA-ACR-140_ppr.txt", skip = 104)
+data <- data[,c(1,34)]
+
+#run for loop to get median ppm per replicate
+med_ppm <- data.frame()
+for(i in 1:length(L)) {
+  total <- cbind(names[i], DFs[[i]])
+  med_ppm <- rbind(med_ppm, total)
+}
+med_ppm <- med_ppm %>%
+  mutate(group = substr(gsub("sRNA-", "", med_ppm$V1), 1, 3))%>%
+  select(group, V2)
+
+colnames(med_ppm) <- c("group", "score")
+med_ppm$score <- as.numeric(med_ppm$score)
+
+#divide ppr-mbr score by 10e5 for plotting
+med_ppm$score <- med_ppm$score/100000
+
+#order for plotting
+med_ppm$group <- factor(med_ppm$group , levels=c("ACR", "POC", "POR"))
+
+#get specific p-values for plotting
+
+####### Tests
+apul.peve <- wilcox.test (med_ppm$score[med_ppm$group == "ACR"],med_ppm$score[med_ppm$group == "POR"])
+apul.pmea <- wilcox.test (med_ppm$score[med_ppm$group == "ACR"],med_ppm$score[med_ppm$group == "POC"])
+pmea.peve <- wilcox.test (med_ppm$score[med_ppm$group == "POC"],med_ppm$score[med_ppm$group == "POR"])
+
+
+#my.boxplot.out <- paste0("output/12-piwiRNA_comparizon/", my.outprefix,"_all_species.pdf")
+#pdf(my.boxplot.out, height = 5, width = 5)
+boxplot(score ~ group, data = med_ppm, 
+        col = c("#FED799FF", "#FD9B6BFF", "#D8456CFF"),
+        ylim = c(0,6), las = 2, ylab = "median x10e5 ppr-mbr (100 bootstraps) ")
+beeswarm::beeswarm(score ~ group, data = med_ppm, add = T, pch = 16)
+text(1.5, 5, signif(apul.pmea$p.value,2) )
+text(2, 5.5, signif(apul.peve$p.value,2) )
+text(2.5, 4, signif(pmea.peve$p.value,2) )
+
+#dev.off()
+
+# plot ping pong overlap per nucleotide position 
+
+DF_nuc = lapply(L, function(x) {
+  data <- read.table(x, skip = 104)
+  data <- data[1,c(1:30)] %>%
+    transpose()
+})
+
+nuc_score <- data.frame()
+for(i in 1:length(L)) {
+  total <- cbind(names[i], DF_nuc[[i]])
+  nuc_score <- rbind(nuc_score, total)
+}
+
+nuc_score <- nuc_score %>%
+  mutate(group = substr(gsub("sRNA-", "", nuc_score$`names[i]`), 1, 3)) %>%
+  mutate(score = nuc_score$V1) %>%
+  mutate(position = rep(c(1:30),16)) %>%
+  select(position, score, group) %>%
+  pivot_wider(names_from = group, values_from = score, values_fn = mean)
+
+p1 <- ggplot(nuc_score) + geom_bar(aes(x=position, y=ACR), stat="identity") +
+ scale_x_continuous(name = "5' overlap (bp)", breaks = c(1:30)) +
+  theme_pubclean() +
+  theme(axis.ticks.y.left = element_blank(),
+        axis.text.y.left = element_blank(),
+        axis.title.y = element_blank()) +
+  gghighlight(position == 10)
+p2 <- ggplot(nuc_score) + geom_bar(aes(x=position, y=POR), stat="identity") +
+ scale_x_continuous(name = "5' overlap (bp)", breaks = c(1:30)) +
+  theme_pubclean() +
+  theme(axis.ticks.y.left = element_blank(),
+        axis.text.y.left = element_blank(),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.x = element_blank()) +
+  gghighlight(position == 10)
+p3 <- ggplot(nuc_score) + geom_bar(aes(x=position, y=POC), stat="identity") +
+ scale_x_continuous(name = "5' overlap (bp)", breaks = c(1:30)) +
+  theme_pubclean() +
+  theme(axis.ticks.y.left = element_blank(),
+        axis.text.y.left = element_blank(),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.x = element_blank()) +
+  gghighlight(position == 10)
+
+overlap_plot <- plot_grid(p2, p3, p1, nrow = 3, align = "hv", rel_heights = c(1,1,0.9))
+overlap_plot
+
+ggsave(filename = paste0("output/12-piwiRNA_comparizon/", my.outprefix,"piRNA_pp_overlap_plot.png"), length_plot, width = 5, height = 4)
 
 
 ```
 
+# piRNA base composition (logo graphs)
+```{r}
+# Nucleotide Distribution Plots
+
+my.outprefix <- paste(Sys.Date(),"all_species",sep="_")
+
+#load trimmed fasta sequences without headers
+APUL_sequences <- read.table("../D-Apul/output/18-Apul-piRNA/0_piRNA_pipeline_proTRAC/total_fasta_APUL_replaced.fasta")
+PMEA_sequences <- read.table("../F-Pmea/output/18-Pmea-piRNA/0_piRNA_pipeline_proTRAC/total_fasta_PMEA_replaced.fasta")
+PEVE_sequences <- read.table("../E-Peve//output/18-Peve-piRNA/0_piRNA_pipeline_proTRAC/total_fasta_PEVE_replaced.fasta")
+
+#make position weight matrix
+pfm_APUL <- consensusMatrix(APUL_sequences$V1)
+pfm_PMEA <- consensusMatrix(PMEA_sequences$V1)
+pfm_PEVE <- consensusMatrix(PEVE_sequences$V1)
+
+#make logo plot
+APUL_plot <- ggseqlogo(pfm_APUL, method = 'bit', seq_type = "rna") + theme_cowplot()
+PMEA_plot <- ggseqlogo(pfm_PMEA, method = 'bit', seq_type = "rna") + theme_cowplot()
+PEVE_plot <- ggseqlogo(pfm_PEVE, method = 'bit', seq_type = "rna") + theme_cowplot()
+
+#remove large modified fasta file
+rm(APUL_sequences, PMEA_sequences, PEVE_sequences)  
+
+logo_plot <- plot_grid(PMEA_plot, PEVE_plot, APUL_plot, nrow = 3, align = "hv")
+logo_plot
+
+ggsave(filename = paste0("output/12-piwiRNA_comparizon/", my.outprefix,"piRNA_nucleotide_plot.png"), logo_plot, width = 5, height = 4)
+```
+
+# piRNA-TE 
+```{r}
+
+```
