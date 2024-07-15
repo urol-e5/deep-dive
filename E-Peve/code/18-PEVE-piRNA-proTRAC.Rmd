@@ -124,7 +124,7 @@ perl ../code/NGSToolbox/proTRAC_2.4.2.pl \
 
 ## I wanted to also run proTRAC on individual datasets and then merge clusters. This has been done by the authors of the software and it produces different clusters. 
 
-```{r, enging='bash'}
+```{r, engine='bash'}
 #PEVE all samples individually for re-cluster, genomic features, and ping/pong analysis starting from the dusted reads 
 
 for f in *no-dust
@@ -160,16 +160,32 @@ perl /scratch/jeirinlo/javirodr/sncRNA_E5_corals/code/NGSToolbox/proTRAC_2.4.2.p
 -geneset /scratch/jeirinlo/javirodr/sncRNA_E5_corals/genomes/PEVE/Porites_evermanni_v1.annot.gff
 done
 
-# Merge Clusters for PEVE
-# You have to modify the script merge_cluster.pl adding the folder names of the proTRAC outputs you are merging. 
-# After modifying it, you just need to run the script in the location of the proTRAC outputs
+# Merge clusters across samples. To get a good representation of clusters I selected clusters which are present in at least two replicates, and the overlap is by at least 50% of the cluster length and is reciprocal (i.e. A overlaps 50% of B and B overlaps 50% of A):
 
-perl /scratch/jeirinlo/javirodr/sncRNA_E5_corals/code/NGSToolbox/merge_clusters.pl
+# Using bedtools first:
 
-# individual cluster results are in the folders:
-## proTRAC_POR-73_preproc.map.weighted-10000-1000-b-0_2024y6m20d10h40m27s 
-## proTRAC_POR-79_preproc.map.weighted-10000-1000-b-0_2024y6m20d10h43m52s
-## proTRAC_POR-82_preproc.map.weighted-10000-1000-b-0_2024y6m20d10h47m50s
-# Merged cluster coordinates are in the file merged_cluster_coordinated.txt
+FILES=(proTRAC_results_PEVE/*.proTRAC.bed)
+NUM_FILES=${#FILES[@]}
+# Loop over each file
+for (( i=0; i<$NUM_FILES; i++ )); do
+  for (( j=i+1; j<$NUM_FILES; j++ )); do
+    FILE1=${FILES[$i]}
+    FILE2=${FILES[$j]}
+    
+    intersectBed -a $FILE1 -b $FILE2 -f 0.5 -r > proTRAC_results_PEVE/${i}_${j}_merged.bed
+  done
+done
+
+bedops -m *_merged.bed > PEVE.merged.clusters.bed
+
+
+# Run ping pong ID on all mapped reads 
+
+for f in *.weighted-10000-1000-b-0
+do
+perl /scratch/jeirinlo/javirodr/sncRNA_E5_corals/code/NGSToolbox/TBr2_pingpong.pl \
+-i ${f} \
+-o ${f}.pp
+done
 ```
 

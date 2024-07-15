@@ -1,0 +1,150 @@
+---
+title: "TE_in_piRNA_clusters"
+author: "Javier Rodriguez Casariego"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include = TRUE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, cache = TRUE)
+knitr::opts_knit$set(root.dir = '/Users/jarcasariego/Dropbox/Other_projects/E5_work/deep-dive/E-Peve/')
+```
+
+
+```{r}
+#This script generates stacked barplots comparing TE content in the entire genome to that of piRNA clusters
+#load libraries
+library(dplyr)   
+library(ggplot2)
+library(tidyverse)
+library(gtools)
+
+my.outprefix <- paste(Sys.Date(),"Cluster",sep="_")
+
+#read in the outfile from repeatmasker
+out_file <- read.table("data/Porites_evermanni_v1.fa.out", comment.char = "", header = F, fill = T, skip = 2)
+
+#retains only 1)chromosome 2)start 3)stop 4)TE name 5)Family Name and 6)percent divergence
+bed_file <- out_file[,c(5:7,11,2)]
+
+#Assess how the families breakdown for the whole genome
+#remove empty lines 
+bed_file <- bed_file %>%
+  drop_na(.)
+
+#output bed file
+write.table(bed_file, file = "output/18-Peve-piRNA/2_TE_piRNA_cluster_overlap/PEVE_repeatmasker_bedfile.bed", sep = "\t", col.names = F, row.names = F, quote = F)
+
+#retain only major family name and combine unclear and Unknown
+bed_file$V11 <- factor(bed_file$V11)
+bed_file$V11 <- gsub("/.*","",bed_file$V11)
+bed_file$V11 <- gsub("unclear","Unknown",bed_file$V11)
+
+#make a table of the families of TEs. How frequently do the different TE families appear in the genome?
+table_of_TEs <- as.data.frame(table(bed_file$V11))
+
+#remove simple repeats and unify "unknown" and "unclear"
+table_of_TEs <- table_of_TEs[(!grepl("Low_complexity", table_of_TEs$Var1)),]
+table_of_TEs <- table_of_TEs[(!grepl("Simple_repeat", table_of_TEs$Var1)),]
+table_of_TEs <- table_of_TEs[(!grepl("ARTEFACT", table_of_TEs$Var1)),]
+
+#create matrix with TE family frequency in the genome
+cols.g <- rainbow(nrow(table_of_TEs))
+table_of_TEs$percent = round(100*table_of_TEs$Freq/sum(table_of_TEs$Freq), digits = 1)
+table_of_TEs$label = paste(table_of_TEs$Var1," (", table_of_TEs$percent,"%)", sep = "")
+```
+
+#check how the families breakdown for piRNA clusters
+```{r, engine='bash'}
+# Intersect cluster bedfile with TE bedfile
+bedtools intersect -wo -a PEVE_merged_cluster.bed -b PEVE_repeatmasker_bedfile.bed > PEVE_piRNA_cluster_TEs_intersect.txt
+
+```
+
+```{r}
+#read in the output of bedtools intersect
+cluster_TEs <- read.table("output/18-Peve-piRNA/2_TE_piRNA_cluster_overlap/PEVE_piRNA_cluster_TEs_intersect.txt")
+
+#repeat analysis as above with piRNA cluster TEs
+cluster_TEs$V7 <- gsub("/.*","",cluster_TEs$V7)
+cluster_TEs$V7 <- gsub("unclear","Unknown",cluster_TEs$V7)
+table_of_cluster_TEs <- as.data.frame(table(cluster_TEs$V7))
+table_of_cluster_TEs <- table_of_cluster_TEs[(!grepl("Low_complexity", table_of_cluster_TEs$Var1)),]
+table_of_cluster_TEs <- table_of_cluster_TEs[(!grepl("Simple_repeat", table_of_cluster_TEs$Var1)),]
+cols <- rainbow(nrow(table_of_cluster_TEs))
+table_of_cluster_TEs$percent = round(100*table_of_cluster_TEs$Freq/sum(table_of_cluster_TEs$Freq), digits = 1)
+table_of_cluster_TEs$label = paste(table_of_cluster_TEs$Var1," (", table_of_cluster_TEs$percent,"%)", sep = "")
+
+#generate stacked barplot showing TE distribution of clusters vs whole genome
+table_of_TEs$origin <- "genome"
+table_of_cluster_TEs$origin <- "cluster"
+clust <- table_of_cluster_TEs[,c(5,1,3)]
+genome <- table_of_TEs[,c(5,1,3)]
+all <- rbind(clust, genome)
+colnames(all)[2] <- "family"
+
+# Stacked barplot
+my.stack.out <- paste0("output/18-Peve-piRNA/2_TE_piRNA_cluster_overlap/", my.outprefix,"cluster_stack_plot.pdf")
+#pdf(my.stack.out)
+ggplot(all, aes(fill=family, y=percent, x=origin)) + 
+  geom_bar(position="stack", stat="identity") + theme_bw() +
+  coord_flip() 
+#dev.off()
+
+```
+This figure only shows the proportional enrichment of specific transposable element families respective to other families either in the genome or in the clusters, but does not describe the enrichment of a specific family in piRNA clusters respective to that of the entire genome (% of genome or % of cluster). I need to obtain the fraction of coverage of each family respective to the genome and to the piRNA clusters full lengths
+
+
+```{r}
+# calculate representative fraction of genome (603805388 bases) corresponding to TE families
+cov_file.g <- bed_file %>%
+  mutate(bases = V7-V6) %>%
+  select(V11, bases) %>%
+  group_by(V11) %>%
+  summarise(total = sum(bases)) %>%
+  mutate(perc = total/603805388*100)
+colnames(cov_file.g) <- c("family", "total_g","perc_g")
+
+# calculate representative fraction of piRNA clusters ( bases) corresponding to TE families
+cov_file.c <- cluster_TEs %>%
+  select(V7, V9) %>%
+  group_by(V7) %>%
+  summarise(total = sum(V9)) %>%
+  mutate(perc = total/830133*100)  
+colnames(cov_file.c) <- c("family", "total_c","perc_c")
+
+cov_merge <- merge(cov_file.g, cov_file.c, all.x = T) %>%
+  replace(is.na(.), 0) %>%
+  mutate(pseudo_perc_c = perc_c + 0.1) %>%
+  mutate(pseudo_perc_g = perc_g + 0.1) %>%
+  mutate(n_fold = foldchange(pseudo_perc_c, pseudo_perc_g)) %>%
+  mutate(direction = ifelse(n_fold >= 0, 1, 0)) %>%
+  mutate(across(where(is.character), factor)) %>%
+  arrange(desc(n_fold)) %>%
+  mutate(family = fct_reorder(family, n_fold))
+cov_merge <- cov_merge[(!grepl("Low_complexity", cov_merge$family)),]
+cov_merge <- cov_merge[(!grepl("Simple_repeat", cov_merge$family)),]
+cov_merge <- cov_merge[(!grepl("ARTEFACT", cov_merge$family)),]
+cov_merge <- cov_merge[(!grepl("Unknown", cov_merge$family)),]
+
+fold_TE <- ggplot(data=cov_merge, aes(x=family, y=n_fold, fill=factor(direction))) +
+geom_bar(stat="identity") + 
+coord_flip() +
+  scale_y_continuous(name = "n-fold exnrichment in piRNA clusters", limits = c(-2,5)) +
+  scale_fill_discrete(type = list(c("khaki2", "brown2"))) +
+  theme_classic() +
+  theme(axis.line.x = element_line(colour = "black"),
+        axis.title.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.line.y = element_blank(),
+        legend.position="none") +
+  geom_hline(yintercept = 0, size = .75) +
+  geom_text(aes(y=n_fold, x = family,label=family, hjust = ifelse(cov_merge$n_fold >= 0, -0.1, 1.1))) 
+fold_TE
+
+ggsave(filename = paste0("output/18-Peve-piRNA/2_TE_piRNA_cluster_overlap/", my.outprefix,"clusterTE_enrich_plot.png"), fold_TE, width = 3, height = 4)
+
+```
+
+
