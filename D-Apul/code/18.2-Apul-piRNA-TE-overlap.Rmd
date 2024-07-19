@@ -17,6 +17,7 @@ knitr::opts_knit$set(root.dir = '/Users/jarcasariego/Dropbox/Other_projects/E5_w
 library(dplyr)   
 library(ggplot2)
 library(tidyverse)
+library(gtools)
 
 my.outprefix <- paste(Sys.Date(),"Cluster",sep="_")
 
@@ -83,11 +84,11 @@ colnames(all)[2] <- "family"
 
 # Stacked barplot
 my.stack.out <- paste0("output/18-Apul-piRNA/2_TE_piRNA_cluster_overlap/", my.outprefix,"cluster_stack_plot.pdf")
-#pdf(my.stack.out)
+pdf(my.stack.out)
 ggplot(all, aes(fill=family, y=percent, x=origin)) + 
   geom_bar(position="stack", stat="identity") + theme_bw() +
   coord_flip() 
-#dev.off()
+dev.off()
 
 ```
 This figure only shows the proportional enrichment of specific transposable element families respective to other families either in the genome or in the clusters, but does not describe the enrichment of a specific family in piRNA clusters respective to that of the entire genome (% of genome or % of cluster). I need to obtain the fraction of coverage of each family respective to the genome and to the piRNA clusters full lengths
@@ -102,39 +103,48 @@ cov_file.g <- bed_file %>%
   group_by(V11) %>%
   summarise(total = sum(bases)) %>%
   mutate(perc = total/475381253*100)
-colnames(cov_file.g) <- c("family", "total_c","perc_g")
+colnames(cov_file.g) <- c("family", "total_g","perc_g")
 
-# calculate representative fraction of piRNA clusters ( bases) corresponding to TE families
+# calculate representative fraction of piRNA clusters (788650 bases) corresponding to TE families
 cov_file.c <- cluster_TEs %>%
   select(V8, V9) %>%
   group_by(V8) %>%
   summarise(total = sum(V9)) %>%
   mutate(perc = total/788650*100)  
-colnames(cov_file.c) <- c("family", "total_g","perc_c")
+colnames(cov_file.c) <- c("family", "total_c","perc_c")
 
-cov_merge <- merge(cov_file.c, cov_file.g)  %>%
-  mutate(n_fold = perc_c/perc_g) %>%
+cov_merge <- merge(cov_file.g, cov_file.c, all.x = T) %>%
+  replace(is.na(.), 0) %>%
+  mutate(pseudo_perc_c = perc_c + 0.1) %>%
+  mutate(pseudo_perc_g = perc_g + 0.1) %>%
+  mutate(n_fold = foldchange(pseudo_perc_c, pseudo_perc_g)) %>%
   mutate(direction = ifelse(n_fold >= 0, 1, 0)) %>%
-  arrange(desc(n_fold))
+  mutate(across(where(is.character), factor)) %>%
+  arrange(desc(n_fold)) %>%
+  mutate(family = fct_reorder(family, n_fold))
 cov_merge <- cov_merge[(!grepl("Low_complexity", cov_merge$family)),]
 cov_merge <- cov_merge[(!grepl("Simple_repeat", cov_merge$family)),]
-cov_merge$family <- factor(cov_merge$family, levels = c("tRNA","LINE","Satellite","DNA","SINE","LTR","RC"), ordered = T)
+cov_merge <- cov_merge[(!grepl("ARTEFACT", cov_merge$family)),]
+cov_merge <- cov_merge[(!grepl("Unknown", cov_merge$family)),]
 
-fold_TE <- ggplot(data=cov_merge, aes(x=family, y=n_fold)) +
-geom_bar(stat="identity",fill="red") + 
+fold_TE <- ggplot(data=cov_merge, aes(x=family, y=n_fold, fill=factor(direction))) +
+geom_bar(stat="identity") + 
 coord_flip() +
-  scale_y_continuous(name = "n-fold exnrichment in piRNA clusters", limits = c(-1,8), breaks = c(-1,2,4,6,8)) +
+  scale_y_continuous(name = "n-fold exnrichment in piRNA clusters", limits = c(-2,2.5)) +
+  scale_fill_discrete(type = list(c("khaki2", "brown2"))) +
   theme_classic() +
   theme(axis.line.x = element_line(colour = "black"),
         axis.title.y = element_blank(),
         axis.ticks.y = element_blank(),
         axis.text.y = element_blank(),
-        axis.line.y = element_blank()) +
+        axis.line.y = element_blank(),
+        legend.position="none") +
   geom_hline(yintercept = 0, size = .75) +
-  geom_text(aes(label = family), nudge_y = 1)
+  geom_text(aes(y=n_fold, x = family,label=family, hjust = ifelse(cov_merge$n_fold >= 0, -0.1, 1.1))) 
 fold_TE
 
-ggsave(filename = paste0("output/18-Apul-piRNA/2_TE_piRNA_cluster_overlap/", my.outprefix,"clusterTE_enrich_plot.png"), fold_TE, width = 3, height = 4)
+
+ggsave(filename = paste0("output/18-Apul-piRNA/2_TE_piRNA_cluster_overlap/", my.outprefix,"clusterTE_enrich_plot.png"), fold_TE, width = 6, height = 5)
 
 ```
 

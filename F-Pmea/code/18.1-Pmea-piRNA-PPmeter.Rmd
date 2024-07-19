@@ -161,4 +161,51 @@ plt <- ggplot(pp_matrix,aes(neg, pos, fill=count)) +
 
 ggsave(filename = paste0("output/18-Pmea-piRNA/1_PPmeter/", my.outprefix,"piRNA_pp_pair_heat.png"), plt, width = 6, height = 5)
 ```
+```{r}
+library(Biostrings)
+
+#function to process ping-pong reads FASTA file and extract all, 1U, and 10A read length
+process_fasta <- function(fasta_file) {
+    sequences <- readDNAStringSet(fasta_file, format = "fasta")
+    sequences_with_1U <- sequences[substr(as.character(sequences), 1, 1) == "T"] 
+    sequences_with_10A <- sequences[substr(as.character(sequences), 10, 10) == "A"]
+    sequence_1U_lengths <- data.frame(length = Biostrings::width(sequences_with_1U)) %>%
+        group_by(length) %>%
+        summarise(freq = n()) %>%
+        mutate(group = "1U")
+    sequence_10A_lengths <- data.frame(length = Biostrings::width(sequences_with_10A)) %>%
+        group_by(length) %>%
+        summarise(freq = n()) %>%
+        mutate(group = "10A")
+    sequence_lengths <- data.frame(length = head(Biostrings::width(as.character(sequences)),-1)) %>%
+        group_by(length) %>%
+        summarise(freq = n()) %>%
+        mutate(group = "all")
+    lengths_df <- rbind(sequence_1U_lengths, sequence_10A_lengths, sequence_lengths)
+    return(lengths_df)
+}
+
+# Define the function to plot the distribution
+plot_length_distribution <- function(lengths) {
+    # Create a data frame for plotting
+    lengths_df <- data.frame(Length =sequence_lengths)
+    
+    # Plot the length distribution using ggplot2
+    ggplot(lengths_df) +
+        geom_bar(aes(x = length, y = )) +
+        theme_minimal() +
+        labs(title = "Read Length Distribution",
+             x = "Read Length",
+             y = "Frequency")
+}
+
+# Path to your FASTA file
+fasta_file <- "output/18-Pmea-piRNA/0_piRNA_pipeline_proTRAC/PMEA_mapped_piRNA.fasta"
+
+# Process the FASTA file to get sequence lengths
+sequence_lengths <- process_fasta(fasta_file)
+
+# Plot the lengths distribution
+plot_length_distribution(sequence_lengths)
+```
 

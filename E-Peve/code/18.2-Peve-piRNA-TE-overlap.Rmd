@@ -85,11 +85,11 @@ colnames(all)[2] <- "family"
 
 # Stacked barplot
 my.stack.out <- paste0("output/18-Peve-piRNA/2_TE_piRNA_cluster_overlap/", my.outprefix,"cluster_stack_plot.pdf")
-#pdf(my.stack.out)
+pdf(my.stack.out)
 ggplot(all, aes(fill=family, y=percent, x=origin)) + 
   geom_bar(position="stack", stat="identity") + theme_bw() +
   coord_flip() 
-#dev.off()
+dev.off()
 
 ```
 This figure only shows the proportional enrichment of specific transposable element families respective to other families either in the genome or in the clusters, but does not describe the enrichment of a specific family in piRNA clusters respective to that of the entire genome (% of genome or % of cluster). I need to obtain the fraction of coverage of each family respective to the genome and to the piRNA clusters full lengths
@@ -143,7 +143,7 @@ coord_flip() +
   geom_text(aes(y=n_fold, x = family,label=family, hjust = ifelse(cov_merge$n_fold >= 0, -0.1, 1.1))) 
 fold_TE
 
-ggsave(filename = paste0("output/18-Peve-piRNA/2_TE_piRNA_cluster_overlap/", my.outprefix,"clusterTE_enrich_plot.png"), fold_TE, width = 3, height = 4)
+ggsave(filename = paste0("output/18-Peve-piRNA/2_TE_piRNA_cluster_overlap/", my.outprefix,"clusterTE_enrich_plot.png"), fold_TE, width = 6, height = 5)
 
 ```
 

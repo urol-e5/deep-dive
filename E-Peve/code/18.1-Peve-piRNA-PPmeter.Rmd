@@ -44,12 +44,12 @@ med_ppm$score <- as.numeric(med_ppm$score)
 med_ppm$score <- med_ppm$score/100000
 
 
-#my.boxplot.out <- paste0("output/18-Peve-piRNA/1_PPmeter/", my.outprefix,"_PP_Percentages.pdf")
-#pdf(my.boxplot.out, height = 5, width = 5)
-boxplot(score ~ group, data = med_ppm, 
-        col = c("deeppink", "deeppink3", "deeppink4"),
-        ylab = "Median x10e5 ppr-mbr (100 bootstraps")
-#dev.off()
+my.boxplot.out <- paste0("output/18-Peve-piRNA/1_PPmeter/", my.outprefix,"_PP_Percentages.pdf")
+pdf(my.boxplot.out, height = 5, width = 5)
+boxplot(med_ppm$score,
+        horizontal = T,
+        xlab = "Median x10e5 ppr-mbr (100 bootstraps")
+dev.off()
 ```
 Next, I need to create a matrix of the lenghts of the pairs of sequenced with a ping-pong signal. There might be a way of extracting this information from the PPmeter output, but I cannot find it and no one has it public. Hence I will mcgiver a way that has hogh potential to be wrong, but let's see.
 
