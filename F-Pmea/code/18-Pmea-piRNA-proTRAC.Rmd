@@ -1,0 +1,237 @@
+---
+title: "18-PMEA-piRNA-proTRAC"
+author: "Javier Rodriguez-Casariego"
+date: "`r Sys.Date()`"
+output: html
+---
+
+```{r, engine='bash'}
+
+# Remove redundant reads from trimmed fastqs, keep reads between 25 and 35 nt, remove low complexity reads and change the format for SeqMap alignment
+
+for f in /scratch/jeirinlo/jrodr979/sncRNA_E5_corals/20240513_PIWI_pipeline/PMEA/*.fq
+do
+perl NGSToolbox/TBr2_collapse.pl -i ${f} -o ${f}.collapsed
+perl NGSToolbox/TBr2_length-filter.pl -i ${f}.collapsed -o ${f}.collapsed.filt -min 25 -max 35
+perl NGSToolbox/TBr2_duster.pl -i ${f}.collapsed.filt
+done
+
+```
+
+```{r, engine='bash'}
+
+# concatenate reads in a single file per species
+cat /scratch/jeirinlo/jrodr979/sncRNA_E5_corals/20240513_PIWI_pipeline/PMEA/*.collapsed.filt.no-dust > /scratch/jeirinlo/jrodr979/sncRNA_E5_corals/20240513_PIWI_pipeline/PMEA_filt_merged.fq
+
+
+```
+
+```{r, engine='bash'}
+
+# Filter rRNA, tRNA, snRNAs, miRNAs, and snoRNAs reads (based in annotations on gff file non of these are piwi or related. 
+## There are no annotations of small RNAs for any porites, performed de novo tRNA and rRNA prediction based on the available reference genome assemblies
+
+cd /scrach/jeirinlo/javirodr/snRNA_E5_corals/genomes/PMEA
+
+# for tRNA annotation I used tRNAscan-SE with default settings
+conda activate trnascan_env
+
+tRNAscan-SE \
+-o PMEA-tRNA.out \
+-f PMEA-tRNA_struct.out \
+-s PMEA-tRNA_isospecific.out \
+-m PMEA-tRNA_stats.out \
+-b PMEA-tRNA.bed \
+-j PMEA-tRNA.gff3 \
+-a PMEA-tRNA.fasta \
+-d \
+--thread 8 \
+Pocillopora_meandrina_HIv1.assembly.fasta
+
+conda deactivate
+
+# for rRNA RNAmmer is not available through conda and has not been supported for a while. Therefore I used barRNAp https://github.com/tseemann/barrnap
+conda activate barrnap_env
+
+barrnap \
+--kingdom euk \
+--threads 8 \
+--outseq PMEA-rRNA.fasta \
+Pocillopora_meandrina_HIv1.assembly.fasta
+
+conda deactivate
+
+# extract hairpin-miRNA, siRNA and other annotations from ShortStack results
+
+grep -v '^#' PMEA_shortStackResults.gff3 | cut -s -f 3 | sort | uniq -c | sort -rn 
+grep $'\tsiRNA' PMEA_shortStackResults.gff3 > PMEA.GFFannotation.siRNA.gff
+grep $'\tMIRNA_hairpin\t' PMEA_shortStackResults.gff3 > PMEA.GFFannotation.precursor_miRNA.gff
+
+bedtools getfasta -fi Pocillopora_meandrina_HIv1.assembly.fasta -bed PMEA.GFFannotation.siRNA.gff -fo PMEA_siRNA.fasta
+bedtools getfasta -fi Pocillopora_meandrina_HIv1.assembly.fasta -bed PMEA.GFFannotation.precursor_miRNA.gff -fo PMEA_precursor_miRNA.fasta
+
+cat PMEA-rRNA.fasta PMEA-tRNA.fasta PMEA_siRNA.fasta PMEA_precursor_miRNA.fasta > PMEA_otherSmallRNAs.filt.fasta
+
+
+```
+
+```{r, engine='bash'}
+## use sortmerna to clear reads that match the fasta
+conda activate sortmerna_env
+
+sortmerna \
+--ref /scratch/jeirinlo/javirodr/sncRNA_E5_corals/genomes/PMEA/PMEA_otherSmallRNAs.filt.fasta \
+--reads /scratch/jeirinlo/javirodr/sncRNA_E5_corals/20240513_PIWI_pipeline/PMEA_filt_merged.fq \
+--workdir /scratch/jeirinlo/javirodr/sncRNA_E5_corals/20240514_sortMerna/PMEA/ \
+--fastx \
+--other
+
+# align clean reads to the genome
+cp 20240514_sortMerna/PMEA/out/other.fq 20240513_PIWI_pipeline/PMEA_merged_preproc
+
+# simplify fasta headers on genome to include only the scaffold or chr name. proTRAC dont go well with long headers
+
+sed 's/^>\([^ ]*\).*/>\1/' Pocillopora_meandrina_HIv1.assembly.fasta > Pocillopora_meandrina_HIv1.assembly.fa
+
+# option 1
+
+perl code/NGSToolbox/sRNAmapper.pl \
+-input 20240513_PIWI_pipeline/PMEA_merged_preproc \
+-genome /scratch/jeirinlo/javirodr/sncRNA_E5_corals/genomes/PMEA/Pocillopora_meandrina_HIv1.assembly.fa \
+-alignments best
+
+
+```
+
+```{r, engine='bash'}
+# define origin for multiple mapping reads using reallocate
+
+perl code/NGSToolbox/reallocate.pl PMEA_merged_preproc.map 10000 1000 b 0 
+
+
+```
+
+```{r, engine='bash'}
+# run proTRAC on merged mapped reads using the gene tracks and the RepeatMasker output
+ 
+perl ../code/NGSToolbox/proTRAC_2.4.2.pl \
+-map PMEA_merged_preproc.map.weighted-10000-1000-b-0 \
+-genome ../genomes/PMEA/Pocillopora_meandrina_HIv1.assembly.fa \
+-repeatmasker ../genomes/PMEA/Pocillopora_meandrina_HIv1.assembly.fasta.out \
+-geneset ../genomes/PMEA/	Pocillopora_meandrina_HIv1.genes.gff3
+
+# Output folder is proTRAC_PMEA_merged_preproc.map.weighted-10000-1000-b-0_2024y6m16d8h19m14s
+```
+
+## I wanted to also run proTRAC on individual datasets and then merge clusters. This has been done by the authors of the software and it produces different clusters. 
+
+```{r, engine='bash'}
+#PMEA all samples individually for re-cluster, genomic features, and ping/pong analysis 
+for f in *.no-dust
+do
+mkdir /scratch/jeirinlo/javirodr/sncRNA_E5_corals/20240617_ProTRAC_individual_samples/PMEA/sortmerna/${f/-S1-TP2-fastp-adapters-polyG-31bp-merged.fq.collapsed.filt.no-dust}
+sortmerna \
+--ref /scratch/jeirinlo/javirodr/sncRNA_E5_corals/genomes/PMEA/PMEA_otherSmallRNAs.filt.fasta \
+--reads /scratch/jeirinlo/javirodr/sncRNA_E5_corals/20240617_ProTRAC_individual_samples/PMEA/${f} \
+--workdir /scratch/jeirinlo/javirodr/sncRNA_E5_corals/20240617_ProTRAC_individual_samples/PMEA/sortmerna/${f/-S1-TP2-fastp-adapters-polyG-31bp-merged.fq.collapsed.filt.no-dust} \
+--fastx \
+--other
+done
+
+#Obtain piRNA length distribution
+
+for f in $(find "." -name '*_preproc')
+do
+output=piRNA_length_data/${f/_preproc}_piRNA_length.txt;
+cat $f | awk '{if(NR%4==1) {printf(">%s\n",substr($0,2));} else if(NR%4==2) print;}'| awk '$0 ~ ">" {print c; c=0;printf substr($0,2,10) "\t"; } $0 !~ ">" {c+=length($0);} END { print c; }' | sed '/^$/d' | awk '{print $2}' | sort | uniq -c | awk '{print $1,$2}' > $output
+done
+
+# pre-process piRNA fastq files for logo plot generation
+# creates a fasta file with headers removed
+
+for f in $(find "." -name '*_preproc')
+do
+output=${f/_preproc}_piRNA_reduced_PMEA.fa;
+cat $f | awk '{if(NR%4==1) {printf(">%s\n",substr($0,2));} else if(NR%4==2) print;}' | awk '/^>/{ seqlen=0; print; next; } seqlen < 24 { if (seqlen + length($0) > 24) $0 = substr($0, 1, 24-seqlen); seqlen += length($0); print }' | sed '/^>/d' > $output
+done
+
+#replace T with U
+
+cat *_piRNA_reduced_PMEA.fa > total_fasta_PMEA.fasta
+sed 's/T/U/g' total_fasta_PMEA.fasta > total_fasta_PMEA_replaced.fasta
+
+# Map to the genome
+
+for f in *preproc
+do
+perl /scratch/jeirinlo/javirodr/sncRNA_E5_corals/code/NGSToolbox/sRNAmapper.pl \
+-input ${f} \
+-genome /scratch/jeirinlo/javirodr/sncRNA_E5_corals/genomes/PMEA/Pocillopora_meandrina_HIv1.assembly.fa \
+-alignments best
+done
+
+for f in *map
+do
+perl /scratch/jeirinlo/javirodr/sncRNA_E5_corals/code/NGSToolbox/reallocate.pl ${f} 10000 1000 b 0
+done
+
+for f in *.weighted-10000-1000-b-0
+do
+perl /scratch/jeirinlo/javirodr/sncRNA_E5_corals/code/NGSToolbox/proTRAC_2.4.4.pl \
+-map ${f} \
+-genome /scratch/jeirinlo/javirodr/sncRNA_E5_corals/genomes/PMEA/Pocillopora_meandrina_HIv1.assembly.fa \
+-repeatmasker /scratch/jeirinlo/javirodr/sncRNA_E5_corals/genomes/PMEA/Pocillopora_meandrina_HIv1.assembly.fasta.out \
+-geneset /scratch/jeirinlo/javirodr/sncRNA_E5_corals/genomes/PMEA/Pocillopora_meandrina_HIv1.genes.gff3
+done
+
+# Parse proTRAC output into a 5-bedfile with cluster coordinates, a summary file with general stats, and a .tab file with other cluster characteristics
+# use the parse_proTRAC.pl script developed by https://github.com/agata-sm/
+
+# create a results folder and move result.table there
+
+mkdir proTRAC_results_PMEA
+
+for f in proTRAC_sRNA-POC-*
+do 
+cp ${f}/results.table proTRAC_results_PMEA/results.table.${f/_preproc.map.weighted-10000-100*}
+done
+
+for f in proTRAC_results_PMEA/results.table*
+do
+perl /scratch/jeirinlo/javirodr/sncRNA_E5_corals/code/parse_proTRAC.pl \
+--infile ${f} \
+--outdir proTRAC_results_PMEA/
+done
+
+# Merge clusters across samples. To get a good representation of clusters I selected clusters which are present in at least two replicates, and the overlap is by at least 50% of the cluster length and is reciprocal (i.e. A overlaps 50% of B and B overlaps 50% of A):
+
+# Using bedtools first:
+
+FILES=(proTRAC_results_PMEA/*.proTRAC.bed)
+NUM_FILES=${#FILES[@]}
+# Loop over each file
+for (( i=0; i<$NUM_FILES; i++ )); do
+  for (( j=i+1; j<$NUM_FILES; j++ )); do
+    FILE1=${FILES[$i]}
+    FILE2=${FILES[$j]}
+    
+    intersectBed -a $FILE1 -b $FILE2 -f 0.5 -r > proTRAC_results_PMEA/${i}_${j}_merged.bed
+  done
+done
+
+bedops -m *_merged.bed > PMEA.merged.clusters.bed
+
+
+
+
+# Run ping pong ID on all mapped reads 
+
+for f in *.weighted-10000-1000-b-0
+do
+perl /scratch/jeirinlo/javirodr/sncRNA_E5_corals/code/NGSToolbox/TBr2_pingpong.pl \
+-i ${f} \
+-o ${f}.pp
+done
+
+```
+

@@ -1,0 +1,73 @@
+---
+title: "18.3-Apul-piRNA-size-nucleotide-dist"
+author: "Javier Rodriguez Casariego"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, cache = TRUE)
+knitr::opts_knit$set(root.dir = '/Users/jarcasariego/Dropbox/Other_projects/E5_work/deep-dive/D-Apul/')
+```
+
+```{r}
+
+#load libraries
+library(Biostrings) # Biostrings_2.62.0 
+require(ggplot2)    # ggplot2_3.3.6
+library(ggseqlogo)  # install.packages("ggseqlogo")
+library(reshape2)   # reshape2_1.4.4
+
+####################################
+#1. Generate length distributions
+
+#set outprefix
+my.outprefix <- paste(Sys.Date(),"piRNA",sep="_")
+
+#load list of file names
+L = list.files(path = "output/18-Apul-piRNA-proTRAC/1_piRNA_pipeline_proTRAC/piRNA_length_data//", pattern=".txt", recursive = T)
+
+names <- gsub("_piRNA_length.txt", "", L)
+
+DFs = lapply(L, function(x) {
+  data <- read.table(paste0("output/18-Apul-piRNA-proTRAC/1_piRNA_pipeline_proTRAC/piRNA_length_data//", x), comment.char = "")
+  colnames(data) <- c("freq", "length")
+  return(data)
+})
+
+combo = Reduce(function(...) merge(..., by = "length", all=T), DFs)
+colnames(combo) <- c("length", names)
+combo$sums <- rowSums(combo[,c(2:6)])
+
+piRNA_length <- ggplot(data=combo, aes(x=length, y=sums, group=1)) +
+  geom_line()+
+  geom_point() + ggtitle("Seq Dist")
+
+#save logo plot
+my.pca.out <- paste0("output/18-Apul-piRNA-proTRAC/3_length_and_nuc_dist/", my.outprefix,"piRNA_length_plot.pdf")
+pdf(my.pca.out)
+piRNA_length
+dev.off()
+
+#2. Nucleotide Distribution Plots
+
+#load trimmed fasta sequences without headers
+sequences <- read.table("output/18-Apul-piRNA-proTRAC/1_piRNA_pipeline_proTRAC/total_fasta_APUL_replaced.fasta")
+
+#make position weight matrix
+pfm_APUL <- consensusMatrix(sequences$V1)
+
+#make logo plot
+APUL_plot <- ggseqlogo(pfm_APUL, method = 'bit', seq_type = "rna") + ggtitle("Acorpora pulchra")
+
+#remove large modified fasta file
+rm(sequences)  
+
+#save female logo plot
+my.logo.out <- paste0("output/18-Apul-piRNA-proTRAC/3_length_and_nuc_dist/", my.outprefix,"APUL_logo_plot.pdf")
+pdf(my.logo.out, height = 2.5, width = 5)
+APUL_plot
+dev.off()
+
+```
+

@@ -1,0 +1,163 @@
+---
+title: "18.1_Peve-piRNA-PPmeter"
+author: "Javier Rodriguez Casariego"
+date: '`r Sys.Date()`'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, cache = TRUE)
+knitr::opts_knit$set(root.dir = '/Users/jarcasariego/Dropbox/Other_projects/E5_work/deep-dive/E-Peve/')
+```
+
+PING PONG SIGNATURES FOR ALL SPECIES WAS COMPLETED IN: deep-dive/D-Apul/code/18.1_Apul-piRNA-PPmeter
+
+```{r}
+#Ping-pong analysis using the output of Ping-Pong Meter
+
+#set prefix
+my.outprefix <- paste(Sys.Date(),"ppr_Peve_analysis",sep="_")
+
+#load list of file names
+L = list.files(path = "output/18-Peve-piRNA/1_PPmeter/ppr_Peve/", pattern=".txt", recursive = T)
+names <- gsub("_ppr.txt", "", L)
+
+#this function keeps only the instances of 10 bp overlaps per million read pairs
+DFs = lapply(L, function(x) {
+  data <- read.table(paste0("output/18-Peve-piRNA/1_PPmeter/ppr_Peve/", x), skip = 2, nrows = 100)
+  data <- data[,c(1,33)]
+  colnames(data) <- c("rep", "score")
+  score <- median(data$score)
+  return(score)
+})
+
+#run for loop to get median ppm per replicate
+med_ppm <- data.frame()
+for(i in 1:length(L)) {
+  total <- cbind(names[i], DFs[[i]])
+  med_ppm <- rbind(med_ppm, total)
+}
+colnames(med_ppm) <- c("group", "score")
+med_ppm$score <- as.numeric(med_ppm$score)
+
+#divide ppr-mbr score by 10e5 for plotting
+med_ppm$score <- med_ppm$score/100000
+
+
+my.boxplot.out <- paste0("output/18-Peve-piRNA/1_PPmeter/", my.outprefix,"_PP_Percentages.pdf")
+pdf(my.boxplot.out, height = 5, width = 5)
+boxplot(med_ppm$score,
+        horizontal = T,
+        xlab = "Median x10e5 ppr-mbr (100 bootstraps")
+dev.off()
+```
+Next, I need to create a matrix of the lenghts of the pairs of sequenced with a ping-pong signal. There might be a way of extracting this information from the PPmeter output, but I cannot find it and no one has it public. Hence I will mcgiver a way that has hogh potential to be wrong, but let's see.
+
+First, I'm mapping all _preproc reads to the AMIL genome with bowtie and creating bed files with bedops showing the location of each mapped read. 
+
+```{r, engine='bash'}
+
+bowtie-build /scratch/jeirinlo/javirodr/sncRNA_E5_corals/genomes/PEVE/Porites_evermanni_v1.fa PEVE_index
+
+for f in $(find "." -name '*_preproc')
+do
+        f2="${f}";
+        of="${f}_mapped";
+        of_bam="${of}.bam"
+        of_sorted="${of}_sorted"
+        of_sorted_bam="${of_sorted}.bam"
+        of_sorted_bambai="${of_sorted}.bam.bai"
+        of_sorted_bai="${of_sorted}.bai"
+
+        bowtie -v 3 -a -p 4 --best --strata -S PEVE_index $f2 $of
+        samtools view -bS -o $of_bam $of
+        rm $of
+        samtools sort $of_bam -o $of_sorted_bam
+        rm $of_bam
+        samtools index $of_sorted_bam
+        mv $of_sorted_bambai $of_sorted_bai
+
+done
+
+#Now we need to convert to bed files for subsequent processing steps
+
+for f in $(find "." -name '*.bam')
+        do
+    f2=$(basename "${f}" | sed 's/\.bam/\.bed/g');
+
+bamToBed -i $f > $f2
+
+done
+
+```
+
+Now, create bed files for + reads starting at 5' (start) and extending 10 bases, and for - reads starting at 5' (end) and extending -10 bases.
+ 
+ 5' U----------
+    A---------- 5'
+
+something like this.
+
+If I get complete overlap of these reads I got pingpong pairs. 
+I will create a column with the original sizes to build the ping-pong read length matrix.
+
+```{r, engine='bash'}
+
+for f in *.bed
+do
+pos_bed=${f/_sorted.bed}_5p_10_positive.bed
+neg_bed=${f/_sorted.bed}_5p_10_negative.bed
+pos_bed_sorted=${pos_bed/.bed}_sorted.bed
+neg_bed_sorted=${neg_bed/.bed}_sorted.bed
+outfile=${f/_preproc_mapped_sorted.bed}_ping_pong_lengths.txt
+
+awk '$6 == "+" {print $1"\t"$2"\t"$2+10"\t"$4"\t"$5"\t"$6"\t"$3-$2}' $f > $pos_bed
+awk '$6 == "-" {print $1"\t"$3-10"\t"$3"\t"$4"\t"$5"\t"$6"\t"$3-$2}' $f > $neg_bed
+
+sort -k1,1 -k2,2n $pos_bed > $pos_bed_sorted
+sort -k1,1 -k2,2n $neg_bed > $neg_bed_sorted
+
+bedtools intersect -a $pos_bed_sorted -b $neg_bed_sorted -wo -f 1  | awk 'BEGIN { OFS = "\t" } { print $1, $4, $7, $11, $14 }' > $outfile
+done
+
+# merge all outputs and only keep the lengths pairs
+
+cat *_lengths.txt | awk '{print $3"\t"$5}' > Peve_pingpong_matrix.txt
+
+```
+
+```{r}
+
+pp_df <- read.table("output/18-Peve-piRNA/1_PPmeter/Peve_pingpong_matrix.txt", header = F)
+colnames(pp_df) <- c("pos", "neg")
+
+pp_matrix <- as_tibble(pp_df) %>% 
+    arrange(pos, neg) %>% 
+    group_by(pos, neg) %>% 
+    summarise(num_pairs = n(), .groups = "drop") %>% 
+    pivot_wider(names_from = neg, values_from = num_pairs) %>% 
+    remove_rownames() %>%
+    gather("neg", "count", -pos)
+
+# plotting the heatmap
+plt <- ggplot(pp_matrix,aes(neg, pos, fill=count)) + 
+  geom_tile() + 
+  scale_y_continuous(n.breaks = 7) +
+  scale_fill_gradient(low = "white",
+  high = "darkred",
+  space = "Lab",
+  na.value = "grey50",
+  guide = "colourbar",
+  aesthetics = "fill" ) + 
+  theme_linedraw() +
+  labs(fill = "number of read pairs") +
+  theme(axis.title = element_blank(),
+        legend.text = element_blank(),
+        legend.title = element_text(angle = 90))
+
+
+ plt
+
+ggsave(filename = paste0("output/18-Peve-piRNA/1_PPmeter/", my.outprefix,"piRNA_pp_pair_heat.png"), plt, width = 6, height = 5)
+```
+
