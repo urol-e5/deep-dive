@@ -113,6 +113,12 @@ ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/figures/histogr
          res    = 600,
          width  = 5000,
          height = 5000)
+
+ggexport(filename = "../../supplemental/miRNA/histogram_Apul_miRNA_lengths.png",
+         plot   = hist_Apul_lengths,
+         res    = 600,
+         width  = 5000,
+         height = 5000)
 ```
 
 Pmea:
@@ -139,6 +145,12 @@ hist_Pmea_lengths <- ggplot(Pmea_lengths, aes(x = length)) +
 hist_Pmea_lengths
 
 ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/figures/histogram_Pmea_miRNA_lengths.png",
+         plot   = hist_Pmea_lengths,
+         res    = 600,
+         width  = 5000,
+         height = 5000)
+
+ggexport(filename = "../../supplemental/miRNA/histogram_Pmea_miRNA_lengths.png",
          plot   = hist_Pmea_lengths,
          res    = 600,
          width  = 5000,
@@ -171,6 +183,12 @@ hist_Peve_lengths <- ggplot(Peve_lengths, aes(x = length)) +
 hist_Peve_lengths
 
 ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/figures/histogram_Peve_miRNA_lengths.png",
+         plot   = hist_Peve_lengths,
+         res    = 600,
+         width  = 5000,
+         height = 5000)
+
+ggexport(filename = "../../supplemental/miRNA/histogram_Peve_miRNA_lengths.png",
          plot   = hist_Peve_lengths,
          res    = 600,
          width  = 5000,
@@ -211,6 +229,12 @@ hist_all_lengths <- ggplot(all_lengths, aes(x = length, fill = Species)) +
 hist_all_lengths
 
 ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/figures/histogram_all_miRNA_lengths.png",
+         plot   = hist_all_lengths,
+         res    = 600,
+         width  = 5000,
+         height = 5000)
+
+ggexport(filename = "../../supplemental/miRNA/histogram_all_miRNA_lengths.png",
          plot   = hist_all_lengths,
          res    = 600,
          width  = 5000,
@@ -572,6 +596,12 @@ ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/figures/venn_co
          res    = 600,
          width  = 5000,
          height = 5000)
+
+ggexport(filename = "../../supplemental/miRNA/venn_conserved_miRNA.png",
+         plot   = venn_conserved,
+         res    = 600,
+         width  = 5000,
+         height = 5000)
 ```
 
 
@@ -677,6 +707,12 @@ ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/figures/PCoA_al
          res    = 600,
          width  = 5000,
          height = 5000)
+
+ggexport(filename = "../../supplemental/miRNA/PCoA_all_species_sequence_similarity.png",
+         plot   = pcoa_plot,
+         res    = 600,
+         width  = 5000,
+         height = 5000)
 ```
 
 ## Heatmap
@@ -702,6 +738,12 @@ all.spec.seqsim.heat <- pheatmap(all_to_all_full_shortnames,
 
 # Save plot
 ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/figures/heatmap_all_species_sequence_similarity.png",
+         plot   = all.spec.seqsim.heat,
+         res    = 600,
+         width  = 5000,
+         height = 5000)
+
+ggexport(filename = "../../supplemental/miRNA/heatmap_all_species_sequence_similarity.png",
          plot   = all.spec.seqsim.heat,
          res    = 600,
          width  = 5000,
@@ -964,6 +1006,9 @@ table <- tableGrob(table_data, rows=NULL)
 miRNA_matches_table <- grid.arrange(table)
 
 png("../output/10-shortRNA-ShortStack-comparison/figures/table_miRNA_matches.png", width = 400, height = 100)
+grid.arrange(table)
+
+png("../../supplemental/miRNA/table_miRNA_matches.png", width = 400, height = 100)
 grid.arrange(table)
 
 ```

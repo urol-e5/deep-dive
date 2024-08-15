@@ -132,6 +132,12 @@ ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/figures/histogr
          res    = 600,
          width  = 5000,
          height = 5000)
+
+ggexport(filename = "../../supplemental/miRNA/histogram_Apul_miRNA_lengths.png",
+         plot   = hist_Apul_lengths,
+         res    = 600,
+         width  = 5000,
+         height = 5000)
 ```
 
 Pmea:
@@ -163,6 +169,12 @@ hist_Pmea_lengths
 
 ``` r
 ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/figures/histogram_Pmea_miRNA_lengths.png",
+         plot   = hist_Pmea_lengths,
+         res    = 600,
+         width  = 5000,
+         height = 5000)
+
+ggexport(filename = "../../supplemental/miRNA/histogram_Pmea_miRNA_lengths.png",
          plot   = hist_Pmea_lengths,
          res    = 600,
          width  = 5000,
@@ -200,6 +212,12 @@ hist_Peve_lengths
 
 ``` r
 ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/figures/histogram_Peve_miRNA_lengths.png",
+         plot   = hist_Peve_lengths,
+         res    = 600,
+         width  = 5000,
+         height = 5000)
+
+ggexport(filename = "../../supplemental/miRNA/histogram_Peve_miRNA_lengths.png",
          plot   = hist_Peve_lengths,
          res    = 600,
          width  = 5000,
@@ -245,6 +263,12 @@ hist_all_lengths
 
 ``` r
 ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/figures/histogram_all_miRNA_lengths.png",
+         plot   = hist_all_lengths,
+         res    = 600,
+         width  = 5000,
+         height = 5000)
+
+ggexport(filename = "../../supplemental/miRNA/histogram_all_miRNA_lengths.png",
          plot   = hist_all_lengths,
          res    = 600,
          width  = 5000,
@@ -341,14 +365,14 @@ Apul
 -out ../output/10-shortRNA-ShortStack-comparison/blasts/Apul-db/Apul_ShortStack_mature
 ```
 
-    Building a new DB, current time: 08/09/2024 08:57:33
+    Building a new DB, current time: 08/15/2024 13:14:06
     New DB name:   /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Apul-db/Apul_ShortStack_mature
     New DB title:  ../data/10-shortRNA-ShortStack-comparison/Apul_ShortStack_mature.fasta
     Sequence type: Nucleotide
     Deleted existing Nucleotide BLAST database named /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Apul-db/Apul_ShortStack_mature
     Keep MBits: T
     Maximum file size: 1000000000B
-    Adding sequences from FASTA; added 38 sequences in 0.00245595 seconds.
+    Adding sequences from FASTA; added 38 sequences in 0.00222206 seconds.
 
 Peve
 
@@ -359,14 +383,14 @@ Peve
 -out ../output/10-shortRNA-ShortStack-comparison/blasts/Peve-db/Peve_ShortStack_mature
 ```
 
-    Building a new DB, current time: 08/09/2024 08:57:33
+    Building a new DB, current time: 08/15/2024 13:14:06
     New DB name:   /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Peve-db/Peve_ShortStack_mature
     New DB title:  ../data/10-shortRNA-ShortStack-comparison/Peve_ShortStack_mature.fasta
     Sequence type: Nucleotide
     Deleted existing Nucleotide BLAST database named /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Peve-db/Peve_ShortStack_mature
     Keep MBits: T
     Maximum file size: 1000000000B
-    Adding sequences from FASTA; added 46 sequences in 0.00246096 seconds.
+    Adding sequences from FASTA; added 46 sequences in 0.00290895 seconds.
 
 Pmea
 
@@ -377,14 +401,14 @@ Pmea
 -out ../output/10-shortRNA-ShortStack-comparison/blasts/Pmea-db/Pmea_ShortStack_mature
 ```
 
-    Building a new DB, current time: 08/09/2024 08:57:34
+    Building a new DB, current time: 08/15/2024 13:14:07
     New DB name:   /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Pmea-db/Pmea_ShortStack_mature
     New DB title:  ../data/10-shortRNA-ShortStack-comparison/Pmea_ShortStack_mature.fasta
     Sequence type: Nucleotide
     Deleted existing Nucleotide BLAST database named /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Pmea-db/Pmea_ShortStack_mature
     Keep MBits: T
     Maximum file size: 1000000000B
-    Adding sequences from FASTA; added 37 sequences in 0.00246596 seconds.
+    Adding sequences from FASTA; added 37 sequences in 0.00254297 seconds.
 
 ## 2.2 Run Blastn
 
@@ -817,6 +841,12 @@ ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/figures/venn_co
          res    = 600,
          width  = 5000,
          height = 5000)
+
+ggexport(filename = "../../supplemental/miRNA/venn_conserved_miRNA.png",
+         plot   = venn_conserved,
+         res    = 600,
+         width  = 5000,
+         height = 5000)
 ```
 
 # 4 Compare sequence similarity across all species
@@ -930,6 +960,12 @@ ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/figures/PCoA_al
          res    = 600,
          width  = 5000,
          height = 5000)
+
+ggexport(filename = "../../supplemental/miRNA/PCoA_all_species_sequence_similarity.png",
+         plot   = pcoa_plot,
+         res    = 600,
+         width  = 5000,
+         height = 5000)
 ```
 
 ## 4.2 Heatmap
@@ -959,6 +995,12 @@ all.spec.seqsim.heat <- pheatmap(all_to_all_full_shortnames,
 ``` r
 # Save plot
 ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/figures/heatmap_all_species_sequence_similarity.png",
+         plot   = all.spec.seqsim.heat,
+         res    = 600,
+         width  = 5000,
+         height = 5000)
+
+ggexport(filename = "../../supplemental/miRNA/heatmap_all_species_sequence_similarity.png",
          plot   = all.spec.seqsim.heat,
          res    = 600,
          width  = 5000,
@@ -1358,5 +1400,8 @@ miRNA_matches_table <- grid.arrange(table)
 
 ``` r
 png("../output/10-shortRNA-ShortStack-comparison/figures/table_miRNA_matches.png", width = 400, height = 100)
+grid.arrange(table)
+
+png("../../supplemental/miRNA/table_miRNA_matches.png", width = 400, height = 100)
 grid.arrange(table)
 ```
