@@ -13,6 +13,11 @@ knitr::opts_knit$set(root.dir = '/Users/jarcasariego/Dropbox/Other_projects/E5_w
 PING PONG SIGNATURES FOR ALL SPECIES WAS COMPLETED IN: deep-dive/D-Apul/code/18.1_Apul-piRNA-PPmeter
 
 ```{r}
+library(dplyr)   
+library(ggplot2)
+library(tidyverse)
+library(gtools)
+
 #Ping-pong analysis using the output of Ping-Pong Meter
 
 #set prefix
@@ -138,7 +143,7 @@ pp_matrix <- as_tibble(pp_df) %>%
     summarise(num_pairs = n(), .groups = "drop") %>% 
     pivot_wider(names_from = neg, values_from = num_pairs) %>% 
     remove_rownames() %>%
-    gather("neg", "count", -pos)
+    tidyr::gather("neg", "count", -pos)
 
 # plotting the heatmap
 plt <- ggplot(pp_matrix,aes(neg, pos, fill=count)) + 
@@ -172,18 +177,48 @@ process_fasta <- function(fasta_file) {
     sequence_1U_lengths <- data.frame(length = Biostrings::width(sequences_with_1U)) %>%
         group_by(length) %>%
         summarise(freq = n()) %>%
-        mutate(group = "1U")
+      mutate(grp = "1U")
     sequence_10A_lengths <- data.frame(length = Biostrings::width(sequences_with_10A)) %>%
         group_by(length) %>%
         summarise(freq = n()) %>%
-        mutate(group = "10A")
+      mutate(grp = "10A")
     sequence_lengths <- data.frame(length = head(Biostrings::width(as.character(sequences)),-1)) %>%
         group_by(length) %>%
         summarise(freq = n()) %>%
-        mutate(group = "all")
-    lengths_df <- rbind(sequence_1U_lengths, sequence_10A_lengths, sequence_lengths)
+      mutate(grp = "all") 
+    lengths_df <- rbind(sequence_1U_lengths, sequence_lengths, sequence_10A_lengths)
+    lengths_df$group = factor(lengths_df$grp, levels= c("10A", "all", "1U"), ordered = TRUE)
     return(lengths_df)
 }
+
+plot_opposing_barplots <- function(lengths_df) {
+    ggplot(lengths_df, aes(x = length)) +
+        geom_bar(aes(y = -perc_U), stat = "identity", fill = "grey", color = "black") +
+        geom_bar(aes(y = perc_A), stat = "identity", fill = "red", color = "black") +
+        scale_y_continuous(name = "Read count", labels = scales::percent) +
+        theme_minimal() +
+        labs(title = "Read Length Distribution",
+             x = "Read Length")
+}
+
+
+ggplot(lengths_df, aes(fill = group, y = freq, x = length)) +
+  geom_bar(position ="fill", stat = "identity")
+  
+  
+        geom_bar(aes(x = length, y = perc_A), stat = "identity", fill = "red", color = "black") +
+        geom_bar(aes(x = length, y = -perc_U), stat = "identity", fill = "grey", color = "black") +
+        #geom_line(aes(x = length, y = freq), color = "black") +
+        #geom_point(aes(x = length, y = freq), color = "black") +
+        scale_y_(
+            name = "Percentage",
+            #sec.axis = sec_axis(~ ., name = "Read count"),
+            breaks = seq(-100, 100, 20),
+            labels = abs(seq(-100, 100, 20))
+        ) +
+        theme_minimal() +
+        labs(title = "Read Length Distribution",
+             x = "Read Length")
 
 # Define the function to plot the distribution
 plot_length_distribution <- function(lengths) {
@@ -206,6 +241,8 @@ fasta_file <- "output/18-Pmea-piRNA/0_piRNA_pipeline_proTRAC/PMEA_mapped_piRNA.f
 sequence_lengths <- process_fasta(fasta_file)
 
 # Plot the lengths distribution
-plot_length_distribution(sequence_lengths)
+plot_opposing_barplots(sequence_lengths)
+
 ```
+
 
