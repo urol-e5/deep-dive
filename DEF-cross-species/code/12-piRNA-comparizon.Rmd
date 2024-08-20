@@ -14,14 +14,18 @@ knitr::opts_knit$set(root.dir = '/Users/jarcasariego/Dropbox/Other_projects/E5_w
 #load libraries
 library(Biostrings) # Biostrings_2.62.0 
 require(ggplot2)    # ggplot2_3.3.6
+library(ggpubr)
 library(ggseqlogo)  # install.packages("ggseqlogo")
 library(reshape2)   # reshape2_1.4.4
 library(data.table)
 library(gghighlight) #install.packages("gghighlight")
+library(plotrix)
+library(dplyr)
+library(tidyr)
 
 ```
 
-# piRNA reads size distribution
+# putative piRNA reads size distribution
 ```{r}
 my.outprefix <- paste(Sys.Date(),"all_species",sep="_")
 
@@ -46,48 +50,40 @@ DFs = lapply(L, function(x) {
 combo = Reduce(function(...) merge(..., by = "length", all=T), DFs)
 colnames(combo) <- c("length", names)
 combo <- combo %>%
-  mutate(ACR_sums = rowSums(combo[,2:6])) %>%
-  mutate(POC_sums = rowSums(combo[,7:11])) %>%
-  mutate(POR_sums = rowSums(combo[,12:14])) %>%
-  select(length,ACR_sums,POC_sums,POR_sums)
+  mutate(ACR = rowSums(combo[,2:6])) %>%
+  mutate(POC = rowSums(combo[,7:11])) %>%
+  mutate(POR = rowSums(combo[,12:14])) %>%
+  select(length,ACR,POC,POR) %>%
+  pivot_longer(c("ACR", "POC", "POR"), 
+  values_to = "sums", names_to = "group")
 
-p1 <- ggplot(combo) + geom_bar(aes(x=length, y=ACR_sums), stat="identity") +
- scale_x_continuous(name = "Length (bp)", breaks = c(24,25,26,27,28,29,30,31,32)) + 
- scale_y_continuous(name = "Acropora cervicornis") +
-  theme_pubclean() +
+group.labs <- c("A. pulchra", "P. tuahiniensis", "P. evermanni")
+names(group.labs) <- c("ACR","POC","POR")
+
+length_plot <- ggplot(combo) + geom_bar(aes(x=length, y=sums, fill=group), stat="identity") +
+ scale_x_continuous(name = "Length (bp)", breaks = c(24,25,26,27,28,29,30,31,32)) +
+  scale_fill_manual(values = c("#408EC6", "#7A2048", "#1E2761")) +
+  theme_bw() +
+  facet_wrap(~group, ncol = 1, labeller = labeller(group = group.labs), strip.position="left") +
   theme(axis.ticks.y.left = element_blank(),
         axis.text.y.left = element_blank(),
-        axis.title.y = element_text(face = "italic",size = 7))
-p2 <- ggplot(combo) + geom_bar(aes(x=length, y=POC_sums), stat="identity") +
- scale_x_continuous(name = "Length (bp)", breaks = c(24,25,26,27,28,29,30,31,32)) + 
- scale_y_continuous(name = "Pocillopora meandrina") +
-  theme_pubclean() +
-  theme(axis.ticks.y.left = element_blank(),
-        axis.text.y.left = element_blank(),
-        axis.title.y = element_text(face = "italic", size = 7),
-        axis.title.x = element_blank(),
-        axis.ticks.x = element_blank(),
-        axis.text.x = element_blank())
-p3 <- ggplot(combo) + geom_bar(aes(x=length, y=POR_sums), stat="identity") +
- scale_x_continuous(name = "Length (bp)", breaks = c(24,25,26,27,28,29,30,31,32)) + 
- scale_y_continuous(name = "Porites evermanni") +
-  theme_pubclean() +
-  theme(axis.ticks.y.left = element_blank(),
-        axis.text.y.left = element_blank(),
-        axis.title.y = element_text(face = "italic",size = 7),
-        axis.title.x = element_blank(),
-        axis.ticks.x = element_blank(),
-        axis.text.x = element_blank())
+        axis.title.y = element_blank(),
+        axis.line.x = element_line(),
+        panel.grid = element_blank(), 
+        panel.border = element_blank(),
+        strip.background = element_blank(),
+        legend.position = 'none',
+        strip.text = element_text(face = "italic", size = 9))
 
-length_plot <- plot_grid(p2, p3, p1, nrow = 3, align = "hv", rel_heights = c(1,1,0.9))
+length_plot
 
-ggsave(filename = paste0("output/12-piwiRNA_comparizon/", my.outprefix,"piRNA_length_plot.png"), length_plot, width = 5, height = 4)
+ggsave(filename = paste0("output/12-piwiRNA_comparizon/", my.outprefix,"piRNA_length_plot.png"), length_plot, width = 3, height = 3)
 
 ```
 
-# ping pong signatures
+# putative piRNA ping pong signatures
 ```{r}
-#Graph comparing ping pong per million bootstrapped reads across species
+#Graph comparing ping pong per million bootstrapped reads across species for PPmeter output with all mapped putative piRNAs
 
 my.outprefix <- paste(Sys.Date(),"ppr_mbr_analysis",sep="_")
 
@@ -113,7 +109,7 @@ DFs = lapply(L, function(x) {
 })
 L[[1]]
 data <- read.table("../D-Apul/output/18-Apul-piRNA/1_PPmeter/ppr_Apul/sRNA-ACR-140_ppr.txt", skip = 104)
-data <- data[,c(1,34)]
+data <- data[,c(1,33)]
 
 #run for loop to get median ppm per replicate
 med_ppm <- data.frame()
@@ -142,15 +138,16 @@ apul.pmea <- wilcox.test (med_ppm$score[med_ppm$group == "ACR"],med_ppm$score[me
 pmea.peve <- wilcox.test (med_ppm$score[med_ppm$group == "POC"],med_ppm$score[med_ppm$group == "POR"])
 
 
-#my.boxplot.out <- paste0("output/12-piwiRNA_comparizon/", my.outprefix,"_all_species.pdf")
-#pdf(my.boxplot.out, height = 5, width = 5)
-boxplot(score ~ group, data = med_ppm, 
-        col = c("#FED799FF", "#FD9B6BFF", "#D8456CFF"),
-        ylim = c(0,6), las = 2, ylab = "median x10e5 ppr-mbr (100 bootstraps) ")
-beeswarm::beeswarm(score ~ group, data = med_ppm, add = T, pch = 16)
-text(1.5, 5, signif(apul.pmea$p.value,2) )
-text(2, 5.5, signif(apul.peve$p.value,2) )
-text(2.5, 4, signif(pmea.peve$p.value,2) )
+my_comparisons <- list( c("POC", "POR"), c("ACR", "POC"), c("ACR", "POR"))
+zscore_plt <- ggboxplot(med_ppm, x = "group", y = "score",
+          color = "group", palette = "jco")+ 
+  stat_compare_means(comparisons = my_comparisons, method = "wilcox.test",label.y = c(2.5, 3.4, 3.7)) +
+  scale_y_continuous(name = "median x10e5 ppr-mbr (100 bootstraps)") +
+  theme(axis.title.x = element_blank(),
+        legend.position = "none")
+zscore_plt
+
+ggsave(filename = paste0("output/12-piwiRNA_comparizon/", my.outprefix,"ppm_all_species.png"), zscore_plt, width = 5, height = 4)
 
 #dev.off()
 
@@ -172,47 +169,37 @@ nuc_score <- nuc_score %>%
   mutate(group = substr(gsub("sRNA-", "", nuc_score$`names[i]`), 1, 3)) %>%
   mutate(score = nuc_score$V1) %>%
   mutate(position = rep(c(1:30),16)) %>%
-  select(position, score, group) %>%
-  pivot_wider(names_from = group, values_from = score, values_fn = mean)
+  select(position, score, group)
 
-p1 <- ggplot(nuc_score) + geom_bar(aes(x=position, y=ACR), stat="identity") +
- scale_x_continuous(name = "5' overlap (bp)", breaks = c(1:30)) +
-  theme_pubclean() +
-  theme(axis.ticks.y.left = element_blank(),
-        axis.text.y.left = element_blank(),
-        axis.title.y = element_blank()) +
-  gghighlight(position == 10)
-p2 <- ggplot(nuc_score) + geom_bar(aes(x=position, y=POR), stat="identity") +
- scale_x_continuous(name = "5' overlap (bp)", breaks = c(1:30)) +
-  theme_pubclean() +
+overlap_plot <- ggplot(nuc_score, aes(fill = group)) + geom_bar(aes(x=position, y=score), stat="identity") +
+ scale_x_continuous(name = "5' overlap (bp)", limits = c(1,23)) +
+ scale_fill_manual(values = c("#408EC6", "#7A2048", "#1E2761")) +
+  facet_wrap(~group, ncol = 1) +
+  gghighlight(position == 10, calculate_per_facet = TRUE, unhighlighted_params = list(fill = NULL, alpha = 0.3 )) +
+  theme_bw() +
   theme(axis.ticks.y.left = element_blank(),
         axis.text.y.left = element_blank(),
         axis.title.y = element_blank(),
-        axis.title.x = element_blank(),
-        axis.ticks.x = element_blank(),
-        axis.text.x = element_blank()) +
-  gghighlight(position == 10)
-p3 <- ggplot(nuc_score) + geom_bar(aes(x=position, y=POC), stat="identity") +
- scale_x_continuous(name = "5' overlap (bp)", breaks = c(1:30)) +
-  theme_pubclean() +
-  theme(axis.ticks.y.left = element_blank(),
-        axis.text.y.left = element_blank(),
-        axis.title.y = element_blank(),
-        axis.title.x = element_blank(),
-        axis.ticks.x = element_blank(),
-        axis.text.x = element_blank()) +
-  gghighlight(position == 10)
+        panel.grid = element_blank(), 
+        panel.border = element_blank(), 
+        axis.line.x = element_line(),
+        strip.text.x = element_blank(),
+        legend.position = 'none',
+        )
 
-overlap_plot <- plot_grid(p2, p3, p1, nrow = 3, align = "hv", rel_heights = c(1,1,0.9))
 overlap_plot
 
-ggsave(filename = paste0("output/12-piwiRNA_comparizon/", my.outprefix,"piRNA_pp_overlap_plot.png"), length_plot, width = 5, height = 4)
+ggsave(filename = paste0("output/12-piwiRNA_comparizon/", my.outprefix,"piRNA_pp_overlap_plot.png"), overlap_plot, width = 3, height = 3)
+
+
 
 
 ```
 
-# piRNA base composition (logo graphs)
+# putative piRNA base composition (logo graphs)
 ```{r}
+library(gridExtra)
+
 # Nucleotide Distribution Plots
 
 my.outprefix <- paste(Sys.Date(),"all_species",sep="_")
@@ -227,21 +214,129 @@ pfm_APUL <- consensusMatrix(APUL_sequences$V1)
 pfm_PMEA <- consensusMatrix(PMEA_sequences$V1)
 pfm_PEVE <- consensusMatrix(PEVE_sequences$V1)
 
-#make logo plot
-APUL_plot <- ggseqlogo(pfm_APUL, method = 'bit', seq_type = "rna") + theme_cowplot()
-PMEA_plot <- ggseqlogo(pfm_PMEA, method = 'bit', seq_type = "rna") + theme_cowplot()
-PEVE_plot <- ggseqlogo(pfm_PEVE, method = 'bit', seq_type = "rna") + theme_cowplot()
-
 #remove large modified fasta file
 rm(APUL_sequences, PMEA_sequences, PEVE_sequences)  
 
-logo_plot <- plot_grid(PMEA_plot, PEVE_plot, APUL_plot, nrow = 3, align = "hv")
+# create a list to facet the plot
+seqs <- list(pfm_APUL,pfm_PMEA, pfm_PEVE)
+names(seqs) <- c("APUL", "PTHU","PEVE")
+
+#make logo plot
+logo_plot <- ggplot() + 
+  geom_logo(seqs, method = 'bit', seq_type = "rna",) + 
+  theme_logo() +
+  facet_grid(vars(seq_group), switch = "y") +
+  theme_bw() + 
+  scale_x_continuous(name = "position (bp)", limits = c(0.5,20)) +
+  theme(axis.ticks.y.left = element_blank(),
+        axis.text.y.left = element_blank(),
+        axis.title.y = element_blank(),
+        panel.grid = element_blank(), 
+        panel.border = element_blank(), 
+        axis.line.x = element_line(),
+        strip.text = element_blank(),
+        strip.background = element_blank()
+        )
 logo_plot
 
-ggsave(filename = paste0("output/12-piwiRNA_comparizon/", my.outprefix,"piRNA_nucleotide_plot.png"), logo_plot, width = 5, height = 4)
+
+ggsave(filename = paste0("output/12-piwiRNA_comparizon/", my.outprefix,"piRNA_nucleotide_plot.png"), logo_plot, width = 3, height = 3)
 ```
 
-# piRNA-TE 
+# Ping-pong z scores for putative piRNAs
+```{r}
+# Graph z-scores per species
+
+APUL_Z <- read.table("output/12-piwiRNA_comparizon/pp_z-scores/APUL_pp_z-scores.txt") %>%
+  dplyr::mutate(sp = "ACR",
+                z_score = V2) %>%
+  select(sp,z_score) 
+  
+PMEA_Z <- read.table("output/12-piwiRNA_comparizon/pp_z-scores/PMEA_pp_z-scores.txt") %>%
+  dplyr::mutate(sp = "POC",
+                z_score = V2) %>%
+  select(sp,z_score) 
+PEVE_Z <- read.table("output/12-piwiRNA_comparizon/pp_z-scores/PEVE_pp_z-scores.txt") %>%
+  dplyr::mutate(sp = "POR",
+                z_score = V2) %>%
+  select(sp,z_score) 
+
+z_group <- rbind(PMEA_Z, APUL_Z, PEVE_Z) %>%
+  dplyr::group_by(sp) %>%
+  summarise_each(funs(mean,sd,std.error)) %>%
+  mutate(mean = round(mean, 1))
+z_group$sp <- factor(z_group$sp, levels = c("ACR", "POC", "POR"), ordered = TRUE)
+stat_res <- data_frame(y = c(rep("mean",3)), group1 = c("ACR","ACR","POC"), group2 = c("POC", "POR", "POR"), p.value = c("*** (Z=27.36)","*** (Z=22.24)","*** (Z=4.93)"))
+
+z_score_plot <- ggplot(z_group) +
+    geom_bar( aes(x=sp, y=mean, fill=sp), stat="identity", width=0.3) +
+    geom_errorbar( aes(x=sp, ymin=mean-std.error, ymax=mean+std.error), width=0.1) +
+  coord_flip() +
+  theme_bw() +
+  scale_x_discrete(limits=rev) +
+  scale_fill_manual(values = c("#408EC6", "#7A2048", "#1E2761")) +
+  scale_y_continuous(name = "Z-score", limits = c(0,100)) +
+  theme(panel.grid = element_blank(), 
+        panel.border = element_blank(), 
+        axis.line.x = element_line(),
+        axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(), 
+        legend.position = 'none'
+        ) +
+  geom_hline(yintercept = 0, size = .75) +
+  stat_pvalue_manual(data = stat_res, 
+                     label = "p.value",
+                     y.position = c(51, 88, 81), coord.flip = TRUE, label.size = 2, tip.length = 0.01);z_score_plot
+
+
+```
+
+
+
 ```{r}
 
+library(ggpubr)
+library(cowplot)
+final_plt <- plot_grid(length_plot,overlap_plot, logo_plot, z_score_plot, nrow = 1, align = "h", labels = c("A", "B", "C", "D"))
+final_plt
+
+ggsave(filename = "figures/piRNA_final_plot.png", final_plt, width = 12, height = 3)
+```
+
+
+
+# clustered piRNAs characterization 
+## Cluster piRNA composition graph
+```{r}
+APUL_clust <- read.table("output/12-piwiRNA_comparizon/clusters/APUL_cluster_summary.tab", header = T) %>%
+  dplyr::mutate(sp = "ACR") 
+PMEA_clust <- read.table("output/12-piwiRNA_comparizon/clusters/PMEA_cluster_summary.tab", header = T) %>%
+  dplyr::mutate(sp = "POC") 
+PEVE_clust <- read.table("output/12-piwiRNA_comparizon/clusters/PEVE_cluster_summary.tab", header = T) %>%
+  dplyr::mutate(sp = "POR") 
+
+clust_summary <- rbind(APUL_clust, PMEA_clust, PEVE_clust) %>%
+  select(., sp, perc_unique_tags_in_clusters, perc_reads_in_clusters, avg_perc_1T_in_clusters) %>%
+  group_by(sp) %>%
+  summarise_all(funs(mean,sd)) %>%
+  gather(key = vars, value = percent, !sp) %>%
+  mutate(vars = factor(vars, level=c('perc_reads_in_clusters', 'perc_unique_tags_in_clusters', 'avg_perc_1T_in_clusters'), ordered = T))
+  
+ggplot(clust_summary, aes(x=sp, y=percent, fill = sp, alpha = vars)) +
+  geom_col(position = "dodge") +
+  geom_text(data = data.frame(sp = c("ACR","ACR","ACR"), percent = c(108, 104, 100),
+                              vars = levels(clust_summary$vars),
+                              colour = c("reads in cluster (%)", "unique sequences in cluster (%)", "5'U sequence bias (%)")),
+            aes(label = colour)) +
+  theme_classic() +
+  scale_x_discrete(labels=c("A. pulchra", "P. tuahiniensis", "P. evermanni")) +
+  scale_fill_manual(values = c("#408EC6", "#7A2048", "#1E2761")) +
+  scale_alpha_discrete(range = c(.4,1)) +
+  theme(legend.position = "none",
+        panel.grid = element_blank(), 
+        panel.border = element_blank(), 
+        axis.text.x = element_text(face = "italic"),
+        axis.title = element_blank()
+        ) 
 ```
