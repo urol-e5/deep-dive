@@ -1,0 +1,103 @@
+---
+title: "Closest genomic features to ncRNAs - Apul"
+author: "Jill Ashey"
+date: "2024-08-20"
+output: html_document
+---
+
+## Closest genomic features to ncRNAs in Acropora pulchra 
+
+This code will investigate the proximity of ncRNAs to other genomic features in Acropora pulchra. The `bash` code snippets were done on the URI HPC server, Andromeda. I copied the Apul miRNA [gff](https://github.com/urol-e5/deep-dive/blob/main/D-Apul/output/13.2.1-Apul-sRNAseq-ShortStack-31bp-fastp-merged-cnidarian_miRBase/ShortStack_out/Results.gff3) and [fasta](https://github.com/urol-e5/deep-dive/blob/main/D-Apul/output/13.2.1-Apul-sRNAseq-ShortStack-31bp-fastp-merged-cnidarian_miRBase/ShortStack_out/mir.fasta) files onto Andromeda. We used the Amillepora genomic information for Apul analyses. 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# Load packages
+library(tidyverse)
+```
+
+Sort the genome gff file for Apul. We are using the Amil genome for reference. 
+```{bash}
+cd /data/putnamlab/jillashey/genome/Amil_v2.01/
+wget http://gannet.fish.washington.edu/seashell/snaps/GCF_013753865.1_Amil_v2.1_genomic.gff
+sort -k1,1 -k4,4n GCF_013753865.1_Amil_v2.1_genomic.gff > GCF_013753865.1_Amil_v2.1_genomic_sorted.gff 
+```
+
+Sort miRNA gff file and run `bed closest`.
+```{bash}
+cd /data/putnamlab/jillashey/e5/ncRNA_gff
+
+sort -k1,1 -k4,4n Apul_Results.gff3 > Apul_Results_sorted.gff3
+
+interactive 
+module load BEDTools/2.30.0-GCC-11.3.0
+bedtools closest -a Apul_Results_sorted.gff3 -b /data/putnamlab/jillashey/genome/Amil_v2.01/GCF_013753865.1_Amil_v2.1_genomic_sorted.gff > Apul_output.bed
+
+wc -l Apul_output.bed 
+61599 Apul_output.bed
+
+head Apul_output.bed 
+NC_058066.1	ShortStack	Unknown_sRNA_locus	152483	152910	140	-	.	ID=Cluster_1;DicerCall=N;MIRNA=N	NC_058066.1	RefSeq	region	1	39361238	.	+	.	ID=NC_058066.1:1..39361238;Dbxref=taxon:45264;Name=1;chromosome=1;collection-date=2017;country=Indonesia;gbkey=Src;genome=chromosome;isolate=JS-1;isolation-source=Whole tissue;mol_type=genomic DNA;tissue-type=Adult tissue
+NC_058066.1	ShortStack	Unknown_sRNA_locus	152483	152910	140	-	.	ID=Cluster_1;DicerCall=N;MIRNA=N	NC_058066.1	Gnomon	gene	92732	195229	.	+	.	ID=gene-LOC114963509;Dbxref=GeneID:114963509;Name=LOC114963509;gbkey=Gene;gene=LOC114963509;gene_biotype=protein_coding
+NC_058066.1	ShortStack	Unknown_sRNA_locus	152483	152910	140	-	.	ID=Cluster_1;DicerCall=N;MIRNA=N	NC_058066.1	Gnomon	mRNA	92732	195229	.	+	.	ID=rna-XM_044317725.1;Parent=gene-LOC114963509;Dbxref=GeneID:114963509,Genbank:XM_044317725.1;Name=XM_044317725.1;Note=The sequence of the model RefSeq transcript was modified relative to this genomic sequence to represent the inferred CDS: deleted 1 base in 1 codon;exception=unclassified transcription discrepancy;experiment=COORDINATES: polyA evidence [ECO:0006239];gbkey=mRNA;gene=LOC114963509;model_evidence=Supporting evidence includes similarity to: 2 mRNAs%2C 3 ESTs%2C 12 Proteins%2C and 100%25 coverage of the annotated genomic feature by RNAseq alignments%2C including 1 sample with support for all annotated introns;product=uncharacterized LOC114963509;transcript_id=XM_044317725.1
+NC_058066.1	ShortStack	Unknown_sRNA_locus	152483	152910	140	-	.	ID=Cluster_1;DicerCall=N;MIRNA=N	NC_058066.1	Gnomon	gene	145277	165521	.	+	.	ID=gene-LOC122957574;Dbxref=GeneID:122957574;Name=LOC122957574;gbkey=Gene;gene=LOC122957574;gene_biotype=protein_coding
+NC_058066.1	ShortStack	Unknown_sRNA_locus	152483	152910	140	-	.	ID=Cluster_1;DicerCall=N;MIRNA=N	NC_058066.1	Gnomon	mRNA	145277	165521	.	+	.	ID=rna-XM_044317744.1;Parent=gene-LOC122957574;Dbxref=GeneID:122957574,Genbank:XM_044317744.1;Name=XM_044317744.1;gbkey=mRNA;gene=LOC122957574;model_evidence=Supporting evidence includes similarity to: 5 Proteins%2C and 99%25 coverage of the annotated genomic feature by RNAseq alignments%2C including 2 samples with support for all annotated introns;product=uncharacterized LOC122957574;transcript_id=XM_044317744.1
+NC_058066.1	ShortStack	Unknown_sRNA_locus	152483	152910	140	-	.	ID=Cluster_1;DicerCall=N;MIRNA=N	NC_058066.1	Gnomon	CDS	152268	152501	.	+	2	ID=cds-XP_044173679.1;Parent=rna-XM_044317744.1;Dbxref=GeneID:122957574,Genbank:XP_044173679.1;Name=XP_044173679.1;gbkey=CDS;gene=LOC122957574;product=uncharacterized protein LOC122957574;protein_id=XP_044173679.1
+NC_058066.1	ShortStack	Unknown_sRNA_locus	152483	152910	140	-	.	ID=Cluster_1;DicerCall=N;MIRNA=N	NC_058066.1	Gnomon	exon	152268	152501	.	+	.	ID=exon-XM_044317744.1-4;Parent=rna-XM_044317744.1;Dbxref=GeneID:122957574,Genbank:XM_044317744.1;gbkey=mRNA;gene=LOC122957574;product=uncharacterized LOC122957574;transcript_id=XM_044317744.1
+NC_058066.1	ShortStack	Unknown_sRNA_locus	161064	161674	549	.	.	ID=Cluster_2;DicerCall=N;MIRNA=N	NC_058066.1	RefSeq	region	1	39361238	.	+	.	ID=NC_058066.1:1..39361238;Dbxref=taxon:45264;Name=1;chromosome=1;collection-date=2017;country=Indonesia;gbkey=Src;genome=chromosome;isolate=JS-1;isolation-source=Whole tissue;mol_type=genomic DNA;tissue-type=Adult tissue
+NC_058066.1	ShortStack	Unknown_sRNA_locus	161064	161674	549	.	.	ID=Cluster_2;DicerCall=N;MIRNA=N	NC_058066.1	Gnomon	gene	92732	195229	.	+	.	ID=gene-LOC114963509;Dbxref=GeneID:114963509;Name=LOC114963509;gbkey=Gene;gene=LOC114963509;gene_biotype=protein_coding
+NC_058066.1	ShortStack	Unknown_sRNA_locus	161064	161674	549	.	.	ID=Cluster_2;DicerCall=N;MIRNA=N	NC_058066.1	Gnomon	mRNA	92732	195229	.	+	.	ID=rna-XM_044317725.1;Parent=gene-LOC114963509;Dbxref=GeneID:114963509,Genbank:XM_044317725.1;Name=XM_044317725.1;Note=The sequence of the model RefSeq transcript was modified relative to this genomic sequence to represent the inferred CDS: deleted 1 base in 1 codon;exception=unclassified transcription discrepancy;experiment=COORDINATES: polyA evidence [ECO:0006239];gbkey=mRNA;gene=LOC114963509;model_evidence=Supporting evidence includes similarity to: 2 mRNAs%2C 3 ESTs%2C 12 Proteins%2C and 100%25 coverage of the annotated genomic feature by RNAseq alignments%2C including 1 sample with support for all annotated introns;product=uncharacterized LOC114963509;transcript_id=XM_044317725.1
+```
+
+Remove the unknown siRNA loci
+```{bash}
+awk 'BEGIN {OFS="\t"} $3 != "Unknown_sRNA_locus"' Apul_output.bed > filtered_Apul_output.bed
+
+wc -l filtered_Apul_output.bed
+755 filtered_Apul_output.bed
+
+head filtered_Apul_output.bed 
+NC_058066.1	ShortStack	siRNA24_locus	5224792	5225215	1264	+	.	ID=Cluster_184;DicerCall=24;MIRNA=N	NC_058066.1	RefSeq	region	1	39361238	.	+	.	ID=NC_058066.1:1..39361238;Dbxref=taxon:45264;Name=1;chromosome=1;collection-date=2017;country=Indonesia;gbkey=Src;genome=chromosome;isolate=JS-1;isolation-source=Whole tissue;mol_type=genomic DNA;tissue-type=Adult tissue
+NC_058066.1	ShortStack	siRNA24_locus	5224792	5225215	1264	+	.	ID=Cluster_184;DicerCall=24;MIRNA=N	NC_058066.1	Gnomon	gene	5153290	5231353	.	-	.	ID=gene-LOC114950433;Dbxref=GeneID:114950433;Name=LOC114950433;gbkey=Gene;gene=LOC114950433;gene_biotype=protein_coding
+NC_058066.1	ShortStack	siRNA24_locus	5224792	5225215	1264	+	.	ID=Cluster_184;DicerCall=24;MIRNA=N	NC_058066.1	Gnomon	mRNA	5153290	5231353	.	-	.	ID=rna-XM_044310280.1;Parent=gene-LOC114950433;Dbxref=GeneID:114950433,Genbank:XM_044310280.1;Name=XM_044310280.1;experiment=COORDINATES: polyA evidence [ECO:0006239];gbkey=mRNA;gene=LOC114950433;model_evidence=Supporting evidence includes similarity to: 15 mRNAs%2C 31 Proteins%2C and 99%25 coverage of the annotated genomic feature by RNAseq alignments;product=uncharacterized LOC114950433;transcript_id=XM_044310280.1
+NC_058066.1	ShortStack	siRNA21_locus	7563377	7563797	118	+	.	ID=Cluster_225;DicerCall=21;MIRNA=N	NC_058066.1	RefSeq	region	1	39361238	.	+	.	ID=NC_058066.1:1..39361238;Dbxref=taxon:45264;Name=1;chromosome=1;collection-date=2017;country=Indonesia;gbkey=Src;genome=chromosome;isolate=JS-1;isolation-source=Whole tissue;mol_type=genomic DNA;tissue-type=Adult tissue
+NC_058066.1	ShortStack	siRNA21_locus	7563377	7563797	118	+	.	ID=Cluster_225;DicerCall=21;MIRNA=N	NC_058066.1	Gnomon	gene	7523354	7569602	.	-	.	ID=gene-LOC114970982;Dbxref=GeneID:114970982;Name=LOC114970982;gbkey=Gene;gene=LOC114970982;gene_biotype=protein_coding
+NC_058066.1	ShortStack	siRNA21_locus	7563377	7563797	118	+	.	ID=Cluster_225;DicerCall=21;MIRNA=N	NC_058066.1	Gnomon	mRNA	7523354	7569602	.	-	.	ID=rna-XM_044320669.1;Parent=gene-LOC114970982;Dbxref=GeneID:114970982,Genbank:XM_044320669.1;Name=XM_044320669.1;Note=The sequence of the model RefSeq transcript was modified relative to this genomic sequence to represent the inferred CDS: inserted 1 base in 1 codon;exception=unclassified transcription discrepancy;gbkey=mRNA;gene=LOC114970982;model_evidence=Supporting evidence includes similarity to: 6 Proteins%2C and 98%25 coverage of the annotated genomic feature by RNAseq alignments%2C including 1 sample with support for all annotated introns;product=uncharacterized LOC114970982;transcript_id=XM_044320669.1
+NC_058066.1	ShortStack	siRNA22_locus	8905068	8905484	102	-	.	ID=Cluster_251;DicerCall=22;MIRNA=N	NC_058066.1	RefSeq	region	1	39361238	.	+	.	ID=NC_058066.1:1..39361238;Dbxref=taxon:45264;Name=1;chromosome=1;collection-date=2017;country=Indonesia;gbkey=Src;genome=chromosome;isolate=JS-1;isolation-source=Whole tissue;mol_type=genomic DNA;tissue-type=Adult tissue
+NC_058066.1	ShortStack	MIRNA_hairpin	12757125	12757218	8293	-	.	ID=Cluster_316;DicerCall=23;MIRNA=Y	NC_058066.1	RefSeq	region	1	39361238	.	+	.	ID=NC_058066.1:1..39361238;Dbxref=taxon:45264;Name=1;chromosome=1;collection-date=2017;country=Indonesia;gbkey=Src;genome=chromosome;isolate=JS-1;isolation-source=Whole tissue;mol_type=genomic DNA;tissue-type=Adult tissue
+NC_058066.1	ShortStack	MIRNA_hairpin	12757125	12757218	8293	-	.	ID=Cluster_316;DicerCall=23;MIRNA=Y	NC_058066.1	Gnomon	gene	12755159	12764546	.	-	.	ID=gene-LOC114961148;Dbxref=GeneID:114961148;Name=LOC114961148;gbkey=Gene;gene=LOC114961148;gene_biotype=protein_coding
+NC_058066.1	ShortStack	MIRNA_hairpin	12757125	12757218	8293	-	.	ID=Cluster_316;DicerCall=23;MIRNA=Y	NC_058066.1	Gnomon	mRNA	12755159	12764546	.	-	.	ID=rna-XM_029339755.2;Parent=gene-LOC114961148;Dbxref=GeneID:114961148,Genbank:XM_029339755.2;Name=XM_029339755.2;experiment=COORDINATES: polyA evidence [ECO:0006239];gbkey=mRNA;gene=LOC114961148;model_evidence=Supporting evidence includes similarity to: 7 mRNAs%2C 8 Proteins%2C and 100%25 coverage of the annotated genomic feature by RNAseq alignments%2C including 87 samples with support for all annotated introns;product=zinc finger MYND domain-containing protein 19-like;transcript_id=XM_029339755.2
+```
+
+If I subtract the 5th column (end of miRNA feature) by the 13th column (beginning of genomic feature), this will tell me if there is overlap in the two features. If the number is positive, it means there is overlap. If it is negative, it means there is no overlap. I did not run bed intersect because I attempted that with Ptuh in code below and it did not give me any meaningful output. 
+
+```{bash}
+awk '{ $(NF+1) = $13 - $5 }1' OFS='\t' filtered_Apul_output.bed > filtered_Apul_output_overlap.bed
+
+head filtered_Apul_output_overlap.bed 
+NC_058066.1	ShortStack	siRNA24_locus	5224792	5225215	1264	+	.	ID=Cluster_184;DicerCall=24;MIRNA=N	NC_058066.1	RefSeq	region	1	39361238	.	+	.	ID=NC_058066.1:1..39361238;Dbxref=taxon:45264;Name=1;chromosome=1;collection-date=2017;country=Indonesia;gbkey=Src;genome=chromosome;isolate=JS-1;isolation-source=Whole	tissue;mol_type=genomic	DNA;tissue-type=Adult	tissue	-5225214
+NC_058066.1	ShortStack	siRNA24_locus	5224792	5225215	1264	+	.	ID=Cluster_184;DicerCall=24;MIRNA=N	NC_058066.1	Gnomon	gene	5153290	5231353	.	-	.	ID=gene-LOC114950433;Dbxref=GeneID:114950433;Name=LOC114950433;gbkey=Gene;gene=LOC114950433;gene_biotype=protein_coding	-71925
+NC_058066.1	ShortStack	siRNA24_locus	5224792	5225215	1264	+	.	ID=Cluster_184;DicerCall=24;MIRNA=N	NC_058066.1	Gnomon	mRNA	5153290	5231353	.	-	.	ID=rna-XM_044310280.1;Parent=gene-LOC114950433;Dbxref=GeneID:114950433,Genbank:XM_044310280.1;Name=XM_044310280.1;experiment=COORDINATES:	polyA	evidence	[ECO:0006239];gbkey=mRNA;gene=LOC114950433;model_evidence=Supporting	evidence	includes	similarity	to:	15	mRNAs%2C	31	Proteins%2C	and	99%25	coverage	of	the	annotated	genomic	feature	by	RNAseq	alignments;product=uncharacterized	LOC114950433;transcript_id=XM_044310280.1	-71925
+NC_058066.1	ShortStack	siRNA21_locus	7563377	7563797	118	+	.	ID=Cluster_225;DicerCall=21;MIRNA=N	NC_058066.1	RefSeq	region	1	39361238	.	+	.	ID=NC_058066.1:1..39361238;Dbxref=taxon:45264;Name=1;chromosome=1;collection-date=2017;country=Indonesia;gbkey=Src;genome=chromosome;isolate=JS-1;isolation-source=Whole	tissue;mol_type=genomic	DNA;tissue-type=Adult	tissue	-7563796
+NC_058066.1	ShortStack	siRNA21_locus	7563377	7563797	118	+	.	ID=Cluster_225;DicerCall=21;MIRNA=N	NC_058066.1	Gnomon	gene	7523354	7569602	.	-	.	ID=gene-LOC114970982;Dbxref=GeneID:114970982;Name=LOC114970982;gbkey=Gene;gene=LOC114970982;gene_biotype=protein_coding	-40443
+NC_058066.1	ShortStack	siRNA21_locus	7563377	7563797	118	+	.	ID=Cluster_225;DicerCall=21;MIRNA=N	NC_058066.1	Gnomon	mRNA	7523354	7569602	.	-	.	ID=rna-XM_044320669.1;Parent=gene-LOC114970982;Dbxref=GeneID:114970982,Genbank:XM_044320669.1;Name=XM_044320669.1;Note=The	sequence	of	the	model	RefSeq	transcript	was	modified	relative	to	this	genomic	sequence	to	represent	the	inferred	CDS:	inserted	base	in	1	codon;exception=unclassified	transcription	discrepancy;gbkey=mRNA;gene=LOC114970982;model_evidence=Supporting	evidence	includes	similarity	to:	6	Proteins%2C	and	98%25	coverage	of	theannotated	genomic	feature	by	RNAseq	alignments%2C	including	1	sample	with	support	for	all	annotated	introns;product=uncharacterized	LOC114970982;transcript_id=XM_044320669.1	-40443
+NC_058066.1	ShortStack	siRNA22_locus	8905068	8905484	102	-	.	ID=Cluster_251;DicerCall=22;MIRNA=N	NC_058066.1	RefSeq	region	1	39361238	.	+	.	ID=NC_058066.1:1..39361238;Dbxref=taxon:45264;Name=1;chromosome=1;collection-date=2017;country=Indonesia;gbkey=Src;genome=chromosome;isolate=JS-1;isolation-source=Whole	tissue;mol_type=genomic	DNA;tissue-type=Adult	tissue	-8905483
+NC_058066.1	ShortStack	MIRNA_hairpin	12757125	12757218	8293	-	.	ID=Cluster_316;DicerCall=23;MIRNA=Y	NC_058066.1	RefSeq	region	1	39361238	.	+	.	ID=NC_058066.1:1..39361238;Dbxref=taxon:45264;Name=1;chromosome=1;collection-date=2017;country=Indonesia;gbkey=Src;genome=chromosome;isolate=JS-1;isolation-source=Whole	tissue;mol_type=genomic	DNA;tissue-type=Adult	tissue	-12757217
+NC_058066.1	ShortStack	MIRNA_hairpin	12757125	12757218	8293	-	.	ID=Cluster_316;DicerCall=23;MIRNA=Y	NC_058066.1	Gnomon	gene	12755159	12764546	.	-	.	ID=gene-LOC114961148;Dbxref=GeneID:114961148;Name=LOC114961148;gbkey=Gene;gene=LOC114961148;gene_biotype=protein_coding	-2059
+NC_058066.1	ShortStack	MIRNA_hairpin	12757125	12757218	8293	-	.	ID=Cluster_316;DicerCall=23;MIRNA=Y	NC_058066.1	Gnomon	mRNA	12755159	12764546	.	-	.	ID=rna-XM_029339755.2;Parent=gene-LOC114961148;Dbxref=GeneID:114961148,Genbank:XM_029339755.2;Name=XM_029339755.2;experiment=COORDINATES:	polyA	evidence	[ECO:0006239];gbkey=mRNA;gene=LOC114961148;model_evidence=Supporting	evidence	includes	similarity	to:	7	mRNAs%2C	8	Proteins%2C	and	100%25	coverage	of	the	annotated	genomic	feature	by	RNAseq	alignments%2C	including	87	samples	with	support	for	all	annotated	introns;product=zinc	finger	MYNdomain-containing	protein	19-like;transcript_id=XM_029339755.2	-2059
+```
+
+Count number of positive and negative numbers
+
+```{bash}
+awk '{if ($NF < 0) neg++; else if ($NF > 0) pos++} END {print "Positive count:", pos; print "Negative count:", neg}' filtered_Apul_output_overlap.bed
+
+Positive count: 
+Negative count: 755
+```
+
+Load Apul miRNA file into R
+
+```{r}
+bed <- read.delim("../output/19-bedtools-closest/filtered_Apul_output_overlap.bed", header = F)
+```
