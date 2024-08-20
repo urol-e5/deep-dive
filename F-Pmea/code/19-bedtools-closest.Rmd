@@ -1,0 +1,30 @@
+---
+title: "Closest genomic features to miRNAs"
+author: "Jill Ashey"
+date: "2024-08-20"
+output: html_document
+---
+
+This code will investigate the proximity of ncRNAs to other genomic features. The `bash` code snippets were done on the URI HPC server, Andromeda 
+
+
+## miRNAs
+
+
+
+
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# Load packages
+library(tidyverse)
+```
+
+Load Ptuh bed file into R. 
+```{r}
+bed <- read.delim("../output/19-bedtools-closest/filtered_Ptuh_output_overlap.bed", header = F)
+```
+
