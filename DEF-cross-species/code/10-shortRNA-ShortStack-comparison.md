@@ -7,8 +7,11 @@ Kathleen Durkin
   - <a href="#11-isolate-mature-mirna-sequences"
     id="toc-11-isolate-mature-mirna-sequences">1.1 Isolate mature miRNA
     sequences</a>
-  - <a href="#12-merge-the-three-mature-mirna-fastas"
-    id="toc-12-merge-the-three-mature-mirna-fastas">1.2 Merge the three
+  - <a href="#12-check-mirna-length-distributions"
+    id="toc-12-check-mirna-length-distributions">1.2 Check miRNA length
+    distributions</a>
+  - <a href="#13-merge-the-three-mature-mirna-fastas"
+    id="toc-13-merge-the-three-mature-mirna-fastas">1.3 Merge the three
     mature miRNA FASTAs</a>
 - <a href="#2-blasts" id="toc-2-blasts">2 BLASTs</a>
   - <a href="#21-make-database-for-each-species"
@@ -85,7 +88,218 @@ grep "^>" Pmea_ShortStack_mature.fasta | wc -l
     46
     37
 
-## 1.2 Merge the three mature miRNA FASTAs
+## 1.2 Check miRNA length distributions
+
+``` r
+# Set our color scheme for plotting -- options for both the abbreviated labels or the full, correct species names
+species_colors <- c('A_pulchra' = '#408EC6',
+                    'P_evermanni' = '#1E2761',
+                    'P_tuahiniensis' = '#7A2048')
+
+species_colors_nolabel <- c('#408EC6', '#1E2761', '#7A2048')
+```
+
+Apul:
+
+``` bash
+# Extract sequence lengths and calculate statistics
+grep -v '^>' ../data/10-shortRNA-ShortStack-comparison/Apul_ShortStack_mature.fasta | awk '{ print length($0) }' > ../data/10-shortRNA-ShortStack-comparison/Apul_ShortStack_mature_lengths.txt
+```
+
+``` r
+# Read in the lengths
+Apul_lengths <- read.table("../data/10-shortRNA-ShortStack-comparison/Apul_ShortStack_mature_lengths.txt", header = FALSE, col.names = "length")
+
+# Make histogram of lengths
+hist_Apul_lengths <- ggplot(Apul_lengths, aes(x = length)) +
+  geom_histogram(binwidth = 1, fill = species_colors['A_pulchra'], color = "black") +
+  geom_text(stat = 'count', aes(label = ..count..), vjust = -0.5) +
+  labs(title = "A. pulchra miRNA sequence lengths",
+       x = "Sequence Length [nucleotides]",
+       y = "Frequency") +
+  xlim(20, 25) +
+  ylim(0, 41) +
+  theme_minimal()
+
+hist_Apul_lengths
+```
+
+<img src="10-shortRNA-ShortStack-comparison_files/figure-gfm/plot-Apul-miRNA-lengths-1.png" style="display: block; margin: auto;" />
+
+``` r
+ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/figures/histogram_Apul_miRNA_lengths.png",
+         plot   = hist_Apul_lengths,
+         res    = 600,
+         width  = 5000,
+         height = 5000)
+
+ggexport(filename = "../../supplemental/miRNA/histogram_Apul_miRNA_lengths.png",
+         plot   = hist_Apul_lengths,
+         res    = 600,
+         width  = 5000,
+         height = 5000)
+```
+
+Pmea:
+
+``` bash
+# Extract sequence lengths and calculate statistics
+grep -v '^>' ../data/10-shortRNA-ShortStack-comparison/Pmea_ShortStack_mature.fasta | awk '{ print length($0) }' > ../data/10-shortRNA-ShortStack-comparison/Pmea_ShortStack_mature_lengths.txt
+```
+
+``` r
+# Read in the lengths
+Pmea_lengths <- read.table("../data/10-shortRNA-ShortStack-comparison/Pmea_ShortStack_mature_lengths.txt", header = FALSE, col.names = "length")
+
+# Make histogram of lengths
+hist_Pmea_lengths <- ggplot(Pmea_lengths, aes(x = length)) +
+  geom_histogram(binwidth = 1, fill = species_colors['P_tuahiniensis'], color = "black") +
+  geom_text(stat = 'count', aes(label = ..count..), vjust = -0.5) +
+  labs(title = "P. tuahiniensis miRNA sequence lengths",
+       x = "Sequence Length [nucleotides]",
+       y = "Frequency") +
+  xlim(20.5, 24.5) +
+  ylim(0, 41) +
+  theme_minimal()
+
+hist_Pmea_lengths
+```
+
+<img src="10-shortRNA-ShortStack-comparison_files/figure-gfm/plot-Pmea-miRNA-lengths-1.png" style="display: block; margin: auto;" />
+
+``` r
+ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/figures/histogram_Pmea_miRNA_lengths.png",
+         plot   = hist_Pmea_lengths,
+         res    = 600,
+         width  = 5000,
+         height = 5000)
+
+ggexport(filename = "../../supplemental/miRNA/histogram_Pmea_miRNA_lengths.png",
+         plot   = hist_Pmea_lengths,
+         res    = 600,
+         width  = 5000,
+         height = 5000)
+```
+
+Peve:
+
+``` bash
+# Extract sequence lengths and calculate statistics
+grep -v '^>' ../data/10-shortRNA-ShortStack-comparison/Peve_ShortStack_mature.fasta | awk '{ print length($0) }' > ../data/10-shortRNA-ShortStack-comparison/Peve_ShortStack_mature_lengths.txt
+```
+
+``` r
+# Read in the lengths
+Peve_lengths <- read.table("../data/10-shortRNA-ShortStack-comparison/Peve_ShortStack_mature_lengths.txt", header = FALSE, col.names = "length")
+
+# Make histogram of lengths
+hist_Peve_lengths <- ggplot(Peve_lengths, aes(x = length)) +
+  geom_histogram(binwidth = 1, 
+                 fill = species_colors['P_evermanni'], 
+                 color = "black") +
+  geom_text(stat = 'count', aes(label = ..count..), vjust = -0.5) +
+  labs(title = "P. evermanni miRNA sequence lengths",
+       x = "Sequence Length [nucleotides]",
+       y = "Frequency") +
+  xlim(20.5, 24.5) +
+  ylim(0, 41) +
+  theme_minimal()
+
+hist_Peve_lengths
+```
+
+<img src="10-shortRNA-ShortStack-comparison_files/figure-gfm/plot-Peve-miRNA-lengths-1.png" style="display: block; margin: auto;" />
+
+``` r
+ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/figures/histogram_Peve_miRNA_lengths.png",
+         plot   = hist_Peve_lengths,
+         res    = 600,
+         width  = 5000,
+         height = 5000)
+
+ggexport(filename = "../../supplemental/miRNA/histogram_Peve_miRNA_lengths.png",
+         plot   = hist_Peve_lengths,
+         res    = 600,
+         width  = 5000,
+         height = 5000)
+```
+
+Let’s also make a plot showing the length distributions of all three
+species
+
+``` r
+# Add a new column to each data frame to label the source file
+Apul_lengths <- Apul_lengths %>% mutate(Species = 'A_pulchra')
+Peve_lengths <- Peve_lengths %>% mutate(Species = 'P_evermanni')
+Pmea_lengths <- Pmea_lengths %>% mutate(Species = 'P_tuahiniensis')
+
+# Combine the data frames into one
+all_lengths <- rbind(Apul_lengths, Peve_lengths, Pmea_lengths)
+```
+
+``` r
+hist_all_lengths <- ggplot(all_lengths, aes(x = length, fill = Species)) +
+  geom_histogram(binwidth = 1, 
+                 position = position_dodge(width = 0.91), 
+                 color = "black", 
+                 width = 0.9) +
+  geom_text(stat = 'count', 
+            aes(label = ..count..), 
+            vjust = -0.5, 
+            position = position_dodge(width = 1)) +
+  scale_fill_manual(values = species_colors) +
+  labs(title = "Sequence lengths by species",
+       x = "Sequence Length [nucleotides]",
+       y = "Frequency",
+       fill = "Species") +
+  xlim(20.5, 24.5) +
+  ylim(0, 41) +
+  theme_minimal()
+
+hist_all_lengths
+```
+
+<img src="10-shortRNA-ShortStack-comparison_files/figure-gfm/plot-all-lengths-1.png" style="display: block; margin: auto;" />
+
+``` r
+ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/figures/histogram_all_miRNA_lengths.png",
+         plot   = hist_all_lengths,
+         res    = 600,
+         width  = 5000,
+         height = 5000)
+
+ggexport(filename = "../../supplemental/miRNA/histogram_all_miRNA_lengths.png",
+         plot   = hist_all_lengths,
+         res    = 600,
+         width  = 5000,
+         height = 5000)
+```
+
+``` r
+# Summarize min, max, and average lengths for each species
+length_summary <- all_lengths %>%
+  group_by(Species) %>%
+  summarise(
+    Min_Length = min(length, na.rm = TRUE),
+    Max_Length = max(length, na.rm = TRUE),
+    Avg_Length = mean(length, na.rm = TRUE)
+  )
+
+print(length_summary)
+```
+
+    # A tibble: 3 × 4
+      Species        Min_Length Max_Length Avg_Length
+      <chr>               <int>      <int>      <dbl>
+    1 A_pulchra              21         24       22.2
+    2 P_evermanni            21         23       21.9
+    3 P_tuahiniensis         21         23       21.9
+
+``` bash
+rm -r ../data/10-shortRNA-ShortStack-comparison/*lengths.txt
+```
+
+## 1.3 Merge the three mature miRNA FASTAs
 
 ``` bash
 cd ../data/10-shortRNA-ShortStack-comparison
@@ -117,7 +331,7 @@ tail merged_all_ShortStack_mature.fasta
     >Cluster_6429.mature::Pocillopora_meandrina_HIv1___Sc0000035:1989841-1989863(+)
     TATTTACAACTCTCAAAACAAC
 
-Let’s do a quick investigation of our mature miRNAs.
+Let’s do a quick investigation of our merged mature miRNAs.
 
 ``` bash
 # Extract sequence lengths and calculate statistics
@@ -151,14 +365,14 @@ Apul
 -out ../output/10-shortRNA-ShortStack-comparison/blasts/Apul-db/Apul_ShortStack_mature
 ```
 
-    Building a new DB, current time: 06/06/2024 10:27:04
+    Building a new DB, current time: 08/15/2024 13:14:06
     New DB name:   /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Apul-db/Apul_ShortStack_mature
     New DB title:  ../data/10-shortRNA-ShortStack-comparison/Apul_ShortStack_mature.fasta
     Sequence type: Nucleotide
     Deleted existing Nucleotide BLAST database named /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Apul-db/Apul_ShortStack_mature
     Keep MBits: T
     Maximum file size: 1000000000B
-    Adding sequences from FASTA; added 38 sequences in 0.002177 seconds.
+    Adding sequences from FASTA; added 38 sequences in 0.00222206 seconds.
 
 Peve
 
@@ -169,14 +383,14 @@ Peve
 -out ../output/10-shortRNA-ShortStack-comparison/blasts/Peve-db/Peve_ShortStack_mature
 ```
 
-    Building a new DB, current time: 06/06/2024 10:27:04
+    Building a new DB, current time: 08/15/2024 13:14:06
     New DB name:   /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Peve-db/Peve_ShortStack_mature
     New DB title:  ../data/10-shortRNA-ShortStack-comparison/Peve_ShortStack_mature.fasta
     Sequence type: Nucleotide
     Deleted existing Nucleotide BLAST database named /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Peve-db/Peve_ShortStack_mature
     Keep MBits: T
     Maximum file size: 1000000000B
-    Adding sequences from FASTA; added 46 sequences in 0.00254607 seconds.
+    Adding sequences from FASTA; added 46 sequences in 0.00290895 seconds.
 
 Pmea
 
@@ -187,14 +401,14 @@ Pmea
 -out ../output/10-shortRNA-ShortStack-comparison/blasts/Pmea-db/Pmea_ShortStack_mature
 ```
 
-    Building a new DB, current time: 06/06/2024 10:27:05
+    Building a new DB, current time: 08/15/2024 13:14:07
     New DB name:   /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Pmea-db/Pmea_ShortStack_mature
     New DB title:  ../data/10-shortRNA-ShortStack-comparison/Pmea_ShortStack_mature.fasta
     Sequence type: Nucleotide
     Deleted existing Nucleotide BLAST database named /home/shared/8TB_HDD_02/shedurkin/deep-dive/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/blasts/Pmea-db/Pmea_ShortStack_mature
     Keep MBits: T
     Maximum file size: 1000000000B
-    Adding sequences from FASTA; added 37 sequences in 0.00251293 seconds.
+    Adding sequences from FASTA; added 37 sequences in 0.00254297 seconds.
 
 ## 2.2 Run Blastn
 
@@ -615,7 +829,7 @@ a <- list("A. pulchra" = apul_mature_newconservedID,
           "P. evermanni" = peve_mature_newconservedID,
           "P. tuahiniensis" = pmea_mature_newconservedID)
 
-venn_conserved <- ggvenn(a, show_percentage = FALSE)
+venn_conserved <- ggvenn(a, show_percentage = FALSE, fill_color = species_colors_nolabel)
 venn_conserved
 ```
 
@@ -623,6 +837,12 @@ venn_conserved
 
 ``` r
 ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/figures/venn_conserved_miRNA.png",
+         plot   = venn_conserved,
+         res    = 600,
+         width  = 5000,
+         height = 5000)
+
+ggexport(filename = "../../supplemental/miRNA/venn_conserved_miRNA.png",
          plot   = venn_conserved,
          res    = 600,
          width  = 5000,
@@ -719,12 +939,12 @@ rownames(pcoa_vec_annot) <- pcoa_vec_annot$rownames
 percent_var <- round(pcoa[["values"]][["Relative_eig"]]*100)
 
 # Note that mtORF data indicates our P.meandrina samples are actually P.tuahiniensis, so that's the species name we'll be using in figures
-pcoa_plot <- ggplot(pcoa_vec_annot, aes(Axis.1, Axis.2, color=Species)) + 
-  geom_point(size=4, alpha = 5/10) +
+pcoa_plot <- ggplot(pcoa_vec_annot, aes(Axis.1, Axis.2, color = Species)) + 
+  geom_point(size = 4, alpha = .5) +
   ggtitle("PCoA of mature miRNA pairwise genetic distance (all to all)") +
   xlab(paste0("PC1: ",percent_var[1],"% variance")) +
   ylab(paste0("PC2: ",percent_var[2],"% variance")) + 
-  scale_color_manual(labels = c("A. pulchra", "P. evermanni", "P. tuahiniensis"), values = c("red", "green", "blue")) +
+  scale_color_manual(values = species_colors) +
   coord_fixed() +
   stat_ellipse()
 
@@ -736,6 +956,12 @@ pcoa_plot
 ``` r
 # Save plot
 ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/figures/PCoA_all_species_sequence_similarity.png",
+         plot   = pcoa_plot,
+         res    = 600,
+         width  = 5000,
+         height = 5000)
+
+ggexport(filename = "../../supplemental/miRNA/PCoA_all_species_sequence_similarity.png",
          plot   = pcoa_plot,
          res    = 600,
          width  = 5000,
@@ -769,6 +995,12 @@ all.spec.seqsim.heat <- pheatmap(all_to_all_full_shortnames,
 ``` r
 # Save plot
 ggexport(filename = "../output/10-shortRNA-ShortStack-comparison/figures/heatmap_all_species_sequence_similarity.png",
+         plot   = all.spec.seqsim.heat,
+         res    = 600,
+         width  = 5000,
+         height = 5000)
+
+ggexport(filename = "../../supplemental/miRNA/heatmap_all_species_sequence_similarity.png",
          plot   = all.spec.seqsim.heat,
          res    = 600,
          width  = 5000,
@@ -1168,5 +1400,8 @@ miRNA_matches_table <- grid.arrange(table)
 
 ``` r
 png("../output/10-shortRNA-ShortStack-comparison/figures/table_miRNA_matches.png", width = 400, height = 100)
+grid.arrange(table)
+
+png("../../supplemental/miRNA/table_miRNA_matches.png", width = 400, height = 100)
 grid.arrange(table)
 ```
