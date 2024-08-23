@@ -69,31 +69,6 @@ Pocillopora_meandrina_HIv1___Sc0000000	ShortStack	MIRNA_hairpin	2872019	2872110	
 Pocillopora_meandrina_HIv1___Sc0000000	ShortStack	mature_miRNA	2872041	2872061	110	+	.	ID=Cluster_34.mature;Parent=Cluster_34	Pocillopora_meandrina_HIv1___Sc0000000	AUGUSTUS	transcript	2868586	2871318	.	+	.	ID=Pocillopora_meandrina_HIv1___TS.g25957.t1
 ```
 
-If I subtract the 5th column (representing the end of the miRNA feature) by the 13th column (representing the beginning of the genomic feature), this will tell me if there is overlap of the two features. If the value is positive, there is overlap. If the value is negative, there is no overlap between the features. 
-```{bash}
-awk '{ $(NF+1) = $13 - $5 }1' OFS='\t' filtered_Ptuh_output.bed > filtered_Ptuh_output_overlap.bed
-
-head filtered_Ptuh_output_overlap.bed
-Pocillopora_meandrina_HIv1___Sc0000000	ShortStack	siRNA22_locus	173728	174150	1257	+	.	ID=Cluster_4;DicerCall=22;MIRNA=Pocillopora_meandrina_HIv1___Sc0000000	AUGUSTUS	CDS	174509	175333	.	-	0	Parent=Pocillopora_meandrina_HIv1___RNAseq.g20918.t1	359
-Pocillopora_meandrina_HIv1___Sc0000000	ShortStack	siRNA22_locus	173728	174150	1257	+	.	ID=Cluster_4;DicerCall=22;MIRNA=Pocillopora_meandrina_HIv1___Sc0000000	AUGUSTUS	exon	174509	175333	.	-	0	Parent=Pocillopora_meandrina_HIv1___RNAseq.g20918.t1	359
-Pocillopora_meandrina_HIv1___Sc0000000	ShortStack	siRNA22_locus	173728	174150	1257	+	.	ID=Cluster_4;DicerCall=22;MIRNA=Pocillopora_meandrina_HIv1___Sc0000000	AUGUSTUS	transcript	174509	176444	.	-	.	ID=Pocillopora_meandrina_HIv1___RNAseq.g20918.t1	359
-Pocillopora_meandrina_HIv1___Sc0000000	ShortStack	MIRNA_hairpin	818027	818120	12096	+	.	ID=Cluster_19;DicerCall=23;MIRNA=Y	Pocillopora_meandrina_HIv1___Sc0000000	AUGUSTUS	transcript	816355	820160	.	+	.	ID=Pocillopora_meandrina_HIv1___RNAseq.g21001.t1	-1765
-Pocillopora_meandrina_HIv1___Sc0000000	ShortStack	mature_miRNA	818049	818070	3240	+	.	ID=Cluster_19.mature;Parent=Cluster_19	Pocillopora_meandrina_HIv1___Sc0000000	AUGUSTUS	transcript	816355	820160	.	+	.	ID=Pocillopora_meandrina_HIv1___RNAseq.g21001.t1	-1715
-Pocillopora_meandrina_HIv1___Sc0000000	ShortStack	miRNA-star	818079	818100	9	+	.	ID=Cluster_19.star;Parent=Cluster_19	Pocillopora_meandrina_HIv1___Sc0000000	AUGUSTUS	transcript	816355	820160	.	+	.	ID=Pocillopora_meandrina_HIv1___RNAseq.g21001.t1	-1745
-Pocillopora_meandrina_HIv1___Sc0000000	ShortStack	MIRNA_hairpin	2872019	2872110	177	+	.	ID=Cluster_34;DicerCall=21;MIRNA=Y	Pocillopora_meandrina_HIv1___Sc0000000	AUGUSTUS	transcript	2868586	2871318	.	+	.	ID=Pocillopora_meandrina_HIv1___TS.g25957.t1	-3524
-Pocillopora_meandrina_HIv1___Sc0000000	ShortStack	MIRNA_hairpin	2872019	2872110	177	+	.	ID=Cluster_34;DicerCall=21;MIRNA=Y	Pocillopora_meandrina_HIv1___Sc0000000	AUGUSTUS	CDS	2870522	2871318	.	+	2	Parent=Pocillopora_meandrina_HIv1___TS.g25957.t1	-1588
-Pocillopora_meandrina_HIv1___Sc0000000	ShortStack	MIRNA_hairpin	2872019	2872110	177	+	.	ID=Cluster_34;DicerCall=21;MIRNA=Y	Pocillopora_meandrina_HIv1___Sc0000000	AUGUSTUS	exon	2870522	2871318	.	+	2	Parent=Pocillopora_meandrina_HIv1___TS.g25957.t1	-1588
-Pocillopora_meandrina_HIv1___Sc0000000	ShortStack	mature_miRNA	2872041	2872061	110	+	.	ID=Cluster_34.mature;Parent=Cluster_34	Pocillopora_meandrina_HIv1___Sc0000000	AUGUSTUS	transcript	2868586	2871318	.	+	.	ID=Pocillopora_meandrina_HIv1___TS.g25957.t1	-3475
-```
-
-Count number of positive and negative values.
-```{bash}
-awk '{if ($NF < 0) neg++; else if ($NF > 0) pos++} END {print "Positive count:", pos; print "Negative count:", neg}' filtered_Ptuh_output_overlap.bed
-
-Positive count: 99
-Negative count: 306
-```
-
 Moving into R to visualize and calculate more stats.
 
 Load Ptuh bed file into R. 
@@ -112,6 +87,12 @@ unique(bed_filt$m_type)
 unique(bed_filt$gf_type)
 ```
 
+The Pmea genome only has the following genomic features annotated: CDS, exon, transcript. Subset by transcript, as the transcript encompasses both the CDS and exon regions in the genome. 
+```{r}
+bed_filt <- bed_filt %>%
+  dplyr::filter(gf_type == "transcript")
+```
+
 Remove the siRNA m_types and make column that has cluster IDs for miRNAs. 
 ```{r}
 bed_filt <- bed_filt %>%
@@ -123,9 +104,37 @@ bed_filt$m_ID <- gsub(".mature", "", bed_filt$m_ID)
 bed_filt$m_ID <- gsub(".star", "", bed_filt$m_ID)
 
 length(unique(bed_filt$m_ID)) # check how many miRNAs are there - should be 37 for Ptuh
+unique(bed_filt$m_type)
 ```
 
-Discuss with e5 group how to present/visualize this data. 
+The remaining types of genomic features for miRNAs are miRNA hairpins, mature miRNAs and miRNA stars. 
+
+Calculate the overlap and distance based on the m_start, m_end, gf_start, and gf_end columns. Overlap occurs if the start of one feature is within the bounds of another. If there is no overlaps, the distance can be calculated as the gap between the end of one feature and the start of another. 
+```{r}
+bed_filt$overlap <- with(bed_filt, pmin(m_end, gf_end) - pmax(m_start, gf_start))
+
+sum(bed_filt$overlap < 0)
+sum(bed_filt$overlap > 0)
+```
+
+39 miRNA features do not overlap with a transcript. 72 features do overlap with a transcript. Calculate average/percentages of distance and overlap for miRNA hairpins, mature miRNAs and miRNA stars. . 
+```{r}
+# Perform calculations grouped by m_type
+summary_stats <- bed_filt %>%
+  group_by(m_type) %>%
+  summarize(
+    avg_overlap = mean(overlap[overlap > 0], na.rm = TRUE),
+    avg_distance = mean(overlap[overlap < 0], na.rm = TRUE),
+    percent_overlap = sum(overlap > 0) / n() * 100,
+    percent_distance_lt_1kb = sum(overlap < 0 & overlap > -1000) / n() * 100,
+    percent_distance = sum(overlap < 0) / n() * 100
+  )
+
+# Display the summary statistics
+print(summary_stats)
+```
+
+https://github.com/urol-e5/deep-dive/blob/main/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/Ptuh_results_mature_named.csv 
 
 
 
