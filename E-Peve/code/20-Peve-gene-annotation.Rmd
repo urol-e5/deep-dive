@@ -41,55 +41,32 @@ knitr::opts_chunk$set(
 ```
 
 
-Apul
+Peve
 
 # Protein
 
 ```{bash}
 cd ../data
 
-curl -O https://gannet.fish.washington.edu/seashell/snaps/GCF_013753865.1_Amil_v2.1.protein.faa
+curl -O https://gannet.fish.washington.edu/seashell/snaps/Porites_evermanni_v1.annot.pep.fa
 ```
 
 
 
 ```{bash}
-head ../data/GCF_013753865.1_Amil_v2.1.protein.faa
-```
-
-```{bash}
-ls ../../data/blast_dbs
+head ../data/Porites_evermanni_v1.annot.pep.fa
 ```
 
 
-```{bash}
-cd ../../data/blast_dbs
-curl -O https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_sprot.fasta.gz
-mv uniprot_sprot.fasta.gz uniprot_sprot_r2024_04.fasta.gz
-gunzip -k uniprot_sprot_r2024_04.fasta.gz
-```
-
-```{bash}
-head ../../data/blast_dbs/uniprot_sprot_r2024_04.fasta
-echo "Number of Sequences"
-grep -c ">" ../../data/blast_dbs/uniprot_sprot_r2024_04.fasta
-```
-
-```{bash}
-/home/shared/ncbi-blast-2.15.0+/bin/makeblastdb \
--in ../../data/blast_dbs/uniprot_sprot_r2024_04.fasta \
--dbtype prot \
--out ../../data/blast_dbs/uniprot_sprot_r2024_04
-```
 
 
 ```{bash}
-fasta="../data/GCF_013753865.1_Amil_v2.1.protein.faa"
+fasta="../data/Porites_evermanni_v1.annot.pep.fa"
 
 /home/shared/ncbi-blast-2.15.0+/bin/blastp \
 -query $fasta \
 -db ../../data/blast_dbs/uniprot_sprot_r2024_04 \
--out ../output/20-Apul-gene-annotation/blastp_out.tab \
+-out ../output/20-Peve-gene-annotation/blastp_out.tab \
 -evalue 1E-05 \
 -num_threads 48 \
 -max_target_seqs 1 \
