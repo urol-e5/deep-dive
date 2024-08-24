@@ -73,14 +73,38 @@ Moving into R to visualize and calculate more stats.
 
 Load Apul bed file into R. 
 ```{r}
-bed <- read.delim2("../output/19-bedtools-closest/miRNA_filtered_Apul_output_overlap.bed", header = F)
+bed <- read.delim2("../output/19-bedtools-closest/miRNA_filtered_Apul_output.bed", header = F)
 head(bed)
 ```
 
-Format is messed up for the Apul file. There are too many columns and info from the columns is out of order. Need to look into this. 
+Keep specific columns and rename them. I'm going to label columns that relate to miRNAs with an "m" and columns that relate to genomic features with a "gf".
+```{r}
+bed_filt <- bed %>%
+  dplyr::select(V1, V2, V3, V4, V5, V7, V9, V10, V11, V12, V13, V14, V16, V18) %>%
+  dplyr::rename("m_chrom" = "V1", "m_source" = "V2", "m_type" = "V3", "m_start" = "V4", "m_end" = "V5", "m_strand" = "V7", "m_attr" = "V9", "gf_chrom" = "V10", "gf_source" = "V11", "gf_type" = "V12", "gf_start" = "V13", "gf_end" = "V14", "gf_strand" = "V16", "gf_attr" = "V18")
 
+unique(bed_filt$m_type)
+unique(bed_filt$gf_type)
+```
 
+Apul has more features annotated than Ptuh and Peve: region, gene, CDS, mRNA, lnc_RNA, exon, psuedogene, transcript, tRNA, cDNA_match. For Ptuh, I subset by transcript. For Peve, I subset by mRNA. Looking at the `bed_filt` file, the mRNA and gene seem to be the same in terms of start and end locations. I'm going to subset by mRNA because I want to keep it consistent across the species. Transcript has ~10 entries for Apul so I will not subset by that. 
+```{r}
+bed_filt <- bed_filt %>%
+  dplyr::filter(gf_type == "mRNA")
+```
 
+Remove the siRNA m_types and make column that has cluster IDs for miRNAs. 
+```{r}
+bed_filt <- bed_filt %>%
+  dplyr::filter(!grepl("siRNA", m_type)) %>%
+  mutate(m_ID = sub(";.*", "", m_attr))
 
+# Remove .mature and .star from the ID column 
+bed_filt$m_ID <- gsub(".mature", "", bed_filt$m_ID)
+bed_filt$m_ID <- gsub(".star", "", bed_filt$m_ID)
 
+length(unique(bed_filt$m_ID)) # check how many miRNAs are there - should be 38 for Apul
+unique(bed_filt$m_type)
+```
 
+There are 27 unique IDs where there should be 38...When I forgo the filtering of the mRNA, there are 38 unique IDs...

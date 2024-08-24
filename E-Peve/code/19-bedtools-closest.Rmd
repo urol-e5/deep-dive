@@ -1,0 +1,139 @@
+---
+title: "Closest genomic features to ncRNAs - Peve"
+author: "Jill Ashey"
+date: "2024-08-24"
+output: html_document
+---
+
+## Closest genomic features to ncRNAs in Porites evermanni 
+
+This code will investigate the proximity of ncRNAs to other genomic features in 
+
+
+
+
+
+Pocillopora tuahiniensis. The `bash` code snippets were done on the URI HPC server, Andromeda. I copied the Ptuh miRNA [gff](https://github.com/urol-e5/deep-dive/blob/main/F-Pmea/output/13.2.1-Pmea-sRNAseq-ShortStack-31bp-fastp-merged-cnidarian_miRBase/ShortStack_out/Results.gff3) and [fasta](https://github.com/urol-e5/deep-dive/blob/main/F-Pmea/output/13.2.1-Pmea-sRNAseq-ShortStack-31bp-fastp-merged-cnidarian_miRBase/ShortStack_out/mir.fasta) files onto Andromeda. We used the Pmeandrina genomic information for Ptuh. 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# Load packages
+library(tidyverse)
+```
+
+
+
+
+
+add bash code 
+
+
+
+
+Moving into R to visualize and calculate more stats.
+
+Load Ptuh bed file into R. 
+```{r}
+bed <- read.delim("../output/19-bedtools-closest/miRNA_filtered_Peve_output.bed", header = F)
+head(bed)
+```
+
+Keep specific columns and rename them. I'm going to label columns that relate to miRNAs with an "m" and columns that relate to genomic features with a "gf".
+```{r}
+bed_filt <- bed %>%
+  dplyr::select(V1, V2, V3, V4, V5, V7, V9, V10, V11, V12, V13, V14, V16, V18) %>%
+  dplyr::rename("m_chrom" = "V1", "m_source" = "V2", "m_type" = "V3", "m_start" = "V4", "m_end" = "V5", "m_strand" = "V7", "m_attr" = "V9", "gf_chrom" = "V10", "gf_source" = "V11", "gf_type" = "V12", "gf_start" = "V13", "gf_end" = "V14", "gf_strand" = "V16", "gf_attr" = "V18")
+
+unique(bed_filt$m_type)
+unique(bed_filt$gf_type)
+```
+
+The Peve genome only has the following genomic features annotated: CDS, UTR, mRNA. Subset by mRNA.
+```{r}
+bed_filt <- bed_filt %>%
+  dplyr::filter(gf_type == "mRNA")
+```
+
+Remove the siRNA m_types and make column that has cluster IDs for miRNAs. 
+```{r}
+bed_filt <- bed_filt %>%
+  dplyr::filter(!grepl("siRNA", m_type)) %>%
+  mutate(m_ID = sub(";.*", "", m_attr))
+
+# Remove .mature and .star from the ID column 
+bed_filt$m_ID <- gsub(".mature", "", bed_filt$m_ID)
+bed_filt$m_ID <- gsub(".star", "", bed_filt$m_ID)
+
+length(unique(bed_filt$m_ID)) # check how many miRNAs are there - should be 46 for Peve
+unique(bed_filt$m_type)
+```
+
+The remaining types of genomic features for miRNAs are miRNA hairpins, mature miRNAs and miRNA stars. 
+
+Calculate the overlap and distance based on the m_start, m_end, gf_start, and gf_end columns. Overlap occurs if the start of one feature is within the bounds of another. If there is no overlaps, the distance can be calculated as the gap between the end of one feature and the start of another. 
+```{r}
+bed_filt$overlap <- with(bed_filt, pmin(m_end, gf_end) - pmax(m_start, gf_start))
+
+sum(bed_filt$overlap < 0)
+sum(bed_filt$overlap > 0)
+```
+
+39 miRNA features do not overlap with an mRNA. 99 features do overlap with an mRNA. Calculate average/percentages of distance and overlap for miRNA hairpins, mature miRNAs and miRNA stars.
+```{r}
+# Perform calculations grouped by m_type
+summary_stats <- bed_filt %>%
+  group_by(m_type) %>%
+  summarize(
+    avg_overlap = mean(overlap[overlap > 0], na.rm = TRUE),
+    avg_distance = mean(overlap[overlap < 0], na.rm = TRUE),
+    percent_overlap = sum(overlap > 0) / n() * 100,
+    percent_distance_lt_1kb = sum(overlap < 0 & overlap > -1000) / n() * 100,
+    percent_distance = sum(overlap < 0) / n() * 100
+  )
+
+# Display the summary statistics
+print(summary_stats)
+```
+
+Filter for mature miRNAs
+```{r}
+bed_filt_mature <- bed_filt %>%
+    dplyr::filter(m_type == "mature_miRNA")
+
+bed_filt_mature$m_ID <- gsub("ID=", "", bed_filt_mature$m_ID)
+```
+
+Read in the mature named miRNAs 
+```{r}
+mature <- read.csv("../../DEF-cross-species/output/10-shortRNA-ShortStack-comparison/Peve_results_mature_named.csv", header = T)
+head(mature)
+```
+
+Merge `bed_filt_mature` and `mature` by the cluster column 
+```{r}
+bed_filt_mature_all <- bed_filt_mature %>%
+  full_join(mature, by = c("m_ID" = "Name"))
+```
+
+Save output
+```{r}
+write.csv(file = "../output/19-bedtools-closest/Peve_mature_miRNAs_bedtools.csv", bed_filt_mature_all)
+```
+
+Calculate average/percentages of distance and overlap for miRNA hairpins, mature miRNAs and miRNA stars. . 
+```{r}
+# Perform calculations grouped by m_type
+summary_stats_mature <- bed_filt_mature_all %>%
+  #group_by(m_type) %>%
+  summarize(
+    avg_overlap = mean(overlap[overlap > 0], na.rm = TRUE),
+    avg_distance = mean(overlap[overlap < 0], na.rm = TRUE),
+    percent_overlap = sum(overlap > 0) / n() * 100,
+    percent_distance_lt_1kb = sum(overlap < 0 & overlap > -1000) / n() * 100,
+    percent_distance = sum(overlap < 0) / n() * 100
+  )
+
+# Display the summary statistics
+print(summary_stats_mature)
+```
