@@ -73,7 +73,7 @@ Moving into R to visualize and calculate more stats.
 
 Load Ptuh bed file into R. 
 ```{r}
-bed <- read.delim("../output/19-bedtools-closest/miRNA_filtered_Ptuh_output_overlap.bed", header = F)
+bed <- read.delim("../output/19-bedtools-closest/miRNA_filtered_Ptuh_output.bed", header = F)
 head(bed)
 ```
 
@@ -117,7 +117,7 @@ sum(bed_filt$overlap < 0)
 sum(bed_filt$overlap > 0)
 ```
 
-39 miRNA features do not overlap with a transcript. 72 features do overlap with a transcript. Calculate average/percentages of distance and overlap for miRNA hairpins, mature miRNAs and miRNA stars. . 
+39 miRNA features do not overlap with a transcript. 72 features do overlap with a transcript. Calculate average/percentages of distance and overlap for miRNA hairpins, mature miRNAs and miRNA stars.
 ```{r}
 # Perform calculations grouped by m_type
 summary_stats <- bed_filt %>%
@@ -134,9 +134,47 @@ summary_stats <- bed_filt %>%
 print(summary_stats)
 ```
 
-https://github.com/urol-e5/deep-dive/blob/main/DEF-cross-species/output/10-shortRNA-ShortStack-comparison/Ptuh_results_mature_named.csv 
+Filter for mature miRNAs
+```{r}
+bed_filt_mature <- bed_filt %>%
+    dplyr::filter(m_type == "mature_miRNA")
 
+bed_filt_mature$m_ID <- gsub("ID=", "", bed_filt_mature$m_ID)
+```
 
+Read in the mature named miRNAs 
+```{r}
+mature <- read.csv("../../DEF-cross-species/output/10-shortRNA-ShortStack-comparison/Ptuh_results_mature_named.csv", header = T)
+head(mature)
+```
+
+Merge `bed_filt_mature` and `mature` by the cluster column 
+```{r}
+bed_filt_mature_all <- bed_filt_mature %>%
+  full_join(mature, by = c("m_ID" = "Name"))
+```
+
+Save output
+```{r}
+write.csv(file = "../output/19-bedtools-closest/Ptuh_mature_miRNAs_bedtools.csv", bed_filt_mature_all)
+```
+
+Calculate average/percentages of distance and overlap for miRNA hairpins, mature miRNAs and miRNA stars. . 
+```{r}
+# Perform calculations grouped by m_type
+summary_stats_mature <- bed_filt_mature_all %>%
+  #group_by(m_type) %>%
+  summarize(
+    avg_overlap = mean(overlap[overlap > 0], na.rm = TRUE),
+    avg_distance = mean(overlap[overlap < 0], na.rm = TRUE),
+    percent_overlap = sum(overlap > 0) / n() * 100,
+    percent_distance_lt_1kb = sum(overlap < 0 & overlap > -1000) / n() * 100,
+    percent_distance = sum(overlap < 0) / n() * 100
+  )
+
+# Display the summary statistics
+print(summary_stats_mature)
+```
 
 
 
