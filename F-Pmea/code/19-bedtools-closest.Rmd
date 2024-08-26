@@ -176,7 +176,43 @@ summary_stats_mature <- bed_filt_mature_all %>%
 print(summary_stats_mature)
 ```
 
+Read in GO annotation information
+```{r}
+annot <- read.delim("../output/20-Pmea-gene-annotation/Pmea-protein-GO.tsv")
+```
 
+Remove "ID=" from `bed_filt_mature_all`
+```{r}
+bed_filt_mature_all$gf_attr <- gsub("ID=", "", bed_filt_mature_all$gf_attr)
+```
 
+Merge `annot` and `bed_filt_mature_all` dfs. 
+```{r}
+bed_filt_mature_annot <- bed_filt_mature_all %>%
+  left_join(annot, by = c("gf_attr" = "query"))
+```
+
+Save output
+```{r}
+write.csv(file = "../output/19-bedtools-closest/Pmea_mature_miRNAs_bedtools_annot.csv", bed_filt_mature_annot)
+```
+
+There are 5 genes in the df that do not have annotations. Look at the functions of the genes that overlap with miRNAs. 
+```{r}
+overlap <- bed_filt_mature_annot %>%
+  dplyr::filter(overlap > 0)
+
+unique(overlap$BiologicalProcess)
+unique(overlap$ProteinNames)
+```
+
+Look at functions of genes that do not overlap with miRNAs 
+```{r}
+no_overlap <- bed_filt_mature_annot %>%
+  dplyr::filter(overlap < 0)
+
+unique(no_overlap$BiologicalProcess)
+unique(no_overlap$ProteinNames)
+```
 
 
