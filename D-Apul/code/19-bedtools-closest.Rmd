@@ -73,7 +73,7 @@ Moving into R to visualize and calculate more stats.
 
 Load Apul bed file into R. 
 ```{r}
-bed <- read.delim2("../output/19-bedtools-closest/miRNA_filtered_Apul_output.bed", header = F)
+bed <- read.delim2("../output/19-bedtools-closest/miRNA_filtered_Apul_output_mRNA_only.bed", header = F)
 head(bed)
 ```
 
@@ -86,14 +86,7 @@ bed_filt <- bed %>%
 unique(bed_filt$m_type)
 unique(bed_filt$gf_type)
 ```
-
-Apul has more features annotated than Ptuh and Peve: region, gene, CDS, mRNA, lnc_RNA, exon, psuedogene, transcript, tRNA, cDNA_match. For Ptuh, I subset by transcript. For Peve, I subset by mRNA. Looking at the `bed_filt` file, the mRNA and gene seem to be the same in terms of start and end locations. I'm going to subset by mRNA because I want to keep it consistent across the species. Transcript has ~10 entries for Apul so I will not subset by that. 
-```{r}
-bed_filt <- bed_filt %>%
-  dplyr::filter(gf_type == "mRNA")
-```
-
-Remove the siRNA m_types and make column that has cluster IDs for miRNAs. 
+Only has mRNAs, do not have to filter by genomic feature. Remove the siRNA m_types and make column that has cluster IDs for miRNAs. 
 ```{r}
 bed_filt <- bed_filt %>%
   dplyr::filter(!grepl("siRNA", m_type)) %>%
@@ -104,8 +97,125 @@ bed_filt$m_ID <- gsub(".mature", "", bed_filt$m_ID)
 bed_filt$m_ID <- gsub(".star", "", bed_filt$m_ID)
 
 length(unique(bed_filt$m_ID)) # check how many miRNAs are there - should be 38 for Apul
-unique(bed_filt$m_type)
 ```
 
-There are 27 unique IDs where there should be 38...When I forgo the filtering of the mRNA, there are 38 unique IDs...I may need to revisit the bedtools closest code for Apul. 
+The remaining types of genomic features for miRNAs are miRNA hairpins, mature miRNAs and miRNA stars. 
+
+Calculate the overlap and distance based on the m_start, m_end, gf_start, and gf_end columns. Overlap occurs if the start of one feature is within the bounds of another. If there is no overlaps, the distance can be calculated as the gap between the end of one feature and the start of another. 
+```{r}
+bed_filt$overlap <- with(bed_filt, pmin(m_end, gf_end) - pmax(m_start, gf_start))
+
+sum(bed_filt$overlap < 0)
+sum(bed_filt$overlap > 0)
+```
+
+60 miRNA features do not overlap with a transcript. 165 features do overlap with a transcript. Calculate average/percentages of distance and overlap for miRNA hairpins, mature miRNAs and miRNA stars.
+
+```{r}
+# Perform calculations grouped by m_type
+summary_stats <- bed_filt %>%
+  group_by(m_type) %>%
+  summarize(
+    avg_overlap = mean(overlap[overlap > 0], na.rm = TRUE),
+    avg_distance = mean(overlap[overlap < 0], na.rm = TRUE),
+    percent_overlap = sum(overlap > 0) / n() * 100,
+    percent_distance_lt_1kb = sum(overlap < 0 & overlap > -1000) / n() * 100,
+    percent_distance = sum(overlap < 0) / n() * 100
+  )
+
+# Display the summary statistics
+print(summary_stats)
+```
+
+Filter for mature miRNAs
+```{r}
+bed_filt_mature <- bed_filt %>%
+    dplyr::filter(m_type == "mature_miRNA")
+
+bed_filt_mature$m_ID <- gsub("ID=", "", bed_filt_mature$m_ID)
+length(unique(bed_filt_mature$m_ID))
+```
+
+Read in the mature named miRNAs 
+```{r}
+mature <- read.csv("../../DEF-cross-species/output/10-shortRNA-ShortStack-comparison/Apul_results_mature_named.csv", header = T)
+head(mature)
+```
+
+Merge `bed_filt_mature` and `mature` by the cluster column 
+```{r}
+bed_filt_mature_all <- bed_filt_mature %>%
+  full_join(mature, by = c("m_ID" = "Name"))
+head(bed_filt_mature_all)
+```
+
+Save output
+```{r}
+write.csv(file = "../output/19-bedtools-closest/Apul_mature_miRNAs_bedtools.csv", bed_filt_mature_all)
+```
+
+There are miRNAs matching up to multiple mRNAs but they don't actually seem to be unique mRNAs, as they have the same gf_start and gf_end but different gf_attr (ID= specifically). They appear to be from the same gene but different ID numbers. They may be variants...not sure. 
+
+Calculate average/percentages of distance and overlap for mature miRNAs.
+```{r}
+# Perform calculations grouped by m_type
+summary_stats_mature <- bed_filt_mature_all %>%
+  #group_by(m_type) %>%
+  summarize(
+    avg_overlap = mean(overlap[overlap > 0], na.rm = TRUE),
+    avg_distance = mean(overlap[overlap < 0], na.rm = TRUE),
+    percent_overlap = sum(overlap > 0) / n() * 100,
+    percent_distance_lt_1kb = sum(overlap < 0 & overlap > -1000) / n() * 100,
+    percent_distance = sum(overlap < 0) / n() * 100
+  )
+
+# Display the summary statistics
+print(summary_stats_mature)
+```
+
+Read in GO annotation information. For Ptuh and Peve, I used the protein files but Steven also made an RNA annotation file for Apul. I initially tried to use the Apul protein file but the query IDs did not match. 
+```{r}
+annot <- read.delim("../output/20-Apul-gene-annotation/Apul-rna-GO.tsv")
+```
+
+Pull out gene name information from the `gf_attr` column in the `bed_filt_mature_all` df
+```{r}
+bed_filt_mature_all <- bed_filt_mature_all %>%
+   mutate(gf_ID = sub(";.*", "", gf_attr))
+
+bed_filt_mature_all$gf_ID <- gsub("ID=rna-", "", bed_filt_mature_all$gf_ID) 
+```
+
+Merge `annot` and `bed_filt_mature_all` dfs. 
+```{r}
+bed_filt_mature_annot <- bed_filt_mature_all %>%
+  left_join(annot, by = c("gf_ID" = "query"))
+
+# Make sure there are still 38 miRNAs
+length(unique(bed_filt_mature_annot$m_ID))
+```
+
+Save output
+```{r}
+write.csv(file = "../output/19-bedtools-closest/Apul_mature_miRNAs_bedtools_annot.csv", bed_filt_mature_annot)
+```
+
+Look at the functions of the genes that overlap with miRNAs. 
+```{r}
+overlap <- bed_filt_mature_annot %>%
+  dplyr::filter(overlap > 0)
+
+unique(overlap$BiologicalProcess)
+unique(overlap$ProteinNames)
+```
+
+Look at functions of genes that do not overlap with miRNAs 
+```{r}
+no_overlap <- bed_filt_mature_annot %>%
+  dplyr::filter(overlap < 0)
+
+unique(no_overlap$BiologicalProcess)
+unique(no_overlap$ProteinNames)
+```
+
 
