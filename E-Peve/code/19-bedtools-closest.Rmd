@@ -121,7 +121,7 @@ Save output
 write.csv(file = "../output/19-bedtools-closest/Peve_mature_miRNAs_bedtools.csv", bed_filt_mature_all)
 ```
 
-Calculate average/percentages of distance and overlap for miRNA hairpins, mature miRNAs and miRNA stars. . 
+Calculate average/percentages of distance and overlap for mature miRNAs
 ```{r}
 # Perform calculations grouped by m_type
 summary_stats_mature <- bed_filt_mature_all %>%
@@ -137,3 +137,50 @@ summary_stats_mature <- bed_filt_mature_all %>%
 # Display the summary statistics
 print(summary_stats_mature)
 ```
+
+Read in GO annotation information
+```{r}
+annot <- read.delim("../output/20-Peve-gene-annotation/Peve-protein-GO.tsv")
+```
+
+Pull out gene name information from the `gf_attr` column in the `bed_filt_mature_all` df
+```{r}
+bed_filt_mature_all <- bed_filt_mature_all %>%
+   mutate(gf_ID = sub(";.*", "", gf_attr))
+
+bed_filt_mature_all$gf_ID <- gsub("ID=", "", bed_filt_mature_all$gf_ID)
+```
+
+Merge `annot` and `bed_filt_mature_all` dfs. 
+```{r}
+bed_filt_mature_annot <- bed_filt_mature_all %>%
+  left_join(annot, by = c("gf_ID" = "query"))
+```
+
+Save output
+```{r}
+write.csv(file = "../output/19-bedtools-closest/Peve_mature_miRNAs_bedtools_annot.csv", bed_filt_mature_annot)
+```
+
+There are 7 genes in the df that do not have annotations, including the gene that overlaps with miR-100. Look at the functions of the genes that overlap with miRNAs. 
+```{r}
+overlap <- bed_filt_mature_annot %>%
+  dplyr::filter(overlap > 0)
+
+unique(overlap$BiologicalProcess)
+unique(overlap$ProteinNames)
+```
+
+Look at functions of genes that do not overlap with miRNAs 
+```{r}
+no_overlap <- bed_filt_mature_annot %>%
+  dplyr::filter(overlap < 0)
+
+unique(no_overlap$BiologicalProcess)
+unique(no_overlap$ProteinNames)
+```
+
+
+
+
+
