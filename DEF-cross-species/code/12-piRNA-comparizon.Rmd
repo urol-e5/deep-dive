@@ -298,13 +298,55 @@ z_score_plot <- ggplot(z_group) +
 
 library(ggpubr)
 library(cowplot)
-final_plt <- plot_grid(length_plot,overlap_plot, logo_plot, z_score_plot, nrow = 1, align = "h", labels = c("A", "B", "C", "D"))
+final_plt <- plot_grid(length_plot,overlap_plot, logo_plot, z_score_plot, nrow = 1, align = "h", labels = c("A", "B", "C", "D"), label_x = 0, label_y = 1.15, hjust = -0.1, vjust = 5)
 final_plt
 
 ggsave(filename = "figures/piRNA_final_plot.png", final_plt, width = 12, height = 3)
 ```
 
+# Overlaps
 
+```{r}
+
+library(ggtext) 
+library(ggExtra)
+library(gtable)
+overlap <- read.csv("output/12-piwiRNA_comparizon/piRNA_feature_overlap.csv")
+overlap$element <- factor(overlap$element, levels = c("TE", "gene","intergenic"), ordered = TRUE)
+
+overlap <- overlap %>% 
+  group_by(sp) %>% # Variable to be transformed
+  mutate(perc = (count / sum(count)*100)) %>% 
+  ungroup()
+  
+cp <- coord_polar(theta = "y", start = 0)
+cp$is_free <- function() TRUE
+
+over_plot <- ggplot(overlap, aes(x="", y=perc, alpha=element, fill = sp)) +
+  scale_fill_manual(values = c("#408EC6", "#7A2048", "#1E2761"), labels = c("*A. pulchra*", "*P. tuahiniensis*", "*P. evermanni*")) +
+  scale_alpha_discrete(range = c(.4,1), labels = c("Repetitive elements-derived piRNAs", "Gene-derived piRNAs", "Intergenic piRNAs")) +
+  geom_bar(stat="identity", width=1) +
+  cp +
+  facet_wrap(~sp, scales = "free") +
+  geom_text(aes(label = ifelse(perc > 15 , paste0(round(perc), "%"), "")), 
+            position = position_stack(vjust = 0.5),
+            show.legend = FALSE) +
+  geom_text(aes(x = 1.7, label = ifelse(perc < 15 , paste0(round(perc), "%"), "")), 
+            position = position_stack(vjust = 0.5),
+            show.legend = FALSE) +
+  theme_void() +
+  theme(aspect.ratio = 1, 
+        strip.text = element_blank(), 
+        legend.title = element_blank(),
+        legend.text = element_markdown(),
+        legend.position = "bottom",
+        legend.box = "vertical");over_plot;
+over_plot
+
+ggsave(filename = "figures/piRNA_overlap_plot.png", over_plot)
+
+
+```
 
 # clustered piRNAs characterization 
 ## Cluster piRNA composition graph
@@ -319,24 +361,122 @@ PEVE_clust <- read.table("output/12-piwiRNA_comparizon/clusters/PEVE_cluster_sum
 clust_summary <- rbind(APUL_clust, PMEA_clust, PEVE_clust) %>%
   select(., sp, perc_unique_tags_in_clusters, perc_reads_in_clusters, avg_perc_1T_in_clusters) %>%
   group_by(sp) %>%
-  summarise_all(funs(mean,sd)) %>%
+  summarise_all(list(mean)) %>%
   gather(key = vars, value = percent, !sp) %>%
-  mutate(vars = factor(vars, level=c('perc_reads_in_clusters', 'perc_unique_tags_in_clusters', 'avg_perc_1T_in_clusters'), ordered = T))
-  
-ggplot(clust_summary, aes(x=sp, y=percent, fill = sp, alpha = vars)) +
+  mutate(vars = factor(vars, level=c('avg_perc_1T_in_clusters','perc_unique_tags_in_clusters', 'perc_reads_in_clusters'), ordered = T))
+
+clust_cov_plot <- ggplot(clust_summary, aes(x=sp, y=percent, fill = sp, alpha = vars)) +
   geom_col(position = "dodge") +
-  geom_text(data = data.frame(sp = c("ACR","ACR","ACR"), percent = c(108, 104, 100),
-                              vars = levels(clust_summary$vars),
-                              colour = c("reads in cluster (%)", "unique sequences in cluster (%)", "5'U sequence bias (%)")),
-            aes(label = colour)) +
+  coord_flip() +
   theme_classic() +
-  scale_x_discrete(labels=c("A. pulchra", "P. tuahiniensis", "P. evermanni")) +
+  scale_x_discrete(guide = 'none', limits=rev) +
   scale_fill_manual(values = c("#408EC6", "#7A2048", "#1E2761")) +
-  scale_alpha_discrete(range = c(.4,1)) +
-  theme(legend.position = "none",
+  scale_alpha_discrete(range = c(1,.4), labels = c('Average percent 1T in clusters', 'Average percent of unique sequences in clusters', 'Average percent of total reads in clusters')) + 
+  ylab("Fraction (%)") +
+  theme(legend.position = "right",
+        legend.title = element_blank(),
         panel.grid = element_blank(), 
         panel.border = element_blank(), 
-        axis.text.x = element_text(face = "italic"),
-        axis.title = element_blank()
-        ) 
+        axis.text.y = element_blank(),
+        axis.title.y = element_blank(), 
+        axis.ticks.y = element_blank(),
+        axis.line.y = element_blank(),
+        );clust_cov_plot  
+ggsave(filename = "figures/cluster_charact_plot.png", clust_cov_plot, width = 6, height = 3)
 ```
+
+
+## Cluster overlaps
+
+```{r}
+
+APUL_m_clust <- read.table("../D-Apul/output/18-Apul-piRNA/0_piRNA_pipeline_proTRAC/proTRAC_results_APUL/APUL.merged.clusters.bed", header = F) %>%
+  mutate(bp_overlap = V3-V2) %>%
+  select(V1,V2,V3,bp_overlap) %>%
+  mutate(sp = "ACR")
+colnames(APUL_m_clust) <- c("chr","start","end","bp_overlap","sp")
+PMEA_m_clust <- read.table("../F-Pmea/output/18-Pmea-piRNA/0_piRNA_pipeline_proTRAC/proTRAC_results_PMEA/PMEA.merged.clusters.bed", header = F) %>%
+  mutate(bp_overlap = V3-V2) %>%
+  select(V1,V2,V3,bp_overlap) %>%
+  mutate(sp = "POC")
+colnames(PMEA_m_clust) <- c("chr","start","end","bp_overlap","sp")
+PEVE_m_clust <- read.table("../E-Peve/output/18-Peve-piRNA/0_piRNA_pipeline_proTRAC/proTRAC_results_PEVE/PEVE.merged.clusters.bed", header = F) %>%
+  mutate(bp_overlap = V3-V2) %>%
+  select(V1,V2,V3,bp_overlap) %>%
+  mutate(sp = "POR")
+colnames(PEVE_m_clust) <- c("chr","start","end","bp_overlap","sp")
+
+APUL_gene <- read.table("../D-Apul/output/18-Apul-piRNA/0_piRNA_pipeline_proTRAC/proTRAC_results_APUL/APUL.merged.clusters.gene.overlap.tab", header = F) %>%
+  select(V1, V2, V3, V13) %>%
+  mutate(sp = "ACR")
+colnames(APUL_gene) <- c("chr","start","end","bp_overlap","sp")
+PMEA_gene <- read.table("../F-Pmea/output/18-Pmea-piRNA/0_piRNA_pipeline_proTRAC/proTRAC_results_PMEA/PMEA.merged.clusters.gene.overlap.tab", header = F) %>%
+  select(V1, V2, V3, V13) %>%
+  mutate(sp = "POC")
+colnames(PMEA_gene) <- c("chr","start","end","bp_overlap","sp")
+PEVE_gene <- read.table("../E-Peve/output/18-Peve-piRNA/0_piRNA_pipeline_proTRAC/proTRAC_results_PEVE/PEVE.merged.clusters.gene.overlap.tab", header = F) %>%
+  select(V1, V2, V3, V13) %>%
+  mutate(sp = "POR")
+colnames(PEVE_gene) <- c("chr","start","end","bp_overlap","sp")
+
+APUL_TE <- read.table("../D-Apul/output/18-Apul-piRNA/0_piRNA_pipeline_proTRAC/proTRAC_results_APUL/APUL_piRNA_clusters_TEs_intersect.txt", header = F) %>%
+  select(V1, V2, V3, V9) %>%
+  mutate(sp = "ACR")
+colnames(APUL_TE) <- c("chr","start","end","bp_overlap","sp")
+PMEA_TE <- read.table("../F-Pmea/output/18-Pmea-piRNA/0_piRNA_pipeline_proTRAC/proTRAC_results_PMEA/PMEA_piRNA_cluster_TEs_intersect.txt", header = F) %>%
+  select(V1, V2, V3, V9)%>%
+  mutate(sp = "POC")
+colnames(PMEA_TE) <- c("chr","start","end","bp_overlap","sp")
+PEVE_TE <- read.table("../E-Peve/output/18-Peve-piRNA/0_piRNA_pipeline_proTRAC/proTRAC_results_PEVE/PEVE_piRNA_cluster_TEs_intersect.txt", header = F) %>%
+  select(V1, V2, V3, V9)%>%
+  mutate(sp = "POR")
+colnames(PEVE_TE) <- c("chr","start","end","bp_overlap","sp")
+
+merged_clust_over <- rbind(APUL_gene,PMEA_gene,PEVE_gene) %>%
+  select(bp_overlap, sp) %>%
+  group_by(sp) %>%
+  summarise(sum(bp_overlap)) %>%
+  mutate(element = "gene") %>% rbind(rbind(APUL_TE,PMEA_TE,PEVE_TE) %>%
+  select(bp_overlap, sp) %>%
+  group_by(sp) %>%
+  summarise(sum(bp_overlap)) %>%
+  mutate(element = "TE")) %>% rbind(rbind(APUL_m_clust,PMEA_m_clust,PEVE_m_clust) %>%
+  select(bp_overlap, sp) %>%
+  group_by(sp) %>%
+  summarise(sum(bp_overlap)) %>%
+  mutate(element = "clust")) %>%
+  spread(element, "sum(bp_overlap)") %>%
+  mutate(intergenic = clust-(gene + TE)) %>%
+  select(sp, gene, TE, intergenic) %>%
+  gather(key = "element", value = "bp_count", 2:4) %>%
+  group_by(sp) %>% 
+  mutate(perc = (bp_count/sum(bp_count)*100)) %>%
+  ungroup()
+
+cp <- coord_polar(theta = "y", start = 0)
+cp$is_free <- function() TRUE
+
+clust_plot <- ggplot(merged_clust_over, aes(x="", y=perc, alpha=element, fill = sp)) +
+  geom_bar(stat="identity", width=1) +
+  cp +
+  facet_wrap(~sp, scales = "free", ncol = 1) +
+  geom_text(aes(label = ifelse(perc > 15 , paste0(round(perc), "%"), "")), 
+            position = position_stack(vjust = 0.5),
+            show.legend = FALSE) +
+  geom_text(aes(x = 1.7, label = ifelse(perc < 15 , paste0(round(perc), "%"), "")), 
+            position = position_stack(vjust = 0.5),
+            show.legend = FALSE) +
+  scale_fill_manual(values = c("#408EC6", "#7A2048", "#1E2761"), labels = c("*A. pulchra*", "*P. tuahiniensis*", "*P. evermanni*")) +
+  scale_alpha_discrete(range = c(.4,1), labels = c("Gene-derived piRNAs", "Intergenic piRNAs", "TE-derived piRNAs")) +
+  theme_void() +
+  theme(aspect.ratio = 1,
+        panel.spacing = unit(0, "lines"),
+        strip.text = element_blank(), 
+        legend.title = element_blank(),
+        legend.text = element_markdown(),
+        legend.position = "right",
+        legend.box = "vertical");clust_plot
+
+ggsave(filename = "figures/cluster_overlap_plot.png", clust_plot, width = 7, height = 5)
+```
+

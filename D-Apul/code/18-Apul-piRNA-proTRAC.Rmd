@@ -5,7 +5,7 @@ date: "`r Sys.Date()`"
 output: html_document
 ---
 
-```{r, engine='bash'}
+```{r eval=FALSE, engine='bash', include=FALSE}
 
 # 1) Remove redundant reads from trimmed fastqs, keep reads between 25 and 35 nt (filtering out siRNA and mature miRNA), remove low complexity reads and change the format for small RNA alignment
 
@@ -18,14 +18,14 @@ done
 
 ```
 
-```{r, engine='bash'}
+```{r, eval=FALSE, engine='bash', include=FALSE}
 
 # concatenate reads in a single file 
 cat /scratch/jeirinlo/jrodr979/sncRNA_E5_corals/20240513_PIWI_pipeline/APUL/*.collapsed.filt.no-dust > /scratch/jeirinlo/jrodr979/sncRNA_E5_corals/20240513_PIWI_pipeline/APUL_filt_merged.fq
 
 ```
 
-```{r, engine='bash'}
+```{r, eval=FALSE, engine='bash', include=FALSE}
 
 # Filter annotated rRNA, tRNA, snRNAs, miRNAs, and snoRNAs reads (based in annotations on gff file non of these are piwi or related. 
 ## build a reference dataset of annotated non-codingRNAs
@@ -51,7 +51,7 @@ cat *fasta > APUL_otherSmallRNAs.fasta
 
 ```
 
-```{r, engine='bash'}
+```{r, eval=FALSE, engine='bash', include=FALSE}
 ## use sortmerna to clear reads that match the fasta
 sortmerna \
 --ref /scratch/jeirinlo/jrodr979/sncRNA_E5_corals/genomes/APUL/APUL_otherSmallRNAs.filt.fasta \
@@ -79,7 +79,7 @@ perl code/NGSToolbox/sRNAmapper.pl \
 
 ```
 
-```{r, engine='bash'}
+```{r, eval=FALSE, engine='bash', include=FALSE}
 # define origin for multiple mapping reads using reallocate
 
 perl code/NGSToolbox/reallocate.pl APUL_merged_preproc.map 10000 1000 b 0 
@@ -87,7 +87,7 @@ perl code/NGSToolbox/reallocate.pl APUL_merged_preproc.map 10000 1000 b 0
 
 ```
 
-```{r, engine='bash'}
+```{r, eval=FALSE, engine='bash', include=FALSE}
 # run proTRAC using the gene tracks and the RepeatMasker output
  
 perl ../code/NGSToolbox/proTRAC_2.4.2.pl \
@@ -99,7 +99,7 @@ perl ../code/NGSToolbox/proTRAC_2.4.2.pl \
 # Output folder is proTRAC_APUL_merged_preproc.map.weighted-10000-1000-b-0_2024y5m20d9h58m12s
 ```
 
-```{r, engine='bash'}
+```{r, eeval=FALSE, engine='bash', include=FALSE}
 for f in *.no-dust
 do
 mkdir /scratch/jeirinlo/javirodr/sncRNA_E5_corals/20240617_ProTRAC_individual_samples/APUL/sortmerna/${f/-S1-TP2-fastp-adapters-polyG-31bp-merged.fq.collapsed.filt.no-dust}

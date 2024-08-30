@@ -43,7 +43,7 @@ bed_file$V11 <- gsub("unclear","Unknown",bed_file$V11)
 ```
 
 #check how the families breakdown for piRNA clusters
-```{r, engine='bash'}
+```{r eval=FALSE, engine='bash', include=FALSE}
 # Intersect cluster bedfile with TE bedfile
 bedtools intersect -wo -a PMEA_merged_cluster.bed -b PMEA_repeatmasker_bedfile.bed > PMEA_piRNA_cluster_TEs_intersect.txt
 
@@ -51,7 +51,7 @@ bedtools intersect -wo -a PMEA_merged_cluster.bed -b PMEA_repeatmasker_bedfile.b
 
 # graph TE % coverage vs divergence of all TEs and those in clusters   
 ```{r}
-genome_TEs <- bed_file2 %>%
+genome_TEs <- bed_file %>%
   mutate(perc_g = ((V7-V6)/376580126)*100) %>%
   mutate(div_g = round(V2, 0)) %>%
   select(perc_g, div_g, V11) %>%
@@ -59,6 +59,7 @@ genome_TEs <- bed_file2 %>%
   summarise(sum_perc_g = sum(perc_g), .groups = "keep")
 genome_TEs <- genome_TEs[(!grepl("Low_complexity", genome_TEs$V11)),]
 genome_TEs <- genome_TEs[(!grepl("Simple_repeat", genome_TEs$V11)),]
+genome_TEs <- genome_TEs[(!grepl("ARTEFACT", genome_TEs$V11)),]
 genome_TEs$V11 <- gsub("unclear","Unknown",genome_TEs$V11)
     
 #read in the output of bedtools intersect
@@ -75,20 +76,42 @@ cluster_TEs <- cluster_TEs[(!grepl("Low_complexity", cluster_TEs$V7)),]
 cluster_TEs <- cluster_TEs[(!grepl("Simple_repeat", cluster_TEs$V7)),]
 cluster_TEs$V7 <- gsub("unclear","Unknown",cluster_TEs$V7)
 
+common_colors <- c(       
+  "DNA"="#F8766D",
+  "LINE"="#E18A00",
+  "LTR" = "#BE9C00",
+  "RC"="#8CAB00", 
+  "Retroposon"= "#24B700",
+  "rRNA"= "#00BE70",
+  "Satellite"= "#00C1AB",
+  "scRNA"= "#00BBDA",
+  "SINE"="#00ACFC",
+  "snRNA"="#8B93FF", 
+  "srpRNA"= "#D575FE",
+  "tRNA"= "#F962DD",
+  "Unknown"="#FF65AC")
+
 p1 <- ggplot(genome_TEs, aes(fill=V11, y=sum_perc_g, x=div_g)) + 
     geom_bar(position="stack", stat="identity") +
   scale_x_continuous(name = "Divergence from consensus (%)", breaks = c(0,5,10,15,20,25,30,35,40)) +
   scale_y_continuous(name = "Proportion of genome (%)") +
+  scale_fill_manual(values = common_colors) +
   theme_classic() +
   theme(legend.title = element_blank(), 
         legend.text = element_text(size = 7, margin = margin(r = 0, l = 0)),
         legend.key.size = unit(.3, 'cm'), 
         ) 
 
+g <- ggplot_build(p1)
+common_colors <- unique(g$data[[1]]["fill"])
+common_colors <- as.character(common_colors$fill)
+names(common_colors) <- c("DNA", "LINE","LTR","RC", "Retroposon","rRNA","Satellite","scRNA","SINE","snRNA","srpRNA","tRNA","Unknown")
+
 p2 <- ggplot(cluster_TEs, aes(fill=V7, y=sum_perc_c, x=div_c)) + 
     geom_bar(position="stack", stat="identity") +
   scale_x_continuous(name = "Divergence from consensus (%)", breaks = c(0,5,10,15,20,25,30,35,40)) +
   scale_y_continuous(name = "Proportion of clusters (%)", breaks = c(0,.5,1,1.5,2,2.5,3)) +
+  scale_fill_manual(values = common_colors) +
   theme_classic() +
   theme(legend.title = element_blank(), 
         legend.text = element_text(size = 7, margin = margin(r = 0, l = 0)),
