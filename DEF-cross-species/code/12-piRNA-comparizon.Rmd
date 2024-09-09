@@ -22,6 +22,8 @@ library(gghighlight) #install.packages("gghighlight")
 library(plotrix)
 library(dplyr)
 library(tidyr)
+library(tibble)
+library(tidyverse)
 
 ```
 
@@ -407,7 +409,7 @@ PEVE_m_clust <- read.table("../E-Peve/output/18-Peve-piRNA/0_piRNA_pipeline_proT
 colnames(PEVE_m_clust) <- c("chr","start","end","bp_overlap","sp")
 
 APUL_gene <- read.table("../D-Apul/output/18-Apul-piRNA/0_piRNA_pipeline_proTRAC/proTRAC_results_APUL/APUL.merged.clusters.gene.overlap.tab", header = F) %>%
-  select(V1, V2, V3, V13) %>%
+  select(V1, V2, V3, V13, ) %>%
   mutate(sp = "ACR")
 colnames(APUL_gene) <- c("chr","start","end","bp_overlap","sp")
 PMEA_gene <- read.table("../F-Pmea/output/18-Pmea-piRNA/0_piRNA_pipeline_proTRAC/proTRAC_results_PMEA/PMEA.merged.clusters.gene.overlap.tab", header = F) %>%
@@ -478,5 +480,336 @@ clust_plot <- ggplot(merged_clust_over, aes(x="", y=perc, alpha=element, fill = 
         legend.box = "vertical");clust_plot
 
 ggsave(filename = "figures/cluster_overlap_plot.png", clust_plot, width = 7, height = 5)
+```
+
+## GO enrichment in clusters
+```{r}
+
+library(topGO)
+library(clusterProfiler)
+library(pathview)
+
+# Load annotation
+GO_APUL <- read.delim("../data/Apul-rna-GO.tsv", sep = "\t", header = T)  %>%
+  select(query, GeneOntologyIDs) ## Need to replace transcript names with gene names
+GO_PMEA <- read.delim("../data/Pmea-rna-GO.tsv", sep = "\t", header = T)  %>%
+  mutate(gene_name = query) %>%
+  select(gene_name, GeneOntologyIDs)
+write_tsv(GO_PMEA, file = "../data/Pmea_gene2go.tab")
+GO_PEVE <- read.delim("../data/Peve-rna-GO.tsv", sep = "\t", header = T)  %>%
+  select(query, GeneOntologyIDs) %>%
+  mutate(gene_name = gsub("Parent=","", query)) %>%
+  select(gene_name, GeneOntologyIDs)
+write_tsv(GO_PEVE, file = "../data/Peve_gene2go.tab")
+
+## Relate gene_ID and transcripts
+
+#grep $'\tmRNA\t' ../genome/APUL/GCF_013753865.1_Amil_v2.1_genomic.gff |
+#awk '
+#BEGIN { FS = "\t"; OFS = "\t" } 
+#{
+#  if ($9 ~ /gene=/ && $9 ~ /ID=/) {
+#    match($9, /gene=[^;]*/);
+#    gene = substr($9, RSTART+5, RLENGTH-5);
+#    match($9, /ID=[^;]*/);
+#    transcript_id = substr($9, RSTART+3, RLENGTH-3);
+#    print gene, transcript_id;
+#  }
+#}' > ../data/APUL_gene2transcript.tab
+
+gene2trans <- read.table("../data/APUL_gene2transcript.tab", header = F) %>%
+  mutate(query = gsub("rna-", "", V2)) %>%
+  select(query, V1)
+colnames(gene2trans) <- c("query", "gene_name")
+
+GO_APUL <- GO_APUL %>%
+  left_join(.,gene2trans) %>%
+  select(gene_name, GeneOntologyIDs)
+write_tsv(GO_APUL, file = "../data/Apul_gene2go.tab")
+
+# Get overlapping genes
+APUL_gene_IDs <- read.table("../D-Apul/output/18-Apul-piRNA/0_piRNA_pipeline_proTRAC/proTRAC_results_APUL/APUL.merged.clusters.gene.overlap.tab", header = F) %>%
+  select(V12) %>%
+  separate(V12, into = paste0("col", 1:6), sep = ";", fill = "right") %>%
+  select(starts_with("col")) %>%
+  pivot_longer(cols = everything(), names_to = "key", values_to = "value") %>%
+  filter(grepl("gene=", value)) %>%
+  mutate(gene_name = sub("gene=", "", value)) %>%
+  select(gene_name) 
+apul_clust_genes <- as.character(APUL_gene_IDs$gene_name)
+apul_all_genes <- as.character(GO_APUL$gene_name)
+Apul_GeneList <- factor(as.integer(apul_all_genes %in% apul_clust_genes))
+names(Apul_GeneList) <- apul_all_genes
+
+
+PMEA_gene_IDs <- read.table("../F-Pmea/output/18-Pmea-piRNA/0_piRNA_pipeline_proTRAC/proTRAC_results_PMEA/PMEA.merged.clusters.gene.overlap.tab", header = F) %>%
+  select(V12) %>%
+  mutate(gene_name = sub("ID=", "", V12)) %>%
+  select(gene_name)
+
+pmea_clust_genes <- as.character(PMEA_gene_IDs$gene_name)
+pmea_all_genes <- as.character(GO_PMEA$gene_name)
+Pmea_GeneList <- factor(as.integer(pmea_all_genes %in% pmea_clust_genes))
+names(Pmea_GeneList) <- pmea_all_genes
+
+PEVE_gene_IDs <- read.table("../E-Peve/output/18-Peve-piRNA/0_piRNA_pipeline_proTRAC/proTRAC_results_PEVE/PEVE.merged.clusters.gene.overlap.tab", header = F) %>%
+  select(V12) %>%
+  separate(V12, into = paste0("col", 1:6), sep = ";", fill = "right") %>%
+  select(starts_with("col")) %>%
+  pivot_longer(cols = everything(), names_to = "key", values_to = "value") %>%
+  filter(grepl("ID=", value)) %>%
+  mutate(gene_name = sub("ID=", "", value)) %>%
+  select(gene_name)
+
+peve_clust_genes <- as.character(PEVE_gene_IDs$gene_name)
+peve_all_genes <- as.character(GO_PEVE$gene_name)
+Peve_GeneList <- factor(as.integer(peve_all_genes %in% peve_clust_genes))
+names(Peve_GeneList) <- peve_all_genes
+```
+ 
+# Run TopGO
+```{r}
+topDiffGenes <- function(allScore) {
+return(allScore < 0.05)}
+
+#GOnode<-10
+
+APUL_gene2go<-readMappings("../data/Apul_gene2go.tab", IDsep=";", sep="\t")
+PMEA_gene2go<-readMappings("../data/Pmea_gene2go.tab", IDsep=";", sep="\t")
+PEVE_gene2go<-readMappings("../data/Peve_gene2go.tab", IDsep=";", sep="\t")
+
+# Biological Process
+GO_APUL_BP <-new("topGOdata", ontology="BP", gene2GO=APUL_gene2go, allGenes=Apul_GeneList, annot = annFUN.gene2GO, geneSel=topDiffGenes)
+
+GO_PMEA_BP <-new("topGOdata", ontology="BP", gene2GO=PMEA_gene2go, allGenes=Pmea_GeneList, annot = annFUN.gene2GO, geneSel=topDiffGenes)
+
+GO_PEVE_BP <-new("topGOdata", ontology="BP", gene2GO=PEVE_gene2go, allGenes=Peve_GeneList, annot = annFUN.gene2GO, geneSel=topDiffGenes)
+
+# Run tests 
+GO_APUL_BP_FE <- runTest(GO_APUL_BP, algorithm="weight01", statistic="fisher")
+GO_PMEA_BP_FE <- runTest(GO_PMEA_BP, algorithm="weight01", statistic="fisher")
+GO_PEVE_BP_FE <- runTest(GO_PEVE_BP, algorithm="weight01", statistic="fisher")
+
+##Table of Results
+GO_APUL_BP_En <- GenTable(GO_APUL_BP, Fisher = GO_APUL_BP_FE,
+  orderBy = "Fisher",  topNodes = 100, numChar = 51)
+GO_APUL_BP_En$Fisher<-as.numeric(GO_APUL_BP_En$Fisher)
+
+GO_PEVE_BP_En <- GenTable(GO_PEVE_BP, Fisher = GO_PEVE_BP_FE,
+  orderBy = "Fisher",  topNodes = 100, numChar = 51)
+GO_PEVE_BP_En$Fisher<-as.numeric(GO_PEVE_BP_En$Fisher)
+
+GO_PMEA_BP_En <- GenTable(GO_PMEA_BP, Fisher = GO_PMEA_BP_FE,
+  orderBy = "Fisher",  topNodes = 100, numChar = 51)
+GO_PMEA_BP_En$Fisher<-as.numeric(GO_PMEA_BP_En$Fisher)
+
+##Filter for Significant Terms
+GO_APUL_BP_En<-GO_APUL_BP_En[GO_APUL_BP_En$Fisher<0.01,]
+GO_PEVE_BP_En<-GO_PEVE_BP_En[GO_PEVE_BP_En$Fisher<0.01,]
+GO_PMEA_BP_En<-GO_PMEA_BP_En[GO_PMEA_BP_En$Fisher<0.01,]
+
+##Fix order of terms for plotting
+GO_APUL_BP_En$Term<-factor(GO_APUL_BP_En$Term, levels = rev(GO_APUL_BP_En$Term))
+GO_PEVE_BP_En$Term<-factor(GO_PEVE_BP_En$Term, levels = rev(GO_PEVE_BP_En$Term))
+GO_PMEA_BP_En$Term<-factor(GO_PMEA_BP_En$Term, levels = rev(GO_PMEA_BP_En$Term))
+
+##Add Contrast, Timepoint, and Direction columns
+GO_APUL_BP_En$Species<-"*A. pulchra*"
+GO_APUL_BP_En$ontology<-"Biological Process" 
+
+GO_PMEA_BP_En$Species<-"*P. tuahiniensis*"
+GO_PMEA_BP_En$ontology<-"Biological Process" 
+
+GO_PEVE_BP_En$Species<-"*P. evermanni*"
+GO_PEVE_BP_En$ontology<-"Biological Process"  
+
+Reduce(intersect, list(GO_APUL_BP_En$GO.ID, GO_PEVE_BP_En$GO.ID))
+Reduce(intersect, list(GO_APUL_BP_En$GO.ID, GO_PMEA_BP_En$GO.ID))
+Reduce(intersect, list(GO_PMEA_BP_En$GO.ID, GO_PEVE_BP_En$GO.ID))
+
+# Cellular components
+GO_APUL_CC <-new("topGOdata", ontology="CC", gene2GO=APUL_gene2go, allGenes=Apul_GeneList, annot = annFUN.gene2GO, geneSel=topDiffGenes)
+
+GO_PMEA_CC <-new("topGOdata", ontology="CC", gene2GO=PMEA_gene2go, allGenes=Pmea_GeneList, annot = annFUN.gene2GO, geneSel=topDiffGenes)
+
+GO_PEVE_CC <-new("topGOdata", ontology="CC", gene2GO=PEVE_gene2go, allGenes=Peve_GeneList, annot = annFUN.gene2GO, geneSel=topDiffGenes)
+
+# Run tests 
+GO_APUL_CC_FE <- runTest(GO_APUL_CC, algorithm="weight01", statistic="fisher")
+GO_PMEA_CC_FE <- runTest(GO_PMEA_CC, algorithm="weight01", statistic="fisher")
+GO_PEVE_CC_FE <- runTest(GO_PEVE_CC, algorithm="weight01", statistic="fisher")
+
+##Table of Results
+GO_APUL_CC_En <- GenTable(GO_APUL_CC, Fisher = GO_APUL_CC_FE,
+  orderBy = "Fisher",  topNodes = 100, numChar = 51)
+GO_APUL_CC_En$Fisher<-as.numeric(GO_APUL_CC_En$Fisher)
+
+GO_PEVE_CC_En <- GenTable(GO_PEVE_CC, Fisher = GO_PEVE_CC_FE,
+  orderBy = "Fisher",  topNodes = 100, numChar = 51)
+GO_PEVE_CC_En$Fisher<-as.numeric(GO_PEVE_CC_En$Fisher)
+
+GO_PMEA_CC_En <- GenTable(GO_PMEA_CC, Fisher = GO_PMEA_CC_FE,
+  orderBy = "Fisher",  topNodes = 100, numChar = 51)
+GO_PMEA_CC_En$Fisher<-as.numeric(GO_PMEA_CC_En$Fisher)
+
+##Filter for Significant Terms
+GO_APUL_CC_En<-GO_APUL_CC_En[GO_APUL_CC_En$Fisher<0.01,]
+GO_PEVE_CC_En<-GO_PEVE_CC_En[GO_PEVE_CC_En$Fisher<0.01,]
+GO_PMEA_CC_En<-GO_PMEA_CC_En[GO_PMEA_CC_En$Fisher<0.01,]
+
+##Fix order of terms for plotting
+GO_APUL_CC_En$Term<-factor(GO_APUL_CC_En$Term, levels = rev(GO_APUL_CC_En$Term))
+GO_PEVE_CC_En$Term<-factor(GO_PEVE_CC_En$Term, levels = rev(GO_PEVE_CC_En$Term))
+GO_PMEA_CC_En$Term<-factor(GO_PMEA_CC_En$Term, levels = rev(GO_PMEA_CC_En$Term))
+
+##Add Contrast, Timepoint, and Direction columns
+GO_APUL_CC_En$Species<-"*A. pulchra*"
+GO_APUL_CC_En$ontology<-"Cellular Component" 
+
+GO_PMEA_CC_En$Species<-"*P. tuahiniensis*"
+GO_PMEA_CC_En$ontology<-"Cellular Component" 
+
+GO_PEVE_CC_En$Species<-"*P. evermanni*"
+GO_PEVE_CC_En$ontology<-"Cellular Component" 
+
+Reduce(intersect, list(GO_APUL_CC_En$GO.ID, GO_PEVE_CC_En$GO.ID))
+Reduce(intersect, list(GO_APUL_CC_En$GO.ID, GO_PMEA_CC_En$GO.ID))
+Reduce(intersect, list(GO_PMEA_CC_En$GO.ID, GO_PEVE_CC_En$GO.ID))
+
+# Molecular functions
+## Create datasets
+GO_APUL_MF <-new("topGOdata", ontology="MF", gene2GO=APUL_gene2go, allGenes=Apul_GeneList, annot = annFUN.gene2GO, geneSel=topDiffGenes)
+
+GO_PMEA_MF <-new("topGOdata", ontology="MF", gene2GO=PMEA_gene2go, allGenes=Pmea_GeneList, annot = annFUN.gene2GO, geneSel=topDiffGenes)
+
+GO_PEVE_MF <-new("topGOdata", ontology="MF", gene2GO=PEVE_gene2go, allGenes=Peve_GeneList, annot = annFUN.gene2GO, geneSel=topDiffGenes)
+
+# Run tests 
+GO_APUL_MF_FE <- runTest(GO_APUL_MF, algorithm="weight01", statistic="fisher")
+GO_PMEA_MF_FE <- runTest(GO_PMEA_MF, algorithm="weight01", statistic="fisher")
+GO_PEVE_MF_FE <- runTest(GO_PEVE_MF, algorithm="weight01", statistic="fisher")
+
+##Table of Results
+GO_APUL_MF_En <- GenTable(GO_APUL_MF, Fisher = GO_APUL_MF_FE,
+  orderBy = "Fisher",  topNodes = 100, numChar = 51)
+GO_APUL_MF_En$Fisher<-as.numeric(GO_APUL_MF_En$Fisher)
+
+GO_PEVE_MF_En <- GenTable(GO_PEVE_MF, Fisher = GO_PEVE_MF_FE,
+  orderBy = "Fisher",  topNodes = 100, numChar = 51)
+GO_PEVE_MF_En$Fisher<-as.numeric(GO_PEVE_MF_En$Fisher)
+
+GO_PMEA_MF_En <- GenTable(GO_PMEA_MF, Fisher = GO_PMEA_MF_FE,
+  orderBy = "Fisher",  topNodes = 100, numChar = 51)
+GO_PMEA_MF_En$Fisher<-as.numeric(GO_PMEA_MF_En$Fisher)
+
+##Filter for Significant Terms
+GO_APUL_MF_En<-GO_APUL_MF_En[GO_APUL_MF_En$Fisher<0.01,]
+GO_PEVE_MF_En<-GO_PEVE_MF_En[GO_PEVE_MF_En$Fisher<0.01,]
+GO_PMEA_MF_En<-GO_PMEA_MF_En[GO_PMEA_MF_En$Fisher<0.01,]
+
+##Fix order of terms for plotting
+GO_APUL_MF_En$Term<-factor(GO_APUL_MF_En$Term, levels = rev(GO_APUL_MF_En$Term))
+GO_PEVE_MF_En$Term<-factor(GO_PEVE_MF_En$Term, levels = rev(GO_PEVE_MF_En$Term))
+GO_PMEA_MF_En$Term<-factor(GO_PMEA_MF_En$Term, levels = rev(GO_PMEA_MF_En$Term))
+
+##Add Contrast, Timepoint, and Direction columns
+GO_APUL_MF_En$Species<-"*A. pulchra*"
+GO_APUL_MF_En$ontology<-"Molecular Function" 
+
+GO_PMEA_MF_En$Species<-"*P. tuahiniensis*"
+GO_PMEA_MF_En$ontology<-"Molecular Function" 
+
+GO_PEVE_MF_En$Species<-"*P. evermanni*"
+GO_PEVE_MF_En$ontology<-"Molecular Function" 
+
+Reduce(intersect, list(GO_APUL_MF_En$GO.ID, GO_PEVE_MF_En$GO.ID))
+Reduce(intersect, list(GO_APUL_MF_En$GO.ID, GO_PMEA_MF_En$GO.ID))
+Reduce(intersect, list(GO_PMEA_MF_En$GO.ID, GO_PEVE_MF_En$GO.ID))
+
+all_GOs <- rbind(GO_APUL_BP_En, GO_PMEA_BP_En, GO_PEVE_BP_En,GO_APUL_MF_En, GO_PMEA_MF_En, GO_PEVE_MF_En,GO_APUL_CC_En, GO_PMEA_CC_En, GO_PEVE_CC_En) %>%
+  mutate(prop.sig.genes = Significant/Annotated)
+all_GOs$ontology <- as.factor(all_GOs$ontology)
+all_GOs$Species <- as.factor(all_GOs$Species)
+
+str(all_GOs)
+
+```
+
+
+```{r}
+####Plot Feature Sizes
+axis.title.sz=18
+axis.txt.sz=14
+leg.title.sz=15
+leg.txt.sz=12
+levels.sz=7
+sig.sz=5
+panel.lab.sz=25
+point.sz=4
+bar.sz=1
+cap.sz=0.3
+
+
+
+# Biological Processes 
+
+GO_plot<-ggplot(all_GOs, aes(x = Term, y = -log10(Fisher), size = prop.sig.genes, fill = -log10(Fisher))) +
+  #expand_limits(y = 1.5) +
+  #ylim(1, 7.25) +
+  # Add horizontal lines with a single aesthetic value
+  geom_hline(yintercept = -log10(0.01), linetype = "longdash", colour = "black", linewidth = .6) +
+  geom_hline(yintercept = -log10(0.001), linetype = "solid", colour = "black", linewidth = .6) +
+  geom_point(shape = 21) + 
+  scale_size(range = c(2, 12)) + 
+  scale_fill_continuous(low = "#1AD3D1FF", high = "#4686FBFF") +
+  xlab('') + 
+  ylab('Enrichment score') +
+  labs(caption = 'Cut-off lines at p=0.01 and p=0.001') +
+  theme_bw() +
+  facet_grid(vars(ontology), vars(Species), scales = "free", space = "free_y") + 
+  theme(
+    legend.position = 'right',
+    legend.background = element_rect(),
+    plot.title = element_text(size = axis.title.sz, face = 'bold', vjust = 1, colour = "black"),
+    plot.subtitle = element_text(size = axis.txt.sz, vjust = 1, colour = "black"),
+    plot.caption = element_text(size = leg.txt.sz, vjust = 1, face = 'italic', colour = "black"),
+    axis.text.x = element_text(size = axis.txt.sz, hjust = 1.10, colour = "black"),
+    axis.text.y = element_text(size = axis.txt.sz, vjust = 0.5, colour = "black"),
+    axis.title.x = element_text(size = axis.title.sz, colour = "black"),
+    axis.title.y = element_text(size = axis.title.sz, colour = "black"),
+    axis.line = element_line(colour = 'black'),
+    legend.key = element_blank(),
+    legend.text = element_text(size = leg.txt.sz),
+    title = element_text(size = leg.txt.sz),
+    strip.background = element_blank(), 
+    strip.text = element_markdown(),
+    panel.border = element_rect(colour = "black", fill = "NA"), 
+    panel.background = element_rect(fill = NA, color = "black") 
+  ) +
+  coord_flip();GO_plot
+
+ggsave(filename = "figures/cluster_GOs_plot.png", GO_plot, width = 15, height = 20)
+```
+# Plot overlaps
+```{r}
+library(ggvenn)
+library(cowplot)
+
+GOs_BP_wide <- list(APUL=GO_APUL_BP_En$GO.ID,PTUA=GO_PMEA_BP_En$GO.ID,PEVE=GO_PEVE_BP_En$GO.ID)
+GOs_CC_wide <- list(APUL=GO_APUL_CC_En$GO.ID,PTUA=GO_PMEA_CC_En$GO.ID,PEVE=GO_PEVE_CC_En$GO.ID)
+GOs_MF_wide <- list(APUL=GO_APUL_MF_En$GO.ID,PTUA=GO_PMEA_MF_En$GO.ID,PEVE=GO_PEVE_MF_En$GO.ID)
+
+gv1 <- ggvenn(GOs_BP_wide, fill_color = c("#408EC6", "#7A2048", "#1E2761"),
+  stroke_size = 0.5, set_name_size = 0, show_percentage = F, stroke_color = F)
+gv2 <- ggvenn(GOs_CC_wide, fill_color = c("#408EC6", "#7A2048", "#1E2761"),
+  stroke_size = 0.5, set_name_size = 0, show_percentage = F, stroke_color = F 
+  )
+gv3 <- ggvenn(GOs_MF_wide, fill_color = c("#408EC6", "#7A2048", "#1E2761"),
+  stroke_size = 0.5, set_name_size = 0, show_percentage = F, stroke_color = F 
+  )
+
+GO_venn <- plot_grid(gv1,gv2, gv3, nrow = 1, align = "h", labels = c("Biological Process", "Cellular Component", "Molecular Function"), vjust = 7, hjust = -0.2)
+
+ggsave("figures/GO_overlaps_vennDiagram.png", GO_venn, height = 4.6, width = 8)
 ```
 
