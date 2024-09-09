@@ -33,7 +33,7 @@ add bash code
 
 Moving into R to visualize and calculate more stats.
 
-Load Ptuh bed file into R. 
+Load Peve bed file into R. 
 ```{r}
 bed <- read.delim("../output/19-bedtools-closest/miRNA_filtered_Peve_output.bed", header = F)
 head(bed)
@@ -140,7 +140,11 @@ print(summary_stats_mature)
 
 Read in GO annotation information
 ```{r}
-annot <- read.delim("../output/20-Peve-gene-annotation/Peve-protein-GO.tsv")
+annot <- read.delim("../output/20-Peve-gene-annotation/Peve-rna-GO.tsv")
+
+prot <- read.delim("../output/20-Peve-gene-annotation/Peve-protein-GO.tsv")
+rna <- read.delim("../output/20-Peve-gene-annotation/Peve-rna-GO.tsv")
+
 ```
 
 Pull out gene name information from the `gf_attr` column in the `bed_filt_mature_all` df
@@ -179,6 +183,18 @@ no_overlap <- bed_filt_mature_annot %>%
 unique(no_overlap$BiologicalProcess)
 unique(no_overlap$ProteinNames)
 ```
+
+
+
+Load Peve piRNA closest file into R. 
+```{r}
+pi_bed <- read.delim("../output/19-bedtools-closest/Peve_piRNA_output.bed", header = F)
+head(pi_bed)
+length(unique(pi_bed$V1)) # should be 107, but is currently 83...
+```
+
+
+
 
 
 
