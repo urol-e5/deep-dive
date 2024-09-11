@@ -1,0 +1,270 @@
+---
+title: "Closest gene comparisons across species"
+author: "Jill Ashey"
+date: "2024-09-11"
+output: html_document
+---
+
+This code will examine the overlap (if any) between the GO enrichment of the closest gene across species. See the following rmds for TopGO analysis by species: XXXXXXXX
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(Biostrings) # Biostrings_2.62.0 
+require(ggplot2)    # ggplot2_3.3.6
+library(ggpubr)
+library(ggseqlogo)  # install.packages("ggseqlogo")
+library(reshape2)   # reshape2_1.4.4
+library(data.table)
+library(gghighlight) #install.packages("gghighlight")
+library(plotrix)
+library(dplyr)
+library(tidyr)
+library(tibble)
+library(tidyverse)
+library(ggvenn)
+```
+
+## piRNA
+
+Compare terms identified in piRNA GO enrichment analysis across species
+
+Read in data from all species
+```{r}
+apul_go_pi <- read.csv("../../D-Apul/output/19-bedtools-closest/Apul_GO_en_sig_gene_piRNA.csv")
+apul_go_pi$Species <- "Acropora pulchra"
+peve_go_pi <- read.csv("../../E-Peve/output/19-bedtools-closest/Peve_GO_en_sig_gene_piRNA.csv")
+peve_go_pi$Species <- "Porites evermanni"
+pmea_go_pi <- read.csv("../../F-Pmea/output/19-bedtools-closest/Pmea_GO_en_sig_gene_piRNA.csv")
+pmea_go_pi$Species <- "Pocillopora tuahiniensis"
+
+all_go_pi <- rbind(apul_go_pi, pmea_go_pi, peve_go_pi)
+```
+
+Subset by ontology 
+```{r}
+# Apul
+apul_go_pi_bp <- apul_go_pi %>%
+  dplyr::filter(ontology == "Biological Processes")
+apul_go_pi_cc <- apul_go_pi %>%
+  dplyr::filter(ontology == "Cellular Components")
+apul_go_pi_mf <- apul_go_pi %>%
+  dplyr::filter(ontology == "Molecular Functions")
+
+# Peve
+peve_go_pi_bp <- peve_go_pi %>%
+  dplyr::filter(ontology == "Biological Processes")
+peve_go_pi_cc <- peve_go_pi %>%
+  dplyr::filter(ontology == "Cellular Components")
+peve_go_pi_mf <- peve_go_pi %>%
+  dplyr::filter(ontology == "Molecular Functions")
+
+# Pmea
+pmea_go_pi_bp <- pmea_go_pi %>%
+  dplyr::filter(ontology == "Biological Processes")
+pmea_go_pi_cc <- pmea_go_pi %>%
+  dplyr::filter(ontology == "Cellular Components")
+pmea_go_pi_mf <- pmea_go_pi %>%
+  dplyr::filter(ontology == "Molecular Functions")
+```
+
+Look at overlaps with venn diagrams 
+```{r}
+# Biological Processes
+GOs_BP_wide_pi <- list(APUL=apul_go_pi_bp$GeneOntologyIDs, PTUH=pmea_go_pi_bp$GeneOntologyIDs,PEVE=peve_go_pi_bp$GeneOntologyIDs)
+
+bp_venn_pi <- ggvenn(GOs_BP_wide, fill_color = c("#408EC6", "#7A2048", "#1E2761"),
+  stroke_size = 0.5, set_name_size = 0, show_percentage = F, stroke_color = F); bp_venn_pi
+
+# Cellular Components
+GOs_CC_wide_pi <- list(APUL=apul_go_pi_cc$GeneOntologyIDs, PTUH=pmea_go_pi_cc$GeneOntologyIDs,PEVE=peve_go_pi_cc$GeneOntologyIDs)
+
+cc_venn <- ggvenn(GOs_CC_wide, fill_color = c("#408EC6", "#7A2048", "#1E2761"),
+  stroke_size = 0.5, set_name_size = 0, show_percentage = F, stroke_color = F); cc_venn_pi
+
+# Molecular Functions
+GOs_MF_wide_pi <- list(APUL=apul_go_pi_mf$GeneOntologyIDs, PTUH=pmea_go_pi_mf$GeneOntologyIDs,PEVE=peve_go_pi_mf$GeneOntologyIDs)
+
+mf_venn_pi <- ggvenn(GOs_MF_wide, fill_color = c("#408EC6", "#7A2048", "#1E2761"),
+  stroke_size = 0.5, set_name_size = 0, show_percentage = F, stroke_color = F); mf_venn_pi
+```
+
+Assess shared GO terms between species 
+```{r}
+# Count the number of unique species for each GeneOntologyID
+shared_go_pi <- all_go_pi %>%
+  group_by(GeneOntologyIDs) %>%
+  summarise(unique_species = n_distinct(Species)) %>%
+  filter(unique_species > 1) %>%
+  select(GeneOntologyIDs)
+
+# Create a new dataframe with only the shared GeneOntologyIDs
+shared_go_pi_df <- all_go_pi %>%
+  filter(GeneOntologyIDs %in% shared_go_pi$GeneOntologyIDs)
+
+# Plot 
+GO_plot_pi <- ggplot(shared_go_pi_df, aes(x = Term, y = -log10(Fisher), shape = Species, fill = Species)) +
+  geom_point(size = 25, color = "black", stroke = 2) +  # Black border around shapes
+  scale_shape_manual(values = c(21, 22, 23)) +  # Shapes that can be filled
+  scale_fill_manual(values = c("#408EC6", "#7A2048", "#1E2761")) +  # Custom colors for each species
+  scale_size(range = c(2, 12)) + 
+  xlab('') + 
+  ylab('log(Enrichment score)') +
+  facet_grid(vars(ontology), scales = "free", space = "free_y") + 
+  theme_bw() +
+  theme(
+    axis.title = element_text(size = 36, face = "bold"),        # Axis title size
+    axis.text = element_text(size = 34, colour = "black"),                        # Axis text size
+    legend.title = element_text(size = 34, face = "bold"),      # Legend title size
+    legend.text = element_text(size = 32),                      # Legend text size
+    strip.text = element_text(size = 34, face = "bold"),        # Facet text size
+    strip.background = element_rect(fill = "lightgray", color = "black", size = 1.5),         # Facet background
+    axis.line = element_line(size = 1, colour = "black"),       # Enhanced axis lines
+    axis.ticks = element_line(size = 1),                        # Thicker axis ticks
+     #panel.border = element_blank()                             # Remove panel border
+    #panel.grid.major = element_blank(),                         # Remove major grid lines
+    #panel.grid.minor = element_blank()                          # Remove minor grid lines
+        panel.border = element_rect(color = "black", size = 1.2),   # Enhanced facet border lines
+    panel.grid.major = element_line(size = 0.5, color = "gray"), # Grid lines inside the facets
+    panel.spacing = unit(1, "lines"),                           # Increase space between facets
+    strip.placement = "outside"    
+  ) +
+  coord_flip(); GO_plot_pi
+
+ggsave(filename = "../figures/piRNA_shared_GOs_plot.png", GO_plot_pi, width = 25, height = 25)
+ggsave(filename = "../figures/piRNA_shared_GOs_plot.pdf", GO_plot_pi, width = 25, height = 25)
+```
+
+I like this plot a lot!
+
+
+
+
+
+
+## miRNA
+
+Compare terms identified in miRNA GO enrichment analysis across species
+
+Read in data from all species
+```{r}
+apul_go_mi <- read.csv("../../D-Apul/output/19-bedtools-closest/Apul_GO_en_sig_gene_miRNA.csv")
+apul_go_mi$Species <- "Acropora pulchra"
+peve_go_mi <- read.csv("../../E-Peve/output/19-bedtools-closest/Peve_GO_en_sig_gene_miRNA.csv")
+peve_go_mi$Species <- "Porites evermanni"
+pmea_go_mi <- read.csv("../../F-Pmea/output/19-bedtools-closest/Pmea_GO_en_sig_gene_miRNA.csv")
+pmea_go_mi$Species <- "Pocillopora tuahiniensis"
+
+all_go_mi <- rbind(apul_go_mi, pmea_go_mi, peve_go_mi)
+```
+
+Subset by ontology 
+```{r}
+# Apul
+apul_go_mi_bp <- apul_go_mi %>%
+  dplyr::filter(ontology == "Biological Processes")
+apul_go_mi_cc <- apul_go_mi %>%
+  dplyr::filter(ontology == "Cellular Components")
+apul_go_mi_mf <- apul_go_mi %>%
+  dplyr::filter(ontology == "Molecular Functions")
+
+# Peve
+peve_go_mi_bp <- peve_go_mi %>%
+  dplyr::filter(ontology == "Biological Processes")
+peve_go_mi_cc <- peve_go_mi %>%
+  dplyr::filter(ontology == "Cellular Components")
+peve_go_mi_mf <- peve_go_mi %>%
+  dplyr::filter(ontology == "Molecular Functions")
+
+# Pmea
+pmea_go_mi_bp <- pmea_go_mi %>%
+  dplyr::filter(ontology == "Biological Processes")
+pmea_go_mi_cc <- pmea_go_mi %>%
+  dplyr::filter(ontology == "Cellular Components")
+pmea_go_mi_mf <- pmea_go_mi %>%
+  dplyr::filter(ontology == "Molecular Functions")
+```
+
+Look at overlaps with venn diagrams 
+```{r}
+# Biological Processes
+GOs_BP_wide_mi <- list(APUL=apul_go_mi_bp$GeneOntologyIDs, PTUH=pmea_go_mi_bp$GeneOntologyIDs,PEVE=peve_go_mi_bp$GeneOntologyIDs)
+
+bp_venn_mi <- ggvenn(GOs_BP_wide_mi, fill_color = c("#408EC6", "#7A2048", "#1E2761"),
+  stroke_size = 0.5, set_name_size = 0, show_percentage = F, stroke_color = F); bp_venn_mi
+
+# Cellular Components
+GOs_CC_wide_mi <- list(APUL=apul_go_mi_cc$GeneOntologyIDs, PTUH=pmea_go_mi_cc$GeneOntologyIDs,PEVE=peve_go_mi_cc$GeneOntologyIDs)
+
+cc_venn_mi <- ggvenn(GOs_CC_wide_mi, fill_color = c("#408EC6", "#7A2048", "#1E2761"),
+  stroke_size = 0.5, set_name_size = 0, show_percentage = F, stroke_color = F); cc_venn_mi
+
+# Molecular Functions
+GOs_MF_wide_mi <- list(APUL=apul_go_mi_mf$GeneOntologyIDs, PTUH=pmea_go_mi_mf$GeneOntologyIDs,PEVE=peve_go_mi_mf$GeneOntologyIDs)
+
+mf_venn_mi <- ggvenn(GOs_MF_wide_mi, fill_color = c("#408EC6", "#7A2048", "#1E2761"),
+  stroke_size = 0.5, set_name_size = 0, show_percentage = F, stroke_color = F); mf_venn_mi
+```
+
+Assess shared GO terms between species 
+```{r}
+# Count the number of unique species for each GeneOntologyID
+shared_go <- all_go %>%
+  group_by(GeneOntologyIDs) %>%
+  summarise(unique_species = n_distinct(Species)) %>%
+  filter(unique_species > 1) %>%
+  select(GeneOntologyIDs)
+
+# Create a new dataframe with only the shared GeneOntologyIDs
+shared_go_df <- all_go %>%
+  filter(GeneOntologyIDs %in% shared_go$GeneOntologyIDs)
+
+# Plot 
+GO_plot <- ggplot(shared_go_df, aes(x = Term, y = -log10(Fisher), shape = Species, fill = Species)) +
+  geom_point(size = 4, color = "black") +  # Black border around shapes
+  scale_shape_manual(values = c(21, 22, 23)) +  # Shapes that can be filled
+  scale_fill_manual(values = c("#408EC6", "#7A2048", "#1E2761")) +  # Custom colors for each species
+  scale_size(range = c(2, 12)) + 
+  xlab('') + 
+  ylab('Enrichment score') +
+  facet_grid(vars(ontology), scales = "free", space = "free_y") + 
+  theme_bw() +
+  coord_flip(); GO_plot
+```
+
+Assess shared GO terms between species 
+```{r}
+# Count the number of unique species for each GeneOntologyID
+shared_go_mi <- all_go_mi %>%
+  group_by(GeneOntologyIDs) %>%  # Group by both GeneOntologyIDs and ontology
+  summarise(unique_species = n_distinct(Species), .groups = 'keep') %>%  # Count distinct species for each GO term and ontology
+  filter(unique_species > 1)
+
+shared_go_mi <- all_go_mi %>%
+  group_by(GeneOntologyIDs) %>%
+  filter(if (any(ontology == "Cellular Components")) ontology == "Cellular Components" else TRUE) %>%
+  summarise(unique_species = n_distinct(Species), .groups = 'drop') %>%
+  filter(unique_species > 1)
+
+# Create a new dataframe with only the shared GeneOntologyIDs
+shared_go_mi_df <- all_go_mi %>%
+  filter(GeneOntologyIDs %in% shared_go_mi$GeneOntologyIDs)
+
+# Plot 
+GO_plot_mi <- ggplot(shared_go_mi_df, aes(x = Term, y = -log10(Fisher), shape = Species, fill = Species)) +
+  geom_point(size = 4, color = "black") +  # Black border around shapes
+  scale_shape_manual(values = c(21, 22, 23)) +  # Shapes that can be filled
+  scale_fill_manual(values = c("#408EC6", "#7A2048", "#1E2761")) +  # Custom colors for each species
+  scale_size(range = c(2, 12)) + 
+  xlab('') + 
+  ylab('Enrichment score') +
+  facet_grid(vars(ontology)) + 
+  theme_bw() +
+  coord_flip(); GO_plot_mi
+
+ggsave(filename = "../figures/miRNA_shared_GOs_plot.png", GO_plot_mi, width = 15, height = 20)
+```
+
+Weird...having issues with this plot. It is plotting terms that are unique only to one species when I am asking it to plot only terms that are shared by 2+ species. When I look in the df however, the terms actually are shared, the plot itself just isn't plotting them. Ah it might be because some GO terms belong to multiple ontologies...which is dumb. It looks like most of the issue is arising from POC. I have tried to remove terms that are associated with 1+ ontology and only keep the row that is associated with cellular components but this has not succeeded. UGH
+
+
