@@ -7,114 +7,66 @@ output: html_document
 
 ## Closest genomic features to ncRNAs in Acropora pulchra 
 
-This code will investigate the proximity of ncRNAs to other genomic features in Acropora pulchra. The `bash` code snippets were done on the URI HPC server, Andromeda. I copied the Apul miRNA [gff](https://github.com/urol-e5/deep-dive/blob/main/D-Apul/output/13.2.1-Apul-sRNAseq-ShortStack-31bp-fastp-merged-cnidarian_miRBase/ShortStack_out/Results.gff3) and [fasta](https://github.com/urol-e5/deep-dive/blob/main/D-Apul/output/13.2.1-Apul-sRNAseq-ShortStack-31bp-fastp-merged-cnidarian_miRBase/ShortStack_out/mir.fasta) files onto Andromeda. We used the Amillepora genomic information for Apul analyses. 
+This code will investigate the proximity of ncRNAs to mRNAs in Acropora pulchra
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
 # Load packages
 library(tidyverse)
+library(topGO)
 ```
 
-Sort the genome gff file for Apul. We are using the Amil genome for reference. 
-```{bash}
-cd /data/putnamlab/jillashey/genome/Amil_v2.01/
-wget http://gannet.fish.washington.edu/seashell/snaps/GCF_013753865.1_Amil_v2.1_genomic.gff
-sort -k1,1 -k4,4n GCF_013753865.1_Amil_v2.1_genomic.gff > GCF_013753865.1_Amil_v2.1_genomic_sorted.gff 
-```
+See [bash code](https://github.com/JillAshey/JillAshey_Putnam_Lab_Notebook/blob/master/_posts/2024-08-19-e5-deepdive-ncRNA-closest-features.md) for `bedtools closest` analysis. 
 
-Sort miRNA gff file and run `bed closest`.
-```{bash}
-cd /data/putnamlab/jillashey/e5/ncRNA_gff
-
-sort -k1,1 -k4,4n Apul_Results.gff3 > Apul_Results_sorted.gff3
-
-interactive 
-module load BEDTools/2.30.0-GCC-11.3.0
-bedtools closest -a Apul_Results_sorted.gff3 -b /data/putnamlab/jillashey/genome/Amil_v2.01/GCF_013753865.1_Amil_v2.1_genomic_sorted.gff > Apul_output.bed
-
-wc -l Apul_output.bed 
-61599 Apul_output.bed
-
-head Apul_output.bed 
-NC_058066.1	ShortStack	Unknown_sRNA_locus	152483	152910	140	-	.	ID=Cluster_1;DicerCall=N;MIRNA=N	NC_058066.1	RefSeq	region	1	39361238	.	+	.	ID=NC_058066.1:1..39361238;Dbxref=taxon:45264;Name=1;chromosome=1;collection-date=2017;country=Indonesia;gbkey=Src;genome=chromosome;isolate=JS-1;isolation-source=Whole tissue;mol_type=genomic DNA;tissue-type=Adult tissue
-NC_058066.1	ShortStack	Unknown_sRNA_locus	152483	152910	140	-	.	ID=Cluster_1;DicerCall=N;MIRNA=N	NC_058066.1	Gnomon	gene	92732	195229	.	+	.	ID=gene-LOC114963509;Dbxref=GeneID:114963509;Name=LOC114963509;gbkey=Gene;gene=LOC114963509;gene_biotype=protein_coding
-NC_058066.1	ShortStack	Unknown_sRNA_locus	152483	152910	140	-	.	ID=Cluster_1;DicerCall=N;MIRNA=N	NC_058066.1	Gnomon	mRNA	92732	195229	.	+	.	ID=rna-XM_044317725.1;Parent=gene-LOC114963509;Dbxref=GeneID:114963509,Genbank:XM_044317725.1;Name=XM_044317725.1;Note=The sequence of the model RefSeq transcript was modified relative to this genomic sequence to represent the inferred CDS: deleted 1 base in 1 codon;exception=unclassified transcription discrepancy;experiment=COORDINATES: polyA evidence [ECO:0006239];gbkey=mRNA;gene=LOC114963509;model_evidence=Supporting evidence includes similarity to: 2 mRNAs%2C 3 ESTs%2C 12 Proteins%2C and 100%25 coverage of the annotated genomic feature by RNAseq alignments%2C including 1 sample with support for all annotated introns;product=uncharacterized LOC114963509;transcript_id=XM_044317725.1
-NC_058066.1	ShortStack	Unknown_sRNA_locus	152483	152910	140	-	.	ID=Cluster_1;DicerCall=N;MIRNA=N	NC_058066.1	Gnomon	gene	145277	165521	.	+	.	ID=gene-LOC122957574;Dbxref=GeneID:122957574;Name=LOC122957574;gbkey=Gene;gene=LOC122957574;gene_biotype=protein_coding
-NC_058066.1	ShortStack	Unknown_sRNA_locus	152483	152910	140	-	.	ID=Cluster_1;DicerCall=N;MIRNA=N	NC_058066.1	Gnomon	mRNA	145277	165521	.	+	.	ID=rna-XM_044317744.1;Parent=gene-LOC122957574;Dbxref=GeneID:122957574,Genbank:XM_044317744.1;Name=XM_044317744.1;gbkey=mRNA;gene=LOC122957574;model_evidence=Supporting evidence includes similarity to: 5 Proteins%2C and 99%25 coverage of the annotated genomic feature by RNAseq alignments%2C including 2 samples with support for all annotated introns;product=uncharacterized LOC122957574;transcript_id=XM_044317744.1
-NC_058066.1	ShortStack	Unknown_sRNA_locus	152483	152910	140	-	.	ID=Cluster_1;DicerCall=N;MIRNA=N	NC_058066.1	Gnomon	CDS	152268	152501	.	+	2	ID=cds-XP_044173679.1;Parent=rna-XM_044317744.1;Dbxref=GeneID:122957574,Genbank:XP_044173679.1;Name=XP_044173679.1;gbkey=CDS;gene=LOC122957574;product=uncharacterized protein LOC122957574;protein_id=XP_044173679.1
-NC_058066.1	ShortStack	Unknown_sRNA_locus	152483	152910	140	-	.	ID=Cluster_1;DicerCall=N;MIRNA=N	NC_058066.1	Gnomon	exon	152268	152501	.	+	.	ID=exon-XM_044317744.1-4;Parent=rna-XM_044317744.1;Dbxref=GeneID:122957574,Genbank:XM_044317744.1;gbkey=mRNA;gene=LOC122957574;product=uncharacterized LOC122957574;transcript_id=XM_044317744.1
-NC_058066.1	ShortStack	Unknown_sRNA_locus	161064	161674	549	.	.	ID=Cluster_2;DicerCall=N;MIRNA=N	NC_058066.1	RefSeq	region	1	39361238	.	+	.	ID=NC_058066.1:1..39361238;Dbxref=taxon:45264;Name=1;chromosome=1;collection-date=2017;country=Indonesia;gbkey=Src;genome=chromosome;isolate=JS-1;isolation-source=Whole tissue;mol_type=genomic DNA;tissue-type=Adult tissue
-NC_058066.1	ShortStack	Unknown_sRNA_locus	161064	161674	549	.	.	ID=Cluster_2;DicerCall=N;MIRNA=N	NC_058066.1	Gnomon	gene	92732	195229	.	+	.	ID=gene-LOC114963509;Dbxref=GeneID:114963509;Name=LOC114963509;gbkey=Gene;gene=LOC114963509;gene_biotype=protein_coding
-NC_058066.1	ShortStack	Unknown_sRNA_locus	161064	161674	549	.	.	ID=Cluster_2;DicerCall=N;MIRNA=N	NC_058066.1	Gnomon	mRNA	92732	195229	.	+	.	ID=rna-XM_044317725.1;Parent=gene-LOC114963509;Dbxref=GeneID:114963509,Genbank:XM_044317725.1;Name=XM_044317725.1;Note=The sequence of the model RefSeq transcript was modified relative to this genomic sequence to represent the inferred CDS: deleted 1 base in 1 codon;exception=unclassified transcription discrepancy;experiment=COORDINATES: polyA evidence [ECO:0006239];gbkey=mRNA;gene=LOC114963509;model_evidence=Supporting evidence includes similarity to: 2 mRNAs%2C 3 ESTs%2C 12 Proteins%2C and 100%25 coverage of the annotated genomic feature by RNAseq alignments%2C including 1 sample with support for all annotated introns;product=uncharacterized LOC114963509;transcript_id=XM_044317725.1
-```
-
-Remove the unknown siRNA loci
-```{bash}
-awk 'BEGIN {OFS="\t"} $3 != "Unknown_sRNA_locus"' Apul_output.bed > filtered_Apul_output.bed
-
-wc -l filtered_Apul_output.bed
-755 filtered_Apul_output.bed
-
-head filtered_Apul_output.bed 
-NC_058066.1	ShortStack	siRNA24_locus	5224792	5225215	1264	+	.	ID=Cluster_184;DicerCall=24;MIRNA=N	NC_058066.1	RefSeq	region	1	39361238	.	+	.	ID=NC_058066.1:1..39361238;Dbxref=taxon:45264;Name=1;chromosome=1;collection-date=2017;country=Indonesia;gbkey=Src;genome=chromosome;isolate=JS-1;isolation-source=Whole tissue;mol_type=genomic DNA;tissue-type=Adult tissue
-NC_058066.1	ShortStack	siRNA24_locus	5224792	5225215	1264	+	.	ID=Cluster_184;DicerCall=24;MIRNA=N	NC_058066.1	Gnomon	gene	5153290	5231353	.	-	.	ID=gene-LOC114950433;Dbxref=GeneID:114950433;Name=LOC114950433;gbkey=Gene;gene=LOC114950433;gene_biotype=protein_coding
-NC_058066.1	ShortStack	siRNA24_locus	5224792	5225215	1264	+	.	ID=Cluster_184;DicerCall=24;MIRNA=N	NC_058066.1	Gnomon	mRNA	5153290	5231353	.	-	.	ID=rna-XM_044310280.1;Parent=gene-LOC114950433;Dbxref=GeneID:114950433,Genbank:XM_044310280.1;Name=XM_044310280.1;experiment=COORDINATES: polyA evidence [ECO:0006239];gbkey=mRNA;gene=LOC114950433;model_evidence=Supporting evidence includes similarity to: 15 mRNAs%2C 31 Proteins%2C and 99%25 coverage of the annotated genomic feature by RNAseq alignments;product=uncharacterized LOC114950433;transcript_id=XM_044310280.1
-NC_058066.1	ShortStack	siRNA21_locus	7563377	7563797	118	+	.	ID=Cluster_225;DicerCall=21;MIRNA=N	NC_058066.1	RefSeq	region	1	39361238	.	+	.	ID=NC_058066.1:1..39361238;Dbxref=taxon:45264;Name=1;chromosome=1;collection-date=2017;country=Indonesia;gbkey=Src;genome=chromosome;isolate=JS-1;isolation-source=Whole tissue;mol_type=genomic DNA;tissue-type=Adult tissue
-NC_058066.1	ShortStack	siRNA21_locus	7563377	7563797	118	+	.	ID=Cluster_225;DicerCall=21;MIRNA=N	NC_058066.1	Gnomon	gene	7523354	7569602	.	-	.	ID=gene-LOC114970982;Dbxref=GeneID:114970982;Name=LOC114970982;gbkey=Gene;gene=LOC114970982;gene_biotype=protein_coding
-NC_058066.1	ShortStack	siRNA21_locus	7563377	7563797	118	+	.	ID=Cluster_225;DicerCall=21;MIRNA=N	NC_058066.1	Gnomon	mRNA	7523354	7569602	.	-	.	ID=rna-XM_044320669.1;Parent=gene-LOC114970982;Dbxref=GeneID:114970982,Genbank:XM_044320669.1;Name=XM_044320669.1;Note=The sequence of the model RefSeq transcript was modified relative to this genomic sequence to represent the inferred CDS: inserted 1 base in 1 codon;exception=unclassified transcription discrepancy;gbkey=mRNA;gene=LOC114970982;model_evidence=Supporting evidence includes similarity to: 6 Proteins%2C and 98%25 coverage of the annotated genomic feature by RNAseq alignments%2C including 1 sample with support for all annotated introns;product=uncharacterized LOC114970982;transcript_id=XM_044320669.1
-NC_058066.1	ShortStack	siRNA22_locus	8905068	8905484	102	-	.	ID=Cluster_251;DicerCall=22;MIRNA=N	NC_058066.1	RefSeq	region	1	39361238	.	+	.	ID=NC_058066.1:1..39361238;Dbxref=taxon:45264;Name=1;chromosome=1;collection-date=2017;country=Indonesia;gbkey=Src;genome=chromosome;isolate=JS-1;isolation-source=Whole tissue;mol_type=genomic DNA;tissue-type=Adult tissue
-NC_058066.1	ShortStack	MIRNA_hairpin	12757125	12757218	8293	-	.	ID=Cluster_316;DicerCall=23;MIRNA=Y	NC_058066.1	RefSeq	region	1	39361238	.	+	.	ID=NC_058066.1:1..39361238;Dbxref=taxon:45264;Name=1;chromosome=1;collection-date=2017;country=Indonesia;gbkey=Src;genome=chromosome;isolate=JS-1;isolation-source=Whole tissue;mol_type=genomic DNA;tissue-type=Adult tissue
-NC_058066.1	ShortStack	MIRNA_hairpin	12757125	12757218	8293	-	.	ID=Cluster_316;DicerCall=23;MIRNA=Y	NC_058066.1	Gnomon	gene	12755159	12764546	.	-	.	ID=gene-LOC114961148;Dbxref=GeneID:114961148;Name=LOC114961148;gbkey=Gene;gene=LOC114961148;gene_biotype=protein_coding
-NC_058066.1	ShortStack	MIRNA_hairpin	12757125	12757218	8293	-	.	ID=Cluster_316;DicerCall=23;MIRNA=Y	NC_058066.1	Gnomon	mRNA	12755159	12764546	.	-	.	ID=rna-XM_029339755.2;Parent=gene-LOC114961148;Dbxref=GeneID:114961148,Genbank:XM_029339755.2;Name=XM_029339755.2;experiment=COORDINATES: polyA evidence [ECO:0006239];gbkey=mRNA;gene=LOC114961148;model_evidence=Supporting evidence includes similarity to: 7 mRNAs%2C 8 Proteins%2C and 100%25 coverage of the annotated genomic feature by RNAseq alignments%2C including 87 samples with support for all annotated introns;product=zinc finger MYND domain-containing protein 19-like;transcript_id=XM_029339755.2
-```
-
-Moving into R to visualize and calculate more stats.
-
-Load Apul bed file into R. 
+Before analysis, make gene2go file from the annotation information
 ```{r}
-bed <- read.delim2("../output/19-bedtools-closest/miRNA_filtered_Apul_output_mRNA_only.bed", header = F)
-head(bed)
+gene2trans <- read.table("../../data/APUL_gene2transcript.tab", header = F) %>%
+  mutate(query = gsub("rna-", "", V2)) %>%
+  select(query, V1)
+colnames(gene2trans) <- c("query", "gene_name")
+
+GO_APUL <- GO_APUL %>%
+  left_join(.,gene2trans) %>%
+  select(gene_name, GeneOntologyIDs)
+write_tsv(GO_APUL, file = "../../data/Apul_gene2go.tab")
 ```
 
-Keep specific columns and rename them. I'm going to label columns that relate to miRNAs with an "m" and columns that relate to genomic features with a "gf".
+## piRNA 
+
+Load Apul piRNA closest file into R. This file represents the genomic features that are closest/are overlapping with piRNA clusters. 
 ```{r}
-bed_filt <- bed %>%
-  dplyr::select(V1, V2, V3, V4, V5, V7, V9, V10, V11, V12, V13, V14, V16, V18) %>%
-  dplyr::rename("m_chrom" = "V1", "m_source" = "V2", "m_type" = "V3", "m_start" = "V4", "m_end" = "V5", "m_strand" = "V7", "m_attr" = "V9", "gf_chrom" = "V10", "gf_source" = "V11", "gf_type" = "V12", "gf_start" = "V13", "gf_end" = "V14", "gf_strand" = "V16", "gf_attr" = "V18")
-
-unique(bed_filt$m_type)
-unique(bed_filt$gf_type)
+pi_bed <- read.delim("../output/19-bedtools-closest/Apul_piRNA_output_mRNA_only.bed", header = F)
+head(pi_bed)
 ```
-Only has mRNAs, do not have to filter by genomic feature. Remove the siRNA m_types and make column that has cluster IDs for miRNAs. 
+
+Keep specific columns and rename them 
 ```{r}
-bed_filt <- bed_filt %>%
-  dplyr::filter(!grepl("siRNA", m_type)) %>%
-  mutate(m_ID = sub(";.*", "", m_attr))
-
-# Remove .mature and .star from the ID column 
-bed_filt$m_ID <- gsub(".mature", "", bed_filt$m_ID)
-bed_filt$m_ID <- gsub(".star", "", bed_filt$m_ID)
-
-length(unique(bed_filt$m_ID)) # check how many miRNAs are there - should be 38 for Apul
+pi_bed_filt <- pi_bed %>%
+  dplyr::select(V1, V2, V3, V4, V6, V7, V8, V12) %>%
+  dplyr::rename("pi_chrom" = "V1", "pi_start" = "V2", "pi_end" = "V3", "gf_chrom" = "V4", "gf_type" = "V6", "gf_start" = "V7", "gf_end" = "V8", "gf_attr" = "V12")
 ```
 
-The remaining types of genomic features for miRNAs are miRNA hairpins, mature miRNAs and miRNA stars. 
-
-Calculate the overlap and distance based on the m_start, m_end, gf_start, and gf_end columns. Overlap occurs if the start of one feature is within the bounds of another. If there is no overlaps, the distance can be calculated as the gap between the end of one feature and the start of another. 
+Pull out gene name information from the `gf_attr` column
 ```{r}
-bed_filt$overlap <- with(bed_filt, pmin(m_end, gf_end) - pmax(m_start, gf_start))
-
-sum(bed_filt$overlap < 0)
-sum(bed_filt$overlap > 0)
+pi_bed_filt <- pi_bed_filt %>%
+  mutate(gene_name = str_extract(gf_attr, "Parent=gene-LOC[0-9]+") %>% 
+                      str_replace("Parent=gene-", ""))
 ```
 
-60 miRNA features do not overlap with a transcript. 165 features do overlap with a transcript. Calculate average/percentages of distance and overlap for miRNA hairpins, mature miRNAs and miRNA stars.
+Calculate the overlap and distance based on the pi_start, pi_end, gf_start, and gf_end columns. Overlap occurs if the start of one feature is within the bounds of another. If there is no overlaps, the distance can be calculated as the gap between the end of one feature and the start of another. 
+```{r}
+pi_bed_filt$overlap <- with(pi_bed_filt, pmin(pi_end, gf_end) - pmax(pi_start, gf_start))
 
+sum(pi_bed_filt$overlap < 0)
+sum(pi_bed_filt$overlap > 0)
+```
+
+Calculate average/percentages of distance and overlap. 
 ```{r}
 # Perform calculations grouped by m_type
-summary_stats <- bed_filt %>%
-  group_by(m_type) %>%
+summary_stats <- pi_bed_filt %>%
+  #group_by(m_type) %>%
   summarize(
     avg_overlap = mean(overlap[overlap > 0], na.rm = TRUE),
     avg_distance = mean(overlap[overlap < 0], na.rm = TRUE),
@@ -127,39 +79,237 @@ summary_stats <- bed_filt %>%
 print(summary_stats)
 ```
 
-Filter for mature miRNAs
-```{r}
-bed_filt_mature <- bed_filt %>%
-    dplyr::filter(m_type == "mature_miRNA")
+Results:
+avg_overlap avg_distance percent_overlap percent_distance_lt_1kb percent_distance
+2557.657    -11468.34        71.32867                4.195804         28.67133
 
-bed_filt_mature$m_ID <- gsub("ID=", "", bed_filt_mature$m_ID)
-length(unique(bed_filt_mature$m_ID))
+Read in gene2go information 
+```{r}
+APUL_gene2go<-read.delim("../../data/Apul_gene2go.tab", sep="\t")
 ```
 
-Read in the mature named miRNAs 
+Make list of genes for input to TopGO
 ```{r}
-mature <- read.csv("../../DEF-cross-species/output/10-shortRNA-ShortStack-comparison/Apul_results_mature_named.csv", header = T)
-head(mature)
+apul_clust_genes <- as.character(unique(pi_bed_filt$gene_name))
+apul_all_genes <- as.character(APUL_gene2go$gene_name)
+Apul_GeneList <- factor(as.integer(apul_all_genes %in% apul_clust_genes))
+names(Apul_GeneList) <- apul_all_genes
 ```
 
-Merge `bed_filt_mature` and `mature` by the cluster column 
+The following code will perform GO enrichment using the weighted Fisher's exact test to assess whether specific GO terms are overrepresented in the genes closest to the piRNA clusters. 
+
+Read in gene-to-go-mappings
 ```{r}
-bed_filt_mature_all <- bed_filt_mature %>%
-  full_join(mature, by = c("m_ID" = "Name"))
-head(bed_filt_mature_all)
+APUL_gene2go_topgo<-readMappings("../../data/Apul_gene2go.tab", IDsep=";", sep="\t")
 ```
 
-Save output
+Set function to select genes of interest (ie those that have pvalue < 0.05)
 ```{r}
-write.csv(file = "../output/19-bedtools-closest/Apul_mature_miRNAs_bedtools.csv", bed_filt_mature_all)
+topDiffGenes <- function(allScore) {
+return(allScore < 0.05)}
 ```
 
-There are miRNAs matching up to multiple mRNAs but they don't actually seem to be unique mRNAs, as they have the same gf_start and gf_end but different gf_attr (ID= specifically). They appear to be from the same gene but different ID numbers. They may be variants...not sure. 
+### Biological Processes
 
-Calculate average/percentages of distance and overlap for mature miRNAs.
+Create `topGOdata` object, which is required for topGO analysis
+```{r}
+GO_APUL_BP_pi <-new("topGOdata", ontology="BP", gene2GO=APUL_gene2go_topgo, allGenes=Apul_GeneList, annot = annFUN.gene2GO, geneSel=topDiffGenes)
+```
+
+Run GO enrichment test 
+```{r}
+GO_APUL_BP_FE_pi <- runTest(GO_APUL_BP_pi, algorithm="weight01", statistic="fisher")
+```
+
+Generate results table 
+```{r}
+GO_APUL_BP_En_pi <- GenTable(GO_APUL_BP_pi, Fisher = GO_APUL_BP_FE_pi, orderBy = "Fisher",  topNodes = 100, numChar = 51)
+```
+Only taking the top 100 GO terms 
+
+Filter by significant results
+```{r}
+GO_APUL_BP_En_pi$Fisher<-as.numeric(GO_APUL_BP_En_pi$Fisher)
+GO_APUL_BP_En_sig_pi<-GO_APUL_BP_En_pi[GO_APUL_BP_En_pi$Fisher<0.05,]
+```
+
+Merge `GO_APUL_BP_En_sig_pi` with GO and gene info. 
+```{r}
+# Separate GO terms 
+APUL_gene2go <- APUL_gene2go %>%
+  separate_rows(GeneOntologyIDs, sep = ";")
+
+# Ensure GO terms in both datasets are formatted similarly (trim whitespaces)
+APUL_gene2go$GeneOntologyIDs <- trimws(APUL_gene2go$GeneOntologyIDs)
+GO_APUL_BP_En_sig_pi$GO.ID <- trimws(GO_APUL_BP_En_sig_pi$GO.ID)
+
+# Join the datasets based on GO term
+GO_APUL_BP_En_sig_gene_pi <- APUL_gene2go %>%
+  left_join(GO_APUL_BP_En_sig_pi, by = c("GeneOntologyIDs" = "GO.ID")) %>%
+  na.omit()
+
+# Add ontology column 
+GO_APUL_BP_En_sig_gene_pi$ontology <- "Biological Processes"
+```
+
+### Cellular Components
+
+Create `topGOdata` object, which is required for topGO analysis
+```{r}
+GO_APUL_CC_pi <-new("topGOdata", ontology="CC", gene2GO=APUL_gene2go_topgo, allGenes=Apul_GeneList, annot = annFUN.gene2GO, geneSel=topDiffGenes)
+```
+
+Run GO enrichment test 
+```{r}
+GO_APUL_CC_FE_pi <- runTest(GO_APUL_CC_pi, algorithm="weight01", statistic="fisher")
+```
+
+Generate results table 
+```{r}
+GO_APUL_CC_En_pi <- GenTable(GO_APUL_CC_pi, Fisher = GO_APUL_CC_FE_pi, orderBy = "Fisher",  topNodes = 100, numChar = 51)
+```
+Only taking the top 100 GO terms 
+
+Filter by significant results
+```{r}
+GO_APUL_CC_En_pi$Fisher<-as.numeric(GO_APUL_CC_En_pi$Fisher)
+GO_APUL_CC_En_sig_pi<-GO_APUL_CC_En_pi[GO_APUL_CC_En_pi$Fisher<0.05,]
+```
+
+Merge `GO_APUL_CC_En_sig_pi` with GO and gene info. 
+```{r}
+# Separate GO terms 
+APUL_gene2go <- APUL_gene2go %>%
+  separate_rows(GeneOntologyIDs, sep = ";")
+
+# Ensure GO terms in both datasets are formatted similarly (trim whitespaces)
+APUL_gene2go$GeneOntologyIDs <- trimws(APUL_gene2go$GeneOntologyIDs)
+GO_APUL_CC_En_sig_pi$GO.ID <- trimws(GO_APUL_CC_En_sig_pi$GO.ID)
+
+# Join the datasets based on GO term
+GO_APUL_CC_En_sig_gene_pi <- APUL_gene2go %>%
+  left_join(GO_APUL_CC_En_sig_pi, by = c("GeneOntologyIDs" = "GO.ID")) %>%
+  na.omit()
+
+# Add ontology column 
+GO_APUL_CC_En_sig_gene_pi$ontology <- "Cellular Components"
+```
+
+### Molecular Functions
+
+Create `topGOdata` object, which is required for topGO analysis
+```{r}
+GO_APUL_MF_pi <-new("topGOdata", ontology="MF", gene2GO=APUL_gene2go_topgo, allGenes=Apul_GeneList, annot = annFUN.gene2GO, geneSel=topDiffGenes)
+```
+
+Run GO enrichment test 
+```{r}
+GO_APUL_MF_FE_pi <- runTest(GO_APUL_MF_pi, algorithm="weight01", statistic="fisher")
+```
+
+Generate results table 
+```{r}
+GO_APUL_MF_En_pi <- GenTable(GO_APUL_MF_pi, Fisher = GO_APUL_MF_FE_pi, orderBy = "Fisher",  topNodes = 100, numChar = 51)
+```
+Only taking the top 100 GO terms 
+
+Filter by significant results
+```{r}
+GO_APUL_MF_En_pi$Fisher<-as.numeric(GO_APUL_MF_En_pi$Fisher)
+GO_APUL_MF_En_sig_pi<-GO_APUL_MF_En_pi[GO_APUL_MF_En_pi$Fisher<0.05,]
+```
+
+Merge `GO_APUL_MF_En_sig_pi` with GO and gene info. 
+```{r}
+# Separate GO terms 
+APUL_gene2go <- APUL_gene2go %>%
+  separate_rows(GeneOntologyIDs, sep = ";")
+
+# Ensure GO terms in both datasets are formatted similarly (trim whitespaces)
+APUL_gene2go$GeneOntologyIDs <- trimws(APUL_gene2go$GeneOntologyIDs)
+GO_APUL_MF_En_sig_pi$GO.ID <- trimws(GO_APUL_MF_En_sig_pi$GO.ID)
+
+# Join the datasets based on GO term
+GO_APUL_MF_En_sig_gene_pi <- APUL_gene2go %>%
+  left_join(GO_APUL_MF_En_sig_pi, by = c("GeneOntologyIDs" = "GO.ID")) %>%
+  na.omit()
+
+# Add ontology column 
+GO_APUL_MF_En_sig_gene_pi$ontology <- "Molecular Functions"
+```
+
+### Join ontologies for piRNAs
+
+Bind `GO_APUL_BP_En_sig_gene_pi`, `GO_APUL_CC_En_sig_gene_pi`, and `GO_APUL_MF_En_sig_gene_pi` to make a df that has significantly enriched GO terms for all ontologies 
+```{r}
+GO_APUL_En_sig_gene_pi <- rbind(GO_APUL_BP_En_sig_gene_pi, GO_APUL_CC_En_sig_gene_pi, GO_APUL_MF_En_sig_gene_pi)
+```
+
+Merge `pi_bed_filt` with `GO_PEVE_En_sig_gene` and calculate proportion of significant genes
+```{r}
+merged_pirna <- GO_APUL_En_sig_gene_pi %>%
+  left_join(pi_bed_filt, by = "gene_name") %>%
+  na.omit() %>%
+  mutate(prop.sig.genes = Significant/Annotated)
+
+# Write to csv 
+write.csv(merged_pirna, "../output/19-bedtools-closest/Apul_GO_en_sig_gene_piRNA.csv")
+```
+
+Plot 
+```{r}
+GO_plot_pi<-ggplot(merged_pirna, aes(x = Term, y = -log(Fisher), size = prop.sig.genes, fill = -log(Fisher))) +
+  #expand_limits(y = 1.5) +
+  #ylim(1, 7.25) +
+  # Add horizontal lines with a single aesthetic value
+  #geom_hline(yintercept = -log10(0.01), linetype = "longdash", colour = "black", linewidth = .6) +
+  #geom_hline(yintercept = -log10(0.001), linetype = "solid", colour = "black", linewidth = .6) +
+  geom_point(shape = 21) + 
+  scale_size(range = c(2, 12)) + 
+  scale_fill_continuous(low = "#1AD3D1FF", high = "#4686FBFF") +
+  xlab('') + 
+  ylab('Enrichment score') +
+  #labs(caption = 'Cut-off lines at p=0.01 and p=0.001') +
+  theme_bw() +
+  facet_grid(vars(ontology), scales = "free", space = "free_y") +
+  coord_flip(); GO_plot_pi
+```
+
+## miRNA 
+
+Load Apul piRNA closest file into R. This file represents the genomic features that are closest/are overlapping with miRNA clusters. 
+```{r}
+mi_bed <- read.delim("../output/19-bedtools-closest/miRNA_filtered_Apul_output_mRNA_only.bed", header = F)
+head(mi_bed)
+```
+
+Keep specific columns and rename them. I'm going to label columns that relate to miRNAs with an "m" and columns that relate to genomic features with a "gf".
+```{r}
+mi_bed_filt <- mi_bed %>%
+  dplyr::select(V1, V2, V3, V4, V5, V7, V9, V10, V11, V12, V13, V14, V16, V18) %>%
+  dplyr::rename("m_chrom" = "V1", "m_source" = "V2", "m_type" = "V3", "m_start" = "V4", "m_end" = "V5", "m_strand" = "V7", "m_attr" = "V9", "gf_chrom" = "V10", "gf_source" = "V11", "gf_type" = "V12", "gf_start" = "V13", "gf_end" = "V14", "gf_strand" = "V16", "gf_attr" = "V18")
+```
+
+Pull out gene name information from the `gf_attr` column
+```{r}
+mi_bed_filt <- mi_bed_filt %>%
+  mutate(gene_name = str_extract(gf_attr, "Parent=gene-LOC[0-9]+") %>% 
+                      str_replace("Parent=gene-", "")) %>%
+  dplyr::filter(m_type == "mature_miRNA")
+```
+
+Calculate the overlap and distance based on the m_start, m_end, gf_start, and gf_end columns. Overlap occurs if the start of one feature is within the bounds of another. If there is no overlaps, the distance can be calculated as the gap between the end of one feature and the start of another. 
+```{r}
+mi_bed_filt$overlap <- with(mi_bed_filt, pmin(m_end, gf_end) - pmax(m_start, gf_start))
+
+sum(mi_bed_filt$overlap < 0)
+sum(mi_bed_filt$overlap > 0)
+```
+
+Calculate average/percentages of distance and overlap. 
 ```{r}
 # Perform calculations grouped by m_type
-summary_stats_mature <- bed_filt_mature_all %>%
+summary_stats <- mi_bed_filt %>%
   #group_by(m_type) %>%
   summarize(
     avg_overlap = mean(overlap[overlap > 0], na.rm = TRUE),
@@ -170,52 +320,201 @@ summary_stats_mature <- bed_filt_mature_all %>%
   )
 
 # Display the summary statistics
-print(summary_stats_mature)
+print(summary_stats)
 ```
 
-Read in GO annotation information. For Ptuh and Peve, I used the protein files but Steven also made an RNA annotation file for Apul. I initially tried to use the Apul protein file but the query IDs did not match. 
+Results: 
+avg_overlap avg_distance percent_overlap percent_distance_lt_1kb percent_distance
+    21.05455     -3099.05        73.33333                       4         26.66667
+
+Read in gene2go information 
 ```{r}
-annot <- read.delim("../output/20-Apul-gene-annotation/Apul-rna-GO.tsv")
+APUL_gene2go<-read.delim("../../data/Apul_gene2go.tab", sep="\t")
 ```
 
-Pull out gene name information from the `gf_attr` column in the `bed_filt_mature_all` df
+Make list of genes for input to TopGO
 ```{r}
-bed_filt_mature_all <- bed_filt_mature_all %>%
-   mutate(gf_ID = sub(";.*", "", gf_attr))
-
-bed_filt_mature_all$gf_ID <- gsub("ID=rna-", "", bed_filt_mature_all$gf_ID) 
+apul_clust_genes <- as.character(unique(mi_bed_filt$gene_name))
+apul_all_genes <- as.character(APUL_gene2go$gene_name)
+Apul_GeneList <- factor(as.integer(apul_all_genes %in% apul_clust_genes))
+names(Apul_GeneList) <- apul_all_genes
 ```
 
-Merge `annot` and `bed_filt_mature_all` dfs. 
+The following code will perform GO enrichment using the weighted Fisher's exact test to assess whether specific GO terms are overrepresented in the genes closest to the piRNA clusters. 
+
+Read in gene-to-go-mappings
 ```{r}
-bed_filt_mature_annot <- bed_filt_mature_all %>%
-  left_join(annot, by = c("gf_ID" = "query"))
-
-# Make sure there are still 38 miRNAs
-length(unique(bed_filt_mature_annot$m_ID))
+APUL_gene2go_topgo<-readMappings("../../data/Apul_gene2go.tab", IDsep=";", sep="\t")
 ```
 
-Save output
+Set function to select genes of interest (ie those that have pvalue < 0.05)
 ```{r}
-write.csv(file = "../output/19-bedtools-closest/Apul_mature_miRNAs_bedtools_annot.csv", bed_filt_mature_annot)
+topDiffGenes <- function(allScore) {
+return(allScore < 0.05)}
 ```
 
-Look at the functions of the genes that overlap with miRNAs. 
+### Biological Processes
+
+Create `topGOdata` object, which is required for topGO analysis
 ```{r}
-overlap <- bed_filt_mature_annot %>%
-  dplyr::filter(overlap > 0)
-
-unique(overlap$BiologicalProcess)
-unique(overlap$ProteinNames)
+GO_APUL_BP_mi <-new("topGOdata", ontology="BP", gene2GO=APUL_gene2go_topgo, allGenes=Apul_GeneList, annot = annFUN.gene2GO, geneSel=topDiffGenes)
 ```
 
-Look at functions of genes that do not overlap with miRNAs 
+Run GO enrichment test 
 ```{r}
-no_overlap <- bed_filt_mature_annot %>%
-  dplyr::filter(overlap < 0)
-
-unique(no_overlap$BiologicalProcess)
-unique(no_overlap$ProteinNames)
+GO_APUL_BP_FE_mi <- runTest(GO_APUL_BP_mi, algorithm="weight01", statistic="fisher")
 ```
 
+Generate results table 
+```{r}
+GO_APUL_BP_En_mi <- GenTable(GO_APUL_BP_mi, Fisher = GO_APUL_BP_FE_mi, orderBy = "Fisher",  topNodes = 100, numChar = 51)
+```
+Only taking the top 100 GO terms 
 
+Filter by significant results
+```{r}
+GO_APUL_BP_En_mi$Fisher<-as.numeric(GO_APUL_BP_En_mi$Fisher)
+GO_APUL_BP_En_sig_mi<-GO_APUL_BP_En_mi[GO_APUL_BP_En_mi$Fisher<0.05,]
+```
+
+Merge `GO_APUL_BP_En_sig_mi` with GO and gene info. 
+```{r}
+# Separate GO terms 
+APUL_gene2go <- APUL_gene2go %>%
+  separate_rows(GeneOntologyIDs, sep = ";")
+
+# Ensure GO terms in both datasets are formatted similarly (trim whitespaces)
+APUL_gene2go$GeneOntologyIDs <- trimws(APUL_gene2go$GeneOntologyIDs)
+GO_APUL_BP_En_sig_mi$GO.ID <- trimws(GO_APUL_BP_En_sig_mi$GO.ID)
+
+# Join the datasets based on GO term
+GO_APUL_BP_En_sig_gene_mi <- APUL_gene2go %>%
+  left_join(GO_APUL_BP_En_sig_mi, by = c("GeneOntologyIDs" = "GO.ID")) %>%
+  na.omit()
+
+# Add ontology column 
+GO_APUL_BP_En_sig_gene_mi$ontology <- "Biological Processes"
+```
+
+### Cellular Components
+
+Create `topGOdata` object, which is required for topGO analysis
+```{r}
+GO_APUL_CC_mi <-new("topGOdata", ontology="CC", gene2GO=APUL_gene2go_topgo, allGenes=Apul_GeneList, annot = annFUN.gene2GO, geneSel=topDiffGenes)
+```
+
+Run GO enrichment test 
+```{r}
+GO_APUL_CC_FE_mi <- runTest(GO_APUL_CC_mi, algorithm="weight01", statistic="fisher")
+```
+
+Generate results table 
+```{r}
+GO_APUL_CC_En_mi <- GenTable(GO_APUL_CC_mi, Fisher = GO_APUL_CC_FE_mi, orderBy = "Fisher",  topNodes = 100, numChar = 51)
+```
+Only taking the top 100 GO terms 
+
+Filter by significant results
+```{r}
+GO_APUL_CC_En_mi$Fisher<-as.numeric(GO_APUL_CC_En_mi$Fisher)
+GO_APUL_CC_En_sig_mi<-GO_APUL_CC_En_mi[GO_APUL_CC_En_mi$Fisher<0.05,]
+```
+
+Merge `GO_APUL_CC_En_sig_mi` with GO and gene info. 
+```{r}
+# Separate GO terms 
+APUL_gene2go <- APUL_gene2go %>%
+  separate_rows(GeneOntologyIDs, sep = ";")
+
+# Ensure GO terms in both datasets are formatted similarly (trim whitespaces)
+APUL_gene2go$GeneOntologyIDs <- trimws(APUL_gene2go$GeneOntologyIDs)
+GO_APUL_CC_En_sig_mi$GO.ID <- trimws(GO_APUL_CC_En_sig_mi$GO.ID)
+
+# Join the datasets based on GO term
+GO_APUL_CC_En_sig_gene_mi <- APUL_gene2go %>%
+  left_join(GO_APUL_CC_En_sig_mi, by = c("GeneOntologyIDs" = "GO.ID")) %>%
+  na.omit()
+
+# Add ontology column 
+GO_APUL_CC_En_sig_gene_mi$ontology <- "Cellular Components"
+```
+
+### Molecular Functions
+
+Create `topGOdata` object, which is required for topGO analysis
+```{r}
+GO_APUL_MF_mi <-new("topGOdata", ontology="MF", gene2GO=APUL_gene2go_topgo, allGenes=Apul_GeneList, annot = annFUN.gene2GO, geneSel=topDiffGenes)
+```
+
+Run GO enrichment test 
+```{r}
+GO_APUL_MF_FE_mi <- runTest(GO_APUL_MF_mi, algorithm="weight01", statistic="fisher")
+```
+
+Generate results table 
+```{r}
+GO_APUL_MF_En_mi <- GenTable(GO_APUL_MF_mi, Fisher = GO_APUL_MF_FE_mi, orderBy = "Fisher",  topNodes = 100, numChar = 51)
+```
+Only taking the top 100 GO terms 
+
+Filter by significant results
+```{r}
+GO_APUL_MF_En_mi$Fisher<-as.numeric(GO_APUL_MF_En_mi$Fisher)
+GO_APUL_MF_En_sig_mi<-GO_APUL_MF_En_mi[GO_APUL_MF_En_mi$Fisher<0.05,]
+```
+
+Merge `GO_APUL_MF_En_sig_mi` with GO and gene info. 
+```{r}
+# Separate GO terms 
+APUL_gene2go <- APUL_gene2go %>%
+  separate_rows(GeneOntologyIDs, sep = ";")
+
+# Ensure GO terms in both datasets are formatted similarly (trim whitespaces)
+APUL_gene2go$GeneOntologyIDs <- trimws(APUL_gene2go$GeneOntologyIDs)
+GO_APUL_MF_En_sig_mi$GO.ID <- trimws(GO_APUL_MF_En_sig_mi$GO.ID)
+
+# Join the datasets based on GO term
+GO_APUL_MF_En_sig_gene_mi <- APUL_gene2go %>%
+  left_join(GO_APUL_MF_En_sig_mi, by = c("GeneOntologyIDs" = "GO.ID")) %>%
+  na.omit()
+
+# Add ontology column 
+GO_APUL_MF_En_sig_gene_mi$ontology <- "Molecular Functions"
+```
+
+### Join ontologies for miRNAs
+
+Bind `GO_APUL_BP_En_sig_gene_mi`, `GO_APUL_CC_En_sig_gene_mi`, and `GO_APUL_MF_En_sig_gene_mi` to make a df that has significantly enriched GO terms for all ontologies 
+```{r}
+GO_APUL_En_sig_gene_mi <- rbind(GO_APUL_BP_En_sig_gene_mi, GO_APUL_CC_En_sig_gene_mi, GO_APUL_MF_En_sig_gene_mi)
+```
+
+Merge `mi_bed_filt` with `GO_APUL_En_sig_gene_mi` and calculate proportion of significant genes
+```{r}
+merged_mirna <- GO_APUL_En_sig_gene_mi %>%
+  left_join(mi_bed_filt, by = "gene_name") %>%
+  na.omit() %>%
+  mutate(prop.sig.genes = Significant/Annotated)
+
+# Write to csv 
+write.csv(merged_mirna, "../output/19-bedtools-closest/Apul_GO_en_sig_gene_miRNA.csv")
+```
+
+Plot 
+```{r}
+GO_plot_pi<-ggplot(merged_mirna, aes(x = Term, y = -log(Fisher), size = prop.sig.genes, fill = -log(Fisher))) +
+  #expand_limits(y = 1.5) +
+  #ylim(1, 7.25) +
+  # Add horizontal lines with a single aesthetic value
+  #geom_hline(yintercept = -log10(0.01), linetype = "longdash", colour = "black", linewidth = .6) +
+  #geom_hline(yintercept = -log10(0.001), linetype = "solid", colour = "black", linewidth = .6) +
+  geom_point(shape = 21) + 
+  scale_size(range = c(2, 12)) + 
+  scale_fill_continuous(low = "#1AD3D1FF", high = "#4686FBFF") +
+  xlab('') + 
+  ylab('Enrichment score') +
+  #labs(caption = 'Cut-off lines at p=0.01 and p=0.001') +
+  theme_bw() +
+  facet_grid(vars(ontology), scales = "free", space = "free_y") +
+  coord_flip(); GO_plot_pi
+```
