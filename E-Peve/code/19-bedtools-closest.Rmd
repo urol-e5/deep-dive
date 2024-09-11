@@ -110,27 +110,27 @@ return(allScore < 0.05)}
 
 Create `topGOdata` object, which is required for topGO analysis
 ```{r}
-GO_PEVE_BP <-new("topGOdata", ontology="BP", gene2GO=PEVE_gene2go_topgo, allGenes=Peve_GeneList, annot = annFUN.gene2GO, geneSel=topDiffGenes)
+GO_PEVE_BP_pi <-new("topGOdata", ontology="BP", gene2GO=PEVE_gene2go_topgo, allGenes=Peve_GeneList, annot = annFUN.gene2GO, geneSel=topDiffGenes)
 ```
 
 Run GO enrichment test 
 ```{r}
-GO_PEVE_BP_FE <- runTest(GO_PEVE_BP, algorithm="weight01", statistic="fisher")
+GO_PEVE_BP_FE_pi <- runTest(GO_PEVE_BP_pi, algorithm="weight01", statistic="fisher")
 ```
 
 Generate results table 
 ```{r}
-GO_PEVE_BP_En <- GenTable(GO_PEVE_BP, Fisher = GO_PEVE_BP_FE, orderBy = "Fisher",  topNodes = 100, numChar = 51)
+GO_PEVE_BP_En_pi <- GenTable(GO_PEVE_BP_pi, Fisher = GO_PEVE_BP_FE_pi, orderBy = "Fisher",  topNodes = 100, numChar = 51)
 ```
 Only taking the top 100 GO terms 
 
 Filter by significant results
 ```{r}
-GO_PEVE_BP_En$Fisher<-as.numeric(GO_PEVE_BP_En$Fisher)
-GO_PEVE_BP_En_sig<-GO_PEVE_BP_En[GO_PEVE_BP_En$Fisher<0.05,]
+GO_PEVE_BP_En_pi$Fisher<-as.numeric(GO_PEVE_BP_En_pi$Fisher)
+GO_PEVE_BP_En_sig_pi<-GO_PEVE_BP_En[GO_PEVE_BP_En_pi$Fisher<0.05,]
 ```
 
-Merge `GO_PEVE_BP_En_sig` with GO and gene info. 
+Merge `GO_PEVE_BP_En_sig_pi` with GO and gene info. 
 ```{r}
 # Separate GO terms 
 PEVE_gene2go <- PEVE_gene2go %>%
@@ -138,42 +138,42 @@ PEVE_gene2go <- PEVE_gene2go %>%
 
 # Ensure GO terms in both datasets are formatted similarly (trim whitespaces)
 PEVE_gene2go$GeneOntologyIDs <- trimws(PEVE_gene2go$GeneOntologyIDs)
-GO_PEVE_BP_En_sig$GO.ID <- trimws(GO_PEVE_BP_En_sig$GO.ID)
+GO_PEVE_BP_En_sig_pi$GO.ID <- trimws(GO_PEVE_BP_En_sig_pi$GO.ID)
 
 # Join the datasets based on GO term
-GO_PEVE_BP_En_sig_gene <- PEVE_gene2go %>%
-  left_join(GO_PEVE_BP_En_sig, by = c("GeneOntologyIDs" = "GO.ID")) %>%
+GO_PEVE_BP_En_sig_gene_pi <- PEVE_gene2go %>%
+  left_join(GO_PEVE_BP_En_sig_pi, by = c("GeneOntologyIDs" = "GO.ID")) %>%
   na.omit()
 
 # Add ontology column 
-GO_PEVE_BP_En_sig_gene$ontology <- "Biological Processes"
+GO_PEVE_BP_En_sig_gene_pi$ontology <- "Biological Processes"
 ```
 
 ### Cellular Components 
 
 Create `topGOdata` object, which is required for topGO analysis
 ```{r}
-GO_PEVE_CC <-new("topGOdata", ontology="CC", gene2GO=PEVE_gene2go_topgo, allGenes=Peve_GeneList, annot = annFUN.gene2GO, geneSel=topDiffGenes)
+GO_PEVE_CC_pi <-new("topGOdata", ontology="CC", gene2GO=PEVE_gene2go_topgo, allGenes=Peve_GeneList, annot = annFUN.gene2GO, geneSel=topDiffGenes)
 ```
 
 Run GO enrichment test 
 ```{r}
-GO_PEVE_CC_FE <- runTest(GO_PEVE_CC, algorithm="weight01", statistic="fisher")
+GO_PEVE_CC_FE_pi <- runTest(GO_PEVE_CC_pi, algorithm="weight01", statistic="fisher")
 ```
 
 Generate results table 
 ```{r}
-GO_PEVE_CC_En <- GenTable(GO_PEVE_CC, Fisher = GO_PEVE_CC_FE, orderBy = "Fisher",  topNodes = 100, numChar = 51)
+GO_PEVE_CC_En_pi <- GenTable(GO_PEVE_CC_pi, Fisher = GO_PEVE_CC_FE_pi, orderBy = "Fisher",  topNodes = 100, numChar = 51)
 ```
 Only taking the top 100 GO terms 
 
 Filter by significant results
 ```{r}
-GO_PEVE_CC_En$Fisher<-as.numeric(GO_PEVE_CC_En$Fisher)
-GO_PEVE_CC_En_sig<-GO_PEVE_CC_En[GO_PEVE_CC_En$Fisher<0.05,]
+GO_PEVE_CC_En_pi$Fisher<-as.numeric(GO_PEVE_CC_En_pi$Fisher)
+GO_PEVE_CC_En_sig_pi<-GO_PEVE_CC_En_pi[GO_PEVE_CC_En_pi$Fisher<0.05,]
 ```
 
-Merge `GO_PEVE_CC_En_sig` with GO and gene info. 
+Merge `GO_PEVE_CC_En_sig_pi` with GO and gene info. 
 ```{r}
 # Separate GO terms 
 PEVE_gene2go <- PEVE_gene2go %>%
@@ -181,39 +181,39 @@ PEVE_gene2go <- PEVE_gene2go %>%
 
 # Ensure GO terms in both datasets are formatted similarly (trim whitespaces)
 PEVE_gene2go$GeneOntologyIDs <- trimws(PEVE_gene2go$GeneOntologyIDs)
-GO_PEVE_CC_En_sig$GO.ID <- trimws(GO_PEVE_CC_En_sig$GO.ID)
+GO_PEVE_CC_En_sig_pi$GO.ID <- trimws(GO_PEVE_CC_En_sig_pi$GO.ID)
 
 # Join the datasets based on GO term
-GO_PEVE_CC_En_sig_gene <- PEVE_gene2go %>%
-  left_join(GO_PEVE_CC_En_sig, by = c("GeneOntologyIDs" = "GO.ID")) %>%
+GO_PEVE_CC_En_sig_gene_pi <- PEVE_gene2go %>%
+  left_join(GO_PEVE_CC_En_sig_pi, by = c("GeneOntologyIDs" = "GO.ID")) %>%
   na.omit()
 
 # Add ontology column 
-GO_PEVE_CC_En_sig_gene$ontology <- "Cellular Components"
+GO_PEVE_CC_En_sig_gene_pi$ontology <- "Cellular Components"
 ```
 
 ### Molecular Functions 
 
 Create `topGOdata` object, which is required for topGO analysis
 ```{r}
-GO_PEVE_MF <-new("topGOdata", ontology="MF", gene2GO=PEVE_gene2go_topgo, allGenes=Peve_GeneList, annot = annFUN.gene2GO, geneSel=topDiffGenes)
+GO_PEVE_MF_pi <-new("topGOdata", ontology="MF", gene2GO=PEVE_gene2go_topgo, allGenes=Peve_GeneList, annot = annFUN.gene2GO, geneSel=topDiffGenes)
 ```
 
 Run GO enrichment test 
 ```{r}
-GO_PEVE_MF_FE <- runTest(GO_PEVE_MF, algorithm="weight01", statistic="fisher")
+GO_PEVE_MF_FE_pi <- runTest(GO_PEVE_MF_pi, algorithm="weight01", statistic="fisher")
 ```
 
 Generate results table 
 ```{r}
-GO_PEVE_MF_En <- GenTable(GO_PEVE_MF, Fisher = GO_PEVE_MF_FE, orderBy = "Fisher",  topNodes = 100, numChar = 51)
+GO_PEVE_MF_En_pi <- GenTable(GO_PEVE_MF_pi, Fisher = GO_PEVE_MF_FE_pi, orderBy = "Fisher",  topNodes = 100, numChar = 51)
 ```
 Only taking the top 100 GO terms 
 
 Filter by significant results
 ```{r}
-GO_PEVE_MF_En$Fisher<-as.numeric(GO_PEVE_MF_En$Fisher)
-GO_PEVE_MF_En_sig<-GO_PEVE_MF_En[GO_PEVE_MF_En$Fisher<0.05,]
+GO_PEVE_MF_En_pi$Fisher<-as.numeric(GO_PEVE_MF_En_pi$Fisher)
+GO_PEVE_MF_En_sig_pi<-GO_PEVE_MF_En_pi[GO_PEVE_MF_En_pi$Fisher<0.05,]
 ```
 
 Merge `GO_PEVE_MF_En_sig` with GO and gene info. 
@@ -224,257 +224,90 @@ PEVE_gene2go <- PEVE_gene2go %>%
 
 # Ensure GO terms in both datasets are formatted similarly (trim whitespaces)
 PEVE_gene2go$GeneOntologyIDs <- trimws(PEVE_gene2go$GeneOntologyIDs)
-GO_PEVE_MF_En_sig$GO.ID <- trimws(GO_PEVE_MF_En_sig$GO.ID)
+GO_PEVE_MF_En_sig_pi$GO.ID <- trimws(GO_PEVE_MF_En_sig_pi$GO.ID)
 
 # Join the datasets based on GO term
-GO_PEVE_MF_En_sig_gene <- PEVE_gene2go %>%
-  left_join(GO_PEVE_MF_En_sig, by = c("GeneOntologyIDs" = "GO.ID")) %>%
+GO_PEVE_MF_En_sig_gene_pi <- PEVE_gene2go %>%
+  left_join(GO_PEVE_MF_En_sig_pi, by = c("GeneOntologyIDs" = "GO.ID")) %>%
   na.omit()
 
 # Add ontology column 
-GO_PEVE_MF_En_sig_gene$ontology <- "Molecular Functions"
+GO_PEVE_MF_En_sig_gene_pi$ontology <- "Molecular Functions"
 ```
 
 ### Join ontologies for piRNAs
 
 Bind `GO_PEVE_BP_En_sig_gene`, `GO_PEVE_CC_En_sig_gene`, and `GO_PEVE_MF_En_sig_gene` to make a df that has significantly enriched GO terms for all ontologies 
 ```{r}
-GO_PEVE_En_sig_gene <- rbind(GO_PEVE_BP_En_sig_gene, GO_PEVE_CC_En_sig_gene, GO_PEVE_MF_En_sig_gene)
+GO_PEVE_En_sig_gene_pi <- rbind(GO_PEVE_BP_En_sig_gene_pi, GO_PEVE_CC_En_sig_gene_pi, GO_PEVE_MF_En_sig_gene_pi)
 ```
 
 Merge `pi_bed_filt` with `GO_PEVE_En_sig_gene` and calculate proportion of significant genes
 ```{r}
-merged_pirna <- GO_PEVE_En_sig_gene %>%
+merged_pirna <- GO_PEVE_En_sig_gene_pi %>%
   left_join(pi_bed_filt, by = "gene_name") %>%
   na.omit() %>%
   mutate(prop.sig.genes = Significant/Annotated)
+
+# Write to csv 
+write.csv(merged_pirna, "../output/19-bedtools-closest/Peve_GO_en_sig_gene_piRNA.csv")
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Load Peve bed file into R. 
+Plot 
 ```{r}
-bed <- read.delim("../output/19-bedtools-closest/miRNA_filtered_Peve_output.bed", header = F)
-head(bed)
+GO_plot_pi<-ggplot(merged_pirna, aes(x = Term, y = Fisher, size = prop.sig.genes, fill = Fisher)) +
+  #expand_limits(y = 1.5) +
+  #ylim(1, 7.25) +
+  # Add horizontal lines with a single aesthetic value
+  #geom_hline(yintercept = -log10(0.01), linetype = "longdash", colour = "black", linewidth = .6) +
+  #geom_hline(yintercept = -log10(0.001), linetype = "solid", colour = "black", linewidth = .6) +
+  geom_point(shape = 21) + 
+  scale_size(range = c(2, 12)) + 
+  scale_fill_continuous(low = "#1AD3D1FF", high = "#4686FBFF") +
+  xlab('') + 
+  ylab('Enrichment score') +
+  #labs(caption = 'Cut-off lines at p=0.01 and p=0.001') +
+  theme_bw() +
+  facet_grid(vars(ontology), scales = "free", space = "free_y") +
+  coord_flip(); GO_plot_pi
+```
+
+## miRNA 
+
+Load Peve miRNA closest file into R. This file represents the genomic features that are closest/are overlapping with piRNA clusters. 
+```{r}
+mi_bed <- read.delim("../output/19-bedtools-closest/miRNA_filtered_Peve_output.bed", header = F)
+head(mi_bed)
 ```
 
 Keep specific columns and rename them. I'm going to label columns that relate to miRNAs with an "m" and columns that relate to genomic features with a "gf".
 ```{r}
-bed_filt <- bed %>%
+mi_bed_filt <- mi_bed %>%
   dplyr::select(V1, V2, V3, V4, V5, V7, V9, V10, V11, V12, V13, V14, V16, V18) %>%
   dplyr::rename("m_chrom" = "V1", "m_source" = "V2", "m_type" = "V3", "m_start" = "V4", "m_end" = "V5", "m_strand" = "V7", "m_attr" = "V9", "gf_chrom" = "V10", "gf_source" = "V11", "gf_type" = "V12", "gf_start" = "V13", "gf_end" = "V14", "gf_strand" = "V16", "gf_attr" = "V18")
-
-unique(bed_filt$m_type)
-unique(bed_filt$gf_type)
 ```
 
-The Peve genome only has the following genomic features annotated: CDS, UTR, mRNA. Subset by mRNA.
+Pull out gene name information from the `gf_attr` column and subset by mRNA and mature miRNA. 
 ```{r}
-bed_filt <- bed_filt %>%
-  dplyr::filter(gf_type == "mRNA")
-```
-
-Remove the siRNA m_types and make column that has cluster IDs for miRNAs. 
-```{r}
-bed_filt <- bed_filt %>%
-  dplyr::filter(!grepl("siRNA", m_type)) %>%
-  mutate(m_ID = sub(";.*", "", m_attr))
-
-# Remove .mature and .star from the ID column 
-bed_filt$m_ID <- gsub(".mature", "", bed_filt$m_ID)
-bed_filt$m_ID <- gsub(".star", "", bed_filt$m_ID)
-
-length(unique(bed_filt$m_ID)) # check how many miRNAs are there - should be 46 for Peve
-unique(bed_filt$m_type)
-```
-
-The remaining types of genomic features for miRNAs are miRNA hairpins, mature miRNAs and miRNA stars. 
-
-Calculate the overlap and distance based on the m_start, m_end, gf_start, and gf_end columns. Overlap occurs if the start of one feature is within the bounds of another. If there is no overlaps, the distance can be calculated as the gap between the end of one feature and the start of another. 
-```{r}
-bed_filt$overlap <- with(bed_filt, pmin(m_end, gf_end) - pmax(m_start, gf_start))
-
-sum(bed_filt$overlap < 0)
-sum(bed_filt$overlap > 0)
-```
-
-39 miRNA features do not overlap with an mRNA. 99 features do overlap with an mRNA. Calculate average/percentages of distance and overlap for miRNA hairpins, mature miRNAs and miRNA stars.
-```{r}
-# Perform calculations grouped by m_type
-summary_stats <- bed_filt %>%
-  group_by(m_type) %>%
-  summarize(
-    avg_overlap = mean(overlap[overlap > 0], na.rm = TRUE),
-    avg_distance = mean(overlap[overlap < 0], na.rm = TRUE),
-    percent_overlap = sum(overlap > 0) / n() * 100,
-    percent_distance_lt_1kb = sum(overlap < 0 & overlap > -1000) / n() * 100,
-    percent_distance = sum(overlap < 0) / n() * 100
-  )
-
-# Display the summary statistics
-print(summary_stats)
-```
-
-Filter for mature miRNAs
-```{r}
-bed_filt_mature <- bed_filt %>%
-    dplyr::filter(m_type == "mature_miRNA")
-
-bed_filt_mature$m_ID <- gsub("ID=", "", bed_filt_mature$m_ID)
-```
-
-Read in the mature named miRNAs 
-```{r}
-mature <- read.csv("../../DEF-cross-species/output/10-shortRNA-ShortStack-comparison/Peve_results_mature_named.csv", header = T)
-head(mature)
-```
-
-Merge `bed_filt_mature` and `mature` by the cluster column 
-```{r}
-bed_filt_mature_all <- bed_filt_mature %>%
-  full_join(mature, by = c("m_ID" = "Name"))
-```
-
-Save output
-```{r}
-write.csv(file = "../output/19-bedtools-closest/Peve_mature_miRNAs_bedtools.csv", bed_filt_mature_all)
-```
-
-Calculate average/percentages of distance and overlap for mature miRNAs
-```{r}
-# Perform calculations grouped by m_type
-summary_stats_mature <- bed_filt_mature_all %>%
-  #group_by(m_type) %>%
-  summarize(
-    avg_overlap = mean(overlap[overlap > 0], na.rm = TRUE),
-    avg_distance = mean(overlap[overlap < 0], na.rm = TRUE),
-    percent_overlap = sum(overlap > 0) / n() * 100,
-    percent_distance_lt_1kb = sum(overlap < 0 & overlap > -1000) / n() * 100,
-    percent_distance = sum(overlap < 0) / n() * 100
-  )
-
-# Display the summary statistics
-print(summary_stats_mature)
-```
-
-Read in GO annotation information
-```{r}
-annot <- read.delim("../output/20-Peve-gene-annotation/Peve-rna-GO.tsv")
-
-prot <- read.delim("../output/20-Peve-gene-annotation/Peve-protein-GO.tsv")
-rna <- read.delim("../output/20-Peve-gene-annotation/Peve-rna-GO.tsv")
-
-```
-
-Pull out gene name information from the `gf_attr` column in the `bed_filt_mature_all` df
-```{r}
-bed_filt_mature_all <- bed_filt_mature_all %>%
-   mutate(gf_ID = sub(";.*", "", gf_attr))
-
-bed_filt_mature_all$gf_ID <- gsub("ID=", "", bed_filt_mature_all$gf_ID)
-```
-
-Merge `annot` and `bed_filt_mature_all` dfs. 
-```{r}
-bed_filt_mature_annot <- bed_filt_mature_all %>%
-  left_join(annot, by = c("gf_ID" = "query"))
-```
-
-Save output
-```{r}
-write.csv(file = "../output/19-bedtools-closest/Peve_mature_miRNAs_bedtools_annot.csv", bed_filt_mature_annot)
-```
-
-There are 7 genes in the df that do not have annotations, including the gene that overlaps with miR-100. Look at the functions of the genes that overlap with miRNAs. 
-```{r}
-overlap <- bed_filt_mature_annot %>%
-  dplyr::filter(overlap > 0)
-
-unique(overlap$BiologicalProcess)
-unique(overlap$ProteinNames)
-```
-
-Look at functions of genes that do not overlap with miRNAs 
-```{r}
-no_overlap <- bed_filt_mature_annot %>%
-  dplyr::filter(overlap < 0)
-
-unique(no_overlap$BiologicalProcess)
-unique(no_overlap$ProteinNames)
-```
-
-
-
-
-Load Peve piRNA closest file into R. 
-```{r}
-pi_bed <- read.delim("../output/19-bedtools-closest/Peve_piRNA_output.bed", header = F)
-head(pi_bed)
-```
-
-Keep specific columns and rename them 
-```{r}
-pi_bed_filt <- pi_bed %>%
-  dplyr::select(V1, V2, V3, V4, V6, V7, V8, V12) %>%
-  dplyr::rename("pi_chrom" = "V1", "pi_start" = "V2", "pi_end" = "V3", "gf_chrom" = "V4", "gf_type" = "V6", "gf_start" = "V7", "gf_end" = "V8", "gf_attr" = "V12")
-```
-
-Subset by mRNAs
-```{r}
-pi_bed_filt <- pi_bed_filt %>%
-  dplyr::filter(gf_type == "mRNA")
+mi_bed_filt <- mi_bed_filt %>%
+  mutate(gene_name = str_extract(gf_attr, "ID=Peve_[0-9]+")) %>%
+  mutate(gene_name = str_replace(gene_name, "ID=", "")) %>% # Remove "ID=" prefix
+  dplyr::filter(gf_type == "mRNA") %>%
+  dplyr::filter(m_type == "mature_miRNA")
 ```
 
 Calculate the overlap and distance based on the m_start, m_end, gf_start, and gf_end columns. Overlap occurs if the start of one feature is within the bounds of another. If there is no overlaps, the distance can be calculated as the gap between the end of one feature and the start of another. 
 ```{r}
-pi_bed_filt$overlap <- with(pi_bed_filt, pmin(pi_end, gf_end) - pmax(pi_start, gf_start))
+mi_bed_filt$overlap <- with(mi_bed_filt, pmin(m_end, gf_end) - pmax(m_start, gf_start))
 
-sum(pi_bed_filt$overlap < 0)
-sum(pi_bed_filt$overlap > 0)
-```
-
-25 miRNA features do not overlap with an mRNA. 138 features do overlap with an mRNA. Javi identified 107 total piRNA clusters for Peve and 
-
-
-
-
-Make new column to identify unique piRNA clusters 
-```{r}
-pi_bed_filt$piRNA_cluster <- paste(pi_bed_filt$pi_chrom, pi_bed_filt$pi_start, pi_bed_filt$pi_end, sep=":")
-pi_bed_filt$piRNA_cluster <- paste(pi_bed_filt$pi_chrom, paste(pi_bed_filt$pi_start, pi_bed_filt$pi_end, sep="-"), sep=":")
-length(unique(pi_bed_filt$piRNA_cluster))
+sum(mi_bed_filt$overlap < 0)
+sum(mi_bed_filt$overlap > 0)
 ```
 
 Calculate average/percentages of distance and overlap. 
 ```{r}
 # Perform calculations grouped by m_type
-summary_stats <- pi_bed_filt %>%
+summary_stats <- mi_bed_filt %>%
   #group_by(m_type) %>%
   summarize(
     avg_overlap = mean(overlap[overlap > 0], na.rm = TRUE),
@@ -488,429 +321,200 @@ summary_stats <- pi_bed_filt %>%
 print(summary_stats)
 ```
 
-Pull out gene name information from the `gf_attr` column in the `bed_filt_mature_all` df
-```{r}
-pi_bed_filt <- pi_bed_filt %>%
-   mutate(gf_ID = sub(";.*", "", gf_attr))
-
-pi_bed_filt$gf_ID <- gsub("ID=", "", pi_bed_filt$gf_ID)
-```
-
-Read in annot file 
-```{r}
-rna <- read.delim("../output/20-Peve-gene-annotation/Peve-rna-GO.tsv")
-rna$query <- gsub("Parent=", "", rna$query)
-
-prot <- read.delim("../output/20-Peve-gene-annotation/Peve-protein-GO.tsv")
-```
-
-Merge annot and filt dfs 
-```{r}
-pi_bed_filt_annot <- pi_bed_filt %>%
-    left_join(prot, by = c("gf_ID" = "query"))
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-GO enrichment for piRNA
-
-
-Load Peve piRNA closest file into R. 
-```{r}
-pi_bed <- read.delim("../output/19-bedtools-closest/Peve_piRNA_output.bed", header = F)
-head(pi_bed)
-```
-
-Keep specific columns and rename them 
-```{r}
-pi_bed_filt <- pi_bed %>%
-  dplyr::select(V1, V2, V3, V4, V6, V7, V8, V12) %>%
-  dplyr::rename("pi_chrom" = "V1", "pi_start" = "V2", "pi_end" = "V3", "gf_chrom" = "V4", "gf_type" = "V6", "gf_start" = "V7", "gf_end" = "V8", "gf_attr" = "V12")
-```
-
-Pull out gene name information from the `gf_attr` column in the `bed_filt_mature_all` df and select only mRNAs
-```{r}
-pi_bed_filt <- pi_bed_filt %>%
-  mutate(gf_ID = sub(";.*", "", gf_attr)) %>%
-  dplyr::filter(gf_type == "mRNA")
-
-pi_bed_filt$gf_ID <- gsub("ID=", "", pi_bed_filt$gf_ID)
-```
+Results:
+avg_overlap avg_distance percent_overlap percent_distance_lt_1kb percent_distance
+    20.93939    -2480.154        71.73913                6.521739         28.26087
 
 Read in gene2go information 
 ```{r}
 PEVE_gene2go<-read.delim("../../data/Peve_gene2go.tab", sep="\t")
 ```
 
-Make list of genes
+Make list of genes for input to TopGO
 ```{r}
-peve_clust_genes <- as.character(unique(pi_bed_filt$gf_ID))
+peve_clust_genes <- as.character(unique(mi_bed_filt$gene_name))
 peve_all_genes <- as.character(PEVE_gene2go$gene_name)
 Peve_GeneList <- factor(as.integer(peve_all_genes %in% peve_clust_genes))
 names(Peve_GeneList) <- peve_all_genes
 ```
 
+The following code will perform GO enrichment using the weighted Fisher's exact test to assess whether specific GO terms are overrepresented in the genes closest to the piRNA clusters. 
 
-Biological processes
+Read in gene-to-go-mappings
+```{r}
+PEVE_gene2go_topgo<-readMappings("../../data/Peve_gene2go.tab", IDsep=";", sep="\t")
+```
+
+Set function to select genes of interest (ie those that have pvalue < 0.05)
 ```{r}
 topDiffGenes <- function(allScore) {
 return(allScore < 0.05)}
-
-PEVE_gene2go<-readMappings("../../data/Peve_gene2go.tab", IDsep=";", sep="\t")
-GO_PEVE_BP <-new("topGOdata", ontology="BP", gene2GO=PEVE_gene2go, allGenes=Peve_GeneList, annot = annFUN.gene2GO, geneSel=topDiffGenes)
-GO_PEVE_BP_FE <- runTest(GO_PEVE_BP, algorithm="weight01", statistic="fisher")
-
-GO_PEVE_BP_En <- GenTable(GO_PEVE_BP, Fisher = GO_PEVE_BP_FE,
-  orderBy = "Fisher",  topNodes = 100, numChar = 51)
-GO_PEVE_BP_En$Fisher<-as.numeric(GO_PEVE_BP_En$Fisher)
-GO_PEVE_BP_En<-GO_PEVE_BP_En[GO_PEVE_BP_En$Fisher<0.05,]
 ```
 
-Merge `GO_PEVE_BP_En` with GO and gene info. 
-```{r}
-PEVE_go<-read.delim("../../data/Peve_gene2go.tab", sep="\t")
+### Biological Processes
 
+Create `topGOdata` object, which is required for topGO analysis
+```{r}
+GO_PEVE_BP_mi <-new("topGOdata", ontology="BP", gene2GO=PEVE_gene2go_topgo, allGenes=Peve_GeneList, annot = annFUN.gene2GO, geneSel=topDiffGenes)
+```
+
+Run GO enrichment test 
+```{r}
+GO_PEVE_BP_FE_mi <- runTest(GO_PEVE_BP_mi, algorithm="weight01", statistic="fisher")
+```
+
+Generate results table 
+```{r}
+GO_PEVE_BP_En_mi <- GenTable(GO_PEVE_BP_mi, Fisher = GO_PEVE_BP_FE_mi, orderBy = "Fisher",  topNodes = 100, numChar = 51)
+```
+Only taking the top 100 GO terms 
+
+Filter by significant results
+```{r}
+GO_PEVE_BP_En_mi$Fisher<-as.numeric(GO_PEVE_BP_En_mi$Fisher)
+GO_PEVE_BP_En_sig_mi<-GO_PEVE_BP_En_mi[GO_PEVE_BP_En_mi$Fisher<0.05,]
+```
+
+Merge `GO_PEVE_BP_En_sig_mi` with GO and gene info. 
+```{r}
 # Separate GO terms 
-PEVE_go <- PEVE_go %>%
+PEVE_gene2go <- PEVE_gene2go %>%
   separate_rows(GeneOntologyIDs, sep = ";")
 
 # Ensure GO terms in both datasets are formatted similarly (trim whitespaces)
-PEVE_go$GeneOntologyIDs <- trimws(PEVE_go$GeneOntologyIDs)
-GO_PEVE_BP_En$GO.ID <- trimws(GO_PEVE_BP_En$GO.ID)
+PEVE_gene2go$GeneOntologyIDs <- trimws(PEVE_gene2go$GeneOntologyIDs)
+GO_PEVE_BP_En_sig_mi$GO.ID <- trimws(GO_PEVE_BP_En_sig_mi$GO.ID)
 
 # Join the datasets based on GO term
-PEVE_go_enriched <- PEVE_go %>%
-  left_join(GO_PEVE_BP_En, by = c("GeneOntologyIDs" = "GO.ID")) %>%
+GO_PEVE_BP_En_sig_gene_mi <- PEVE_gene2go %>%
+  left_join(GO_PEVE_BP_En_sig_mi, by = c("GeneOntologyIDs" = "GO.ID")) %>%
   na.omit()
 
-# View the first few rows of the result
-head(PEVE_go_enriched)
+# Add ontology column 
+GO_PEVE_BP_En_sig_gene_mi$ontology <- "Biological Processes"
 ```
 
-Calculate the overlap and distance based on the m_start, m_end, gf_start, and gf_end columns. Overlap occurs if the start of one feature is within the bounds of another. If there is no overlaps, the distance can be calculated as the gap between the end of one feature and the start of another. 
-```{r}
-pi_bed_filt$overlap <- with(pi_bed_filt, pmin(pi_end, gf_end) - pmax(pi_start, gf_start))
+### Cellular Components 
 
-sum(pi_bed_filt$overlap < 0)
-sum(pi_bed_filt$overlap > 0)
+Create `topGOdata` object, which is required for topGO analysis
+```{r}
+GO_PEVE_CC_mi <-new("topGOdata", ontology="CC", gene2GO=PEVE_gene2go_topgo, allGenes=Peve_GeneList, annot = annFUN.gene2GO, geneSel=topDiffGenes)
 ```
 
-Calculate average/percentages of distance and overlap. 
+Run GO enrichment test 
 ```{r}
-# Perform calculations grouped by m_type
-summary_stats <- pi_bed_filt %>%
-  #group_by(m_type) %>%
-  summarize(
-    avg_overlap = mean(overlap[overlap > 0], na.rm = TRUE),
-    avg_distance = mean(overlap[overlap < 0], na.rm = TRUE),
-    percent_overlap = sum(overlap > 0) / n() * 100,
-    percent_distance_lt_1kb = sum(overlap < 0 & overlap > -1000) / n() * 100,
-    percent_distance = sum(overlap < 0) / n() * 100
-  )
-
-# Display the summary statistics
-print(summary_stats)
+GO_PEVE_CC_FE_mi <- runTest(GO_PEVE_CC_mi, algorithm="weight01", statistic="fisher")
 ```
 
-Pull out gene name information from the `gf_attr` column 
+Generate results table 
 ```{r}
-pi_bed_filt <- pi_bed_filt %>%
-  mutate(gene_name = str_extract(gf_attr, "ID=Peve_[0-9]+")) %>%
-  mutate(gene_name = str_replace(gene_name, "ID=", ""))  # Remove "ID=" prefix
+GO_PEVE_CC_En_mi <- GenTable(GO_PEVE_CC_mi, Fisher = GO_PEVE_CC_FE_mi, orderBy = "Fisher",  topNodes = 100, numChar = 51)
+```
+Only taking the top 100 GO terms 
+
+Filter by significant results
+```{r}
+GO_PEVE_CC_En_mi$Fisher<-as.numeric(GO_PEVE_CC_En_mi$Fisher)
+GO_PEVE_CC_En_sig_mi<-GO_PEVE_CC_En_mi[GO_PEVE_CC_En_mi$Fisher<0.05,]
 ```
 
-Merge `pi_bed_filt` with `PEVE_go_enriched`
+Merge `GO_PEVE_CC_En_sig_mi` with GO and gene info. 
 ```{r}
-merged_data <- PEVE_go_enriched %>%
-  left_join(pi_bed_filt, by = "gene_name") %>%
-  na.omit() %>%
-  mutate(prop.sig.genes = Significant/Annotated)
-```
-
-
-Cellular component 
-```{r}
-topDiffGenes <- function(allScore) {
-return(allScore < 0.05)}
-
-PEVE_gene2go<-readMappings("../../data/Peve_gene2go.tab", IDsep=";", sep="\t")
-GO_PEVE_CC <-new("topGOdata", ontology="CC", gene2GO=PEVE_gene2go, allGenes=Peve_GeneList, annot = annFUN.gene2GO, geneSel=topDiffGenes)
-GO_PEVE_CC_FE <- runTest(GO_PEVE_CC, algorithm="weight01", statistic="fisher")
-
-GO_PEVE_CC_En <- GenTable(GO_PEVE_CC, Fisher = GO_PEVE_CC_FE,
-  orderBy = "Fisher",  topNodes = 100, numChar = 51)
-GO_PEVE_CC_En$Fisher<-as.numeric(GO_PEVE_CC_En$Fisher)
-GO_PEVE_CC_En<-GO_PEVE_CC_En[GO_PEVE_CC_En$Fisher<0.05,]
-```
-
-Merge `GO_PEVE_CC_En` with GO and gene info. 
-```{r}
-#PEVE_go<-read.delim("../../data/Peve_gene2go.tab", sep="\t")
-
 # Separate GO terms 
-#PEVE_go <- PEVE_go %>%
-#  separate_rows(GeneOntologyIDs, sep = ";")
-
-# Ensure GO terms in both datasets are formatted similarly (trim whitespaces)
-#PEVE_go$GeneOntologyIDs <- trimws(PEVE_go$GeneOntologyIDs)
-GO_PEVE_CC_En$GO.ID <- trimws(GO_PEVE_CC_En$GO.ID)
-
-# Join the datasets based on GO term
-PEVE_CC_go_enriched <- PEVE_go %>%
-  left_join(GO_PEVE_CC_En, by = c("GeneOntologyIDs" = "GO.ID")) %>%
-  na.omit()
-
-# View the first few rows of the result
-head(PEVE_CC_go_enriched)
-```
-
-Merge `pi_bed_filt` with `PEVE_CC_go_enriched`
-```{r}
-merged_data_CC <- PEVE_CC_go_enriched %>%
-  left_join(pi_bed_filt, by = "gene_name") %>%
-  na.omit() %>%
-  mutate(prop.sig.genes = Significant/Annotated)
-```
-
-Molecular function 
-```{r}
-topDiffGenes <- function(allScore) {
-return(allScore < 0.05)}
-
-PEVE_gene2go<-readMappings("../../data/Peve_gene2go.tab", IDsep=";", sep="\t")
-GO_PEVE_MF <-new("topGOdata", ontology="MF", gene2GO=PEVE_gene2go, allGenes=Peve_GeneList, annot = annFUN.gene2GO, geneSel=topDiffGenes)
-GO_PEVE_MF_FE <- runTest(GO_PEVE_MF, algorithm="weight01", statistic="fisher")
-
-GO_PEVE_MF_En <- GenTable(GO_PEVE_MF, Fisher = GO_PEVE_MF_FE,
-  orderBy = "Fisher",  topNodes = 100, numChar = 51)
-GO_PEVE_MF_En$Fisher<-as.numeric(GO_PEVE_MF_En$Fisher)
-GO_PEVE_MF_En<-GO_PEVE_MF_En[GO_PEVE_MF_En$Fisher<0.05,]
-```
-
-Merge `GO_PEVE_MF_En` with GO and gene info. 
-```{r}
-#PEVE_go<-read.delim("../../data/Peve_gene2go.tab", sep="\t")
-
-# Separate GO terms 
-#PEVE_go <- PEVE_go %>%
-#  separate_rows(GeneOntologyIDs, sep = ";")
-
-# Ensure GO terms in both datasets are formatted similarly (trim whitespaces)
-#PEVE_go$GeneOntologyIDs <- trimws(PEVE_go$GeneOntologyIDs)
-GO_PEVE_MF_En$GO.ID <- trimws(GO_PEVE_MF_En$GO.ID)
-
-# Join the datasets based on GO term
-PEVE_MF_go_enriched <- PEVE_go %>%
-  left_join(GO_PEVE_MF_En, by = c("GeneOntologyIDs" = "GO.ID")) %>%
-  na.omit()
-
-# View the first few rows of the result
-head(PEVE_MF_go_enriched)
-```
-
-Merge `pi_bed_filt` with `PEVE_MF_go_enriched`
-```{r}
-merged_data_MF <- PEVE_MF_go_enriched %>%
-  left_join(pi_bed_filt, by = "gene_name") %>%
-  na.omit() %>%
-  mutate(prop.sig.genes = Significant/Annotated)
-```
-
-
-
-
-
-
-miRNA
-
-Load Peve bed file into R. 
-```{r}
-bed <- read.delim("../output/19-bedtools-closest/miRNA_filtered_Peve_output.bed", header = F)
-head(bed)
-```
-
-Keep specific columns and rename them. I'm going to label columns that relate to miRNAs with an "m" and columns that relate to genomic features with a "gf".
-```{r}
-bed_filt <- bed %>%
-  dplyr::select(V1, V2, V3, V4, V5, V7, V9, V10, V11, V12, V13, V14, V16, V18) %>%
-  dplyr::rename("m_chrom" = "V1", "m_source" = "V2", "m_type" = "V3", "m_start" = "V4", "m_end" = "V5", "m_strand" = "V7", "m_attr" = "V9", "gf_chrom" = "V10", "gf_source" = "V11", "gf_type" = "V12", "gf_start" = "V13", "gf_end" = "V14", "gf_strand" = "V16", "gf_attr" = "V18")
-
-unique(bed_filt$m_type)
-unique(bed_filt$gf_type)
-```
-
-The Peve genome only has the following genomic features annotated: CDS, UTR, mRNA. Subset by mRNA.
-```{r}
-bed_filt <- bed_filt %>%
-  dplyr::filter(gf_type == "mRNA")
-```
-
-Remove the siRNA m_types and make column that has cluster IDs for miRNAs. 
-```{r}
-bed_filt <- bed_filt %>%
-  dplyr::filter(!grepl("siRNA", m_type)) %>%
-  mutate(m_ID = sub(";.*", "", m_attr))
-
-# Remove .mature and .star from the ID column 
-bed_filt$m_ID <- gsub(".mature", "", bed_filt$m_ID)
-bed_filt$m_ID <- gsub(".star", "", bed_filt$m_ID)
-
-length(unique(bed_filt$m_ID)) # check how many miRNAs are there - should be 46 for Peve
-unique(bed_filt$m_type)
-```
-
-The remaining types of genomic features for miRNAs are miRNA hairpins, mature miRNAs and miRNA stars. 
-
-Calculate the overlap and distance based on the m_start, m_end, gf_start, and gf_end columns. Overlap occurs if the start of one feature is within the bounds of another. If there is no overlaps, the distance can be calculated as the gap between the end of one feature and the start of another. 
-```{r}
-bed_filt$overlap <- with(bed_filt, pmin(m_end, gf_end) - pmax(m_start, gf_start))
-
-sum(bed_filt$overlap < 0)
-sum(bed_filt$overlap > 0)
-```
-
-39 miRNA features do not overlap with an mRNA. 99 features do overlap with an mRNA. Calculate average/percentages of distance and overlap for miRNA hairpins, mature miRNAs and miRNA stars.
-```{r}
-# Perform calculations grouped by m_type
-summary_stats <- bed_filt %>%
-  group_by(m_type) %>%
-  summarize(
-    avg_overlap = mean(overlap[overlap > 0], na.rm = TRUE),
-    avg_distance = mean(overlap[overlap < 0], na.rm = TRUE),
-    percent_overlap = sum(overlap > 0) / n() * 100,
-    percent_distance_lt_1kb = sum(overlap < 0 & overlap > -1000) / n() * 100,
-    percent_distance = sum(overlap < 0) / n() * 100
-  )
-
-# Display the summary statistics
-print(summary_stats)
-```
-
-Filter for mature miRNAs
-```{r}
-bed_filt_mature <- bed_filt %>%
-    dplyr::filter(m_type == "mature_miRNA")
-
-bed_filt_mature$m_ID <- gsub("ID=", "", bed_filt_mature$m_ID)
-```
-
-Read in the mature named miRNAs 
-```{r}
-mature <- read.csv("../../DEF-cross-species/output/10-shortRNA-ShortStack-comparison/Peve_results_mature_named.csv", header = T)
-head(mature)
-```
-
-Merge `bed_filt_mature` and `mature` by the cluster column 
-```{r}
-bed_filt_mature_all <- bed_filt_mature %>%
-  full_join(mature, by = c("m_ID" = "Name"))
-```
-
-Save output
-```{r}
-write.csv(file = "../output/19-bedtools-closest/Peve_mature_miRNAs_bedtools.csv", bed_filt_mature_all)
-```
-
-Calculate average/percentages of distance and overlap for mature miRNAs
-```{r}
-# Perform calculations grouped by m_type
-summary_stats_mature <- bed_filt_mature_all %>%
-  #group_by(m_type) %>%
-  summarize(
-    avg_overlap = mean(overlap[overlap > 0], na.rm = TRUE),
-    avg_distance = mean(overlap[overlap < 0], na.rm = TRUE),
-    percent_overlap = sum(overlap > 0) / n() * 100,
-    percent_distance_lt_1kb = sum(overlap < 0 & overlap > -1000) / n() * 100,
-    percent_distance = sum(overlap < 0) / n() * 100
-  )
-
-# Display the summary statistics
-print(summary_stats_mature)
-```
-
-Pull out gene name information from the `gf_attr` column in the `bed_filt_mature_all` df
-```{r}
-bed_filt_mature_all <- bed_filt_mature_all %>%
-   mutate(gf_ID = sub(";.*", "", gf_attr))
-
-bed_filt_mature_all$gf_ID <- gsub("ID=", "", bed_filt_mature_all$gf_ID)
-```
-
-Pull out gene name information from the `gf_attr` column 
-```{r}
-bed_filt_mature_all <- bed_filt_mature_all %>%
-  mutate(gene_name = str_extract(gf_attr, "ID=Peve_[0-9]+")) %>%
-  mutate(gene_name = str_replace(gene_name, "ID=", ""))  # Remove "ID=" prefix
-```
-
-Make list of genes
-```{r}
-PEVE_gene2go<-read.delim("../../data/Peve_gene2go.tab", sep="\t")
-
-peve_clust_genes <- as.character(unique(bed_filt_mature_all$gene_name))
-peve_all_genes <- as.character(PEVE_gene2go$gene_name)
-Peve_GeneList <- factor(as.integer(peve_all_genes %in% peve_clust_genes))
-names(Peve_GeneList) <- peve_all_genes
-```
-
-Biological processes
-```{r}
-topDiffGenes <- function(allScore) {
-return(allScore < 0.05)}
-
-PEVE_gene2go<-readMappings("../../data/Peve_gene2go.tab", IDsep=";", sep="\t")
-GO_PEVE_BP <-new("topGOdata", ontology="BP", gene2GO=PEVE_gene2go, allGenes=Peve_GeneList, annot = annFUN.gene2GO, geneSel=topDiffGenes)
-GO_PEVE_BP_FE <- runTest(GO_PEVE_BP, algorithm="weight01", statistic="fisher")
-
-GO_PEVE_BP_En <- GenTable(GO_PEVE_BP, Fisher = GO_PEVE_BP_FE,
-  orderBy = "Fisher",  topNodes = 100, numChar = 51)
-GO_PEVE_BP_En$Fisher<-as.numeric(GO_PEVE_BP_En$Fisher)
-GO_PEVE_BP_En<-GO_PEVE_BP_En[GO_PEVE_BP_En$Fisher<0.05,]
-```
-
-Merge `GO_PEVE_BP_En` with GO and gene info. 
-```{r}
-PEVE_go<-read.delim("../../data/Peve_gene2go.tab", sep="\t")
-
-# Separate GO terms 
-PEVE_go <- PEVE_go %>%
+PEVE_gene2go <- PEVE_gene2go %>%
   separate_rows(GeneOntologyIDs, sep = ";")
 
 # Ensure GO terms in both datasets are formatted similarly (trim whitespaces)
-PEVE_go$GeneOntologyIDs <- trimws(PEVE_go$GeneOntologyIDs)
-GO_PEVE_MF_En$GO.ID <- trimws(GO_PEVE_MF_En$GO.ID)
+PEVE_gene2go$GeneOntologyIDs <- trimws(PEVE_gene2go$GeneOntologyIDs)
+GO_PEVE_CC_En_sig_mi$GO.ID <- trimws(GO_PEVE_CC_En_sig_mi$GO.ID)
 
 # Join the datasets based on GO term
-PEVE_BP_go_enriched <- PEVE_go %>%
-  left_join(GO_PEVE_BP_En, by = c("GeneOntologyIDs" = "GO.ID")) %>%
+GO_PEVE_CC_En_sig_gene_mi <- PEVE_gene2go %>%
+  left_join(GO_PEVE_CC_En_sig_mi, by = c("GeneOntologyIDs" = "GO.ID")) %>%
   na.omit()
 
-# View the first few rows of the result
-head(PEVE_BP_go_enriched)
+# Add ontology column 
+GO_PEVE_CC_En_sig_gene_mi$ontology <- "Cellular Components"
 ```
 
-Merge `bed_filt_mature_all` with `PEVE_BP_go_enriched`
+### Molecular Functions 
+
+Create `topGOdata` object, which is required for topGO analysis
 ```{r}
-merged_data_BP <- bed_filt_mature_all %>%
-  full_join(PEVE_BP_go_enriched, by = "gene_name") %>%
+GO_PEVE_MF_mi <-new("topGOdata", ontology="MF", gene2GO=PEVE_gene2go_topgo, allGenes=Peve_GeneList, annot = annFUN.gene2GO, geneSel=topDiffGenes)
+```
+
+Run GO enrichment test 
+```{r}
+GO_PEVE_MF_FE_mi <- runTest(GO_PEVE_MF_mi, algorithm="weight01", statistic="fisher")
+```
+
+Generate results table 
+```{r}
+GO_PEVE_MF_En_mi <- GenTable(GO_PEVE_MF_mi, Fisher = GO_PEVE_MF_FE_mi, orderBy = "Fisher",  topNodes = 100, numChar = 51)
+```
+Only taking the top 100 GO terms 
+
+Filter by significant results
+```{r}
+GO_PEVE_MF_En_mi$Fisher<-as.numeric(GO_PEVE_MF_En_mi$Fisher)
+GO_PEVE_MF_En_sig_mi<-GO_PEVE_MF_En_mi[GO_PEVE_MF_En_mi$Fisher<0.05,]
+```
+
+Merge `GO_PEVE_MF_En_sig_mi` with GO and gene info. 
+```{r}
+# Separate GO terms 
+PEVE_gene2go <- PEVE_gene2go %>%
+  separate_rows(GeneOntologyIDs, sep = ";")
+
+# Ensure GO terms in both datasets are formatted similarly (trim whitespaces)
+PEVE_gene2go$GeneOntologyIDs <- trimws(PEVE_gene2go$GeneOntologyIDs)
+GO_PEVE_MF_En_sig_mi$GO.ID <- trimws(GO_PEVE_MF_En_sig_mi$GO.ID)
+
+# Join the datasets based on GO term
+GO_PEVE_MF_En_sig_gene_mi <- PEVE_gene2go %>%
+  left_join(GO_PEVE_MF_En_sig_mi, by = c("GeneOntologyIDs" = "GO.ID")) %>%
+  na.omit()
+
+# Add ontology column 
+GO_PEVE_MF_En_sig_gene_mi$ontology <- "Molecular Functions"
+```
+
+### Join ontologies for piRNAs
+
+Bind `GO_PEVE_BP_En_sig_gene_mi`, `GO_PEVE_CC_En_sig_gene_mi`, and `GO_PEVE_MF_En_sig_gene_mi` to make a df that has significantly enriched GO terms for all ontologies 
+```{r}
+GO_PEVE_En_sig_gene_mi <- rbind(GO_PEVE_BP_En_sig_gene_mi, GO_PEVE_CC_En_sig_gene_mi, GO_PEVE_MF_En_sig_gene_mi)
+```
+
+Merge `mi_bed_filt` with `GO_PEVE_En_sig_gene_mi` and calculate proportion of significant genes
+```{r}
+merged_mirna <- GO_PEVE_En_sig_gene_mi %>%
+  left_join(mi_bed_filt, by = "gene_name") %>%
   na.omit() %>%
   mutate(prop.sig.genes = Significant/Annotated)
+
+# Write to csv 
+write.csv(merged_mirna, "../output/19-bedtools-closest/Peve_GO_en_sig_gene_miRNA.csv")
 ```
 
-Warning: Detected an unexpected many-to-many relationship between `x` and `y`.
+Plot 
+```{r}
+GO_plot_mi<-ggplot(merged_mirna, aes(x = Term, y = -log10(Fisher), size = prop.sig.genes, fill = -log10(Fisher))) +
+  #expand_limits(y = 1.5) +
+  #ylim(1, 7.25) +
+  # Add horizontal lines with a single aesthetic value
+  #geom_hline(yintercept = -log10(0.01), linetype = "longdash", colour = "black", linewidth = .6) +
+  #geom_hline(yintercept = -log10(0.001), linetype = "solid", colour = "black", linewidth = .6) +
+  geom_point(shape = 21) + 
+  scale_size(range = c(2, 12)) + 
+  scale_fill_continuous(low = "#1AD3D1FF", high = "#4686FBFF") +
+  xlab('') + 
+  ylab('Enrichment score') +
+  #labs(caption = 'Cut-off lines at p=0.01 and p=0.001') +
+  theme_bw() +
+  facet_grid(vars(ontology), scales = "free", space = "free_y") +
+  coord_flip(); GO_plot_mi
+```
 
-
-
-
+## lncRNAs
