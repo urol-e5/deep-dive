@@ -7,13 +7,7 @@ output: html_document
 
 ## Closest genomic features to ncRNAs in Porites evermanni 
 
-This code will investigate the proximity of ncRNAs to other genomic features in 
-
-
-
-
-
-Pocillopora tuahiniensis. The `bash` code snippets were done on the URI HPC server, Andromeda. I copied the Ptuh miRNA [gff](https://github.com/urol-e5/deep-dive/blob/main/F-Pmea/output/13.2.1-Pmea-sRNAseq-ShortStack-31bp-fastp-merged-cnidarian_miRBase/ShortStack_out/Results.gff3) and [fasta](https://github.com/urol-e5/deep-dive/blob/main/F-Pmea/output/13.2.1-Pmea-sRNAseq-ShortStack-31bp-fastp-merged-cnidarian_miRBase/ShortStack_out/mir.fasta) files onto Andromeda. We used the Pmeandrina genomic information for Ptuh. 
+This code will investigate the proximity of ncRNAs to mRNAs in Porites evermanni. 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -23,16 +17,266 @@ library(tidyverse)
 library(topGO)
 ```
 
+See [bash code](https://github.com/JillAshey/JillAshey_Putnam_Lab_Notebook/blob/master/_posts/2024-08-19-e5-deepdive-ncRNA-closest-features.md) for `bedtools closest` analysis. 
+
+Before analysis, make gene2go file from the annotation information
+```{r}
+GO_PEVE <- read.delim("../../data/Peve-rna-GO.tsv", sep = "\t", header = T)  %>%
+  select(query, GeneOntologyIDs) %>%
+  mutate(gene_name = gsub("Parent=","", query)) %>%
+  select(gene_name, GeneOntologyIDs)
+write_tsv(GO_PEVE, file = "../../data/Peve_gene2go.tab")
+```
+
+## piRNA 
+
+Load Peve piRNA closest file into R. This file represents the genomic features that are closest/are overlapping with piRNA clusters. 
+```{r}
+pi_bed <- read.delim("../output/19-bedtools-closest/Peve_piRNA_output.bed", header = F)
+head(pi_bed)
+```
+
+Keep specific columns and rename them 
+```{r}
+pi_bed_filt <- pi_bed %>%
+  dplyr::select(V1, V2, V3, V4, V6, V7, V8, V12) %>%
+  dplyr::rename("pi_chrom" = "V1", "pi_start" = "V2", "pi_end" = "V3", "gf_chrom" = "V4", "gf_type" = "V6", "gf_start" = "V7", "gf_end" = "V8", "gf_attr" = "V12")
+```
+
+Pull out gene name information from the `gf_attr` column and subset by mRNA
+```{r}
+pi_bed_filt <- pi_bed_filt %>%
+  mutate(gene_name = str_extract(gf_attr, "ID=Peve_[0-9]+")) %>%
+  mutate(gene_name = str_replace(gene_name, "ID=", "")) %>% # Remove "ID=" prefix
+  dplyr::filter(gf_type == "mRNA")
+```
+
+Calculate the overlap and distance based on the m_start, m_end, gf_start, and gf_end columns. Overlap occurs if the start of one feature is within the bounds of another. If there is no overlaps, the distance can be calculated as the gap between the end of one feature and the start of another. 
+```{r}
+pi_bed_filt$overlap <- with(pi_bed_filt, pmin(pi_end, gf_end) - pmax(pi_start, gf_start))
+
+sum(pi_bed_filt$overlap < 0)
+sum(pi_bed_filt$overlap > 0)
+```
+
+Calculate average/percentages of distance and overlap. 
+```{r}
+# Perform calculations grouped by m_type
+summary_stats <- pi_bed_filt %>%
+  #group_by(m_type) %>%
+  summarize(
+    avg_overlap = mean(overlap[overlap > 0], na.rm = TRUE),
+    avg_distance = mean(overlap[overlap < 0], na.rm = TRUE),
+    percent_overlap = sum(overlap > 0) / n() * 100,
+    percent_distance_lt_1kb = sum(overlap < 0 & overlap > -1000) / n() * 100,
+    percent_distance = sum(overlap < 0) / n() * 100
+  )
+
+# Display the summary statistics
+print(summary_stats)
+```
+
+Results: 
+avg_overlap avg_distance percent_overlap percent_distance_lt_1kb percent_distance
+1416.043      -4545.6        84.66258                4.907975         15.33742
+
+Read in gene2go information 
+```{r}
+PEVE_gene2go<-read.delim("../../data/Peve_gene2go.tab", sep="\t")
+```
+
+Make list of genes for input to TopGO
+```{r}
+peve_clust_genes <- as.character(unique(pi_bed_filt$gene_name))
+peve_all_genes <- as.character(PEVE_gene2go$gene_name)
+Peve_GeneList <- factor(as.integer(peve_all_genes %in% peve_clust_genes))
+names(Peve_GeneList) <- peve_all_genes
+```
+
+The following code will perform GO enrichment using the weighted Fisher's exact test to assess whether specific GO terms are overrepresented in the genes closest to the piRNA clusters. 
+
+Read in gene-to-go-mappings
+```{r}
+PEVE_gene2go_topgo<-readMappings("../../data/Peve_gene2go.tab", IDsep=";", sep="\t")
+```
+
+Set function to select genes of interest (ie those that have pvalue < 0.05)
+```{r}
+topDiffGenes <- function(allScore) {
+return(allScore < 0.05)}
+```
+
+### Biological Processes
+
+Create `topGOdata` object, which is required for topGO analysis
+```{r}
+GO_PEVE_BP <-new("topGOdata", ontology="BP", gene2GO=PEVE_gene2go_topgo, allGenes=Peve_GeneList, annot = annFUN.gene2GO, geneSel=topDiffGenes)
+```
+
+Run GO enrichment test 
+```{r}
+GO_PEVE_BP_FE <- runTest(GO_PEVE_BP, algorithm="weight01", statistic="fisher")
+```
+
+Generate results table 
+```{r}
+GO_PEVE_BP_En <- GenTable(GO_PEVE_BP, Fisher = GO_PEVE_BP_FE, orderBy = "Fisher",  topNodes = 100, numChar = 51)
+```
+Only taking the top 100 GO terms 
+
+Filter by significant results
+```{r}
+GO_PEVE_BP_En$Fisher<-as.numeric(GO_PEVE_BP_En$Fisher)
+GO_PEVE_BP_En_sig<-GO_PEVE_BP_En[GO_PEVE_BP_En$Fisher<0.05,]
+```
+
+Merge `GO_PEVE_BP_En_sig` with GO and gene info. 
+```{r}
+# Separate GO terms 
+PEVE_gene2go <- PEVE_gene2go %>%
+  separate_rows(GeneOntologyIDs, sep = ";")
+
+# Ensure GO terms in both datasets are formatted similarly (trim whitespaces)
+PEVE_gene2go$GeneOntologyIDs <- trimws(PEVE_gene2go$GeneOntologyIDs)
+GO_PEVE_BP_En_sig$GO.ID <- trimws(GO_PEVE_BP_En_sig$GO.ID)
+
+# Join the datasets based on GO term
+GO_PEVE_BP_En_sig_gene <- PEVE_gene2go %>%
+  left_join(GO_PEVE_BP_En_sig, by = c("GeneOntologyIDs" = "GO.ID")) %>%
+  na.omit()
+
+# Add ontology column 
+GO_PEVE_BP_En_sig_gene$ontology <- "Biological Processes"
+```
+
+### Cellular Components 
+
+Create `topGOdata` object, which is required for topGO analysis
+```{r}
+GO_PEVE_CC <-new("topGOdata", ontology="CC", gene2GO=PEVE_gene2go_topgo, allGenes=Peve_GeneList, annot = annFUN.gene2GO, geneSel=topDiffGenes)
+```
+
+Run GO enrichment test 
+```{r}
+GO_PEVE_CC_FE <- runTest(GO_PEVE_CC, algorithm="weight01", statistic="fisher")
+```
+
+Generate results table 
+```{r}
+GO_PEVE_CC_En <- GenTable(GO_PEVE_CC, Fisher = GO_PEVE_CC_FE, orderBy = "Fisher",  topNodes = 100, numChar = 51)
+```
+Only taking the top 100 GO terms 
+
+Filter by significant results
+```{r}
+GO_PEVE_CC_En$Fisher<-as.numeric(GO_PEVE_CC_En$Fisher)
+GO_PEVE_CC_En_sig<-GO_PEVE_CC_En[GO_PEVE_CC_En$Fisher<0.05,]
+```
+
+Merge `GO_PEVE_CC_En_sig` with GO and gene info. 
+```{r}
+# Separate GO terms 
+PEVE_gene2go <- PEVE_gene2go %>%
+  separate_rows(GeneOntologyIDs, sep = ";")
+
+# Ensure GO terms in both datasets are formatted similarly (trim whitespaces)
+PEVE_gene2go$GeneOntologyIDs <- trimws(PEVE_gene2go$GeneOntologyIDs)
+GO_PEVE_CC_En_sig$GO.ID <- trimws(GO_PEVE_CC_En_sig$GO.ID)
+
+# Join the datasets based on GO term
+GO_PEVE_CC_En_sig_gene <- PEVE_gene2go %>%
+  left_join(GO_PEVE_CC_En_sig, by = c("GeneOntologyIDs" = "GO.ID")) %>%
+  na.omit()
+
+# Add ontology column 
+GO_PEVE_CC_En_sig_gene$ontology <- "Cellular Components"
+```
+
+### Molecular Functions 
+
+Create `topGOdata` object, which is required for topGO analysis
+```{r}
+GO_PEVE_MF <-new("topGOdata", ontology="MF", gene2GO=PEVE_gene2go_topgo, allGenes=Peve_GeneList, annot = annFUN.gene2GO, geneSel=topDiffGenes)
+```
+
+Run GO enrichment test 
+```{r}
+GO_PEVE_MF_FE <- runTest(GO_PEVE_MF, algorithm="weight01", statistic="fisher")
+```
+
+Generate results table 
+```{r}
+GO_PEVE_MF_En <- GenTable(GO_PEVE_MF, Fisher = GO_PEVE_MF_FE, orderBy = "Fisher",  topNodes = 100, numChar = 51)
+```
+Only taking the top 100 GO terms 
+
+Filter by significant results
+```{r}
+GO_PEVE_MF_En$Fisher<-as.numeric(GO_PEVE_MF_En$Fisher)
+GO_PEVE_MF_En_sig<-GO_PEVE_MF_En[GO_PEVE_MF_En$Fisher<0.05,]
+```
+
+Merge `GO_PEVE_MF_En_sig` with GO and gene info. 
+```{r}
+# Separate GO terms 
+PEVE_gene2go <- PEVE_gene2go %>%
+  separate_rows(GeneOntologyIDs, sep = ";")
+
+# Ensure GO terms in both datasets are formatted similarly (trim whitespaces)
+PEVE_gene2go$GeneOntologyIDs <- trimws(PEVE_gene2go$GeneOntologyIDs)
+GO_PEVE_MF_En_sig$GO.ID <- trimws(GO_PEVE_MF_En_sig$GO.ID)
+
+# Join the datasets based on GO term
+GO_PEVE_MF_En_sig_gene <- PEVE_gene2go %>%
+  left_join(GO_PEVE_MF_En_sig, by = c("GeneOntologyIDs" = "GO.ID")) %>%
+  na.omit()
+
+# Add ontology column 
+GO_PEVE_MF_En_sig_gene$ontology <- "Molecular Functions"
+```
+
+### Join ontologies for piRNAs
+
+Bind `GO_PEVE_BP_En_sig_gene`, `GO_PEVE_CC_En_sig_gene`, and `GO_PEVE_MF_En_sig_gene` to make a df that has significantly enriched GO terms for all ontologies 
+```{r}
+GO_PEVE_En_sig_gene <- rbind(GO_PEVE_BP_En_sig_gene, GO_PEVE_CC_En_sig_gene, GO_PEVE_MF_En_sig_gene)
+```
+
+Merge `pi_bed_filt` with `GO_PEVE_En_sig_gene` and calculate proportion of significant genes
+```{r}
+merged_pirna <- GO_PEVE_En_sig_gene %>%
+  left_join(pi_bed_filt, by = "gene_name") %>%
+  na.omit() %>%
+  mutate(prop.sig.genes = Significant/Annotated)
+```
 
 
 
 
-add bash code 
 
 
 
 
-Moving into R to visualize and calculate more stats.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 Load Peve bed file into R. 
 ```{r}
