@@ -516,3 +516,244 @@ GO_plot_mi<-ggplot(merged_mirna, aes(x = Term, y = -log(Fisher), size = prop.sig
   coord_flip(); GO_plot_mi
 ```
 
+## lncRNAs
+
+Load Pmea lncRNA closest file into R. This file represents the genomic features that are closest/are overlapping with lncRNA clusters. 
+```{r}
+lnc_bed <- read.delim("../output/19-bedtools-closest/Pmea_lncRNA_output.bed", header = F)
+head(lnc_bed)
+```
+
+Keep specific columns and rename them 
+```{r}
+lnc_bed_filt <- lnc_bed %>%
+  dplyr::select(V1, V2, V3, V4, V6, V7, V8, V12) %>%
+  dplyr::rename("l_chrom" = "V1", "l_start" = "V2", "l_end" = "V3", "gf_chrom" = "V4", "gf_type" = "V6", "gf_start" = "V7", "gf_end" = "V8", "gf_attr" = "V12")
+```
+
+Pull out gene name information from the `gf_attr` column and subset by mRNA
+```{r}
+lnc_bed_filt <- lnc_bed_filt %>%
+  dplyr::filter(gf_type == "transcript") %>%
+  mutate(gene_name = gf_attr) %>%
+  mutate(gene_name = str_replace(gene_name, "ID=", ""))# Remove "ID=" prefix
+```
+
+Calculate the overlap and distance based on the l_start, l_end, gf_start, and gf_end columns. Overlap occurs if the start of one feature is within the bounds of another. If there is no overlaps, the distance can be calculated as the gap between the end of one feature and the start of another. 
+```{r}
+lnc_bed_filt$overlap <- with(lnc_bed_filt, pmin(l_end, gf_end) - pmax(l_start, gf_start))
+
+sum(lnc_bed_filt$overlap < 0)
+sum(lnc_bed_filt$overlap > 0)
+```
+
+Calculate average/percentages of distance and overlap. 
+```{r}
+summary_stats <- lnc_bed_filt %>%
+  summarize(
+    avg_overlap = mean(overlap[overlap > 0], na.rm = TRUE),
+    avg_distance = mean(overlap[overlap < 0], na.rm = TRUE),
+    percent_overlap = sum(overlap > 0) / n() * 100,
+    percent_distance_lt_1kb = sum(overlap < 0 & overlap > -1000) / n() * 100,
+    percent_distance = sum(overlap < 0) / n() * 100
+  )
+
+# Display the summary statistics
+print(summary_stats)
+```
+
+Results:
+avg_overlap avg_distance percent_overlap percent_distance_lt_1kb percent_distance
+   3000.918    -10380.68        4.252269                17.04093         95.73977
+
+Read in gene2go information 
+```{r}
+PMEA_gene2go<-read.delim("../../data/Pmea_gene2go.tab", sep="\t")
+```
+
+Make list of genes for input to TopGO
+```{r}
+pmea_clust_genes <- as.character(unique(lnc_bed_filt$gene_name))
+pmea_all_genes <- as.character(PMEA_gene2go$gene_name)
+Pmea_GeneList <- factor(as.integer(pmea_all_genes %in% pmea_clust_genes))
+names(Pmea_GeneList) <- pmea_all_genes
+```
+
+The following code will perform GO enrichment using the weighted Fisher's exact test to assess whether specific GO terms are overrepresented in the genes closest to the piRNA clusters. 
+
+Read in gene-to-go-mappings
+```{r}
+PMEA_gene2go_topgo<-readMappings("../../data/Pmea_gene2go.tab", IDsep=";", sep="\t")
+```
+
+Set function to select genes of interest (ie those that have pvalue < 0.05)
+```{r}
+topDiffGenes <- function(allScore) {
+return(allScore < 0.05)}
+```
+
+### Biological Processes
+
+Create `topGOdata` object, which is required for topGO analysis
+```{r}
+GO_PMEA_BP_lnc <-new("topGOdata", ontology="BP", gene2GO=PMEA_gene2go_topgo, allGenes=Pmea_GeneList, annot = annFUN.gene2GO, geneSel=topDiffGenes)
+```
+
+Run GO enrichment test 
+```{r}
+GO_PMEA_BP_FE_lnc <- runTest(GO_PMEA_BP_lnc, algorithm="weight01", statistic="fisher")
+```
+
+Generate results table 
+```{r}
+GO_PMEA_BP_En_lnc <- GenTable(GO_PMEA_BP_lnc, Fisher = GO_PMEA_BP_FE_lnc, orderBy = "Fisher",  topNodes = 100, numChar = 51)
+```
+Only taking the top 100 GO terms 
+
+Filter by significant results
+```{r}
+GO_PMEA_BP_En_lnc$Fisher<-as.numeric(GO_PMEA_BP_En_lnc$Fisher)
+GO_PMEA_BP_En_sig_lnc<-GO_PMEA_BP_En_lnc[GO_PMEA_BP_En_lnc$Fisher<0.05,]
+```
+
+Merge `GO_PMEA_BP_En_sig_lnc` with GO and gene info. 
+```{r}
+# Separate GO terms 
+PMEA_gene2go <- PMEA_gene2go %>%
+  separate_rows(GeneOntologyIDs, sep = ";")
+
+# Ensure GO terms in both datasets are formatted similarly (trim whitespaces)
+PMEA_gene2go$GeneOntologyIDs <- trimws(PMEA_gene2go$GeneOntologyIDs)
+GO_PMEA_BP_En_sig_lnc$GO.ID <- trimws(GO_PMEA_BP_En_sig_lnc$GO.ID)
+
+# Join the datasets based on GO term
+GO_PMEA_BP_En_sig_gene_lnc <- PMEA_gene2go %>%
+  left_join(GO_PMEA_BP_En_sig_lnc, by = c("GeneOntologyIDs" = "GO.ID")) %>%
+  na.omit()
+
+# Add ontology column 
+GO_PMEA_BP_En_sig_gene_lnc$ontology <- "Biological Processes"
+```
+
+### Cellular Components 
+
+Create `topGOdata` object, which is required for topGO analysis
+```{r}
+GO_PMEA_CC_lnc <-new("topGOdata", ontology="CC", gene2GO=PMEA_gene2go_topgo, allGenes=Pmea_GeneList, annot = annFUN.gene2GO, geneSel=topDiffGenes)
+```
+
+Run GO enrichment test 
+```{r}
+GO_PMEA_CC_FE_lnc <- runTest(GO_PMEA_CC_lnc, algorithm="weight01", statistic="fisher")
+```
+
+Generate results table 
+```{r}
+GO_PMEA_CC_En_lnc <- GenTable(GO_PMEA_CC_lnc, Fisher = GO_PMEA_CC_FE_lnc, orderBy = "Fisher",  topNodes = 100, numChar = 51)
+```
+Only taking the top 100 GO terms 
+
+Filter by significant results
+```{r}
+GO_PMEA_CC_En_lnc$Fisher<-as.numeric(GO_PMEA_CC_En_lnc$Fisher)
+GO_PMEA_CC_En_sig_lnc<-GO_PMEA_CC_En_lnc[GO_PMEA_CC_En_lnc$Fisher<0.05,]
+```
+
+Merge `GO_PMEA_CC_En_sig_lnc` with GO and gene info. 
+```{r}
+# Separate GO terms 
+PMEA_gene2go <- PMEA_gene2go %>%
+  separate_rows(GeneOntologyIDs, sep = ";")
+
+# Ensure GO terms in both datasets are formatted similarly (trim whitespaces)
+PMEA_gene2go$GeneOntologyIDs <- trimws(PMEA_gene2go$GeneOntologyIDs)
+GO_PMEA_CC_En_sig_lnc$GO.ID <- trimws(GO_PMEA_CC_En_sig_lnc$GO.ID)
+
+# Join the datasets based on GO term
+GO_PMEA_CC_En_sig_gene_lnc <- PMEA_gene2go %>%
+  left_join(GO_PMEA_CC_En_sig_lnc, by = c("GeneOntologyIDs" = "GO.ID")) %>%
+  na.omit()
+
+# Add ontology column 
+GO_PMEA_CC_En_sig_gene_lnc$ontology <- "Cellular Components"
+```
+
+### Molecular Functions 
+
+Create `topGOdata` object, which is required for topGO analysis
+```{r}
+GO_PMEA_MF_lnc <-new("topGOdata", ontology="MF", gene2GO=PMEA_gene2go_topgo, allGenes=Pmea_GeneList, annot = annFUN.gene2GO, geneSel=topDiffGenes)
+```
+
+Run GO enrichment test 
+```{r}
+GO_PMEA_MF_FE_lnc <- runTest(GO_PMEA_MF_lnc, algorithm="weight01", statistic="fisher")
+```
+
+Generate results table 
+```{r}
+GO_PMEA_MF_En_lnc <- GenTable(GO_PMEA_MF_lnc, Fisher = GO_PMEA_MF_FE_lnc, orderBy = "Fisher",  topNodes = 100, numChar = 51)
+```
+Only taking the top 100 GO terms 
+
+Filter by significant results
+```{r}
+GO_PMEA_MF_En_lnc$Fisher<-as.numeric(GO_PMEA_MF_En_lnc$Fisher)
+GO_PMEA_MF_En_sig_lnc<-GO_PMEA_MF_En_lnc[GO_PMEA_MF_En_lnc$Fisher<0.05,]
+```
+
+Merge `GO_PMEA_MF_En_sig_lnc` with GO and gene info. 
+```{r}
+# Separate GO terms 
+PMEA_gene2go <- PMEA_gene2go %>%
+  separate_rows(GeneOntologyIDs, sep = ";")
+
+# Ensure GO terms in both datasets are formatted similarly (trim whitespaces)
+PMEA_gene2go$GeneOntologyIDs <- trimws(PMEA_gene2go$GeneOntologyIDs)
+GO_PMEA_MF_En_sig_lnc$GO.ID <- trimws(GO_PMEA_MF_En_sig_lnc$GO.ID)
+
+# Join the datasets based on GO term
+GO_PMEA_MF_En_sig_gene_lnc <- PMEA_gene2go %>%
+  left_join(GO_PMEA_MF_En_sig_lnc, by = c("GeneOntologyIDs" = "GO.ID")) %>%
+  na.omit()
+
+# Add ontology column 
+GO_PMEA_MF_En_sig_gene_lnc$ontology <- "Molecular Functions"
+```
+
+### Join ontologies for lncRNAs
+
+Bind `GO_PMEA_BP_En_sig_gene_lnc`, `GO_PMEA_CC_En_sig_gene_lnc`, and `GO_PMEA_MF_En_sig_gene_lnc` to make a df that has significantly enriched GO terms for all ontologies 
+```{r}
+GO_PMEA_En_sig_gene_lnc <- rbind(GO_PMEA_BP_En_sig_gene_lnc, GO_PMEA_CC_En_sig_gene_lnc, GO_PMEA_MF_En_sig_gene_lnc)
+```
+
+Merge `lnc_bed_filt` with `GO_APUL_En_sig_gene_lnc` and calculate proportion of significant genes
+```{r}
+merged_lncrna <- GO_PMEA_En_sig_gene_lnc %>%
+  left_join(lnc_bed_filt, by = "gene_name") %>%
+  na.omit() %>%
+  mutate(prop.sig.genes = Significant/Annotated)
+
+# Write to csv 
+write.csv(merged_lncrna, "../output/19-bedtools-closest/Pmea_GO_en_sig_gene_lncRNA.csv")
+```
+
+Plot 
+```{r}
+GO_plot_lnc<-ggplot(merged_lncrna, aes(x = Term, y = -log(Fisher), size = prop.sig.genes, fill = -log(Fisher))) +
+  #expand_limits(y = 1.5) +
+  #ylim(1, 7.25) +
+  # Add horizontal lines with a single aesthetic value
+  #geom_hline(yintercept = -log10(0.01), linetype = "longdash", colour = "black", linewidth = .6) +
+  #geom_hline(yintercept = -log10(0.001), linetype = "solid", colour = "black", linewidth = .6) +
+  geom_point(shape = 21) + 
+  scale_size(range = c(2, 12)) + 
+  scale_fill_continuous(low = "#1AD3D1FF", high = "#4686FBFF") +
+  xlab('') + 
+  ylab('Enrichment score') +
+  #labs(caption = 'Cut-off lines at p=0.01 and p=0.001') +
+  theme_bw() +
+  facet_grid(vars(ontology), scales = "free", space = "free_y") +
+  coord_flip(); GO_plot_lnc
+```

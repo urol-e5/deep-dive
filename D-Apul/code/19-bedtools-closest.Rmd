@@ -739,3 +739,22 @@ merged_lncrna <- GO_APUL_En_sig_gene_lnc %>%
 write.csv(merged_lncrna, "../output/19-bedtools-closest/Apul_GO_en_sig_gene_lncRNA.csv")
 ```
 
+Plot 
+```{r}
+GO_plot_lnc<-ggplot(merged_lncrna, aes(x = Term, y = Fisher, size = prop.sig.genes, fill = Fisher)) +
+  #expand_limits(y = 1.5) +
+  #ylim(1, 7.25) +
+  # Add horizontal lines with a single aesthetic value
+  #geom_hline(yintercept = -log10(0.01), linetype = "longdash", colour = "black", linewidth = .6) +
+  #geom_hline(yintercept = -log10(0.001), linetype = "solid", colour = "black", linewidth = .6) +
+  geom_point(shape = 21) + 
+  scale_size(range = c(2, 12)) + 
+  scale_fill_continuous(low = "#1AD3D1FF", high = "#4686FBFF") +
+  xlab('') + 
+  ylab('Enrichment score') +
+  #labs(caption = 'Cut-off lines at p=0.01 and p=0.001') +
+  theme_bw() +
+  facet_grid(vars(ontology), scales = "free", space = "free_y") +
+  coord_flip(); GO_plot_lnc
+```
+
