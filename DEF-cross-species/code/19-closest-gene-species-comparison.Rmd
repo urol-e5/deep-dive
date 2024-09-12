@@ -240,31 +240,116 @@ shared_go_mi <- all_go_mi %>%
   summarise(unique_species = n_distinct(Species), .groups = 'keep') %>%  # Count distinct species for each GO term and ontology
   filter(unique_species > 1)
 
-shared_go_mi <- all_go_mi %>%
-  group_by(GeneOntologyIDs) %>%
-  filter(if (any(ontology == "Cellular Components")) ontology == "Cellular Components" else TRUE) %>%
-  summarise(unique_species = n_distinct(Species), .groups = 'drop') %>%
-  filter(unique_species > 1)
-
 # Create a new dataframe with only the shared GeneOntologyIDs
 shared_go_mi_df <- all_go_mi %>%
   filter(GeneOntologyIDs %in% shared_go_mi$GeneOntologyIDs)
 
+# Identify terms associated with both CC and MF, and only keep CC
+shared_go_mi_df <- shared_go_mi_df %>%
+  group_by(GeneOntologyIDs) %>%
+  mutate(cc_present = any(ontology == "Cellular Components")) %>%
+  filter(!(ontology == "Molecular Functions" & cc_present)) %>%
+  ungroup() %>%
+  select(-cc_present)
+
 # Plot 
 GO_plot_mi <- ggplot(shared_go_mi_df, aes(x = Term, y = -log10(Fisher), shape = Species, fill = Species)) +
-  geom_point(size = 4, color = "black") +  # Black border around shapes
+  geom_point(size = 25, color = "black", stroke = 2) +  # Black border around shapes
   scale_shape_manual(values = c(21, 22, 23)) +  # Shapes that can be filled
   scale_fill_manual(values = c("#408EC6", "#7A2048", "#1E2761")) +  # Custom colors for each species
   scale_size(range = c(2, 12)) + 
   xlab('') + 
-  ylab('Enrichment score') +
-  facet_grid(vars(ontology)) + 
+  ylab('log(Enrichment score)') +
+  facet_grid(vars(ontology), scales = "free", space = "free_y") + 
   theme_bw() +
+  theme(
+    axis.title = element_text(size = 36, face = "bold"),        # Axis title size
+    axis.text = element_text(size = 34, colour = "black"),                        # Axis text size
+    legend.title = element_text(size = 34, face = "bold"),      # Legend title size
+    legend.text = element_text(size = 32),                      # Legend text size
+    strip.text = element_text(size = 34, face = "bold"),        # Facet text size
+    strip.background = element_rect(fill = "lightgray", color = "black", size = 1.5),         # Facet background
+    axis.line = element_line(size = 1, colour = "black"),       # Enhanced axis lines
+    axis.ticks = element_line(size = 1),                        # Thicker axis ticks
+     #panel.border = element_blank()                             # Remove panel border
+    #panel.grid.major = element_blank(),                         # Remove major grid lines
+    #panel.grid.minor = element_blank()                          # Remove minor grid lines
+        panel.border = element_rect(color = "black", size = 1.2),   # Enhanced facet border lines
+    panel.grid.major = element_line(size = 0.5, color = "gray"), # Grid lines inside the facets
+    panel.spacing = unit(1, "lines"),                           # Increase space between facets
+    strip.placement = "outside"    
+  ) +
   coord_flip(); GO_plot_mi
 
-ggsave(filename = "../figures/miRNA_shared_GOs_plot.png", GO_plot_mi, width = 15, height = 20)
+ggsave(filename = "../figures/miRNA_shared_GOs_plot.png", GO_plot_mi, width = 25, height = 30)
+ggsave(filename = "../figures/miRNA_shared_GOs_plot.pdf", GO_plot_mi, width = 25, height = 30)
 ```
 
-Weird...having issues with this plot. It is plotting terms that are unique only to one species when I am asking it to plot only terms that are shared by 2+ species. When I look in the df however, the terms actually are shared, the plot itself just isn't plotting them. Ah it might be because some GO terms belong to multiple ontologies...which is dumb. It looks like most of the issue is arising from POC. I have tried to remove terms that are associated with 1+ ontology and only keep the row that is associated with cellular components but this has not succeeded. UGH
+## All ncRNAs 
+
+Filter out extra information from `shared_go_pi_df` and `shared_go_mi_df`
+```{r}
+# Look at dimensions and column names for each df 
+dim(shared_go_pi_df)
+dim(shared_go_mi_df)
+colnames(shared_go_pi_df)
+colnames(shared_go_mi_df)
+
+# Select certain columns 
+filt_shared_go_pi_df <- shared_go_pi_df %>%
+  dplyr::select(c(gene_name, GeneOntologyIDs, Term, Annotated, Significant, Expected, Fisher, ontology, pi_chrom, pi_start, pi_end, gf_chrom, gf_type, gf_start, gf_end, overlap, prop.sig.genes, Species)) %>%
+  rename(ncrna_chrom = pi_chrom, ncrna_start = pi_start, ncrna_end = pi_end) %>%
+  mutate(ncrna = "piRNA")
+
+filt_shared_go_mi_df <- shared_go_mi_df %>%
+  dplyr::select(c(gene_name, GeneOntologyIDs, Term, Annotated, Significant, Expected, Fisher, ontology, m_chrom, m_start, m_end, gf_chrom, gf_type, gf_start, gf_end, overlap, prop.sig.genes, Species)) %>%
+  rename(ncrna_chrom = m_chrom, ncrna_start = m_start, ncrna_end = m_end) %>%
+  mutate(ncrna = "miRNA")
+
+# Bind dfs together 
+all_shared <- rbind(filt_shared_go_pi_df, filt_shared_go_mi_df)
+
+# Save as csv 
+write.csv(all_shared, "../output/18-bedtools-closest-gene/ncRNAs_shared_go_by_species.csv")
+```
+
+Plot 
+```{r}
+GO_plot_all <- ggplot(all_shared, aes(x = Term, y = -log10(Fisher), shape = Species, fill = Species)) +
+  geom_point(size = 22, color = "black", stroke = 2) +  # Black border around shapes
+  scale_shape_manual(values = c(21, 22, 23)) +  # Shapes that can be filled
+  scale_fill_manual(values = c("#408EC6", "#7A2048", "#1E2761")) +  # Custom colors for each species
+  scale_size(range = c(2, 12)) + 
+  xlab('') + 
+  ylab('log(Enrichment score)') +
+  facet_grid(vars(ontology), vars(ncrna), scales = "free", space = "free_y") + 
+  theme_bw() +
+  theme(
+    axis.title = element_text(size = 36, face = "bold"),        # Axis title size
+    axis.text = element_text(size = 34, colour = "black"),                        # Axis text size
+    legend.title = element_text(size = 34, face = "bold"),      # Legend title size
+    legend.text = element_text(size = 32),                      # Legend text size
+    strip.text = element_text(size = 34, face = "bold"),        # Facet text size
+    strip.background = element_rect(fill = "lightgray", color = "black", size = 1.5),         # Facet background
+    axis.line = element_line(size = 1, colour = "black"),       # Enhanced axis lines
+    axis.ticks = element_line(size = 1),                        # Thicker axis ticks
+     #panel.border = element_blank()                             # Remove panel border
+    #panel.grid.major = element_blank(),                         # Remove major grid lines
+    #panel.grid.minor = element_blank()                          # Remove minor grid lines
+        panel.border = element_rect(color = "black", size = 1.2),   # Enhanced facet border lines
+    panel.grid.major = element_line(size = 0.5, color = "gray"), # Grid lines inside the facets
+    panel.spacing = unit(1, "lines"),                           # Increase space between facets
+    strip.placement = "outside"
+  ) +
+  coord_flip(); GO_plot_all
+
+ggsave(filename = "../figures/all_ncRNAs_shared_GOs_plot.png", GO_plot_all, width = 35, height = 35)
+ggsave(filename = "../figures/all_ncRNAs_shared_GOs_plot.pdf", GO_plot_all, width = 35, height = 35)
+```
+
+
+
+
+
 
 
