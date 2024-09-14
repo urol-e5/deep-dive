@@ -23,6 +23,7 @@ library(tidyr)
 library(tibble)
 library(tidyverse)
 library(ggvenn)
+library(cowplot)
 ```
 
 ## piRNA
@@ -584,3 +585,274 @@ GO_plot_lnc_BP <- ggplot(shared_go_lnc_df_BP, aes(x = Term, y = -log10(Fisher), 
 ggsave(filename = "../figures/lncRNAs_shared_GO_BP_plot.png", GO_plot_lnc_BP, width = 35, height = 25)
 ggsave(filename = "../figures/lncRNAs_shared_GO_BP_plot.pdf", GO_plot_lnc_BP, width = 35, height = 25)
 ```
+
+
+
+
+
+## Plot lengths for each species 
+
+I am going to make length plots for each species for lncRNAs, miRNAs and piRNAs so that the format is the same for everything. Also going to make venn diagrams for shared sequences for lncRNAs and miRNAs here so that the format is the same and I can join them in one figure. 
+
+
+### miRNAs 
+
+Kathleen wrote code for the miRNA [length comparison](https://github.com/urol-e5/deep-dive/blob/main/DEF-cross-species/code/10-shortRNA-ShortStack-comparison.Rmd). I'm going to modify her code 
+
+Read in length data for miRNAs
+```{r}
+Apul_lengths_mi <- read.table("../data/10-shortRNA-ShortStack-comparison/Apul_ShortStack_mature_lengths.txt", header = FALSE, col.names = "length")
+Peve_lengths_mi <- read.table("../data/10-shortRNA-ShortStack-comparison/Peve_ShortStack_mature_lengths.txt", header = FALSE, col.names = "length")
+Pmea_lengths_mi <- read.table("../data/10-shortRNA-ShortStack-comparison/Pmea_ShortStack_mature_lengths.txt", header = FALSE, col.names = "length")
+```
+
+Combine dfs
+```{r}
+# Add a new column to each data frame to label the source file
+Apul_lengths_mi <- Apul_lengths_mi %>% mutate(Species = 'A. pulchra')
+Peve_lengths_mi <- Peve_lengths_mi %>% mutate(Species = 'P. evermanni')
+Pmea_lengths_mi <- Pmea_lengths_mi %>% mutate(Species = 'P. tuahiniensis')
+
+# Combine the data frames into one
+all_lengths_mi <- rbind(Apul_lengths_mi, Peve_lengths_mi, Pmea_lengths_mi)
+```
+
+Count miRNA lengths by species
+```{r}
+count_by_group_mi <- all_lengths_mi %>%
+  dplyr::count(Species, length)
+count_by_group_mi
+```
+
+Plot miRNA lengths of all species
+```{r}
+# Set our color scheme for plotting -- options for both the abbreviated labels or the full, correct species names
+species_colors_nolabel <- c('#408EC6', '#1E2761', '#7A2048')
+
+length_plot_mi <- ggplot(count_by_group, aes(x = length, y = n, fill = Species)) + 
+  geom_bar(position = "dodge",
+           stat = "identity",
+           color = "black",  # Bar outline color
+           size = 2,         # Thicker bar outlines
+           width = 0.9) + 
+  scale_fill_manual(values = species_colors_nolabel) + 
+  scale_y_continuous(expand = c(0, 0)) +   # Bars sit on x-axis
+  labs(x = "Length (bp)", y = "Read count") +
+  theme_minimal() + 
+  theme(
+    axis.title = element_text(size = 60, face = "bold", margin = margin(t = 100, r = 100, b = 100, l = 100)),  # Space between titles and text
+    axis.text = element_text(size = 55, colour = "black", margin = margin(t = 10, r = 10, b = 10, l = 10)),  # Axis text size
+    axis.line = element_line(size = 1.5, color = "black"),  # Darker, thicker axis lines
+    axis.ticks = element_line(size = 1.5, color = "black"), # Thicker axis ticks
+    plot.margin = unit(c(1, 1, 1, 1), "cm"),                # Margin around plot (top, right, bottom, left)
+    legend.position = "none"                                # Remove legend
+  ); length_plot_mi
+
+
+ggsave(filename = "../figures/miRNA_lengths.png", length_plot_mi, width = 34, height = 20)
+ggsave(filename = "../figures/miRNA_lengths.pdf", length_plot_mi, width = 34, height = 20)
+```
+
+The actual Venn diagram was made by Kathleen [here](https://github.com/urol-e5/deep-dive/blob/main/DEF-cross-species/code/10-shortRNA-ShortStack-comparison.Rmd). She did some complex code to get the venn to work so I am just doing to pull the numbers from the venn to make the plot format uniform.
+
+Make lists for venn
+```{r}
+# Define elements for each set based on data, correctly reflecting overlaps
+set_APUL <- c(paste0("APUL", 1:32), "APUL_PEVE", "APUL_PMEA", paste0("APUL_PEVE_PMEA", 1:4))
+set_PMEA <- c(paste0("PMEA", 1:31), "APUL_PMEA", "PMEA_PEVE", paste0("APUL_PEVE_PMEA", 1:4))
+set_PEVE <- c(paste0("PEVE", 1:40), "APUL_PEVE", "PMEA_PEVE", paste0("APUL_PEVE_PMEA", 1:4))
+
+# Combine the sets into a named list
+venn_sets <- list(
+  "A. pulchra" = set_APUL,
+  "P. tuahiniensis" = set_PMEA,
+  "P. evermanni" = set_PEVE
+)
+```
+
+Plot overlap of miRNAs across spp
+```{r}
+venn_mi <- ggvenn(
+  venn_sets, 
+  fill_color = species_colors_nolabel,  # Customize the fill colors
+  stroke_size = 1.5, # Outline size of the circles
+  set_name_size = F,         # Size of the set labels
+  show_percentage = F,
+  stroke_alpha = 2,
+  text_size = 20
+); venn_mi
+
+ggsave(filename = "../figures/miRNA_overlap_venn.png", venn_mi, width = 34, height = 20)
+ggsave(filename = "../figures/miRNA_overlap_venn.pdf", venn_mi, width = 34, height = 20)
+```
+
+### piRNAs
+
+Javi wrote code for the piRNA [length comparison](https://github.com/urol-e5/deep-dive/blob/main/DEF-cross-species/code/12-piRNA-comparizon.Rmd). I'm going to modify his code.
+
+Read in length data for piRNAs 
+```{r}
+APUL_L = list.files(path = "../../D-Apul/output/18-Apul-piRNA/0_piRNA_pipeline_proTRAC/piRNA_length_data", pattern=".txt", recursive = T, full.names = T)
+
+PMEA_L = list.files(path = "../../F-Pmea/output/18-Pmea-piRNA/0_piRNA_pipeline_proTRAC/piRNA_length_data", pattern=".txt", recursive = T, full.names = T)
+
+PEVE_L = list.files(path = "../../E-Peve/output/18-Peve-piRNA/0_piRNA_pipeline_proTRAC/piRNA_length_data", pattern=".txt", recursive = T, full.names = T)
+
+L = c(APUL_L,PMEA_L,PEVE_L)
+names <- L %>%
+  substring(.,75) %>%
+  gsub("_piRNA_length.txt", "", .)
+
+DFs = lapply(L, function(x) {
+  data <- read.table(paste0(x), comment.char = "")
+  colnames(data) <- c("freq", "length")
+  return(data)
+})
+```
+
+Count piRNA lengths by species  
+```{r}
+combo = Reduce(function(...) merge(..., by = "length", all=T), DFs)
+colnames(combo) <- c("length", names)
+combo <- combo %>%
+  mutate(ACR = rowSums(combo[,2:6])) %>%
+  mutate(POC = rowSums(combo[,7:11])) %>%
+  mutate(POR = rowSums(combo[,12:14])) %>%
+  select(length,ACR,POC,POR) %>%
+  pivot_longer(c("ACR", "POC", "POR"), values_to = "sums", names_to = "group") %>%
+  mutate(Species = case_when(
+    group == "ACR" ~ "A. pulchra", 
+    group == "POR" ~ "P. evermanni",
+    group == "POC" ~ "P. tuahiniensis"))
+```
+
+Plot piRNA lengths of all species
+```{r}
+# Set our color scheme for plotting -- options for both the abbreviated labels or the full, correct species names
+species_colors_nolabel <- c('#408EC6', '#1E2761', '#7A2048')
+
+length_plot_pi <- ggplot(combo, aes(x = length, y = sums, fill = Species)) + 
+  geom_bar(position = "dodge",
+           stat = "identity",
+           color = "black",  # Bar outline color
+           size = 2,         # Thicker bar outlines
+           width = 0.9) + 
+  scale_fill_manual(values = species_colors_nolabel) + 
+  scale_y_continuous(expand = c(0, 0)) +   # Bars sit on x-axis
+  scale_x_continuous(breaks = unique(combo$length)) +  # Ensure every "length" value appears on the x-axis
+  labs(x = "Length (bp)", y = "Read count") +
+  theme_minimal() + 
+  theme(
+    axis.title = element_text(size = 60, face = "bold", margin = margin(t = 100, r = 100, b = 100, l = 100)),  # Space between titles and text
+    axis.text = element_text(size = 55, colour = "black", margin = margin(t = 10, r = 10, b = 10, l = 10)),  # Axis text size
+    axis.line = element_line(size = 1.5, color = "black"),  # Darker, thicker axis lines
+    axis.ticks = element_line(size = 1.5, color = "black"), # Thicker axis ticks
+    plot.margin = unit(c(1, 1, 1, 1), "cm"),                # Margin around plot (top, right, bottom, left)
+    legend.title = element_text(size = 40, face = "bold"),  # Increase legend title size
+    legend.text = element_text(size = 40),
+    legend.position = "none"                              
+  ) +
+  guides(fill = guide_legend(override.aes = list(size = 20)));  # Increase the size of legend squares
+length_plot_pi
+
+ggsave(filename = "../figures/piRNA_lengths.png", length_plot_pi, width = 34, height = 20)
+ggsave(filename = "../figures/piRNA_lengths.pdf", length_plot_pi, width = 34, height = 20)
+```
+
+### lncRNAs 
+
+Calculate length from bed files
+```{r}
+apul_lnc_bed <- read.delim("../../D-Apul/output/05.33-lncRNA-discovery/Apul_lncRNA.bed", header = F) %>%
+  rename("lncRNA" = "V1", "start" = "V2", "end" = "V3") %>%
+  mutate(length = end-start) %>%
+  mutate(Species = "Acropora pulchra")
+
+peve_lnc_bed <- read.delim("../../E-Peve/output/Peve_lncRNA.bed", header = F) %>%
+  rename("lncRNA" = "V1", "start" = "V2", "end" = "V3") %>%
+  mutate(length = end-start) %>%
+  mutate(Species = "Porites evermanni")
+
+pmea_lnc_bed <- read.delim("../../F-Pmea/output/02-lncRNA-discovery/Pmea_lncRNA.bed", header = F) %>%
+  rename("lncRNA" = "V1", "start" = "V2", "end" = "V3") %>%
+  mutate(length = end-start) %>%
+  mutate(Species = "Pocillopora tuahiniensis")
+
+# Combine the data frames into one
+all_lengths_lnc <- rbind(apul_lnc_bed, peve_lnc_bed, pmea_lnc_bed)
+```
+
+Define custom bins so that the lncRNAs are grouped into 200-300 bp, 300-400 bp, etc
+```{r}
+all_lengths_lnc <- all_lengths_lnc %>%
+  mutate(length_bin = cut(
+    length,
+    breaks = c(200, 300, 400, 500, 600, 700, 800, 900, 1000, Inf),  # Define custom breaks
+    labels = c("200-300", "300-400", "400-500", "500-600", "600-700", "700-800", "800-900", "900-1000", ">1000"),  # Custom labels for each bin
+    include.lowest = TRUE,  # Include the lowest value in the first interval
+    right = FALSE           # Make the intervals left-closed (e.g., 200-300 includes 200, but not 300)
+  ))
+```
+
+Calculate frequency of lncRNAs in each bin by species
+```{r}
+length_freq <- all_lengths_lnc %>%
+  group_by(Species, length_bin) %>%
+  summarize(frequency = n(), .groups = 'drop')
+```
+
+Plot lncRNA lengths for all species 
+```{r}
+# Set our color scheme for plotting -- options for both the abbreviated labels or the full, correct species names
+species_colors_nolabel <- c('#408EC6', '#1E2761', '#7A2048')
+
+length_plot_lnc <- ggplot(length_freq, aes(x = length_bin, y = frequency, fill = Species)) +
+  geom_bar(position = "dodge",
+           stat = "identity",
+           color = "black",  # Bar outline color
+           size = 2,         # Thicker bar outlines
+           width = 0.9) + 
+  scale_fill_manual(values = species_colors_nolabel) + 
+  # Use scale_x_discrete instead of scale_x_continuous
+  scale_x_discrete(name = "Length (bp)") +  # Ensure every "length_bin" value appears on the x-axis
+    scale_y_continuous(name = "Read count", expand = c(0, 0)) +  # Remove padding on y-axis so bars sit on x-axis
+
+  labs(y = "Read count") +
+  theme_minimal() + 
+  theme(
+    axis.title = element_text(size = 60, face = "bold", margin = margin(t = 100, r = 100, b = 100, l = 100)),  # Space between titles and text
+    axis.text = element_text(size = 55, colour = "black", margin = margin(t = 10, r = 10, b = 10, l = 10)),  # Axis text size
+    axis.text.x = element_text(angle = 45, hjust = 1),  # Rotate x-axis text for better readability
+    axis.line = element_line(size = 1.5, color = "black"),  # Darker, thicker axis lines
+    axis.ticks = element_line(size = 1.5, color = "black"), # Thicker axis ticks
+    plot.margin = unit(c(1, 1, 1, 1), "cm"),                # Margin around plot (top, right, bottom, left)
+    legend.title = element_text(size = 40, face = "bold"),  # Increase legend title size
+    legend.text = element_text(size = 40),
+    legend.position = "none"                              
+  ) +
+  guides(fill = guide_legend(override.aes = list(size = 20)));  # Increase the size of legend squares
+
+length_plot_lnc
+
+ggsave(filename = "../figures/lncRNA_lengths.png", length_plot_lnc, width = 34, height = 20)
+ggsave(filename = "../figures/lncRNA_lengths.pdf", length_plot_lnc, width = 34, height = 20)
+```
+
+
+### ALL ncRNAs 
+
+Still need lncRNA length and similarity data. Once I have that, I will put the length and venn plots in one figure here. 
+
+Plot RNA lengths + venns
+```{r}
+plot <- plot_grid(length_plot_lnc, venn_mi, length_plot_mi, venn_mi, length_plot_pi, labels = c("A", "B", "C", "D", "E"), label_size = 80, nrow = 3, ncol = 2)
+
+ggsave(filename = "../figures/ncRNA_lengths_overlap.png", plot, width = 55, height = 45, limitsize = F)
+ggsave(filename = "../figures/ncRNA_lengths_overlap.pdf", plot, width = 55, height = 45, limitsize = F)
+```
+
+
+
+
+
+
