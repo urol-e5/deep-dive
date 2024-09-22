@@ -235,7 +235,7 @@ GO_plot_mi <- ggplot(shared_go_mi_df, aes(x = Term, y = -log10(Fisher), shape = 
   theme_bw() +
   theme(
     axis.title = element_text(size = 36, face = "bold"),        # Axis title size
-    axis.text = element_text(size = 34, colour = "black"),                        # Axis text size
+    axis.text = element_text(size = 34, colour = "black", angle = 75),                        # Axis text size
     legend.title = element_text(size = 34, face = "bold"),      # Legend title size
     legend.text = element_text(size = 32),                      # Legend text size
     strip.text = element_text(size = 34, face = "bold"),        # Facet text size
@@ -249,12 +249,50 @@ GO_plot_mi <- ggplot(shared_go_mi_df, aes(x = Term, y = -log10(Fisher), shape = 
     panel.grid.major = element_line(size = 0.5, color = "gray"), # Grid lines inside the facets
     panel.spacing = unit(1, "lines"),                           # Increase space between facets
     strip.placement = "outside"    
-  ) +
-  coord_flip(); GO_plot_mi
+  ); GO_plot_mi
 
 ggsave(filename = "../figures/miRNA_shared_GOs_plot.png", GO_plot_mi, width = 25, height = 30)
 ggsave(filename = "../figures/miRNA_shared_GOs_plot.pdf", GO_plot_mi, width = 25, height = 30)
 ```
+
+Plot only BP 
+```{r}
+shared_go_mi_df_bp <- shared_go_mi_df %>%
+  dplyr::filter(ontology == "Biological Processes")
+  
+# Plot 
+GO_BP_plot_mi <- ggplot(shared_go_mi_df_bp, aes(x = Term, y = -log10(Fisher), shape = Species, fill = Species)) +
+  geom_point(size = 25, color = "black", stroke = 2) +  # Black border around shapes
+  scale_shape_manual(values = c(21, 22, 23)) +  # Shapes that can be filled
+  scale_fill_manual(values = c("#408EC6", "#7A2048", "#1E2761")) +  # Custom colors for each species
+  scale_size(range = c(2, 12)) + 
+  xlab('') + 
+  ylab('log(Enrichment score)') +
+  facet_grid(vars(ontology), scales = "free", space = "free_y") + 
+  theme_bw() +
+  theme(
+    axis.title = element_text(size = 36, face = "bold"),        # Axis title size
+    axis.text = element_text(size = 34, colour = "black"),                        # Axis text size
+    #axis.text.x = element_text(angle = 80),
+    legend.title = element_text(size = 34, face = "bold"),      # Legend title size
+    legend.text = element_text(size = 32),                      # Legend text size
+    strip.text = element_text(size = 34, face = "bold"),        # Facet text size
+    strip.background = element_rect(fill = "lightgray", color = "black", size = 1.5),         # Facet background
+    axis.line = element_line(size = 1, colour = "black"),       # Enhanced axis lines
+    axis.ticks = element_line(size = 1),                        # Thicker axis ticks
+     #panel.border = element_blank()                             # Remove panel border
+    #panel.grid.major = element_blank(),                         # Remove major grid lines
+    #panel.grid.minor = element_blank()                          # Remove minor grid lines
+        panel.border = element_rect(color = "black", size = 1.2),   # Enhanced facet border lines
+    panel.grid.major = element_line(size = 0.5, color = "gray"), # Grid lines inside the facets
+    panel.spacing = unit(1, "lines"),                           # Increase space between facets
+    strip.placement = "outside"    
+  ); GO_BP_plot_mi
+
+ggsave(filename = "../figures/miRNA_shared_GO_BP_plot.png", GO_BP_plot_mi, width = 25, height = 35)
+ggsave(filename = "../figures/miRNA_shared_GO_BP_plot.pdf", GO_BP_plot_mi, width = 25, height = 35)
+```
+
 
 ## lncRNAs 
 
@@ -542,8 +580,7 @@ GO_plot_smol_BP <- ggplot(small_shared_BP, aes(x = Term, y = -log10(Fisher), sha
     panel.grid.major = element_line(size = 0.5, color = "gray"), # Grid lines inside the facets
     panel.spacing = unit(1, "lines"),                           # Increase space between facets
     strip.placement = "outside"
-  ) +
-  coord_flip(); GO_plot_smol_BP
+  ); GO_plot_smol_BP
 
 ggsave(filename = "../figures/small_ncRNAs_shared_GO_BP_plot.png", GO_plot_smol_BP, width = 35, height = 25)
 ggsave(filename = "../figures/small_ncRNAs_shared_GO_BP_plot.pdf", GO_plot_smol_BP, width = 35, height = 25)
@@ -656,31 +693,46 @@ ggsave(filename = "../figures/miRNA_lengths.pdf", length_plot_mi, width = 34, he
 
 The actual Venn diagram was made by Kathleen [here](https://github.com/urol-e5/deep-dive/blob/main/DEF-cross-species/code/10-shortRNA-ShortStack-comparison.Rmd). She did some complex code to get the venn to work so I am just doing to pull the numbers from the venn to make the plot format uniform.
 
+38 for Apul
+46 for Peve
+37 for Ptuh 
+
+They all share 1 overlap per 2 species and 4 overlaps for all species. what are the percentages for the venn diagram?
+
+
+
+
+
+
+
+
+
 Make lists for venn
 ```{r}
 # Define elements for each set based on data, correctly reflecting overlaps
 set_APUL <- c(paste0("APUL", 1:32), "APUL_PEVE", "APUL_PMEA", paste0("APUL_PEVE_PMEA", 1:4))
-set_PMEA <- c(paste0("PMEA", 1:31), "APUL_PMEA", "PMEA_PEVE", paste0("APUL_PEVE_PMEA", 1:4))
 set_PEVE <- c(paste0("PEVE", 1:40), "APUL_PEVE", "PMEA_PEVE", paste0("APUL_PEVE_PMEA", 1:4))
+set_PMEA <- c(paste0("PMEA", 1:31), "APUL_PMEA", "PMEA_PEVE", paste0("APUL_PEVE_PMEA", 1:4))
 
 # Combine the sets into a named list
 venn_sets <- list(
   "A. pulchra" = set_APUL,
-  "P. tuahiniensis" = set_PMEA,
-  "P. evermanni" = set_PEVE
+  "P. evermanni" = set_PEVE,
+  "P. tuahiniensis" = set_PMEA
 )
 ```
 
 Plot overlap of miRNAs across spp
 ```{r}
 venn_mi <- ggvenn(
-  venn_sets, 
+  venn_sets,
   fill_color = species_colors_nolabel,  # Customize the fill colors
-  stroke_size = 1.5, # Outline size of the circles
-  set_name_size = F,         # Size of the set labels
-  show_percentage = F,
-  stroke_alpha = 2,
-  text_size = 20
+  stroke_size = 1.5,                    # Outline size of the circles
+  set_name_size = 0,                    # Tries to hide set labels
+  show_percentage = T,               # Show only percentages
+  show_elements = F,
+  stroke_alpha = 2,                     # Circle opacity
+  text_size = 20                        # Adjust the percentage text size
 ); venn_mi
 
 ggsave(filename = "../figures/miRNA_overlap_venn.png", venn_mi, width = 34, height = 20)
