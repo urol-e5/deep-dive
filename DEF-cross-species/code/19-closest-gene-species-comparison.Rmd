@@ -25,6 +25,7 @@ library(tidyverse)
 library(ggvenn)
 library(cowplot)
 library(gridExtra)
+library(ComplexUpset)
 ```
 
 ## piRNA
@@ -159,7 +160,7 @@ GO_BP_plot_pi <- ggplot(shared_go_pi_df_bp, aes(x = Term, y = -log10(Fisher), sh
     axis.text = element_text(size = 49, colour = "black"),                        # Axis text size
     axis.text.x = element_text(angle = 75, hjust = 1),  # Rotate and adjust label position
     legend.title = element_text(size = 44, face = "bold"),      # Legend title size
-    legend.text = element_text(size = 42),                      # Legend text size
+    legend.text = element_text(size = 42, face = "italic"),                      # Legend text size
     strip.text = element_text(size = 49, face = "bold"),        # Facet text size
     strip.background = element_rect(fill = "lightgray", color = "black", size = 1.5),         # Facet background
     axis.line = element_line(size = 1, colour = "black"),       # Enhanced axis lines
@@ -315,7 +316,7 @@ GO_BP_plot_mi <- ggplot(shared_go_mi_df_bp, aes(x = Term, y = -log10(Fisher), sh
     axis.text = element_text(size = 49, colour = "black"),                        # Axis text size
     axis.text.x = element_text(angle = 75, hjust = 1),  # Rotate and adjust label position
     legend.title = element_text(size = 44, face = "bold"),      # Legend title size
-    legend.text = element_text(size = 42),                      # Legend text size
+    legend.text = element_text(size = 42, face = "italic"),                      # Legend text size
     strip.text = element_text(size = 49, face = "bold"),        # Facet text size
     strip.background = element_rect(fill = "lightgray", color = "black", size = 1.5),         # Facet background
     axis.line = element_line(size = 1, colour = "black"),       # Enhanced axis lines
@@ -333,7 +334,6 @@ GO_BP_plot_mi <- ggplot(shared_go_mi_df_bp, aes(x = Term, y = -log10(Fisher), sh
 ggsave(filename = "../figures/miRNA_shared_GO_BP_plot.png", GO_BP_plot_mi, width = 25, height = 35)
 ggsave(filename = "../figures/miRNA_shared_GO_BP_plot.pdf", GO_BP_plot_mi, width = 25, height = 35)
 ```
-
 
 ## lncRNAs 
 
@@ -465,7 +465,7 @@ GO_BP_plot_lnc <- ggplot(shared_go_lnc_df_bp, aes(x = Term, y = -log10(Fisher), 
     axis.text = element_text(size = 49, colour = "black"),                        # Axis text size
     axis.text.x = element_text(angle = 75, hjust = 1),  # Rotate and adjust label position
     legend.title = element_text(size = 44, face = "bold"),      # Legend title size
-    legend.text = element_text(size = 42),                      # Legend text size
+    legend.text = element_text(size = 42, face = "italic"),                      # Legend text size
     strip.text = element_text(size = 49, face = "bold"),        # Facet text size
     strip.background = element_rect(fill = "lightgray", color = "black", size = 1.5),         # Facet background
     axis.line = element_line(size = 1, colour = "black"),       # Enhanced axis lines
@@ -477,14 +477,12 @@ GO_BP_plot_lnc <- ggplot(shared_go_lnc_df_bp, aes(x = Term, y = -log10(Fisher), 
     panel.grid.major = element_line(size = 0.5, color = "gray"), # Grid lines inside the facets
     panel.spacing = unit(1, "lines"),                           # Increase space between facets
     strip.placement = "outside",
-    plot.margin = margin(t = 10, r = 10, b = 20, l = 10)        # Add space below the plot
+    plot.margin = margin(t = 10, r = 10, b = 20, l = 200)        # Add space below the plot
   ); GO_BP_plot_lnc
 
-ggsave(filename = "../figures/lncRNA_shared_GO_BP_plot.png", GO_BP_plot_lnc, width = 25, height = 35)
-ggsave(filename = "../figures/lncRNA_shared_GO_BP_plot.pdf", GO_BP_plot_lnc, width = 25, height = 35)
+ggsave(filename = "../figures/lncRNA_shared_GO_BP_plot.png", GO_BP_plot_lnc, width = 45, height = 35)
+ggsave(filename = "../figures/lncRNA_shared_GO_BP_plot.pdf", GO_BP_plot_lnc, width = 45, height = 35)
 ```
-
-
 
 ## All ncRNAs 
 
@@ -555,164 +553,9 @@ ggsave(filename = "../figures/all_ncRNAs_shared_GOs_plot.png", GO_plot_all, widt
 ggsave(filename = "../figures/all_ncRNAs_shared_GOs_plot.pdf", GO_plot_all, width = 35, height = 49)
 ```
 
-Plot only miRNAs and piRNAs
-```{r}
-small_shared <- rbind(filt_shared_go_pi_df, filt_shared_go_mi_df)
-
-GO_plot_smol <- ggplot(small_shared, aes(x = Term, y = -log10(Fisher), shape = Species, fill = Species)) +
-  geom_point(size = 17, color = "black", stroke = 2) +  # Black border around shapes
-  scale_shape_manual(values = c(21, 22, 23)) +  # Shapes that can be filled
-  scale_fill_manual(values = c("#408EC6", "#7A2048", "#1E2761")) +  # Custom colors for each species
-  scale_size(range = c(2, 12)) + 
-  xlab('') + 
-  ylab('log(Enrichment score)') +
-  facet_grid(vars(ontology), vars(ncrna), scales = "free", space = "free_y") + 
-  theme_bw() +
-  theme(
-    axis.title = element_text(size = 36, face = "bold"),        # Axis title size
-    axis.text = element_text(size = 34, colour = "black"),                        # Axis text size
-    legend.title = element_text(size = 34, face = "bold"),      # Legend title size
-    legend.text = element_text(size = 32),                      # Legend text size
-    strip.text = element_text(size = 34, face = "bold"),        # Facet text size
-    strip.background = element_rect(fill = "lightgray", color = "black", size = 1.5),         # Facet background
-    axis.line = element_line(size = 1, colour = "black"),       # Enhanced axis lines
-    axis.ticks = element_line(size = 1),                        # Thicker axis ticks
-     #panel.border = element_blank()                             # Remove panel border
-    #panel.grid.major = element_blank(),                         # Remove major grid lines
-    #panel.grid.minor = element_blank()                          # Remove minor grid lines
-        panel.border = element_rect(color = "black", size = 1.2),   # Enhanced facet border lines
-    panel.grid.major = element_line(size = 0.5, color = "gray"), # Grid lines inside the facets
-    panel.spacing = unit(1, "lines"),                           # Increase space between facets
-    strip.placement = "outside"
-  ) +
-  coord_flip(); GO_plot_smol
-
-ggsave(filename = "../figures/small_ncRNAs_shared_GOs_plot.png", GO_plot_smol, width = 25, height = 35)
-ggsave(filename = "../figures/small_ncRNAs_shared_GOs_plot.pdf", GO_plot_smol, width = 25, height = 35)
-```
-
-
-#### Plot Biological Processes only 
-Plot 
-```{r}
-all_shared_BP <- all_shared %>%
-  dplyr::filter(ontology == "Biological Processes")
-
-GO_plot_all_BP <- ggplot(all_shared_BP, aes(x = Term, y = -log10(Fisher), shape = Species, fill = Species)) +
-  geom_point(size = 17, color = "black", stroke = 2) +  # Black border around shapes
-  scale_shape_manual(values = c(21, 22, 23)) +  # Shapes that can be filled
-  scale_fill_manual(values = c("#408EC6", "#7A2048", "#1E2761")) +  # Custom colors for each species
-  scale_size(range = c(2, 12)) + 
-  xlab('') + 
-  ylab('log(Enrichment score)') +
-  facet_grid(vars(ontology), vars(ncrna), scales = "free", space = "free_y") + 
-  theme_bw() +
-  theme(
-    axis.title = element_text(size = 36, face = "bold"),        # Axis title size
-    axis.text = element_text(size = 34, colour = "black"),                        # Axis text size
-    legend.title = element_text(size = 34, face = "bold"),      # Legend title size
-    legend.text = element_text(size = 32),                      # Legend text size
-    strip.text = element_text(size = 34, face = "bold"),        # Facet text size
-    strip.background = element_rect(fill = "lightgray", color = "black", size = 1.5),         # Facet background
-    axis.line = element_line(size = 1, colour = "black"),       # Enhanced axis lines
-    axis.ticks = element_line(size = 1),                        # Thicker axis ticks
-     #panel.border = element_blank()                             # Remove panel border
-    #panel.grid.major = element_blank(),                         # Remove major grid lines
-    #panel.grid.minor = element_blank()                          # Remove minor grid lines
-        panel.border = element_rect(color = "black", size = 1.2),   # Enhanced facet border lines
-    panel.grid.major = element_line(size = 0.5, color = "gray"), # Grid lines inside the facets
-    panel.spacing = unit(1, "lines"),                           # Increase space between facets
-    strip.placement = "outside"
-  ) +
-  coord_flip(); GO_plot_all_BP
-
-ggsave(filename = "../figures/all_ncRNAs_shared_GO_BP_plot.png", GO_plot_all_BP, width = 35, height = 49)
-ggsave(filename = "../figures/all_ncRNAs_shared_GOs_BP_plot.pdf", GO_plot_all_BP, width = 35, height = 49)
-```
-
-Plot only BP GO terms for miRNAs and piRNAs
-```{r}
-small_shared <- rbind(filt_shared_go_pi_df, filt_shared_go_mi_df)
-
-small_shared_BP <- small_shared %>%
-  dplyr::filter(ontology == "Biological Processes")
-
-GO_plot_smol_BP <- ggplot(small_shared_BP, aes(x = Term, y = -log10(Fisher), shape = Species, fill = Species)) +
-  geom_point(size = 22, color = "black", stroke = 2) +  # Black border around shapes
-  scale_shape_manual(values = c(21, 22, 23)) +  # Shapes that can be filled
-  scale_fill_manual(values = c("#408EC6", "#7A2048", "#1E2761")) +  # Custom colors for each species
-  scale_size(range = c(2, 12)) + 
-  xlab('') + 
-  ylab('log(Enrichment score)') +
-  facet_grid(vars(ontology), vars(ncrna), scales = "free", space = "free_y") + 
-  theme_bw() +
-  theme(
-    axis.title = element_text(size = 36, face = "bold"),        # Axis title size
-    axis.text = element_text(size = 34, colour = "black"),                        # Axis text size
-    legend.title = element_text(size = 34, face = "bold"),      # Legend title size
-    legend.text = element_text(size = 32),                      # Legend text size
-    strip.text = element_text(size = 34, face = "bold"),        # Facet text size
-    strip.background = element_rect(fill = "lightgray", color = "black", size = 1.5),         # Facet background
-    axis.line = element_line(size = 1, colour = "black"),       # Enhanced axis lines
-    axis.ticks = element_line(size = 1),                        # Thicker axis ticks
-     #panel.border = element_blank()                             # Remove panel border
-    #panel.grid.major = element_blank(),                         # Remove major grid lines
-    #panel.grid.minor = element_blank()                          # Remove minor grid lines
-        panel.border = element_rect(color = "black", size = 1.2),   # Enhanced facet border lines
-    panel.grid.major = element_line(size = 0.5, color = "gray"), # Grid lines inside the facets
-    panel.spacing = unit(1, "lines"),                           # Increase space between facets
-    strip.placement = "outside"
-  ); GO_plot_smol_BP
-
-ggsave(filename = "../figures/small_ncRNAs_shared_GO_BP_plot.png", GO_plot_smol_BP, width = 35, height = 25)
-ggsave(filename = "../figures/small_ncRNAs_shared_GO_BP_plot.pdf", GO_plot_smol_BP, width = 35, height = 25)
-```
-
-Plot only BP GO terms for lncRNAs
-```{r}
-shared_go_lnc_df_BP <- all_shared %>%
-  dplyr::filter(ontology == "Biological Processes") %>%
-  dplyr::filter(ncrna == "lncRNA")
-
-GO_plot_lnc_BP <- ggplot(shared_go_lnc_df_BP, aes(x = Term, y = -log10(Fisher), shape = Species, fill = Species)) +
-  geom_point(size = 22, color = "black", stroke = 2) +  # Black border around shapes
-  scale_shape_manual(values = c(21, 22, 23)) +  # Shapes that can be filled
-  scale_fill_manual(values = c("#408EC6", "#7A2048", "#1E2761")) +  # Custom colors for each species
-  scale_size(range = c(2, 12)) + 
-  xlab('') + 
-  ylab('log(Enrichment score)') +
-  facet_grid(vars(ontology), vars(ncrna), scales = "free", space = "free_y") + 
-  theme_bw() +
-  theme(
-    axis.title = element_text(size = 36, face = "bold"),        # Axis title size
-    axis.text = element_text(size = 34, colour = "black"),                        # Axis text size
-    legend.title = element_text(size = 34, face = "bold"),      # Legend title size
-    legend.text = element_text(size = 32),                      # Legend text size
-    strip.text = element_text(size = 34, face = "bold"),        # Facet text size
-    strip.background = element_rect(fill = "lightgray", color = "black", size = 1.5),         # Facet background
-    axis.line = element_line(size = 1, colour = "black"),       # Enhanced axis lines
-    axis.ticks = element_line(size = 1),                        # Thicker axis ticks
-     #panel.border = element_blank()                             # Remove panel border
-    #panel.grid.major = element_blank(),                         # Remove major grid lines
-    #panel.grid.minor = element_blank()                          # Remove minor grid lines
-        panel.border = element_rect(color = "black", size = 1.2),   # Enhanced facet border lines
-    panel.grid.major = element_line(size = 0.5, color = "gray"), # Grid lines inside the facets
-    panel.spacing = unit(1, "lines"),                           # Increase space between facets
-    strip.placement = "outside"
-  ) +
-  coord_flip(); GO_plot_lnc_BP
-
-ggsave(filename = "../figures/lncRNAs_shared_GO_BP_plot.png", GO_plot_lnc_BP, width = 35, height = 25)
-ggsave(filename = "../figures/lncRNAs_shared_GO_BP_plot.pdf", GO_plot_lnc_BP, width = 35, height = 25)
-```
-
-
-
-
-
 ## Plot lengths for each species 
 
-I am going to make length plots for each species for lncRNAs, miRNAs and piRNAs so that the format is the same for everything. Also going to make venn diagrams for shared sequences for lncRNAs and miRNAs here so that the format is the same and I can join them in one figure. 
+I am going to make length plots for each species for lncRNAs, miRNAs and piRNAs so that the format is the same for everything. Also going to make heatmap-esque diagrams for shared sequences for lncRNAs and miRNAs here so that the format is the same and I can join them in one figure. 
 
 
 ### miRNAs 
@@ -773,53 +616,74 @@ ggsave(filename = "../figures/miRNA_lengths.png", length_plot_mi, width = 34, he
 ggsave(filename = "../figures/miRNA_lengths.pdf", length_plot_mi, width = 34, height = 20)
 ```
 
-The actual Venn diagram was made by Kathleen [here](https://github.com/urol-e5/deep-dive/blob/main/DEF-cross-species/code/10-shortRNA-ShortStack-comparison.Rmd). She did some complex code to get the venn to work so I am just doing to pull the numbers from the venn to make the plot format uniform.
-
-38 for Apul
-46 for Peve
-37 for Ptuh 
-
-They all share 1 overlap per 2 species and 4 overlaps for all species. what are the percentages for the venn diagram?
-
-
-
-
-
-
-
-
-
-Make lists for venn
+The actual Venn diagram was made by Kathleen [here](https://github.com/urol-e5/deep-dive/blob/main/DEF-cross-species/code/10-shortRNA-ShortStack-comparison.Rmd). She did some complex code to get the venn to work so I am just doing to pull the numbers from the venn and make a new plot. We discussed making a heatmap looking plot instead of a venn diagram. I probably won't incorporate colors into the heatmap (for now), as the values cannot be proportions because each species has a different number of miRNAs and thus will have a different proportion shared between species. For example, Apul has 38 miRNAs and Peve has 37. They share 5 miRNAs between them; for Apul, the proportion would be 5/38 = 0.13 and for Peve, the proportion would be 0.14. In the boxes, I am going to have the number of miRNAs shared between that set of species. 
 ```{r}
-# Define elements for each set based on data, correctly reflecting overlaps
-set_APUL <- c(paste0("APUL", 1:32), "APUL_PEVE", "APUL_PMEA", paste0("APUL_PEVE_PMEA", 1:4))
-set_PEVE <- c(paste0("PEVE", 1:40), "APUL_PEVE", "PMEA_PEVE", paste0("APUL_PEVE_PMEA", 1:4))
-set_PMEA <- c(paste0("PMEA", 1:31), "APUL_PMEA", "PMEA_PEVE", paste0("APUL_PEVE_PMEA", 1:4))
-
-# Combine the sets into a named list
-venn_sets <- list(
-  "A. pulchra" = set_APUL,
-  "P. evermanni" = set_PEVE,
-  "P. tuahiniensis" = set_PMEA
+# Create the data frame for the 3x3 grid
+data <- data.frame(
+  x = c("A. pulchra", "P. tuahiniensis", "P. evermanni", "A. pulchra", "P. tuahiniensis", 
+        "P. evermanni", "A. pulchra", "P. tuahiniensis", "P. evermanni"),
+  y = c("A. pulchra", "A. pulchra", "A. pulchra", "P. tuahiniensis", "P. tuahiniensis", 
+        "P. tuahiniensis", "P. evermanni", "P. evermanni", "P. evermanni"),
+  value = c(38, 5, 5, 5, 46, 5, 5, 5, 37)
 )
+
+# Add a column to identify repetitive (lower triangle) comparisons
+data <- data %>%
+  mutate(
+    repetitive = ifelse(x > y, "yes", "no"),    # Flag repetitive squares
+    shared = ifelse(repetitive == "yes", NA, value)  # Assign NA to repetitive cells for color gradient
+  )
+
+# Convert x and y to factors to control order
+#data$x <- factor(data$x, levels = c("A. pulchra", "P. tuahiniensis", "P. evermanni"))
+#data$y <- factor(data$y, levels = c("A. pulchra", "P. tuahiniensis", "P. evermanni"))
+
+tile_overlap_mi <- ggplot(data, aes(x = x, y = y)) +
+  geom_tile(aes(fill = repetitive), color = "black", size = 1) +               # Color tiles based on repetitive status
+  geom_tile(data = subset(data, repetitive == "yes"),                # Overlay grey repetitive tiles
+            fill = "gray", color = "black", size = 1) +
+  geom_text(aes(label = ifelse(repetitive == "no", value, "")),      # Display values only for non-repetitive squares
+            size = 25) +                                             # Add text in the middle of each tile
+  #scale_fill_gradient(low = "blue", high = "red", na.value = "gray80") +  # Gradient for values, grey for NA
+  scale_fill_manual(values = c("yes" = "gray80", "no" = "white"),    # Grey out repetitive squares, white for others
+                    name = "Repetitive") +   
+  theme_minimal() +
+  theme(
+    axis.title = element_blank(),                                    # Remove axis titles
+    axis.text = element_text(size = 50, colour = "black", face = "italic"),              # Customize axis text
+    axis.text.x = element_text(angle = 75, hjust = 1),  # Rotate and adjust label position
+    #axis.line = element_line(size = 5, color = "black"),
+    #panel.grid = element_blank(),                                    # Remove grid lines
+    #panel.border = element_blank(),                                   # Remove panel borders
+    legend.position = "none") +       
+  coord_fixed(); tile_overlap_mi
+
+ggsave(filename = "../figures/miRNA_tile_overlap.png", tile_overlap_mi, width = 25, height = 35)
+ggsave(filename = "../figures/miRNA_tile_overlap.pdf", tile_overlap_mi, width = 25, height = 35)
 ```
 
-Plot overlap of miRNAs across spp
+Not a huge fan of the tile plot so going to make an upset plot as well. I need a list of all the miRNAs and then either a 1 if present or a 0 if absent across species. First, read in miRNA dataframes 
 ```{r}
-venn_mi <- ggvenn(
-  venn_sets,
-  fill_color = species_colors_nolabel,  # Customize the fill colors
-  stroke_size = 1.5,                    # Outline size of the circles
-  set_name_size = 0,                    # Tries to hide set labels
-  show_percentage = T,               # Show only percentages
-  show_elements = F,
-  stroke_alpha = 2,                     # Circle opacity
-  text_size = 20                        # Adjust the percentage text size
-); venn_mi
-
-ggsave(filename = "../figures/miRNA_overlap_venn.png", venn_mi, width = 34, height = 20)
-ggsave(filename = "../figures/miRNA_overlap_venn.pdf", venn_mi, width = 34, height = 20)
+apul_mi <- read.csv("../output/10-shortRNA-ShortStack-comparison/Apul_results_mature_named.csv", header = T) %>%
+  dplyr::select(MajorRNA, given_miRNA_name) %>%
+  dplyr::rename("Apul_MajorRNA" = "MajorRNA", "Apul_given_miRNA_name" = "given_miRNA_name")
+peve_mi <- read.csv("../output/10-shortRNA-ShortStack-comparison/Peve_results_mature_named.csv", header = T) %>%
+  dplyr::select(MajorRNA, given_miRNA_name) %>%
+  dplyr::rename("Peve_MajorRNA" = "MajorRNA", "Peve_given_miRNA_name" = "given_miRNA_name")
+pmea_mi <- read.csv("../output/10-shortRNA-ShortStack-comparison/Ptuh_results_mature_named.csv", header = T) %>%
+  dplyr::select(MajorRNA, given_miRNA_name) %>%
+  dplyr::rename("Pmea_MajorRNA" = "MajorRNA", "Pmea_given_miRNA_name" = "given_miRNA_name")
 ```
+
+Join files
+```{r}
+join <- apul_mi %>%
+  full_join(peve_mi, by = c("Apul_MajorRNA" = "Peve_MajorRNA"))
+```
+
+Doesn't work because the miR-2025 and miR-2036 are not exactly the same sequence...look back into this. 
+
+
 
 ### piRNAs
 
@@ -895,6 +759,54 @@ ggsave(filename = "../figures/piRNA_lengths.pdf", length_plot_pi, width = 34, he
 ```
 
 ### lncRNAs 
+
+The actual overlap was calculated by Zach but I am just going to make a tile plot to match the miRNA one above. Similar to the miRNA tile plot above, I am not going to be adding colors or proportions. 
+```{r}
+# Create the data frame for the 3x3 grid
+data <- data.frame(
+  x = c("A. pulchra", "P. tuahiniensis", "P. evermanni", "A. pulchra", "P. tuahiniensis", 
+        "P. evermanni", "A. pulchra", "P. tuahiniensis", "P. evermanni"),
+  y = c("A. pulchra", "A. pulchra", "A. pulchra", "P. tuahiniensis", "P. tuahiniensis", 
+        "P. tuahiniensis", "P. evermanni", "P. evermanni", "P. evermanni"),
+  value = c(16206, 1799, 1763, 1799, 12395, 1044, 1763, 1044, 7378)
+)
+
+# Add a column to identify repetitive (lower triangle) comparisons
+data <- data %>%
+  mutate(
+    repetitive = ifelse(x > y, "yes", "no"),    # Flag repetitive squares
+    shared = ifelse(repetitive == "yes", NA, value)  # Assign NA to repetitive cells for color gradient
+  )
+
+# Convert x and y to factors to control order
+#data$x <- factor(data$x, levels = c("A. pulchra", "P. tuahiniensis", "P. evermanni"))
+#data$y <- factor(data$y, levels = c("A. pulchra", "P. tuahiniensis", "P. evermanni"))
+
+tile_overlap_lnc <- ggplot(data, aes(x = x, y = y)) +
+  geom_tile(aes(fill = repetitive), color = "black", size = 1) +               # Color tiles based on repetitive status
+  geom_tile(data = subset(data, repetitive == "yes"),                # Overlay grey repetitive tiles
+            fill = "gray", color = "black", size = 1) +
+  geom_text(aes(label = ifelse(repetitive == "no", value, "")),      # Display values only for non-repetitive squares
+            size = 25) +                                             # Add text in the middle of each tile
+  #scale_fill_gradient(low = "blue", high = "red", na.value = "gray80") +  # Gradient for values, grey for NA
+  scale_fill_manual(values = c("yes" = "gray80", "no" = "white"),    # Grey out repetitive squares, white for others
+                    name = "Repetitive") +   
+  theme_minimal() +
+  theme(
+    axis.title = element_blank(),                                    # Remove axis titles
+    axis.text = element_text(size = 50, colour = "black", face = "italic"),              # Customize axis text
+    axis.text.x = element_text(angle = 75, hjust = 1),  # Rotate and adjust label position
+    #axis.line = element_line(size = 5, color = "black"),
+    #panel.grid = element_blank(),                                    # Remove grid lines
+    #panel.border = element_blank(),                                   # Remove panel borders
+    legend.position = "none") +       
+  coord_fixed(); tile_overlap_lnc
+
+ggsave(filename = "../figures/lncRNA_tile_overlap.png", tile_overlap_lnc, width = 25, height = 35)
+ggsave(filename = "../figures/lncRNA_tile_overlap.pdf", tile_overlap_lnc, width = 25, height = 35)
+```
+
+Not sure if this is correct...will check with Zach.
 
 Calculate length from bed files
 ```{r}
@@ -998,7 +910,7 @@ plot <- ggplot(species_data, aes(x = x, y = y, fill = Species)) +
          plot.margin = unit(c(1, 1, 1, 1), "cm"),                # Margin around plot (top, right, bottom, left)
          legend.title = element_text(size = 80, face = "bold"),  # Increase legend title size
          legend.spacing.y = unit(100, "cm"),  # Increase vertical spacing between legend boxes
-         legend.text = element_text(size = 80),); plot  
+         legend.text = element_text(size = 80, face = "italic"),); plot  
 
 # Extract only the legend
 legend <- cowplot::get_legend(plot)
@@ -1009,7 +921,7 @@ grid.arrange(legend)
 
 Plot RNA lengths + venns w/ legend 
 ```{r}
-plot <- plot_grid(length_plot_lnc, venn_mi, length_plot_mi, venn_mi, length_plot_pi, grid.arrange(legend), labels = c("A", "B", "C", "D", "E"), label_size = 80, nrow = 3, ncol = 2)
+plot <- plot_grid(length_plot_lnc, tile_overlap_lnc, length_plot_mi, tile_overlap_mi, length_plot_pi, grid.arrange(legend), labels = c("A", "B", "C", "D", "E"), label_size = 80, nrow = 3, ncol = 2)
 
 ggsave(filename = "../figures/ncRNA_lengths_overlap.png", plot, width = 55, height = 45, limitsize = F)
 ggsave(filename = "../figures/ncRNA_lengths_overlap.pdf", plot, width = 55, height = 45, limitsize = F)
