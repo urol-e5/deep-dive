@@ -262,21 +262,21 @@ shared_go_mi_df_bp <- shared_go_mi_df %>%
   
 # Plot 
 GO_BP_plot_mi <- ggplot(shared_go_mi_df_bp, aes(x = Term, y = -log10(Fisher), shape = Species, fill = Species)) +
-  geom_point(size = 25, color = "black", stroke = 2) +  # Black border around shapes
+  geom_point(size = 30, color = "black", stroke = 2) +  # Black border around shapes
   scale_shape_manual(values = c(21, 22, 23)) +  # Shapes that can be filled
   scale_fill_manual(values = c("#408EC6", "#7A2048", "#1E2761")) +  # Custom colors for each species
-  scale_size(range = c(2, 12)) + 
+  #scale_size(range = c(2, 12)) + 
   xlab('') + 
   ylab('log(Enrichment score)') +
   facet_grid(vars(ontology), scales = "free", space = "free_y") + 
   theme_bw() +
   theme(
-    axis.title = element_text(size = 36, face = "bold"),        # Axis title size
-    axis.text = element_text(size = 34, colour = "black"),                        # Axis text size
-    #axis.text.x = element_text(angle = 80),
-    legend.title = element_text(size = 34, face = "bold"),      # Legend title size
-    legend.text = element_text(size = 32),                      # Legend text size
-    strip.text = element_text(size = 34, face = "bold"),        # Facet text size
+    axis.title = element_text(size = 51, face = "bold"),        # Axis title size
+    axis.text = element_text(size = 49, colour = "black"),                        # Axis text size
+    axis.text.x = element_text(angle = 75, hjust = 1),  # Rotate and adjust label position
+    legend.title = element_text(size = 44, face = "bold"),      # Legend title size
+    legend.text = element_text(size = 42),                      # Legend text size
+    strip.text = element_text(size = 49, face = "bold"),        # Facet text size
     strip.background = element_rect(fill = "lightgray", color = "black", size = 1.5),         # Facet background
     axis.line = element_line(size = 1, colour = "black"),       # Enhanced axis lines
     axis.ticks = element_line(size = 1),                        # Thicker axis ticks
@@ -286,7 +286,8 @@ GO_BP_plot_mi <- ggplot(shared_go_mi_df_bp, aes(x = Term, y = -log10(Fisher), sh
         panel.border = element_rect(color = "black", size = 1.2),   # Enhanced facet border lines
     panel.grid.major = element_line(size = 0.5, color = "gray"), # Grid lines inside the facets
     panel.spacing = unit(1, "lines"),                           # Increase space between facets
-    strip.placement = "outside"    
+    strip.placement = "outside",
+    plot.margin = margin(t = 10, r = 10, b = 20, l = 10)        # Add space below the plot
   ); GO_BP_plot_mi
 
 ggsave(filename = "../figures/miRNA_shared_GO_BP_plot.png", GO_BP_plot_mi, width = 25, height = 35)
