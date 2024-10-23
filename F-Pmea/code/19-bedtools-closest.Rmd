@@ -23,7 +23,7 @@ Before analysis, make gene2go file from the annotation information
 ```{r}
 GO_PMEA <- read.delim("../../data/Pmea-rna-GO.tsv", sep = "\t", header = T)  %>%
   mutate(gene_name = query) %>%
-  select(gene_name, GeneOntologyIDs)
+  dplyr::select(gene_name, GeneOntologyIDs)
 write_tsv(GO_PMEA, file = "../../data/Pmea_gene2go.tab")
 ```
 

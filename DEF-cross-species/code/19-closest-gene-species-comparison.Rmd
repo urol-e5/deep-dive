@@ -147,18 +147,19 @@ shared_go_pi_df_bp <- shared_go_pi_df %>%
   
 # Plot 
 GO_BP_plot_pi <- ggplot(shared_go_pi_df_bp, aes(x = Term, y = -log10(Fisher), shape = Species, fill = Species)) +
-  geom_point(size = 30, color = "black", stroke = 2) +  # Black border around shapes
+  geom_point(size = 25, color = "black", stroke = 2) +  # Black border around shapes
   scale_shape_manual(values = c(21, 22, 23)) +  # Shapes that can be filled
   scale_fill_manual(values = c("#408EC6", "#7A2048", "#1E2761")) +  # Custom colors for each species
   #scale_size(range = c(2, 12)) + 
   xlab('') + 
   ylab('log(Enrichment score)') +
   facet_grid(vars(ontology), scales = "free", space = "free_y") + 
+  coord_flip() +
   theme_bw() +
   theme(
     axis.title = element_text(size = 51, face = "bold"),        # Axis title size
     axis.text = element_text(size = 49, colour = "black"),                        # Axis text size
-    axis.text.x = element_text(angle = 75, hjust = 1),  # Rotate and adjust label position
+    axis.text.x = element_text(hjust = 1),  # Rotate and adjust label position
     legend.title = element_text(size = 44, face = "bold"),      # Legend title size
     legend.text = element_text(size = 42, face = "italic"),                      # Legend text size
     strip.text = element_text(size = 49, face = "bold"),        # Facet text size
@@ -175,8 +176,8 @@ GO_BP_plot_pi <- ggplot(shared_go_pi_df_bp, aes(x = Term, y = -log10(Fisher), sh
     plot.margin = margin(t = 10, r = 10, b = 20, l = 10)        # Add space below the plot
   ); GO_BP_plot_pi
 
-ggsave(filename = "../figures/piRNA_shared_GO_BP_plot.png", GO_BP_plot_pi, width = 25, height = 35)
-ggsave(filename = "../figures/piRNA_shared_GO_BP_plot.pdf", GO_BP_plot_pi, width = 25, height = 35)
+ggsave(filename = "../figures/piRNA_shared_GO_BP_plot.png", GO_BP_plot_pi, width = 40, height = 25)
+ggsave(filename = "../figures/piRNA_shared_GO_BP_plot.pdf", GO_BP_plot_pi, width = 40, height = 25)
 ```
 
 
@@ -452,18 +453,19 @@ shared_go_lnc_df_bp <- shared_go_lnc_df %>%
  
 # Plot 
 GO_BP_plot_lnc <- ggplot(shared_go_lnc_df_bp, aes(x = Term, y = -log10(Fisher), shape = Species, fill = Species)) +
-  geom_point(size = 30, color = "black", stroke = 2) +  # Black border around shapes
+  geom_point(size = 25, color = "black", stroke = 2) +  # Black border around shapes
   scale_shape_manual(values = c(21, 22, 23)) +  # Shapes that can be filled
   scale_fill_manual(values = c("#408EC6", "#7A2048", "#1E2761")) +  # Custom colors for each species
   #scale_size(range = c(2, 12)) + 
   xlab('') + 
   ylab('log(Enrichment score)') +
   facet_grid(vars(ontology), scales = "free", space = "free_y") + 
+  coord_flip() +
   theme_bw() +
   theme(
     axis.title = element_text(size = 51, face = "bold"),        # Axis title size
     axis.text = element_text(size = 49, colour = "black"),                        # Axis text size
-    axis.text.x = element_text(angle = 75, hjust = 1),  # Rotate and adjust label position
+    axis.text.x = element_text(hjust = 1),  # Rotate and adjust label position
     legend.title = element_text(size = 44, face = "bold"),      # Legend title size
     legend.text = element_text(size = 42, face = "italic"),                      # Legend text size
     strip.text = element_text(size = 49, face = "bold"),        # Facet text size
@@ -480,8 +482,8 @@ GO_BP_plot_lnc <- ggplot(shared_go_lnc_df_bp, aes(x = Term, y = -log10(Fisher), 
     plot.margin = margin(t = 10, r = 10, b = 20, l = 200)        # Add space below the plot
   ); GO_BP_plot_lnc
 
-ggsave(filename = "../figures/lncRNA_shared_GO_BP_plot.png", GO_BP_plot_lnc, width = 45, height = 35)
-ggsave(filename = "../figures/lncRNA_shared_GO_BP_plot.pdf", GO_BP_plot_lnc, width = 45, height = 35)
+ggsave(filename = "../figures/lncRNA_shared_GO_BP_plot.png", GO_BP_plot_lnc, width = 40, height = 30)
+ggsave(filename = "../figures/lncRNA_shared_GO_BP_plot.pdf", GO_BP_plot_lnc, width = 40, height = 30)
 ```
 
 ## All ncRNAs 
