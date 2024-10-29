@@ -1,0 +1,57 @@
+---
+title: "miRNA target prediction"
+author: "Jill Ashey"
+date: "2024-10-29"
+output: html_document
+---
+
+This script will assess miRNA targets and perform GO enrichment on the genes that are targeted by miRNAs in Apul.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+```
+
+I first need to read in the parsed miranda results. 
+```{r}
+miranda <- read.delim("../output/21-Apul-miRNA-target-prediction/miranda_strict_all_3UTRs_parsed_Apul.txt", header = F) %>% 
+  rename(mirna = V1,
+        Target = V2, 
+        Score = V3, 
+        Energy_kcal_mol = V4, 
+        Query_start_end = V5, 
+        Subject_start_end = V6,
+        Length = V7, 
+        Subject_Identity = V8, 
+        Query_Identity = V9)
+
+miranda$mirna <- gsub(">", "", miranda$mirna)
+length(unique(miranda$mirna))
+```
+
+The target column corresponds to the 3'UTR sequence of a specific gene. To get the corresponding gene name for the UTR, read in the 3'UTR gtf, which has the UTRs as well as their associated gene. 
+```{r}
+three_prime_utr <- read.delim("../output/21-Apul-miRNA-target-prediction/Apul_all_3UTRs.gtf", header = F) %>%
+    rename(chrom = V1,
+        source = V2, 
+        type = V3, 
+        start = V4, 
+        end = V5, 
+        score = V6,
+        strand = V7, 
+        phase = V8, 
+        attr = V9)
+```
+
+Calculate length of 3'UTRs
+```{r}
+three_prime_utr <- three_prime_utr %>%
+  mutate(length = abs(start - end))
+
+mean(three_prime_utr$length)
+median(three_prime_utr$length)
+```
+
+
+
