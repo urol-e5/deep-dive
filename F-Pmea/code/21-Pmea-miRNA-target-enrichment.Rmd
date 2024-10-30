@@ -1,0 +1,42 @@
+---
+title: "Pmea enrichment of miRNA targets"
+author: "Jill Ashey"
+date: "2024-10-30"
+output: html_document
+---
+
+## GO enrichment of Peve miRNA targets
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(topGO)
+```
+
+See [bash code](https://github.com/JillAshey/JillAshey_Putnam_Lab_Notebook/blob/master/_posts/2024-06-15-e5-deepdive-miRNA-TargetPrediction.md) for `miranda` analysis, which was done on Andromeda. 
+
+Read in miranda output file 
+```{r}
+miranda_1kb <- read.delim("../output/21-Pmea-miRNA-target-prediction/miranda_strict_all_1kb_parsed_ptuh.txt", header = F) 
+
+# renaming columns is being weird, doing it manually
+
+
+
+miranda_1kb <- miranda_1kb %>%
+  rename("miRNA" = "V1", 
+        "Target" = "V2", 
+        "Score" = "V3", 
+        "Energy_kcal_mol" = "V4", 
+        "Query_start_end" = "V5", 
+        "Subject_start_end" = "V6",
+        "Length" = "V7", 
+        "Subject_Identity" = "V8", 
+        "Query_Identity" = "V9")
+
+# Remove > in front of miRNA name 
+miranda_1kb$mirna <- gsub(">", "", miranda_1kb$mirna)
+length(unique(miranda_1kb$mirna))
+length(unique(miranda_1kb$Target))
+```
