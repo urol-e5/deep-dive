@@ -5,17 +5,22 @@ date: "2024-10-29"
 output: html_document
 ---
 
-This script will assess miRNA targets and perform GO enrichment on the genes that are targeted by miRNAs in Apul.
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
 ```
 
-I first need to read in the parsed miranda results. 
+## Validating 3'UTR methods 
+
+For Apul, I conducted 2 methods to identify 3'UTRs: 
+1) Ran Gene Ext, which extended ~15% of genes. Median extension was 1010bp. For the rest of the genes, I extended them by 1kb on the right flank and subtracted any areas that overlapped with an existing gene. 
+2) ONLY extended by 1kb on the right flank and subtracted any areas that overlapped with an existing gene. 
+
+1) miranda results from gene ext + 1kb data 
 ```{r}
-miranda <- read.delim("../output/21-Apul-miRNA-target-prediction/miranda_strict_all_3UTRs_parsed_Apul.txt", header = F) %>% 
+# Read in data 
+miranda_all <- read.delim("../output/21-Apul-miRNA-target-prediction/miranda_strict_all_3UTRs_parsed_Apul.txt", header = F) %>% 
   rename(mirna = V1,
         Target = V2, 
         Score = V3, 
@@ -26,32 +31,105 @@ miranda <- read.delim("../output/21-Apul-miRNA-target-prediction/miranda_strict_
         Subject_Identity = V8, 
         Query_Identity = V9)
 
-miranda$mirna <- gsub(">", "", miranda$mirna)
-length(unique(miranda$mirna))
+miranda_all$mirna <- gsub(">", "", miranda_all$mirna)
+length(unique(miranda_all$mirna))
+length(unique(miranda_all$Target))
+
+# Select energy <-20, make new gene id column and remove all coord and length info 
+miranda_filt <- miranda_all %>%
+  filter(Energy_kcal_mol < -20) %>%
+  separate(Target, into = c("gene_id", "Target_coords"), sep = "::") %>%
+  select(-c(Target_coords, Query_start_end, Subject_start_end, Length)) %>%
+  unique()
+length(unique(miranda_filt$mirna))
+length(unique(miranda_filt$gene_id))
+
+# Create the new data frame with gene_id and concatenated mirnas
+gene_mirna_df <- miranda_filt %>%
+  group_by(gene_id) %>%
+  summarize(mirnas = paste(mirna, collapse = ", "))
+
+# Create the new data frame with the highest score mirna for each gene_id
+gene_top_mirna_df <- miranda_filt %>%
+  group_by(gene_id) %>%
+  slice_max(Score, n = 1, with_ties = FALSE) %>%
+  select(gene_id, mirna, Score)
 ```
 
-The target column corresponds to the 3'UTR sequence of a specific gene. To get the corresponding gene name for the UTR, read in the 3'UTR gtf, which has the UTRs as well as their associated gene. 
+2) miranda results from 1kb data only 
 ```{r}
-three_prime_utr <- read.delim("../output/21-Apul-miRNA-target-prediction/Apul_all_3UTRs.gtf", header = F) %>%
-    rename(chrom = V1,
-        source = V2, 
-        type = V3, 
-        start = V4, 
-        end = V5, 
-        score = V6,
-        strand = V7, 
-        phase = V8, 
-        attr = V9)
+# Read in data 
+miranda_1kb <- read.delim("../output/21-Apul-miRNA-target-prediction/miranda_strict_all_1kb_parsed_apul.txt", header = F) %>% 
+  rename(mirna = V1,
+        Target = V2, 
+        Score = V3, 
+        Energy_kcal_mol = V4, 
+        Query_start_end = V5, 
+        Subject_start_end = V6,
+        Length = V7, 
+        Subject_Identity = V8, 
+        Query_Identity = V9)
+
+miranda_1kb$mirna <- gsub(">", "", miranda_1kb$mirna)
+length(unique(miranda_1kb$mirna))
+length(unique(miranda_1kb$Target))
+
+# Select energy <-20, make new gene id column and remove all coord and length info 
+miranda_1kb_filt <- miranda_1kb %>%
+  filter(Energy_kcal_mol < -20) %>%
+  separate(Target, into = c("gene_id", "Target_coords"), sep = "::") %>%
+  select(-c(Target_coords, Query_start_end, Subject_start_end, Length)) %>%
+  unique()
+length(unique(miranda_1kb_filt$mirna))
+length(unique(miranda_1kb_filt$gene_id))
+
+# Create the new data frame with gene_id and concatenated mirnas
+gene_mirna_1kb_df <- miranda_1kb_filt %>%
+  group_by(gene_id) %>%
+  summarize(mirnas = paste(mirna, collapse = ", "))
+
+# Create the new data frame with the highest score mirna for each gene_id
+gene_top_mirna_1kb_df <- miranda_1kb_filt %>%
+  group_by(gene_id) %>%
+  slice_max(Score, n = 1, with_ties = FALSE) %>%
+  select(gene_id, mirna, Score)
 ```
 
-Calculate length of 3'UTRs
+Summarize number of genes targeted by miRNAs via each method 
 ```{r}
-three_prime_utr <- three_prime_utr %>%
-  mutate(length = abs(start - end))
+# Gene ext + 1kb
+mirna_gene_summary <- gene_top_mirna_df %>%
+  group_by(mirna) %>%
+  summarize(num_genes = n_distinct(gene_id))
 
-mean(three_prime_utr$length)
-median(three_prime_utr$length)
+# 1kb 
+mirna_gene_1kb_summary <- gene_top_mirna_1kb_df %>%
+  group_by(mirna) %>%
+  summarize(num_genes = n_distinct(gene_id))
+
+# join dfs to compare numbers 
+both_methods <- full_join(mirna_gene_summary, mirna_gene_1kb_summary, by = "mirna")
 ```
 
+Both methods identify similar numbers of target genes, which is a good check. Are they targeting the same genes? 
+```{r}
+merged_df <- full_join(miranda_filt, miranda_1kb_filt, by = c("mirna", "gene_id"))
+
+# Count NAs in `Score.x` and `Score.y`
+na_count_x <- sum(is.na(merged_df$Score.x))  # Rows present only in `miranda_filt` - gene ext + 1kb
+na_count_y <- sum(is.na(merged_df$Score.y))  # Rows present only in `miranda_1kb_filt` - 1kb only 
+
+# Count rows that matched in both data frames (non-NA in both `Score.x` and `Score.y`)
+match_count <- sum(!is.na(merged_df$Score.x) & !is.na(merged_df$Score.y))
+
+# Display results
+na_count_x
+na_count_y
+match_count
+```
+
+There are 5820 interactions that are identified in both! <300 interactions are only in one method or the other. The methods are yielding very similar results, which is a good gut check. I think I will go with the 1kb method for now, as it does not require bam files, whereas gene ext needs bam files to perform extensions. 
+
+Also note that the interactions described here are not necessarily the ones that are active in the coral at this particular time. This analysis only tells us the potential mRNA targets of miRNAs. Expression data is needed to understand regulation dynamics. 
 
 
