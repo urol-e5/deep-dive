@@ -21,22 +21,426 @@ Read in miranda output file
 miranda_1kb <- read.delim("../output/21-Pmea-miRNA-target-prediction/miranda_strict_all_1kb_parsed_ptuh.txt", header = F) 
 
 # renaming columns is being weird, doing it manually
-
-
-
-miranda_1kb <- miranda_1kb %>%
-  rename("miRNA" = "V1", 
-        "Target" = "V2", 
-        "Score" = "V3", 
-        "Energy_kcal_mol" = "V4", 
-        "Query_start_end" = "V5", 
-        "Subject_start_end" = "V6",
-        "Length" = "V7", 
-        "Subject_Identity" = "V8", 
-        "Query_Identity" = "V9")
+colnames(miranda_1kb) <- c("mirna", "Target", "Score", "Energy_kcal_mol", "Query_start_end", "Subject_start_end", "Length", "Query_Identity", "Subject_Identity")
 
 # Remove > in front of miRNA name 
-miranda_1kb$mirna <- gsub(">", "", miranda_1kb$mirna)
+miranda_1kb$mirna <- sub(">", "", miranda_1kb$mirna)
 length(unique(miranda_1kb$mirna))
 length(unique(miranda_1kb$Target))
+```
+
+Make gene id column
+```{r}
+miranda_1kb$gene_id <- sub("ID=", "", sub(":.*", "", miranda_1kb$Target))
+```
+
+Create new df with only gene and miRNA info; summarize which miRNAs target which genes 
+```{r}
+# Create the new data frame with gene_id and concatenated mirnas
+gene_mirna_1kb_df <- miranda_1kb %>%
+  group_by(gene_id) %>%
+  summarize(mirnas = paste(mirna, collapse = ", "))
+```
+
+Summarize number of genes targeted by each miRNA
+```{r}
+mirna_gene_summary <- miranda_1kb %>%
+  group_by(mirna) %>%
+  summarize(num_genes = n_distinct(gene_id))
+```
+
+Read in gene to go information (generated [here](https://github.com/urol-e5/deep-dive/blob/main/F-Pmea/code/19-Pmea-bedtools-closest.Rmd))
+```{r}
+PMEA_gene2go<-read.delim("../../data/Pmea_gene2go.tab", sep="\t")
+```
+
+Make list of genes for input to TopGO
+```{r}
+# Genes of interest - ie those targeted by miRNAs 
+pmea_clust_genes <- as.character(unique(miranda_1kb$gene_id))
+
+# All genes 
+pmea_all_genes <- as.character(PMEA_gene2go$gene_name)
+
+# Apply 1 or 0 if gene is gene of interest 
+Pmea_GeneList <- factor(as.integer(pmea_all_genes %in% pmea_clust_genes))
+names(Pmea_GeneList) <- pmea_all_genes
+```
+
+Read in gene-to-go-mappings
+```{r}
+PMEA_gene2go_topgo<-readMappings("../../data/Pmea_gene2go.tab", IDsep=";", sep="\t")
+```
+
+Set function to select genes of interest (ie those that have pvalue < 0.05)
+```{r}
+topDiffGenes <- function(allScore) {
+return(allScore < 0.05)}
+```
+
+### Biological Processes
+
+Create `topGOdata` object, which is required for topGO analysis
+```{r}
+GO_PMEA_BP <-new("topGOdata", ontology="BP", gene2GO=PMEA_gene2go_topgo, allGenes=Pmea_GeneList, annot = annFUN.gene2GO, geneSel=topDiffGenes)
+```
+
+Run GO enrichment test 
+```{r}
+GO_PMEA_BP_FE <- runTest(GO_PMEA_BP, algorithm="weight01", statistic="fisher")
+```
+
+Generate results table 
+```{r}
+GO_PMEA_BP_En <- GenTable(GO_PMEA_BP, Fisher = GO_PMEA_BP_FE, orderBy = "Fisher",  topNodes = 100, numChar = 51)
+```
+Only taking the top 100 GO terms 
+
+Filter by significant results
+```{r}
+GO_PMEA_BP_En$Fisher<-as.numeric(GO_PMEA_BP_En$Fisher)
+GO_PMEA_BP_En_sig<-GO_PMEA_BP_En[GO_PMEA_BP_En$Fisher<0.05,]
+```
+
+Merge `GO_PMEA_BP_En_sig` with GO and gene info. 
+```{r}
+# Separate GO terms 
+PMEA_gene2go <- PMEA_gene2go %>%
+  separate_rows(GeneOntologyIDs, sep = ";")
+
+# Ensure GO terms in both datasets are formatted similarly (trim whitespaces)
+PMEA_gene2go$GeneOntologyIDs <- trimws(PMEA_gene2go$GeneOntologyIDs)
+GO_PMEA_BP_En_sig$GO.ID <- trimws(GO_PMEA_BP_En_sig$GO.ID)
+
+# Join the datasets based on GO term
+GO_PMEA_BP_En_sig_gene <- PMEA_gene2go %>%
+  left_join(GO_PMEA_BP_En_sig, by = c("GeneOntologyIDs" = "GO.ID")) %>%
+  na.omit()
+
+# Add ontology column 
+GO_PMEA_BP_En_sig_gene$ontology <- "Biological Processes"
+```
+
+### Cellular Components 
+
+Create `topGOdata` object, which is required for topGO analysis
+```{r}
+GO_PMEA_CC <-new("topGOdata", ontology="CC", gene2GO=PMEA_gene2go_topgo, allGenes=Pmea_GeneList, annot = annFUN.gene2GO, geneSel=topDiffGenes)
+```
+
+Run GO enrichment test 
+```{r}
+GO_PMEA_CC_FE <- runTest(GO_PMEA_CC, algorithm="weight01", statistic="fisher")
+```
+
+Generate results table 
+```{r}
+GO_PMEA_CC_En <- GenTable(GO_PMEA_CC, Fisher = GO_PMEA_CC_FE, orderBy = "Fisher",  topNodes = 100, numChar = 51)
+```
+Only taking the top 100 GO terms 
+
+Filter by significant results
+```{r}
+GO_PMEA_CC_En$Fisher<-as.numeric(GO_PMEA_CC_En$Fisher)
+GO_PMEA_CC_En_sig<-GO_PMEA_CC_En[GO_PMEA_CC_En$Fisher<0.05,]
+```
+
+Merge `GO_PMEA_CC_En_sig` with GO and gene info. 
+```{r}
+# Separate GO terms 
+PMEA_gene2go <- PMEA_gene2go %>%
+  separate_rows(GeneOntologyIDs, sep = ";")
+
+# Ensure GO terms in both datasets are formatted similarly (trim whitespaces)
+PMEA_gene2go$GeneOntologyIDs <- trimws(PMEA_gene2go$GeneOntologyIDs)
+GO_PMEA_CC_En_sig$GO.ID <- trimws(GO_PMEA_CC_En_sig$GO.ID)
+
+# Join the datasets based on GO term
+GO_PMEA_CC_En_sig_gene <- PMEA_gene2go %>%
+  left_join(GO_PMEA_CC_En_sig, by = c("GeneOntologyIDs" = "GO.ID")) %>%
+  na.omit()
+
+# Add ontology column 
+GO_PMEA_CC_En_sig_gene$ontology <- "Cellular Components"
+```
+
+### Molecular Functions
+
+Create `topGOdata` object, which is required for topGO analysis
+```{r}
+GO_PMEA_MF <-new("topGOdata", ontology="MF", gene2GO=PMEA_gene2go_topgo, allGenes=Pmea_GeneList, annot = annFUN.gene2GO, geneSel=topDiffGenes)
+```
+Run GO enrichment test 
+```{r}
+GO_PMEA_MF_FE <- runTest(GO_PMEA_MF, algorithm="weight01", statistic="fisher")
+```
+
+Generate results table 
+```{r}
+GO_PMEA_MF_En <- GenTable(GO_PMEA_MF, Fisher = GO_PMEA_MF_FE, orderBy = "Fisher",  topNodes = 100, numChar = 51)
+```
+Only taking the top 100 GO terms 
+
+Filter by significant results
+```{r}
+GO_PMEA_MF_En$Fisher<-as.numeric(GO_PMEA_MF_En$Fisher)
+GO_PMEA_MF_En_sig<-GO_PMEA_MF_En[GO_PMEA_MF_En$Fisher<0.05,]
+```
+
+Merge `GO_PMEA_MF_En_sig` with GO and gene info. 
+```{r}
+# Separate GO terms 
+PMEA_gene2go <- PMEA_gene2go %>%
+  separate_rows(GeneOntologyIDs, sep = ";")
+
+# Ensure GO terms in both datasets are formatted similarly (trim whitespaces)
+PMEA_gene2go$GeneOntologyIDs <- trimws(PMEA_gene2go$GeneOntologyIDs)
+GO_PMEA_MF_En_sig$GO.ID <- trimws(GO_PMEA_MF_En_sig$GO.ID)
+
+# Join the datasets based on GO term
+GO_PMEA_MF_En_sig_gene <- PMEA_gene2go %>%
+  left_join(GO_PMEA_MF_En_sig, by = c("GeneOntologyIDs" = "GO.ID")) %>%
+  na.omit()
+
+# Add ontology column 
+GO_PMEA_MF_En_sig_gene$ontology <- "Molecular Functions"
+```
+
+### Join ontologies 
+
+Bind so there is a df that has significantly enriched GO terms for all ontologies 
+```{r}
+GO_PMEA_En_sig_gene <- rbind(GO_PMEA_BP_En_sig_gene, GO_PMEA_CC_En_sig_gene, GO_PMEA_MF_En_sig_gene)
+```
+
+Merge `miranda_1kb` with `GO_PMEA_En_sig_gene` and calculate proportion of significant genes
+```{r}
+merged_targets <- GO_PMEA_En_sig_gene %>%
+  left_join(miranda_1kb, by = c("gene_name" = "gene_id")) %>%
+  na.omit() %>%
+  mutate(prop.sig.genes = Significant/Annotated)
+
+# Write to csv 
+write.csv(merged_targets, "../output/21-Pmea-miRNA-target-prediction/Pmea_GO_en_sig_miRNA_targets.csv")
+```
+
+Plot 
+```{r}
+PMEA_GO_plot<-ggplot(merged_targets, aes(x = Term, y = Fisher, size = prop.sig.genes, fill = Fisher)) +
+  #expand_limits(y = 1.5) +
+  #ylim(1, 7.25) +
+  # Add horizontal lines with a single aesthetic value
+  #geom_hline(yintercept = -log10(0.01), linetype = "longdash", colour = "black", linewidth = .6) +
+  #geom_hline(yintercept = -log10(0.001), linetype = "solid", colour = "black", linewidth = .6) +
+  geom_point(shape = 21) + 
+  scale_size(range = c(2, 12)) + 
+  scale_fill_continuous(low = "#1AD3D1FF", high = "#4686FBFF") +
+  xlab('') + 
+  ylab('Enrichment score') +
+  #labs(caption = 'Cut-off lines at p=0.01 and p=0.001') +
+  theme_bw() +
+  facet_grid(vars(ontology), scales = "free", space = "free_y") +
+  coord_flip(); PMEA_GO_plot
+```
+
+## GO enrichment of peve-mir-100 targets
+
+Interested in looking specifically at miR-100, as this is highly conserved across cnidarians and bilaterians
+
+Before starting this section, run lines 9-57 to get the miranda information. 
+
+Filter by mir-100
+```{r}
+mir100_miranda_1kb <- miranda_1kb %>%
+  filter(mirna == "ptuh-mir-100")
+```
+
+Make list of genes for input to TopGO
+```{r}
+# Genes of interest - ie those targeted by miRNAs 
+pmea_clust_genes <- as.character(unique(mir100_miranda_1kb$gene_id))
+
+# All genes 
+pmea_all_genes <- as.character(PMEA_gene2go$gene_name)
+
+# Apply 1 or 0 if gene is gene of interest 
+Pmea_GeneList <- factor(as.integer(pmea_all_genes %in% pmea_clust_genes))
+names(Pmea_GeneList) <- pmea_all_genes
+```
+
+Read in gene-to-go-mappings
+```{r}
+PMEA_gene2go_topgo<-readMappings("../../data/Pmea_gene2go.tab", IDsep=";", sep="\t")
+```
+
+Set function to select genes of interest (ie those that have pvalue < 0.05)
+```{r}
+topDiffGenes <- function(allScore) {
+return(allScore < 0.05)}
+```
+
+### Biological Processes
+
+Create `topGOdata` object, which is required for topGO analysis
+```{r}
+GO_PMEA_mir100_BP <-new("topGOdata", ontology="BP", gene2GO=PMEA_gene2go_topgo, allGenes=Pmea_GeneList, annot = annFUN.gene2GO, geneSel=topDiffGenes)
+```
+
+Run GO enrichment test 
+```{r}
+GO_PMEA_mir100_BP_FE <- runTest(GO_PMEA_mir100_BP, algorithm="weight01", statistic="fisher")
+```
+
+Generate results table 
+```{r}
+GO_PMEA_mir100_BP_En <- GenTable(GO_PMEA_mir100_BP, Fisher = GO_PMEA_mir100_BP_FE, orderBy = "Fisher",  topNodes = 100, numChar = 51)
+```
+Only taking the top 100 GO terms 
+
+Filter by significant results
+```{r}
+GO_PMEA_mir100_BP_En$Fisher<-as.numeric(GO_PMEA_mir100_BP_En$Fisher)
+GO_PMEA_mir100_BP_En_sig<-GO_PMEA_mir100_BP_En[GO_PMEA_mir100_BP_En$Fisher<0.05,]
+```
+
+Merge `GO_PMEA_mir100_BP_En` with GO and gene info. 
+```{r}
+# Separate GO terms 
+PMEA_gene2go <- PMEA_gene2go %>%
+  separate_rows(GeneOntologyIDs, sep = ";")
+
+# Ensure GO terms in both datasets are formatted similarly (trim whitespaces)
+PMEA_gene2go$GeneOntologyIDs <- trimws(PMEA_gene2go$GeneOntologyIDs)
+GO_PMEA_mir100_BP_En_sig$GO.ID <- trimws(GO_PMEA_mir100_BP_En_sig$GO.ID)
+
+# Join the datasets based on GO term
+GO_PMEA_mir100_BP_En_sig_gene <- PMEA_gene2go %>%
+  left_join(GO_PMEA_mir100_BP_En_sig, by = c("GeneOntologyIDs" = "GO.ID")) %>%
+  na.omit()
+
+# Add ontology column 
+GO_PMEA_mir100_BP_En_sig_gene$ontology <- "Biological Processes"
+```
+
+### Cellular Components
+
+Create `topGOdata` object, which is required for topGO analysis
+```{r}
+GO_PMEA_mir100_CC <-new("topGOdata", ontology="CC", gene2GO=PMEA_gene2go_topgo, allGenes=Pmea_GeneList, annot = annFUN.gene2GO, geneSel=topDiffGenes)
+```
+
+Run GO enrichment test 
+```{r}
+GO_PMEA_mir100_CC_FE <- runTest(GO_PMEA_mir100_CC, algorithm="weight01", statistic="fisher")
+```
+
+Generate results table 
+```{r}
+GO_PMEA_mir100_CC_En <- GenTable(GO_PMEA_mir100_CC, Fisher = GO_PMEA_mir100_CC_FE, orderBy = "Fisher",  topNodes = 100, numChar = 51)
+```
+Only taking the top 100 GO terms 
+
+Filter by significant results
+```{r}
+GO_PMEA_mir100_CC_En$Fisher<-as.numeric(GO_PMEA_mir100_CC_En$Fisher)
+GO_PMEA_mir100_CC_En_sig<-GO_PMEA_mir100_CC_En[GO_PMEA_mir100_CC_En$Fisher<0.05,]
+```
+
+Merge `GO_PMEA_mir100_CC_En_sig` with GO and gene info. 
+```{r}
+# Separate GO terms 
+PMEA_gene2go <- PMEA_gene2go %>%
+  separate_rows(GeneOntologyIDs, sep = ";")
+
+# Ensure GO terms in both datasets are formatted similarly (trim whitespaces)
+PMEA_gene2go$GeneOntologyIDs <- trimws(PMEA_gene2go$GeneOntologyIDs)
+GO_PMEA_mir100_CC_En_sig$GO.ID <- trimws(GO_PMEA_mir100_CC_En_sig$GO.ID)
+
+# Join the datasets based on GO term
+GO_PMEA_mir100_CC_En_sig_gene <- PMEA_gene2go %>%
+  left_join(GO_PMEA_mir100_CC_En_sig, by = c("GeneOntologyIDs" = "GO.ID")) %>%
+  na.omit()
+
+# Add ontology column 
+GO_PMEA_mir100_CC_En_sig_gene$ontology <- "Cellular Components"
+```
+
+### Molecular Functions 
+
+Create `topGOdata` object, which is required for topGO analysis
+```{r}
+GO_PMEA_mir100_MF <-new("topGOdata", ontology="MF", gene2GO=PMEA_gene2go_topgo, allGenes=Pmea_GeneList, annot = annFUN.gene2GO, geneSel=topDiffGenes)
+```
+
+Run GO enrichment test 
+```{r}
+GO_PMEA_mir100_MF_FE <- runTest(GO_PMEA_mir100_MF, algorithm="weight01", statistic="fisher")
+```
+
+Generate results table 
+```{r}
+GO_PMEA_mir100_MF_En <- GenTable(GO_PMEA_mir100_MF, Fisher = GO_PMEA_mir100_MF_FE, orderBy = "Fisher",  topNodes = 100, numChar = 51)
+```
+Only taking the top 100 GO terms 
+
+Filter by significant results
+```{r}
+GO_PMEA_mir100_MF_En$Fisher<-as.numeric(GO_PMEA_mir100_MF_En$Fisher)
+GO_PMEA_mir100_MF_En_sig<-GO_PMEA_mir100_MF_En[GO_PMEA_mir100_MF_En$Fisher<0.05,]
+```
+
+Merge `GO_PMEA_mir100_MF_En_sig` with GO and gene info. 
+```{r}
+# Separate GO terms 
+PMEA_gene2go <- PMEA_gene2go %>%
+  separate_rows(GeneOntologyIDs, sep = ";")
+
+# Ensure GO terms in both datasets are formatted similarly (trim whitespaces)
+PMEA_gene2go$GeneOntologyIDs <- trimws(PMEA_gene2go$GeneOntologyIDs)
+GO_PMEA_mir100_MF_En_sig$GO.ID <- trimws(GO_PMEA_mir100_MF_En_sig$GO.ID)
+
+# Join the datasets based on GO term
+GO_PMEA_mir100_MF_En_sig_gene <- PMEA_gene2go %>%
+  left_join(GO_PMEA_mir100_MF_En_sig, by = c("GeneOntologyIDs" = "GO.ID")) %>%
+  na.omit()
+
+# Add ontology column 
+GO_PMEA_mir100_MF_En_sig_gene$ontology <- "Molecular Functions"
+```
+
+### Join ontologies 
+
+Bind so there is a df that has significantly enriched GO terms for all ontologies 
+```{r}
+GO_PMEA_mir100_En_sig_gene <- rbind(GO_PMEA_mir100_BP_En_sig_gene, GO_PMEA_mir100_CC_En_sig_gene, GO_PMEA_mir100_MF_En_sig_gene)
+```
+
+Merge `mir100_miranda_1kb` with `GO_PEVE_En_sig_gene` and calculate proportion of significant genes
+```{r}
+merged_mir100_targets <- GO_PMEA_mir100_En_sig_gene %>%
+  left_join(mir100_miranda_1kb, by = c("gene_name" = "gene_id")) %>%
+  na.omit() %>%
+  mutate(prop.sig.genes = Significant/Annotated)
+
+# Write to csv 
+write.csv(merged_mir100_targets, "../output/21-Pmea-miRNA-target-prediction/Pmea_GO_en_sig_mir-100_targets.csv")
+```
+
+Plot 
+```{r}
+PMEA_GO_plot<-ggplot(merged_mir100_targets, aes(x = Term, y = Fisher, size = prop.sig.genes, fill = Fisher)) +
+  #expand_limits(y = 1.5) +
+  #ylim(1, 7.25) +
+  # Add horizontal lines with a single aesthetic value
+  #geom_hline(yintercept = -log10(0.01), linetype = "longdash", colour = "black", linewidth = .6) +
+  #geom_hline(yintercept = -log10(0.001), linetype = "solid", colour = "black", linewidth = .6) +
+  geom_point(shape = 21) + 
+  scale_size(range = c(2, 12)) + 
+  scale_fill_continuous(low = "#1AD3D1FF", high = "#4686FBFF") +
+  xlab('') + 
+  ylab('Enrichment score') +
+  #labs(caption = 'Cut-off lines at p=0.01 and p=0.001') +
+  theme_bw() +
+  facet_grid(vars(ontology), scales = "free", space = "free_y") +
+  coord_flip(); PMEA_GO_plot
 ```
