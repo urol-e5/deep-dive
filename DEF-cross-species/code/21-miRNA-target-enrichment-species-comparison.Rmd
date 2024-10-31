@@ -84,8 +84,8 @@ GO_plot_target <- ggplot(shared_target_df, aes(x = Term, y = -log10(Fisher), sha
   ) +
   coord_flip(); GO_plot_target
 
-ggsave(filename = "../figures/miRNA_targets_shared_GOs_plot.png", GO_plot_target, width = 25, height = 25)
-ggsave(filename = "../figures/miRNA_targets_shared_GOs_plot.pdf", GO_plot_target, width = 25, height = 25)
+ggsave(filename = "../figures/miRNA_targets_GOs_plot.png", GO_plot_target, width = 25, height = 25)
+ggsave(filename = "../figures/miRNA_targets_GOs_plot.pdf", GO_plot_target, width = 25, height = 25)
 ```
 
 Plot only BP 
@@ -124,8 +124,8 @@ GO_BP_plot <- ggplot(shared_target_df_bp, aes(x = Term, y = -log10(Fisher), shap
     plot.margin = margin(t = 10, r = 10, b = 20, l = 10)        # Add space below the plot
   ); GO_BP_plot
 
-ggsave(filename = "../figures/miRNA_targets_shared_GO_BP_plot.png", GO_BP_plot, width = 40, height = 25)
-ggsave(filename = "../figures/miRNA_targets_shared_GO_BP_plot.pdf", GO_BP_plot, width = 40, height = 25)
+ggsave(filename = "../figures/miRNA_targets_GO_BP_plot.png", GO_BP_plot, width = 40, height = 25)
+ggsave(filename = "../figures/miRNA_targets_GO_BP_plot.pdf", GO_BP_plot, width = 40, height = 25)
 ```
 
 ## mir-100
@@ -188,11 +188,391 @@ ggsave(filename = "../figures/mir-100_targets_GO_plot.png", GO_plot_mir100_targe
 ggsave(filename = "../figures/mir-100_targets_GO_plot.pdf", GO_plot_mir100_target, width = 40, height = 25)
 ```
 
+Plot only BP 
+```{r}
+shared_mir100_target_df_bp <- shared_mir100_target_df %>%
+  dplyr::filter(ontology == "Biological Processes")
+  
+# Plot 
+GO_mir100_BP_plot <- ggplot(shared_mir100_target_df_bp, aes(x = Term, y = -log10(Fisher), shape = Species, fill = Species)) +
+  geom_point(size = 25, color = "black", stroke = 2) +  # Black border around shapes
+  scale_shape_manual(values = c(21, 22, 23)) +  # Shapes that can be filled
+  scale_fill_manual(values = c("#408EC6", "#7A2048", "#1E2761")) +  # Custom colors for each species
+  #scale_size(range = c(2, 12)) + 
+  xlab('') + 
+  ylab('log(Enrichment score)') +
+  facet_grid(vars(ontology), scales = "free", space = "free_y") + 
+  coord_flip() +
+  theme_bw() +
+  theme(
+    axis.title = element_text(size = 51, face = "bold"),        # Axis title size
+    axis.text = element_text(size = 49, colour = "black"),                        # Axis text size
+    axis.text.x = element_text(hjust = 1),  # Rotate and adjust label position
+    legend.title = element_text(size = 44, face = "bold"),      # Legend title size
+    legend.text = element_text(size = 42, face = "italic"),                      # Legend text size
+    strip.text = element_text(size = 49, face = "bold"),        # Facet text size
+    strip.background = element_rect(fill = "lightgray", color = "black", size = 1.5),         # Facet background
+    axis.line = element_line(size = 1, colour = "black"),       # Enhanced axis lines
+    axis.ticks = element_line(size = 1),                        # Thicker axis ticks
+     #panel.border = element_blank()                             # Remove panel border
+    #panel.grid.major = element_blank(),                         # Remove major grid lines
+    #panel.grid.minor = element_blank()                          # Remove minor grid lines
+        panel.border = element_rect(color = "black", size = 1.2),   # Enhanced facet border lines
+    panel.grid.major = element_line(size = 0.5, color = "gray"), # Grid lines inside the facets
+    panel.spacing = unit(1, "lines"),                           # Increase space between facets
+    strip.placement = "outside",
+    plot.margin = margin(t = 10, r = 10, b = 20, l = 10)        # Add space below the plot
+  ); GO_BP_plot
 
+ggsave(filename = "../figures/mir-100_targets_GO_BP_plot.png", GO_mir100_BP_plot, width = 40, height = 25)
+ggsave(filename = "../figures/mir-100_targets_GO_BP_plot.pdf", GO_mir100_BP_plot, width = 40, height = 25)
+```
 
+## mir-2023
 
+Read in data 
+```{r}
+apul_mir2023_target <- read.csv("../../D-Apul/output/21-Apul-miRNA-target-prediction/Apul_GO_en_sig_mir-2023_targets.csv")
+apul_mir2023_target$Species <- "Acropora pulchra"
+peve_mir2023_target <- read.csv("../../E-Peve/output/21-Peve-miRNA-target-prediction/Peve_GO_en_sig_mir-2023_targets.csv")
+peve_mir2023_target$Species <- "Porites evermanni"
+pmea_mir2023_target <- read.csv("../../F-Pmea/output/21-Pmea-miRNA-target-prediction/Pmea_GO_en_sig_mir-2023_targets.csv")
+pmea_mir2023_target$Species <- "Pocillopora tuahiniensis"
 
+all_mir2023_target <- rbind(apul_mir2023_target, peve_mir2023_target, pmea_mir2023_target)
+```
 
+Assess shared GO terms between species 
+```{r}
+# Count the number of unique species for each GeneOntologyID
+shared_mir2023_target <- all_mir2023_target %>%
+  group_by(GeneOntologyIDs) %>%
+  summarise(unique_species = n_distinct(Species)) %>%
+  filter(unique_species > 1) %>%
+  dplyr::select(GeneOntologyIDs)
 
+# Create a new dataframe with only the shared GeneOntologyIDs
+shared_mir2023_target_df <- all_mir2023_target %>%
+  filter(GeneOntologyIDs %in% shared_mir2023_target$GeneOntologyIDs)
 
+# Plot 
+GO_plot_mir2023_target <- ggplot(shared_mir2023_target_df, aes(x = Term, y = -log10(Fisher), shape = Species, fill = Species)) +
+  geom_point(size = 25, color = "black", stroke = 2) +  # Black border around shapes
+  scale_shape_manual(values = c(21, 22, 23)) +  # Shapes that can be filled
+  scale_fill_manual(values = c("#408EC6", "#7A2048", "#1E2761")) +  # Custom colors for each species
+  scale_size(range = c(2, 12)) + 
+  xlab('') + 
+  ylab('log(Enrichment score)') +
+  facet_grid(vars(ontology), scales = "free", space = "free_y") + 
+  theme_bw() +
+  theme(
+    axis.title = element_text(size = 36, face = "bold"),        # Axis title size
+    axis.text = element_text(size = 34, colour = "black"),                        # Axis text size
+    legend.title = element_text(size = 34, face = "bold"),      # Legend title size
+    legend.text = element_text(size = 32),                      # Legend text size
+    strip.text = element_text(size = 34, face = "bold"),        # Facet text size
+    strip.background = element_rect(fill = "lightgray", color = "black", size = 1.5),         # Facet background
+    axis.line = element_line(size = 1, colour = "black"),       # Enhanced axis lines
+    axis.ticks = element_line(size = 1),                        # Thicker axis ticks
+     #panel.border = element_blank()                             # Remove panel border
+    #panel.grid.major = element_blank(),                         # Remove major grid lines
+    #panel.grid.minor = element_blank()                          # Remove minor grid lines
+        panel.border = element_rect(color = "black", size = 1.2),   # Enhanced facet border lines
+    panel.grid.major = element_line(size = 0.5, color = "gray"), # Grid lines inside the facets
+    panel.spacing = unit(1, "lines"),                           # Increase space between facets
+    strip.placement = "outside"    
+  ) +
+  coord_flip(); GO_plot_mir2023_target
+
+ggsave(filename = "../figures/mir-2023_targets_GO_plot.png", GO_plot_mir2023_target, width = 40, height = 25)
+ggsave(filename = "../figures/mir-2023_targets_GO_plot.pdf", GO_plot_mir2023_target, width = 40, height = 25)
+```
+
+Plot only BP 
+```{r}
+shared_mir2023_target_df_bp <- shared_mir2023_target_df %>%
+  dplyr::filter(ontology == "Biological Processes")
+  
+# Plot 
+GO_mir2023_BP_plot <- ggplot(shared_mir2023_target_df_bp, aes(x = Term, y = -log10(Fisher), shape = Species, fill = Species)) +
+  geom_point(size = 25, color = "black", stroke = 2) +  # Black border around shapes
+  scale_shape_manual(values = c(21, 22, 23)) +  # Shapes that can be filled
+  scale_fill_manual(values = c("#408EC6", "#7A2048", "#1E2761")) +  # Custom colors for each species
+  #scale_size(range = c(2, 12)) + 
+  xlab('') + 
+  ylab('log(Enrichment score)') +
+  facet_grid(vars(ontology), scales = "free", space = "free_y") + 
+  coord_flip() +
+  theme_bw() +
+  theme(
+    axis.title = element_text(size = 51, face = "bold"),        # Axis title size
+    axis.text = element_text(size = 49, colour = "black"),                        # Axis text size
+    axis.text.x = element_text(hjust = 1),  # Rotate and adjust label position
+    legend.title = element_text(size = 44, face = "bold"),      # Legend title size
+    legend.text = element_text(size = 42, face = "italic"),                      # Legend text size
+    strip.text = element_text(size = 49, face = "bold"),        # Facet text size
+    strip.background = element_rect(fill = "lightgray", color = "black", size = 1.5),         # Facet background
+    axis.line = element_line(size = 1, colour = "black"),       # Enhanced axis lines
+    axis.ticks = element_line(size = 1),                        # Thicker axis ticks
+     #panel.border = element_blank()                             # Remove panel border
+    #panel.grid.major = element_blank(),                         # Remove major grid lines
+    #panel.grid.minor = element_blank()                          # Remove minor grid lines
+        panel.border = element_rect(color = "black", size = 1.2),   # Enhanced facet border lines
+    panel.grid.major = element_line(size = 0.5, color = "gray"), # Grid lines inside the facets
+    panel.spacing = unit(1, "lines"),                           # Increase space between facets
+    strip.placement = "outside",
+    plot.margin = margin(t = 10, r = 10, b = 20, l = 10)        # Add space below the plot
+  ); GO_mir2023_BP_plot
+
+ggsave(filename = "../figures/mir-2023_targets_GO_BP_plot.png", GO_mir2023_BP_plot, width = 40, height = 25)
+ggsave(filename = "../figures/mir-2023_targets_GO_BP_plot.pdf", GO_mir2023_BP_plot, width = 40, height = 25)
+```
+
+## mir-2025
+
+Read in data 
+```{r}
+apul_mir2025_target <- read.csv("../../D-Apul/output/21-Apul-miRNA-target-prediction/Apul_GO_en_sig_mir-2025_targets.csv")
+apul_mir2025_target$Species <- "Acropora pulchra"
+peve_mir2025_target <- read.csv("../../E-Peve/output/21-Peve-miRNA-target-prediction/Peve_GO_en_sig_mir-2025_targets.csv")
+peve_mir2025_target$Species <- "Porites evermanni"
+pmea_mir2025_target <- read.csv("../../F-Pmea/output/21-Pmea-miRNA-target-prediction/Pmea_GO_en_sig_mir-2025_targets.csv")
+pmea_mir2025_target$Species <- "Pocillopora tuahiniensis"
+
+all_mir2025_target <- rbind(apul_mir2025_target, peve_mir2025_target, pmea_mir2025_target)
+```
+
+Assess shared GO terms between species 
+```{r}
+# Count the number of unique species for each GeneOntologyID
+shared_mir2025_target <- all_mir2025_target %>%
+  group_by(GeneOntologyIDs) %>%
+  summarise(unique_species = n_distinct(Species)) %>%
+  filter(unique_species > 1) %>%
+  dplyr::select(GeneOntologyIDs)
+
+# Create a new dataframe with only the shared GeneOntologyIDs
+shared_mir2025_target_df <- all_mir2025_target %>%
+  filter(GeneOntologyIDs %in% shared_mir2025_target$GeneOntologyIDs)
+
+# Plot 
+GO_plot_mir2025_target <- ggplot(shared_mir2025_target_df, aes(x = Term, y = -log10(Fisher), shape = Species, fill = Species)) +
+  geom_point(size = 25, color = "black", stroke = 2) +  # Black border around shapes
+  scale_shape_manual(values = c(21, 22, 23)) +  # Shapes that can be filled
+  scale_fill_manual(values = c("#408EC6", "#7A2048", "#1E2761")) +  # Custom colors for each species
+  scale_size(range = c(2, 12)) + 
+  xlab('') + 
+  ylab('log(Enrichment score)') +
+  facet_grid(vars(ontology), scales = "free", space = "free_y") + 
+  theme_bw() +
+  theme(
+    axis.title = element_text(size = 36, face = "bold"),        # Axis title size
+    axis.text = element_text(size = 34, colour = "black"),                        # Axis text size
+    legend.title = element_text(size = 34, face = "bold"),      # Legend title size
+    legend.text = element_text(size = 32),                      # Legend text size
+    strip.text = element_text(size = 34, face = "bold"),        # Facet text size
+    strip.background = element_rect(fill = "lightgray", color = "black", size = 1.5),         # Facet background
+    axis.line = element_line(size = 1, colour = "black"),       # Enhanced axis lines
+    axis.ticks = element_line(size = 1),                        # Thicker axis ticks
+     #panel.border = element_blank()                             # Remove panel border
+    #panel.grid.major = element_blank(),                         # Remove major grid lines
+    #panel.grid.minor = element_blank()                          # Remove minor grid lines
+        panel.border = element_rect(color = "black", size = 1.2),   # Enhanced facet border lines
+    panel.grid.major = element_line(size = 0.5, color = "gray"), # Grid lines inside the facets
+    panel.spacing = unit(1, "lines"),                           # Increase space between facets
+    strip.placement = "outside"    
+  ) +
+  coord_flip(); GO_plot_mir2025_target
+
+ggsave(filename = "../figures/mir-2025_targets_GO_plot.png", GO_plot_mir2025_target, width = 40, height = 25)
+ggsave(filename = "../figures/mir-2025_targets_GO_plot.pdf", GO_plot_mir2025_target, width = 40, height = 25)
+```
+
+Plot only BP 
+```{r}
+shared_mir2025_target_df_bp <- shared_mir2025_target_df %>%
+  dplyr::filter(ontology == "Biological Processes")
+  
+# Plot 
+GO_mir2025_BP_plot <- ggplot(shared_mir2025_target_df_bp, aes(x = Term, y = -log10(Fisher), shape = Species, fill = Species)) +
+  geom_point(size = 25, color = "black", stroke = 2) +  # Black border around shapes
+  scale_shape_manual(values = c(21, 22, 23)) +  # Shapes that can be filled
+  scale_fill_manual(values = c("#408EC6", "#7A2048", "#1E2761")) +  # Custom colors for each species
+  #scale_size(range = c(2, 12)) + 
+  xlab('') + 
+  ylab('log(Enrichment score)') +
+  facet_grid(vars(ontology), scales = "free", space = "free_y") + 
+  coord_flip() +
+  theme_bw() +
+  theme(
+    axis.title = element_text(size = 51, face = "bold"),        # Axis title size
+    axis.text = element_text(size = 49, colour = "black"),                        # Axis text size
+    axis.text.x = element_text(hjust = 1),  # Rotate and adjust label position
+    legend.title = element_text(size = 44, face = "bold"),      # Legend title size
+    legend.text = element_text(size = 42, face = "italic"),                      # Legend text size
+    strip.text = element_text(size = 49, face = "bold"),        # Facet text size
+    strip.background = element_rect(fill = "lightgray", color = "black", size = 1.5),         # Facet background
+    axis.line = element_line(size = 1, colour = "black"),       # Enhanced axis lines
+    axis.ticks = element_line(size = 1),                        # Thicker axis ticks
+     #panel.border = element_blank()                             # Remove panel border
+    #panel.grid.major = element_blank(),                         # Remove major grid lines
+    #panel.grid.minor = element_blank()                          # Remove minor grid lines
+        panel.border = element_rect(color = "black", size = 1.2),   # Enhanced facet border lines
+    panel.grid.major = element_line(size = 0.5, color = "gray"), # Grid lines inside the facets
+    panel.spacing = unit(1, "lines"),                           # Increase space between facets
+    strip.placement = "outside",
+    plot.margin = margin(t = 10, r = 10, b = 20, l = 10)        # Add space below the plot
+  ); GO_mir2025_BP_plot
+
+ggsave(filename = "../figures/mir-2025_targets_GO_BP_plot.png", GO_mir2025_BP_plot, width = 40, height = 25)
+ggsave(filename = "../figures/mir-2025_targets_GO_BP_plot.pdf", GO_mir2025_BP_plot, width = 40, height = 25)
+```
+
+## mir-2036
+
+Read in data 
+```{r}
+apul_mir2036_target <- read.csv("../../D-Apul/output/21-Apul-miRNA-target-prediction/Apul_GO_en_sig_mir-2036_targets.csv")
+apul_mir2036_target$Species <- "Acropora pulchra"
+peve_mir2036_target <- read.csv("../../E-Peve/output/21-Peve-miRNA-target-prediction/Peve_GO_en_sig_mir-2036_targets.csv")
+peve_mir2036_target$Species <- "Porites evermanni"
+pmea_mir2036_target <- read.csv("../../F-Pmea/output/21-Pmea-miRNA-target-prediction/Pmea_GO_en_sig_mir-2036_targets.csv")
+pmea_mir2036_target$Species <- "Pocillopora tuahiniensis"
+
+all_mir2036_target <- rbind(apul_mir2036_target, peve_mir2036_target, pmea_mir2036_target)
+```
+
+Assess shared GO terms between species 
+```{r}
+# Count the number of unique species for each GeneOntologyID
+shared_mir2036_target <- all_mir2036_target %>%
+  group_by(GeneOntologyIDs) %>%
+  summarise(unique_species = n_distinct(Species)) %>%
+  filter(unique_species > 1) %>%
+  dplyr::select(GeneOntologyIDs)
+
+# Create a new dataframe with only the shared GeneOntologyIDs
+shared_mir2036_target_df <- all_mir2036_target %>%
+  filter(GeneOntologyIDs %in% shared_mir2036_target$GeneOntologyIDs)
+
+# Plot 
+GO_plot_mir2036_target <- ggplot(shared_mir2036_target_df, aes(x = Term, y = -log10(Fisher), shape = Species, fill = Species)) +
+  geom_point(size = 25, color = "black", stroke = 2) +  # Black border around shapes
+  scale_shape_manual(values = c(21, 22, 23)) +  # Shapes that can be filled
+  scale_fill_manual(values = c("#408EC6", "#7A2048", "#1E2761")) +  # Custom colors for each species
+  scale_size(range = c(2, 12)) + 
+  xlab('') + 
+  ylab('log(Enrichment score)') +
+  facet_grid(vars(ontology), scales = "free", space = "free_y") + 
+  theme_bw() +
+  theme(
+    axis.title = element_text(size = 36, face = "bold"),        # Axis title size
+    axis.text = element_text(size = 34, colour = "black"),                        # Axis text size
+    legend.title = element_text(size = 34, face = "bold"),      # Legend title size
+    legend.text = element_text(size = 32),                      # Legend text size
+    strip.text = element_text(size = 34, face = "bold"),        # Facet text size
+    strip.background = element_rect(fill = "lightgray", color = "black", size = 1.5),         # Facet background
+    axis.line = element_line(size = 1, colour = "black"),       # Enhanced axis lines
+    axis.ticks = element_line(size = 1),                        # Thicker axis ticks
+     #panel.border = element_blank()                             # Remove panel border
+    #panel.grid.major = element_blank(),                         # Remove major grid lines
+    #panel.grid.minor = element_blank()                          # Remove minor grid lines
+        panel.border = element_rect(color = "black", size = 1.2),   # Enhanced facet border lines
+    panel.grid.major = element_line(size = 0.5, color = "gray"), # Grid lines inside the facets
+    panel.spacing = unit(1, "lines"),                           # Increase space between facets
+    strip.placement = "outside"    
+  ) +
+  coord_flip(); GO_plot_mir2036_target
+
+ggsave(filename = "../figures/mir-2036_targets_GO_plot.png", GO_plot_mir2036_target, width = 40, height = 25)
+ggsave(filename = "../figures/mir-2036_targets_GO_plot.pdf", GO_plot_mir2036_target, width = 40, height = 25)
+```
+
+Plot only BP 
+```{r}
+shared_mir2036_target_df_bp <- shared_mir2036_target_df %>%
+  dplyr::filter(ontology == "Biological Processes")
+  
+# Plot 
+GO_mir2036_BP_plot <- ggplot(shared_mir2036_target_df_bp, aes(x = Term, y = -log10(Fisher), shape = Species, fill = Species)) +
+  geom_point(size = 25, color = "black", stroke = 2) +  # Black border around shapes
+  scale_shape_manual(values = c(21, 22, 23)) +  # Shapes that can be filled
+  scale_fill_manual(values = c("#408EC6", "#7A2048", "#1E2761")) +  # Custom colors for each species
+  #scale_size(range = c(2, 12)) + 
+  xlab('') + 
+  ylab('log(Enrichment score)') +
+  facet_grid(vars(ontology), scales = "free", space = "free_y") + 
+  coord_flip() +
+  theme_bw() +
+  theme(
+    axis.title = element_text(size = 51, face = "bold"),        # Axis title size
+    axis.text = element_text(size = 49, colour = "black"),                        # Axis text size
+    axis.text.x = element_text(hjust = 1),  # Rotate and adjust label position
+    legend.title = element_text(size = 44, face = "bold"),      # Legend title size
+    legend.text = element_text(size = 42, face = "italic"),                      # Legend text size
+    strip.text = element_text(size = 49, face = "bold"),        # Facet text size
+    strip.background = element_rect(fill = "lightgray", color = "black", size = 1.5),         # Facet background
+    axis.line = element_line(size = 1, colour = "black"),       # Enhanced axis lines
+    axis.ticks = element_line(size = 1),                        # Thicker axis ticks
+     #panel.border = element_blank()                             # Remove panel border
+    #panel.grid.major = element_blank(),                         # Remove major grid lines
+    #panel.grid.minor = element_blank()                          # Remove minor grid lines
+        panel.border = element_rect(color = "black", size = 1.2),   # Enhanced facet border lines
+    panel.grid.major = element_line(size = 0.5, color = "gray"), # Grid lines inside the facets
+    panel.spacing = unit(1, "lines"),                           # Increase space between facets
+    strip.placement = "outside",
+    plot.margin = margin(t = 10, r = 10, b = 20, l = 10)        # Add space below the plot
+  ); GO_mir2036_BP_plot
+
+ggsave(filename = "../figures/mir-2036_targets_GO_BP_plot.png", GO_mir2036_BP_plot, width = 40, height = 25)
+ggsave(filename = "../figures/mir-2036_targets_GO_BP_plot.pdf", GO_mir2036_BP_plot, width = 40, height = 25)
+```
+
+## Shared miRNAs 
+
+Join shared miRNAs into one df for BP
+```{r}
+shared_mirna_target_bp <- rbind(shared_mir100_target_df_bp, shared_mir2023_target_df_bp, shared_mir2025_target_df_bp, shared_mir2036_target_df_bp)
+
+# Remove species info before miRNA name
+shared_mirna_target_bp$mirna <- gsub("apul-", "", shared_mirna_target_bp$mirna)
+shared_mirna_target_bp$mirna <- gsub("peve-", "", shared_mirna_target_bp$mirna)
+shared_mirna_target_bp$mirna <- gsub("ptuh-", "", shared_mirna_target_bp$mirna)
+```
+
+Plot 
+```{r}
+shared_GO_BP_plot <- ggplot(shared_mirna_target_bp, aes(x = Term, y = -log10(Fisher), shape = Species, fill = Species)) +
+  geom_point(size = 25, color = "black", stroke = 2) +  # Black border around shapes
+  scale_shape_manual(values = c(21, 22, 23)) +  # Shapes that can be filled
+  scale_fill_manual(values = c("#408EC6", "#7A2048", "#1E2761")) +  # Custom colors for each species
+  #scale_size(range = c(2, 12)) + 
+  xlab('') + 
+  ylab('log(Enrichment score)') +
+  facet_grid(vars(mirna), scales = "free", space = "free_y") + 
+  coord_flip() +
+  theme_bw() +
+  theme(
+    axis.title = element_text(size = 51, face = "bold"),        # Axis title size
+    axis.text = element_text(size = 49, colour = "black"),                        # Axis text size
+    axis.text.x = element_text(hjust = 1),  # Rotate and adjust label position
+    legend.title = element_text(size = 44, face = "bold"),      # Legend title size
+    legend.text = element_text(size = 42, face = "italic"),                      # Legend text size
+    strip.text = element_text(size = 49, face = "bold"),        # Facet text size
+    strip.background = element_rect(fill = "lightgray", color = "black", size = 1.5),         # Facet background
+    axis.line = element_line(size = 1, colour = "black"),       # Enhanced axis lines
+    axis.ticks = element_line(size = 1),                        # Thicker axis ticks
+     #panel.border = element_blank()                             # Remove panel border
+    #panel.grid.major = element_blank(),                         # Remove major grid lines
+    #panel.grid.minor = element_blank()                          # Remove minor grid lines
+        panel.border = element_rect(color = "black", size = 1.2),   # Enhanced facet border lines
+    panel.grid.major = element_line(size = 0.5, color = "gray"), # Grid lines inside the facets
+    panel.spacing = unit(1, "lines"),                           # Increase space between facets
+    strip.placement = "outside",
+    plot.margin = margin(t = 10, r = 10, b = 20, l = 10)        # Add space below the plot
+  ); GO_BP_plot
+
+ggsave(filename = "../figures/shared_miRNA_targets_GO_BP_plot.png", shared_GO_BP_plot, width = 40, height = 40)
+ggsave(filename = "../figures/shared_miRNA_targets_GO_BP_plot.pdf", shared_GO_BP_plot, width = 40, height = 40)
+```
 
