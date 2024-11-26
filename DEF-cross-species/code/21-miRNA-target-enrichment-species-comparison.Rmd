@@ -55,6 +55,9 @@ shared_target <- all_target %>%
 shared_target_df <- all_target %>%
   filter(GeneOntologyIDs %in% shared_target$GeneOntologyIDs)
 
+# Save as csv 
+write.csv(shared_target_df, "../output/21-miRNA-target-prediction/miRNA_shared_target_go_by_species.csv")
+
 # Plot 
 GO_plot_target <- ggplot(shared_target_df, aes(x = Term, y = -log10(Fisher), shape = Species, fill = Species)) +
   geom_point(size = 25, color = "black", stroke = 2) +  # Black border around shapes
@@ -101,7 +104,7 @@ GO_BP_plot <- ggplot(shared_target_df_bp, aes(x = Term, y = -log10(Fisher), shap
   #scale_size(range = c(2, 12)) + 
   xlab('') + 
   ylab('log(Enrichment score)') +
-  facet_grid(vars(ontology), scales = "free", space = "free_y") + 
+  #facet_grid(vars(ontology), scales = "free", space = "free_y") + 
   coord_flip() +
   theme_bw() +
   theme(
@@ -538,6 +541,9 @@ shared_mirna_target_bp <- rbind(shared_mir100_target_df_bp, shared_mir2023_targe
 shared_mirna_target_bp$mirna <- gsub("apul-", "", shared_mirna_target_bp$mirna)
 shared_mirna_target_bp$mirna <- gsub("peve-", "", shared_mirna_target_bp$mirna)
 shared_mirna_target_bp$mirna <- gsub("ptuh-", "", shared_mirna_target_bp$mirna)
+
+# Save as csv 
+write.csv(shared_mirna_target_bp, "../output/21-miRNA-target-prediction/conserved_miRNA_shared_target_go_by_species_BP.csv")
 ```
 
 Plot 

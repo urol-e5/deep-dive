@@ -34,11 +34,11 @@ Compare terms identified in piRNA GO enrichment analysis across species
 
 Read in data from all species
 ```{r}
-apul_go_pi <- read.csv("../../D-Apul/output/19-bedtools-closest/Apul_GO_en_sig_gene_piRNA.csv")
+apul_go_pi <- read.csv("../../D-Apul/output/19-Apul-bedtools-closest/Apul_GO_en_sig_gene_piRNA.csv")
 apul_go_pi$Species <- "Acropora pulchra"
-peve_go_pi <- read.csv("../../E-Peve/output/19-bedtools-closest/Peve_GO_en_sig_gene_piRNA.csv")
+peve_go_pi <- read.csv("../../E-Peve/output/19-Peve-bedtools-closest/Peve_GO_en_sig_gene_piRNA.csv")
 peve_go_pi$Species <- "Porites evermanni"
-pmea_go_pi <- read.csv("../../F-Pmea/output/19-bedtools-closest/Pmea_GO_en_sig_gene_piRNA.csv")
+pmea_go_pi <- read.csv("../../F-Pmea/output/19-Pmea-bedtools-closest/Pmea_GO_en_sig_gene_piRNA.csv")
 pmea_go_pi$Species <- "Pocillopora tuahiniensis"
 
 all_go_pi <- rbind(apul_go_pi, pmea_go_pi, peve_go_pi)
@@ -105,6 +105,9 @@ shared_go_pi <- all_go_pi %>%
 shared_go_pi_df <- all_go_pi %>%
   filter(GeneOntologyIDs %in% shared_go_pi$GeneOntologyIDs)
 
+# Save as csv 
+write.csv(shared_go_pi_df, "../output/19-bedtools-closest-gene/piRNA_shared_go_by_species.csv")
+
 # Plot 
 GO_plot_pi <- ggplot(shared_go_pi_df, aes(x = Term, y = -log10(Fisher), shape = Species, fill = Species)) +
   geom_point(size = 25, color = "black", stroke = 2) +  # Black border around shapes
@@ -153,7 +156,7 @@ GO_BP_plot_pi <- ggplot(shared_go_pi_df_bp, aes(x = Term, y = -log10(Fisher), sh
   #scale_size(range = c(2, 12)) + 
   xlab('') + 
   ylab('log(Enrichment score)') +
-  facet_grid(vars(ontology), scales = "free", space = "free_y") + 
+  #facet_grid(vars(ontology), scales = "free", space = "free_y") + 
   coord_flip() +
   theme_bw() +
   theme(
@@ -310,7 +313,7 @@ GO_BP_plot_mi <- ggplot(shared_go_mi_df_bp, aes(x = Term, y = -log10(Fisher), sh
   #scale_size(range = c(2, 12)) + 
   xlab('') + 
   ylab('log(Enrichment score)') +
-  facet_grid(vars(ontology), scales = "free", space = "free_y") + 
+  #facet_grid(vars(ontology), scales = "free", space = "free_y") + 
   theme_bw() +
   theme(
     axis.title = element_text(size = 51, face = "bold"),        # Axis title size
@@ -342,11 +345,11 @@ Compare terms identified in piRNA GO enrichment analysis across species
 
 Read in data from all species
 ```{r}
-apul_go_lnc <- read.csv("../../D-Apul/output/19-bedtools-closest/Apul_GO_en_sig_gene_lncRNA.csv")
+apul_go_lnc <- read.csv("../../D-Apul/output/19-Apul-bedtools-closest/Apul_GO_en_sig_gene_lncRNA.csv")
 apul_go_lnc$Species <- "Acropora pulchra"
-peve_go_lnc <- read.csv("../../E-Peve/output/19-bedtools-closest/Peve_GO_en_sig_gene_lncRNA.csv")
+peve_go_lnc <- read.csv("../../E-Peve/output/19-Peve-bedtools-closest/Peve_GO_en_sig_gene_lncRNA.csv")
 peve_go_lnc$Species <- "Porites evermanni"
-pmea_go_lnc <- read.csv("../../F-Pmea/output/19-bedtools-closest/Pmea_GO_en_sig_gene_lncRNA.csv")
+pmea_go_lnc <- read.csv("../../F-Pmea/output/19-Pmea-bedtools-closest/Pmea_GO_en_sig_gene_lncRNA.csv")
 pmea_go_lnc$Species <- "Pocillopora tuahiniensis"
 
 all_go_lnc <- rbind(apul_go_lnc, pmea_go_lnc, peve_go_lnc)
@@ -413,6 +416,9 @@ shared_go_lnc <- all_go_lnc %>%
 shared_go_lnc_df <- all_go_lnc %>%
   filter(GeneOntologyIDs %in% shared_go_lnc$GeneOntologyIDs)
 
+# Save as csv 
+write.csv(shared_go_lnc_df, "../output/19-bedtools-closest-gene/lncRNA_shared_go_by_species.csv")
+
 # Plot 
 GO_plot_lnc <- ggplot(shared_go_lnc_df, aes(x = Term, y = -log10(Fisher), shape = Species, fill = Species)) +
   geom_point(size = 17, color = "black", stroke = 2) +  # Black border around shapes
@@ -459,7 +465,7 @@ GO_BP_plot_lnc <- ggplot(shared_go_lnc_df_bp, aes(x = Term, y = -log10(Fisher), 
   #scale_size(range = c(2, 12)) + 
   xlab('') + 
   ylab('log(Enrichment score)') +
-  facet_grid(vars(ontology), scales = "free", space = "free_y") + 
+  #facet_grid(vars(ontology), scales = "free", space = "free_y") + 
   coord_flip() +
   theme_bw() +
   theme(
@@ -592,100 +598,32 @@ count_by_group_mi
 Plot miRNA lengths of all species
 ```{r}
 # Set our color scheme for plotting -- options for both the abbreviated labels or the full, correct species names
-species_colors_nolabel <- c('#408EC6', '#1E2761', '#7A2048')
+species_colors_nolabel <- c("#408EC6", "#7A2048", "#1E2761")
 
 length_plot_mi <- ggplot(count_by_group_mi, aes(x = length, y = n, fill = Species)) + 
   geom_bar(position = "dodge",
            stat = "identity",
-           color = "black",  # Bar outline color
-           size = 2,         # Thicker bar outlines
+           color = "black",  
+           size = 2,         
            width = 0.9) + 
   scale_fill_manual(values = species_colors_nolabel) + 
-  scale_y_continuous(expand = c(0, 0)) +   # Bars sit on x-axis
+  scale_y_continuous(expand = c(0, 0)) +   
   labs(x = "", y = "Read count") +
   theme_minimal() + 
   theme(
-    axis.title = element_text(size = 75, face = "bold", margin = margin(t = 100, r = 100, b = 100, l = 150)),  # Space between titles and text
-    axis.text = element_text(size = 70, colour = "black", margin = margin(t = 10, r = 10, b = 10, l = 10)),  # Axis text size
-    axis.line = element_line(size = 1.5, color = "black"),  # Darker, thicker axis lines
-    axis.ticks = element_line(size = 1.5, color = "black"), # Thicker axis ticks
-    plot.margin = unit(c(1, 1, 1, 1), "cm"),                # Margin around plot (top, right, bottom, left)
-    legend.position = "none"                                # Remove legend
+    axis.title = element_text(size = 85, face = "bold", margin = margin(t = 100, r = 100, b = 100, l = 150)),
+    axis.text.y = element_text(size = 80, colour = "black", margin = margin(t = 10, r = 10, b = 10, l = 10)),
+    axis.text.x = element_text(size = 80, colour = "black", margin = margin(t = 10, r = 10, b = 30, l = 10)),  # Increased bottom margin
+    axis.line = element_line(size = 1.5, color = "black"),
+    axis.ticks = element_line(size = 1.5, color = "black"),
+    plot.margin = unit(c(1, 1, 1, 1), "cm"),
+    legend.position = "none"
   ); length_plot_mi
 
 
-ggsave(filename = "../figures/miRNA_lengths.png", length_plot_mi, width = 34, height = 20)
-ggsave(filename = "../figures/miRNA_lengths.pdf", length_plot_mi, width = 34, height = 20)
+ggsave(filename = "../figures/miRNA_lengths.png", length_plot_mi, width = 34, height = 24)
+ggsave(filename = "../figures/miRNA_lengths.pdf", length_plot_mi, width = 34, height = 24)
 ```
-
-The actual Venn diagram was made by Kathleen [here](https://github.com/urol-e5/deep-dive/blob/main/DEF-cross-species/code/10-shortRNA-ShortStack-comparison.Rmd). She did some complex code to get the venn to work so I am just doing to pull the numbers from the venn and make a new plot. We discussed making a heatmap looking plot instead of a venn diagram. I probably won't incorporate colors into the heatmap (for now), as the values cannot be proportions because each species has a different number of miRNAs and thus will have a different proportion shared between species. For example, Apul has 38 miRNAs and Peve has 37. They share 5 miRNAs between them; for Apul, the proportion would be 5/38 = 0.13 and for Peve, the proportion would be 0.14. In the boxes, I am going to have the number of miRNAs shared between that set of species. 
-```{r}
-# Create the data frame for the 3x3 grid
-data <- data.frame(
-  x = c("A. pulchra", "P. tuahiniensis", "P. evermanni", "A. pulchra", "P. tuahiniensis", 
-        "P. evermanni", "A. pulchra", "P. tuahiniensis", "P. evermanni"),
-  y = c("A. pulchra", "A. pulchra", "A. pulchra", "P. tuahiniensis", "P. tuahiniensis", 
-        "P. tuahiniensis", "P. evermanni", "P. evermanni", "P. evermanni"),
-  value = c(38, 5, 5, 5, 46, 5, 5, 5, 37)
-)
-
-# Add a column to identify repetitive (lower triangle) comparisons
-data <- data %>%
-  mutate(
-    repetitive = ifelse(x > y, "yes", "no"),    # Flag repetitive squares
-    shared = ifelse(repetitive == "yes", NA, value)  # Assign NA to repetitive cells for color gradient
-  )
-
-# Convert x and y to factors to control order
-#data$x <- factor(data$x, levels = c("A. pulchra", "P. tuahiniensis", "P. evermanni"))
-#data$y <- factor(data$y, levels = c("A. pulchra", "P. tuahiniensis", "P. evermanni"))
-
-tile_overlap_mi <- ggplot(data, aes(x = x, y = y)) +
-  geom_tile(aes(fill = repetitive), color = "black", size = 1) +               # Color tiles based on repetitive status
-  geom_tile(data = subset(data, repetitive == "yes"),                # Overlay grey repetitive tiles
-            fill = "gray", color = "black", size = 1) +
-  geom_text(aes(label = ifelse(repetitive == "no", value, "")),      # Display values only for non-repetitive squares
-            size = 25) +                                             # Add text in the middle of each tile
-  #scale_fill_gradient(low = "blue", high = "red", na.value = "gray80") +  # Gradient for values, grey for NA
-  scale_fill_manual(values = c("yes" = "gray80", "no" = "white"),    # Grey out repetitive squares, white for others
-                    name = "Repetitive") +   
-  theme_minimal() +
-  theme(
-    axis.title = element_blank(),                                    # Remove axis titles
-    axis.text = element_text(size = 50, colour = "black", face = "italic"),              # Customize axis text
-    axis.text.x = element_text(angle = 75, hjust = 1),  # Rotate and adjust label position
-    #axis.line = element_line(size = 5, color = "black"),
-    #panel.grid = element_blank(),                                    # Remove grid lines
-    #panel.border = element_blank(),                                   # Remove panel borders
-    legend.position = "none") +       
-  coord_fixed(); tile_overlap_mi
-
-ggsave(filename = "../figures/miRNA_tile_overlap.png", tile_overlap_mi, width = 25, height = 35)
-ggsave(filename = "../figures/miRNA_tile_overlap.pdf", tile_overlap_mi, width = 25, height = 35)
-```
-
-Not a huge fan of the tile plot so going to make an upset plot as well. I need a list of all the miRNAs and then either a 1 if present or a 0 if absent across species. First, read in miRNA dataframes 
-```{r}
-apul_mi <- read.csv("../output/10-shortRNA-ShortStack-comparison/Apul_results_mature_named.csv", header = T) %>%
-  dplyr::select(MajorRNA, given_miRNA_name) %>%
-  dplyr::rename("Apul_MajorRNA" = "MajorRNA", "Apul_given_miRNA_name" = "given_miRNA_name")
-peve_mi <- read.csv("../output/10-shortRNA-ShortStack-comparison/Peve_results_mature_named.csv", header = T) %>%
-  dplyr::select(MajorRNA, given_miRNA_name) %>%
-  dplyr::rename("Peve_MajorRNA" = "MajorRNA", "Peve_given_miRNA_name" = "given_miRNA_name")
-pmea_mi <- read.csv("../output/10-shortRNA-ShortStack-comparison/Ptuh_results_mature_named.csv", header = T) %>%
-  dplyr::select(MajorRNA, given_miRNA_name) %>%
-  dplyr::rename("Pmea_MajorRNA" = "MajorRNA", "Pmea_given_miRNA_name" = "given_miRNA_name")
-```
-
-Join files
-```{r}
-join <- apul_mi %>%
-  full_join(peve_mi, by = c("Apul_MajorRNA" = "Peve_MajorRNA"))
-```
-
-Doesn't work because the miR-2025 and miR-2036 are not exactly the same sequence...look back into this. 
-
-
 
 ### piRNAs
 
@@ -730,7 +668,7 @@ combo <- combo %>%
 Plot piRNA lengths of all species
 ```{r}
 # Set our color scheme for plotting -- options for both the abbreviated labels or the full, correct species names
-species_colors_nolabel <- c('#408EC6', '#1E2761', '#7A2048')
+species_colors_nolabel <- c("#408EC6", "#7A2048", "#1E2761")
 
 length_plot_pi <- ggplot(combo, aes(x = length, y = sums, fill = Species)) + 
   geom_bar(position = "dodge",
@@ -744,8 +682,9 @@ length_plot_pi <- ggplot(combo, aes(x = length, y = sums, fill = Species)) +
   labs(x = "Length (bp)", y = "") +
   theme_minimal() + 
   theme(
-    axis.title = element_text(size = 75, face = "bold", margin = margin(t = 100, r = 100, b = 100, l = 100)),  # Space between titles and text
-    axis.text = element_text(size = 70, colour = "black", margin = margin(t = 10, r = 10, b = 10, l = 10)),  # Axis text size
+    axis.title = element_text(size = 85, face = "bold", margin = margin(t = 100, r = 100, b = 100, l = 150)),
+    axis.text.y = element_text(size = 80, colour = "black", margin = margin(t = 10, r = 10, b = 10, l = 10)),
+    axis.text.x = element_text(size = 80, colour = "black", margin = margin(t = 10, r = 10, b = 30, l = 10)),  # Increased bottom margin
     axis.line = element_line(size = 1.5, color = "black"),  # Darker, thicker axis lines
     axis.ticks = element_line(size = 1.5, color = "black"), # Thicker axis ticks
     plot.margin = unit(c(1, 1, 1, 1), "cm"),                # Margin around plot (top, right, bottom, left)
@@ -761,54 +700,6 @@ ggsave(filename = "../figures/piRNA_lengths.pdf", length_plot_pi, width = 34, he
 ```
 
 ### lncRNAs 
-
-The actual overlap was calculated by Zach but I am just going to make a tile plot to match the miRNA one above. Similar to the miRNA tile plot above, I am not going to be adding colors or proportions. 
-```{r}
-# Create the data frame for the 3x3 grid
-data <- data.frame(
-  x = c("A. pulchra", "P. tuahiniensis", "P. evermanni", "A. pulchra", "P. tuahiniensis", 
-        "P. evermanni", "A. pulchra", "P. tuahiniensis", "P. evermanni"),
-  y = c("A. pulchra", "A. pulchra", "A. pulchra", "P. tuahiniensis", "P. tuahiniensis", 
-        "P. tuahiniensis", "P. evermanni", "P. evermanni", "P. evermanni"),
-  value = c(16206, 1799, 1763, 1799, 12395, 1044, 1763, 1044, 7378)
-)
-
-# Add a column to identify repetitive (lower triangle) comparisons
-data <- data %>%
-  mutate(
-    repetitive = ifelse(x > y, "yes", "no"),    # Flag repetitive squares
-    shared = ifelse(repetitive == "yes", NA, value)  # Assign NA to repetitive cells for color gradient
-  )
-
-# Convert x and y to factors to control order
-#data$x <- factor(data$x, levels = c("A. pulchra", "P. tuahiniensis", "P. evermanni"))
-#data$y <- factor(data$y, levels = c("A. pulchra", "P. tuahiniensis", "P. evermanni"))
-
-tile_overlap_lnc <- ggplot(data, aes(x = x, y = y)) +
-  geom_tile(aes(fill = repetitive), color = "black", size = 1) +               # Color tiles based on repetitive status
-  geom_tile(data = subset(data, repetitive == "yes"),                # Overlay grey repetitive tiles
-            fill = "gray", color = "black", size = 1) +
-  geom_text(aes(label = ifelse(repetitive == "no", value, "")),      # Display values only for non-repetitive squares
-            size = 25) +                                             # Add text in the middle of each tile
-  #scale_fill_gradient(low = "blue", high = "red", na.value = "gray80") +  # Gradient for values, grey for NA
-  scale_fill_manual(values = c("yes" = "gray80", "no" = "white"),    # Grey out repetitive squares, white for others
-                    name = "Repetitive") +   
-  theme_minimal() +
-  theme(
-    axis.title = element_blank(),                                    # Remove axis titles
-    axis.text = element_text(size = 50, colour = "black", face = "italic"),              # Customize axis text
-    axis.text.x = element_text(angle = 75, hjust = 1),  # Rotate and adjust label position
-    #axis.line = element_line(size = 5, color = "black"),
-    #panel.grid = element_blank(),                                    # Remove grid lines
-    #panel.border = element_blank(),                                   # Remove panel borders
-    legend.position = "none") +       
-  coord_fixed(); tile_overlap_lnc
-
-ggsave(filename = "../figures/lncRNA_tile_overlap.png", tile_overlap_lnc, width = 25, height = 35)
-ggsave(filename = "../figures/lncRNA_tile_overlap.pdf", tile_overlap_lnc, width = 25, height = 35)
-```
-
-Not sure if this is correct...will check with Zach.
 
 Calculate length from bed files
 ```{r}
@@ -865,7 +756,7 @@ length_freq <- all_lengths_lnc %>%
 Plot lncRNA lengths for all species 
 ```{r}
 # Set our color scheme for plotting -- options for both the abbreviated labels or the full, correct species names
-species_colors_nolabel <- c('#408EC6', '#1E2761', '#7A2048')
+species_colors_nolabel <- c("#408EC6", "#7A2048", "#1E2761")
 
 length_plot_lnc <- ggplot(length_freq, aes(x = length_bin, y = frequency, fill = Species)) +
   geom_bar(position = "dodge",
@@ -880,14 +771,14 @@ length_plot_lnc <- ggplot(length_freq, aes(x = length_bin, y = frequency, fill =
   labs(y = "") +
   theme_minimal() + 
   theme(
-    axis.title = element_text(size = 75, face = "bold", margin = margin(t = 100, r = 100, b = 100, l = 100)),  # Space between titles and text
-    axis.text = element_text(size = 70, colour = "black", margin = margin(t = 10, r = 10, b = 10, l = 10)),  # Axis text size
-    axis.text.x = element_text(angle = 45, hjust = 1),  # Rotate x-axis text for better readability
+    axis.title = element_text(size = 85, face = "bold", margin = margin(t = 100, r = 100, b = 100, l = 150)),
+    axis.text.y = element_text(size = 80, colour = "black", margin = margin(t = 10, r = 10, b = 10, l = 10)),
+    axis.text.x = element_text(size = 80, colour = "black", margin = margin(t = 10, r = 10, b = 30, l = 10), angle = 45, hjust = 1),  # Increased bottom margin
     axis.line = element_line(size = 1.5, color = "black"),  # Darker, thicker axis lines
     axis.ticks = element_line(size = 1.5, color = "black"), # Thicker axis ticks
     plot.margin = unit(c(1, 1, 1, 1), "cm"),                # Margin around plot (top, right, bottom, left)
-    legend.title = element_text(size = 50, face = "bold"),  # Increase legend title size
-    legend.text = element_text(size = 50),
+    legend.title = element_text(size = 70, face = "bold"),  # Increase legend title size
+    legend.text = element_text(size = 70),
     legend.position = "top"                              
   ) +
   guides(fill = guide_legend(override.aes = list(size = 20)));  # Increase the size of legend squares
@@ -898,47 +789,12 @@ ggsave(filename = "../figures/lncRNA_lengths.png", length_plot_lnc, width = 34, 
 ggsave(filename = "../figures/lncRNA_lengths.pdf", length_plot_lnc, width = 34, height = 20)
 ```
 
-
-### ALL ncRNAs 
-
-Still need lncRNA similarity data. Once I have that, I will put the lncRNA venn plot into the figure below 
-
-Make dummy plot and extract legend so I can add it to main plot
-```{r}
-# Create a dummy data frame with the species and their associated colors
-species_data <- data.frame(
-  Species = c("A. pulchra", "P. tuahiniensis", "P. evermanni"),
-  x = c("A", "B", "C"),  # Dummy x values
-  y = 1:3   # Dummy y values
-)
-
-# Create a plot with the desired colors and species
-plot <- ggplot(species_data, aes(x = x, y = y, fill = Species)) +
-  geom_bar(position = "dodge", stat = "identity",            color = "black",  # Bar outline color
-           size = 1,         # Thicker bar outlines
-           width = 0.5) +
-  scale_fill_manual(values = species_colors_nolabel) + 
-  theme_void() +  # Remove plot background
-  theme(legend.position = "right", 
-         legend.key.size = unit(4, "cm"),  # Increase legend box size
-         plot.margin = unit(c(1, 1, 1, 1), "cm"),                # Margin around plot (top, right, bottom, left)
-         legend.title = element_text(size = 80, face = "bold"),  # Increase legend title size
-         legend.spacing.y = unit(100, "cm"),  # Increase vertical spacing between legend boxes
-         legend.text = element_text(size = 80, face = "italic"),); plot  
-
-# Extract only the legend
-legend <- cowplot::get_legend(plot)
-
-# Draw the legend
-grid.arrange(legend)
-```
-
-Plot RNA lengths + venns w/ legend 
+Plot RNA lengths w/ legend 
 ```{r}
 plot <- plot_grid(length_plot_lnc, length_plot_mi, length_plot_pi, labels = c("A", "B", "C"), label_size = 80, nrow = 3, ncol = 1)
 
-ggsave(filename = "../figures/ncRNA_lengths.png", plot, width = 65, height = 45, limitsize = F)
-ggsave(filename = "../figures/ncRNA_lengths.pdf", plot, width = 65, height = 45, limitsize = F)
+ggsave(filename = "../figures/ncRNA_lengths.png", plot, width = 65, height = 50, limitsize = F)
+ggsave(filename = "../figures/ncRNA_lengths.pdf", plot, width = 65, height = 50, limitsize = F)
 ```
 
 
