@@ -520,7 +520,7 @@ GO_plot_mi<-ggplot(merged_mirna, aes(x = Term, y = -log(Fisher), size = prop.sig
 
 Load Pmea lncRNA closest file into R. This file represents the genomic features that are closest/are overlapping with lncRNA clusters. 
 ```{r}
-lnc_bed <- read.delim("../output/19-bedtools-closest/Pmea_lncRNA_output.bed", header = F)
+lnc_bed <- read.delim("../output/19-Pmea-bedtools-closest/Pmea_lncRNA_output.bed", header = F)
 head(lnc_bed)
 ```
 
@@ -552,7 +552,9 @@ Calculate average/percentages of distance and overlap.
 summary_stats <- lnc_bed_filt %>%
   summarize(
     avg_overlap = mean(overlap[overlap > 0], na.rm = TRUE),
+    median_overlap = median(overlap[overlap > 0], na.rm = TRUE),
     avg_distance = mean(overlap[overlap < 0], na.rm = TRUE),
+    median_distance = median(overlap[overlap < 0], na.rm = TRUE),
     percent_overlap = sum(overlap > 0) / n() * 100,
     percent_distance_lt_1kb = sum(overlap < 0 & overlap > -1000) / n() * 100,
     percent_distance = sum(overlap < 0) / n() * 100

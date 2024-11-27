@@ -535,6 +535,17 @@ ggsave(filename = "../figures/mir-2036_targets_GO_BP_plot.pdf", GO_mir2036_BP_pl
 
 Join shared miRNAs into one df for BP
 ```{r}
+shared_mirna_target <- rbind(shared_mir100_target_df, shared_mir2023_target_df, shared_mir2025_target_df, shared_mir2036_target_df)
+
+# Remove species info before miRNA name
+shared_mirna_target$mirna <- gsub("apul-", "", shared_mirna_target$mirna)
+shared_mirna_target$mirna <- gsub("peve-", "", shared_mirna_target$mirna)
+shared_mirna_target$mirna <- gsub("ptuh-", "", shared_mirna_target$mirna)
+
+# Save as csv 
+write.csv(shared_mirna_target, "../output/21-miRNA-target-prediction/conserved_miRNA_shared_target_go_by_species.csv")
+
+### BP only 
 shared_mirna_target_bp <- rbind(shared_mir100_target_df_bp, shared_mir2023_target_df_bp, shared_mir2025_target_df_bp, shared_mir2036_target_df_bp)
 
 # Remove species info before miRNA name

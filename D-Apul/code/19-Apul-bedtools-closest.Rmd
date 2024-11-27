@@ -36,7 +36,7 @@ write_tsv(GO_APUL, file = "../../data/Apul_gene2go.tab")
 
 Load Apul piRNA closest file into R. This file represents the genomic features that are closest/are overlapping with piRNA clusters. 
 ```{r}
-pi_bed <- read.delim("../output/19-bedtools-closest/Apul_piRNA_output_mRNA_only.bed", header = F)
+pi_bed <- read.delim("../output/19-Apul-bedtools-closest/Apul_piRNA_output_mRNA_only.bed", header = F)
 head(pi_bed)
 ```
 
@@ -67,7 +67,9 @@ Calculate average/percentages of distance and overlap.
 summary_stats <- pi_bed_filt %>%
   summarize(
     avg_overlap = mean(overlap[overlap > 0], na.rm = TRUE),
+    median_overlap = median(overlap[overlap > 0], na.rm = TRUE),
     avg_distance = mean(overlap[overlap < 0], na.rm = TRUE),
+    median_distance = median(overlap[overlap < 0], na.rm = TRUE),
     percent_overlap = sum(overlap > 0) / n() * 100,
     percent_distance_lt_1kb = sum(overlap < 0 & overlap > -1000) / n() * 100,
     percent_distance = sum(overlap < 0) / n() * 100
@@ -521,7 +523,7 @@ GO_plot_mi<-ggplot(merged_mirna, aes(x = Term, y = -log(Fisher), size = prop.sig
 
 Load Apul lncRNA closest file into R. This file represents the genomic features that are closest/are overlapping with lncRNA clusters. 
 ```{r}
-lnc_bed <- read.delim("../output/19-bedtools-closest/Apul_lncRNA_output_mRNA_only.bed", header = F)
+lnc_bed <- read.delim("../output/19-Apul-bedtools-closest/Apul_lncRNA_output_mRNA_only.bed", header = F)
 head(lnc_bed)
 ```
 
@@ -552,7 +554,9 @@ Calculate average/percentages of distance and overlap.
 summary_stats <- lnc_bed_filt %>%
   summarize(
     avg_overlap = mean(overlap[overlap > 0], na.rm = TRUE),
+    median_overlap = median(overlap[overlap > 0], na.rm = TRUE),
     avg_distance = mean(overlap[overlap < 0], na.rm = TRUE),
+    median_distance = median(overlap[overlap < 0], na.rm = TRUE),
     percent_overlap = sum(overlap > 0) / n() * 100,
     percent_distance_lt_1kb = sum(overlap < 0 & overlap > -1000) / n() * 100,
     percent_distance = sum(overlap < 0) / n() * 100
