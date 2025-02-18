@@ -1,5 +1,5 @@
 ---
-title: "Long non-coding RNA discovery in _Pocillopora sp._"
+title: "Long non-coding RNA discovery pipeline"
 author: "Zach Bengtsson"
 date: "`r format(Sys.time(), '%d %B, %Y')`"  
 format:
@@ -11,30 +11,17 @@ format:
     theme: sandstone
 ---
 
-[Zenodo Archive](https://zenodo.org/record/8011635) [![](https://zenodo.org/badge/DOI/10.5281/zenodo.8011635.svg)](https://doi.org/10.5281/zenodo.8011635)
+[GitHub Repository](https://github.com/urol-e5/deep-dive)
 
-[GitHub Repository](https://github.com/course-fish546-2023/zach-lncRNA)
+## Introduction
 
-# Introduction
-
-This project uses RNA-seq data from Danielle Becker's experiment exposing colonies of *Pocillopora sp.* to low level nutrient conditions (nitrogen and phosphorous).
-
--   Original Experiment [GitHub Repo](https://github.com/hputnam/Becker_E5)
--   Project [OSF Link](https://osf.io/uayvk/)
-
-## Experimental Design
-
-This study attempts to identify and understand the expression of long non-coding RNAs in corals experiencing low level nutrient enrichment. Long non-coding RNAs (lncRNAs), RNA strands \>200bp that do not code for proteins, are implicated in important processes of gene regulation, but little is known about their function in corals.
-
--   *Pocillopora sp.* corals were experimentall enriched with dissolved inorganic nitrogen and phosphate for 15 months on an oligotrophic fore reef in Mo'orea, French Polynesia.
--   Tissue samples were retrieved, went through RNA extraction, and were sent off for sequencing.
--   The primary data type used in this study is RNA-seq data.
+This pipeline identifies long non-coding RNAs (lncRNAs) and yields expression count matrices of lncRNAs in RNA-seq data.
 
 ## Objectives
 
 1.  Identify lncRNAs present within the RNA-seq data
-2.  Create a list of lncRNA transcript IDs
-3.  Examine the sensitivity of lncRNA expression to low level nutrient enrichment with differential expression analysis
+2.  Create a putative list of lncRNA transcript in GTF and FASTA formats
+3.  Build count matrices for expression analysis
 
 # Part 1: Finding lncRNAs
 
@@ -42,29 +29,30 @@ This study attempts to identify and understand the expression of long non-coding
 
 ## Data Wrangling
 
-Get data from reef genomics genome assembly (GFF3) and scaffolds (FASTA) as well as genome assembly GTF created by Roberts Lab Research Scientist, Sam White...
+Download genome FASTA for mapping and assembly of RNA-seq data
 
 ```{r, engine='bash', eval=FALSE, echo=TRUE}
-wget -P /home/shared/8TB_HDD_02/zbengt/github/zach-lncRNA/data http://pver.reefgenomics.org/download/Pver_genome_assembly_v1.0.gff3.gz
-gunzip /home/shared/8TB_HDD_02/zbengt/github/zach-lncRNA/data/Pver_genome_assembly_v1.0.gff3.gz
-wget -P /home/shared/8TB_HDD_02/zbengt/github/zach-lncRNA/data http://pver.reefgenomics.org/download/Pver_genome_assembly_v1.0.fasta.gz
-gunzip /home/shared/8TB_HDD_02/zbengt/github/zach-lncRNA/data/Pver_genome_assembly_v1.0.fasta.gz
+wget -P ../data/ http://INSERT_LINK_TO_YOUR_GENOME/download/genome.fasta.gz
+gunzip ../data/genome.fasta.gz
 ```
+
+Download genome GTF or GFF for use later in transcript assembly
 
 ```{r, engine='bash', eval=FALSE, echo=TRUE}
-curl -o ../data/Pver_genome_assembly_v1.0-valid.gtf https://gannet.fish.washington.edu/Atumefaciens/20230127-pver-gff_to_gtf/Pver_genome_assembly_v1.0-valid.gtf
+wget -P ../data/ http://INSERT_LINK_TO_YOUR_GENOME_GTF/download/genome.gtf
+gunzip ../data/genome.gtf
 ```
 
-Download 32 paired-end RNA-seq FASTQ files from Roberts Lab server, Gannet. This downloads all FASTQ files at once...
+Download paired-end, post-QC RNA-seq FASTQ files...
 
 ```{r, engine='bash', eval=FALSE, echo=TRUE}
 wget -r \
 --no-check-certificate \
 --quiet \
 --no-directories --no-parent \
--P /home/shared/8TB_HDD_01/pver \
+-P ../data/fastq \
 -A *fastq.gz \
-https://gannet.fish.washington.edu/Atumefaciens/hputnam-Becker_E5/Becker_RNASeq/data/trimmed/
+https://INSERT_LINK_TO_YOUR_TRIMMED_FASTQ_FILES
 ```
 
 What an unzipped FASTQ should look like...
@@ -75,25 +63,26 @@ head /home/shared/8TB_HDD_01/pver/C17_R1_001.fastq
 
 ## HISAT2
 
-HISAT2 build to create an index for the Pver_genome_assembly_v1.0.fasta file...
+HISAT2 build to create an index for the genome FASTA file...
 
 ```{r, engine='bash', eval=FALSE, echo=TRUE}
-/home/shared/hisat2-2.2.1/hisat2-build \
--f ../data/Pver_genome_assembly_v1.0.fasta \
-../output/Pver_genome_assembly_v1.0-valid.index
+/home/shared/hisat2-2.2.1/hisat2-build \ ##replace this with your path to hisat2-build tool
+-f ../data/genome.fasta \
+../output/genome.index
 ```
 
-HISAT2 to align paired-end RNA-Seq reads to the Pver_genome_assembly_v1.0.fasta index...
+HISAT2 to align paired-end RNA-Seq reads to the genome.fasta index...
 
 ```{r, engine='bash', eval=FALSE, echo=TRUE}
-find /home/shared/8TB_HDD_01/pver/*gz \
-| xargs basename -s _R1_001.fastq.gz | xargs -I{} \
-/home/shared/hisat2-2.2.1/hisat2 \
--x ../output/Pver_genome_assembly_v1.0-valid.index \
--p 8 \
--1 /home/shared/8TB_HDD_01/pver/{}_R1_001.fastq.gz \
--2 /home/shared/8TB_HDD_01/pver/{}_R2_001.fastq.gz \
--S /home/shared/8TB_HDD_01/pver/hisat-output/{}-valid.sam
+find ../data/fastq/*fastq.gz \
+| xargs basename -s -INSERT_FILE_BASENAME_HERE.fastq.gz | xargs -I{} \
+/home/shared/hisat2-2.2.1/hisat2 \ ##replace this with your path to hisat2-build tool
+-x ../output/genome.index \
+-p 48 \
+-1 ../data/fastq/{}-R1_001-INSERT_FILE_BASENAME_HERE.fastq.gz \ ##R1 and R2 represent paired end sequences. You will need to examine your file naming system to determine how file basenames distinguish between R1 and R2 for these lines.
+-2 ../data/fastq/{}-R2_001-INSERT_FILE_BASENAME_HERE.fastq.gz \
+-S ../output/lncRNA-discovery/sam/{}.sam \
+2> ../output/lncRNA-discovery/sam/hisat.out
 ```
 
 ## Samtools
@@ -101,36 +90,47 @@ find /home/shared/8TB_HDD_01/pver/*gz \
 Samtools to convert the SAM files output from the previous HISAT2 command into sorted BAM files...
 
 ```{r, engine='bash', eval=FALSE, echo=TRUE}
-for file in /home/shared/8TB_HDD_01/pver/hisat-output/*-valid.sam; do
-    base=$(basename "$file" -valid.sam)
-    /home/shared/samtools-1.12/samtools view -bS "$file" | \
-    /home/shared/samtools-1.12/samtools sort \
-    -o /home/shared/8TB_HDD_01/pver/samtools-output/"$base"_valid_sorted.bam
+mkdir -p ../output/lncRNA-discovery/bam  # Ensure the output directory exists
+
+# Change samtools path to fit your machine
+for samfile in ../output/lncRNA-discovery/sam/*.sam; do
+  bamfile="../output/lncRNA-discovery/bam/$(basename "${samfile%.sam}.bam")"
+  sorted_bamfile="../output/lncRNA-discovery/bam/$(basename "${samfile%.sam}.sorted.bam")"
+
+  # Convert SAM to BAM
+  /home/shared/samtools-1.12/samtools view -bS -@ 20 "$samfile" > "$bamfile"
+
+  # Sort BAM
+  /home/shared/samtools-1.12/samtools sort -@ 20 "$bamfile" -o "$sorted_bamfile"
+
+  # Index sorted BAM
+  /home/shared/samtools-1.12/samtools index -@ 20 "$sorted_bamfile"
 done
+
 ```
 
 ## StringTie
 
-StringTie to assemble transcripts from the sorted BAM files generated by the previous Samtools commands...
+StringTie uses the sorted BAM files to assemble transcripts for each sample, outputting them as GTF (Gene Transfer Format) files. And then merges all individual GTF assemblies into a single merged GTF file. This step extracts transcript information and merges GTFs from all samples--an important step in creating a canonical list of lncRNAs across all samples included in the pipeline.
 
 ```{r, engine='bash', eval=FALSE, echo=TRUE}
-find /home/shared/8TB_HDD_01/pver/samtools-output/*bam \
+find /home/shared/lncRNA-discovery/bam/*bam \
 | xargs basename -s -valid_sorted.bam | xargs -I{} \
-/home/shared/stringtie-2.2.1.Linux_x86_64/stringtie \
+/home/shared/stringtie-2.2.1.Linux_x86_64/stringtie \ # Change tool path
 -p 8 \
--G ../data/Pver_genome_assembly_v1.0-valid.gtf \
--o /home/shared/8TB_HDD_01/pver/stringtie-output/{}-valid.gtf \
-/home/shared/8TB_HDD_01/pver/samtools-output/{}-valid_sorted.bam \
+-G ../data/genome.gtf \
+-o ../output/lncRNA-discovery/stringtie-output/{}.gtf \
+../output/bam/{}-valid_sorted.bam \
 ```
 
 Use StringTie merge to merge all the individual GTF files into a single merged GTF file...
 
 ```{r, engine='bash', eval=FALSE, echo=TRUE}
-/home/shared/stringtie-2.2.1.Linux_x86_64/stringtie \
+/home/shared/stringtie-2.2.1.Linux_x86_64/stringtie \ # Change tool path
 --merge \
--G ../data/Pver_genome_assembly_v1.0-valid.gtf \
--o /home/shared/8TB_HDD_01/pver/stringtie-merge-output/stringtie_merged.gtf \
-/home/shared/8TB_HDD_01/pver/stringtie-output/*-valid.gtf
+-G ../data/genome.gtf \
+-o ../output/stringtie-merge-output/stringtie_merged.gtf \
+../output/stringtie-output/*.gtf
 ```
 
 ## GffCompare
@@ -138,292 +138,113 @@ Use StringTie merge to merge all the individual GTF files into a single merged G
 Use gffcompare to compare annotation file generated by StringTie to a reference annotation file and to produce a set of output files summarizing the results of the comparison, including classification of each transcript...
 
 ```{r, engine='bash', eval=FALSE, echo=TRUE}
-/home/shared/gffcompare-0.12.6.Linux_x86_64/gffcompare \
--r ../data/Pver_genome_assembly_v1.0-valid.gtf \
--G ../data/Pver_genome_assembly_v1.0-valid.gtf \
--o /home/shared/8TB_HDD_01/pver/gffcompare-output/gffcompare_merged \
-/home/shared/8TB_HDD_01/pver/stringtie-merge-output/stringtie_merged.gtf \
+/home/shared/gffcompare-0.12.6.Linux_x86_64/gffcompare \ # CHange tool path
+-r ../data/genome.gtf \
+-o ../output/lncRNA-discovery/gffcompare_merged \
+../output/stringtie-merge-output/stringtie_merged.gtf
 ```
 
 ## Filter
 
-Filter to get a subset of the transcripts from the original GTF file that are putative lncRNA candidates based on their length and lack of overlap with known reference transcripts...
+Filters the combined GTF output from GFFcompare to select only the lines representing "transcripts" and excluding lines starting with "\#" (these are lines in the output format from GFFcompare that don't contain transcript information). This step further filters for a class code of "u", and keep only those with lengths greater than 199 bases. The "u' class code from the GFFcompare step is for"unknown" transcripts, that is those that are not previously annotated in our reference GFF as protein coding. The size filter of +200nt is a common filtering step for isolating lncRNAs.
 
 ```{r, engine='bash', eval=FALSE, echo=TRUE}
-awk '$3 == "transcript" && $1 !~ /^#/ {print}' /home/shared/8TB_HDD_01/pver/gffcompare-output/gffcompare_merged.annotated.gtf | grep 'class_code "u"' | awk '$5 - $4 > 199 {print}' > /home/shared/8TB_HDD_01/pver/filter-output/merged_lncRNA_candidates.gtf
+awk '$3 == "transcript" && $1 !~ /^#/ {print}' ../output/gffcompare-merged/gffcompare_merged.annotated.gtf | grep 'class_code "u"' | awk '$5 - $4 > 199 {print}' > ../output/filter-output/lncRNA_candidates.gtf
 ```
 
 ## Bedtools
 
-Get fasta of lncRNA candidate regions with Bedtools...
+Extracts the sequence data from the \`\$FASTA\` reference file based on the coordinates from the filtered GTF. The resulting sequences represent potential lncRNA candidates.
 
 ```{r, engine='bash', eval=FALSE, echo=TRUE}
-/home/shared/bedtools2/bin/bedtools \
-getfasta -fi ../data/Pver_genome_assembly_v1.0.fasta -bed /home/shared/8TB_HDD_01/pver/filter-output/merged_lncRNA_candidates.gtf -fo /home/shared/8TB_HDD_01/pver/bedtools-output/merged_lncRNA_candidates.fasta -name -split
+/home/shared/bedtools2/bin/fastaFromBed \ #Change tool path
+
+-fi ../data/genome.fasta \
+
+-bed ../output/filter-output/lncRNA_candidates.gtf \
+
+-fo ../output/lncRNA-discovery/candidates-fasta/lncRNA_candidates.fasta \
+
+-name -split
 ```
 
+Check FASTA contents
+
 ```{r, engine='bash', eval=TRUE, echo=FALSE}
-head /home/shared/8TB_HDD_01/pver/bedtools-output/merged_lncRNA_candidates.fasta
+fgrep -c ">" ../output/lncRNA-discovery/candidates-fasta/lncRNA_candidates.fasta
+
+head ../output/lncRNA-discovery/candidates-fasta/lncRNA_candidates.fasta
 ```
 
 ## CPC2
 
-Evaluate coding potential of transcripts with Coding Potential Calculator 2...
+Initializes a conda environment (Anaconda) and runs CPC2, a software to predict whether a transcript is coding or non-coding. The results are saved to the \$OUTPUT_DIR. CPC2 uses ORF (Open Reading Frame) Analysis, Isometric Feature Mapping (Isomap), Sequence Homology, RNA Sequence Features, and Quality of Translation to assess coding potential and flag any transcripts we would want to exclude using the FASTA generated in the previous step.
 
 ```{r, engine='bash', eval=FALSE, echo=TRUE}
-eval "$(/opt/anaconda/anaconda3/bin/conda shell.bash hook)"
-python /home/shared/CPC2_standalone-1.0.1/bin/CPC2.py -i /home/shared/8TB_HDD_01/pver/bedtools-output/merged_lncRNA_candidates.fasta -o ~/github/zach-lncRNA/output/merged_cpc2_results
+eval "$(/opt/anaconda/anaconda3/bin/conda shell.bash hook)" #Change conda and tool path
+python /home/shared/CPC2_standalone-1.0.1/bin/CPC2.py \
+-i ../output/lncRNA-discovery/candidates-fasta/lncRNA_candidates.fasta \
+-o ../output/lncRNA-discovery/cpc2/lncRNA_cpc2.txt
 ```
 
 ## Final Filter
 
-Filter for those transcripts with label "noncoding"...
+Filters the CPC2 results to get only noncoding transcripts (using the class "noncoding" from the CPC2 results) and extracts their IDs and matches these IDs with the sequences from the previous step to generate a GTF of long noncoding transcripts.
+
+Matches these IDs with the sequences from the previous step to generate a GTF of noncoding transcripts.
 
 ```{r, engine='bash', eval=FALSE, echo=TRUE}
-awk '$8 == "noncoding" {print $1}' ~/github/zach-lncRNA/output/merged_cpc2_results.txt > ~/github/zach-lncRNA/output/noncoding_transcripts_ids.txt
-grep -Fwf ~/github/zach-lncRNA/output/noncoding_transcripts_ids.txt /home/shared/8TB_HDD_01/pver/bedtools-output/merged_lncRNA_candidates.fasta > ~/github/zach-lncRNA/output/merged_final_lncRNAs.gtf
+awk '$8 == "noncoding" {print $1}' ../output/lncRNA-discovery/cpc2/lncRNA_cpc2.txt > ../output/lncRNA-discovery/transcript-ids/noncoding_transcripts_ids.txt
 ```
 
-This results in a final list of transcript IDs identified as lncRNAs. The final GTF of lncRNA transcripts can be found [here](https://github.com/course-fish546-2023/zach-lncRNA/blob/main/output/merged_final_lncRNAs.gtf).
+This results in a final list of transcript IDs identified as lncRNAs.
 
-```{r, engine='bash', eval=TRUE, echo=FALSE}
-head ~/github/zach-lncRNA/output/merged_final_lncRNAs.gtf
-tail ~/github/zach-lncRNA/output/merged_final_lncRNAs.gtf
+## Subsetting FASTA
+
+This creates a FASTA of only lncRNAs.
+
+```{r, engine='bash'}
+
+/home/shared/samtools-1.12/samtools faidx ../output/lncRNA-discovery/candidates-fasta/lncRNA_candidates.fasta \
+
+-r ../output/lncRNA-discovery/transcript-ids/noncoding_transcripts_ids.txt > ../output/lncRNA-discovery/lncRNA-fasta/final_lncRNA.fasta
+
 ```
 
-# Part 2: Differential Expression of lncRNAs
+Check
+
+```{r, engine='bash', eval=TRUE}
+
+fgrep -c "\>" ../output/lncRNA-discovery/lncRNA-fasta/final_lncRNA.fasta
+
+fgrep "\>" ../output/lncRNA-discovery/lncRNA-fasta/final_lncRNA.fasta | head -5
+
+head ../output/lncRNA-discovery/lncRNA-fasta/final_lncRNA.fasta
+
+```
+
+# Part 2: Expression Count Matrices
 
 ![Workflow](https://github.com/course-fish546-2023/zach-lncRNA/blob/main/data/DGE-workflow.png?raw=true)
 
-## Kallisto Abundance Estimation
+## Convert Bed to GTF
 
 Transcript quantification using the Kallisto software on multiple pairs of FASTQ files...
 
 ```{r, engine='bash', eval=FALSE, echo=TRUE}
-find /home/shared/8TB_HDD_01/pver/*R1_001.fastq* \
-| xargs basename -s _R1_001.fastq.gz | xargs -I{} /home/shared/kallisto/kallisto \
-quant -i ~/github/zach-lncRNA/output/kallisto-output/Pver_genome_assembly_v1.0.index \
--o /home/shared/8TB_HDD_01/pver/kallisto-output/{} \
--t 20 \
-/home/shared/8TB_HDD_01/pver/{}_R1_001.fastq.gz \
-/home/shared/8TB_HDD_01/pver/{}_R2_001.fastq.gz \
-2>&1 | tee /home/shared/8TB_HDD_01/pver/kallisto-output/{}.out
+awk 'BEGIN{OFS="\t"; count=1} {printf "%s\t.\tlncRNA\t%d\t%d\t.\t+\t.\tgene_id \"lncRNA_%03d\";\n", $1, $2, $3, count++;}' /home/shared/8TB_HDD_03/sr320/github/deep-dive-expression/D-Apul/output/10.1-Apul-lncRNA/Apul_lncRNA.bed \
+> ../output/05-Apul-lncRNA/lncRNAs.gtf
 ```
 
-## Trinity Count Matrix Generation
-
-Generate a count matrix from Kallisto abundance estimates for all transcripts in RNA-seq data...
+## Feature Count Quantification
 
 ```{r, engine='bash', eval=FALSE, echo=TRUE}
-perl /home/shared/trinityrnaseq-v2.12.0/util/abundance_estimates_to_matrix.pl \
---est_method kallisto \
---gene_trans_map none \
---out_prefix ~/github/zach-lncRNA/output/count_matrix \
---name_sample_by_basedir \
-/home/shared/8TB_HDD_01/pver/kallisto-output/*/abundance.tsv
+/home/shared/subread-2.0.5-Linux-x86_64/bin/featureCounts \
+-T 42 \
+-a ../output/05-Apul-lncRNA/lncRNAs.gtf \
+-o ../output/05-Apul-lncRNA/counts.txt \
+-t lncRNA \
+-g gene_id \
+-p \
+../data/*sorted.bam
 ```
-
-## Filter Count Matrix for lncRNA Transcript IDs
-
-Extract counts only for lncRNAs and save as a new filtered count matrix...
-
-```{r, engine='bash', eval=FALSE}
-# Specify the transcript ID file (GTF format)
-transcript_id_file="/home/shared/8TB_HDD_02/zbengt/github/zach-lncRNA/output/merged_final_lncRNAs.gtf"
-
-# Specify the count matrix file
-count_matrix_file="/home/shared/8TB_HDD_02/zbengt/github/zach-lncRNA/output/count_matrix.isoform.counts.matrix"
-
-# Specify the output file for the filtered count matrix
-filtered_count_matrix_file="/home/shared/8TB_HDD_02/zbengt/github/zach-lncRNA/output/filtered_count_matrix.tsv"
-
-# Extract the middle part of the transcript IDs from the GTF file
-grep -oP "(?<=transcript::)[^:]*" "$transcript_id_file" > "tmp_transcript_ids.txt"
-
-# Store the first line (column headings) of the count matrix file
-head -n 1 "$count_matrix_file" > "$filtered_count_matrix_file"
-
-# Filter the count matrix using the extracted transcript IDs, starting from the second line
-awk 'NR==FNR{a[$0];next} ($1 in a)' "tmp_transcript_ids.txt" <(tail -n +2 "$count_matrix_file") >> "$filtered_count_matrix_file"
-
-# Remove the temporary transcript ID file
-rm "tmp_transcript_ids.txt"
-```
-
-The final count matrix of lncRNAs can be found [here](https://github.com/course-fish546-2023/zach-lncRNA/blob/main/output/filtered_count_matrix.tsv). Note: Counts need to be rounded before DESeq2 analysis
-
-## DESeq2 Differential Expression Analysis
-
-Install the DESeq2 package from Bioconductor and load necessary packages to run DESeq2 and create figures...
-
-```{r, eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
-if (!require("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
-
-BiocManager::install("DESeq2")
-```
-
-```{r, eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
-library(DESeq2)
-library(tidyverse)
-library(pheatmap)
-library(RColorBrewer)
-library(data.table)
-```
-
-Create data frame for DESeq to reference. This specifies which sample IDs are control and which are treatment (nutrient enriched)...
-
-```{r, eval=TRUE, echo=TRUE}
-metaData <- data.frame(
-  sample = c("C17", "C18", "C19", "C20", "C21", "C22", "C23", "C24", "C25", "C26", "C27", "C28", "C29", "C30", "C31", "C32", "E10", "E11", "E12", "E13", "E14", "E15", "E16", "E1", "E2", "E3", "E4", "E5", "E6", "E7", "E8", "E9"),
-  treatment = c("Control", "Control", "Control", "Control", "Control", "Control", "Control", "Control", "Control", "Control", "Control", "Control", "Control", "Control", "Control", "Control", "Enriched", "Enriched", "Enriched", "Enriched", "Enriched", "Enriched", "Enriched", "Enriched", "Enriched", "Enriched", "Enriched", "Enriched", "Enriched", "Enriched", "Enriched", "Enriched")
-  )
-```
-
-Load lncRNA filtered count matrix...
-
-```{r, eval=TRUE, echo=TRUE}
-countmatrix <- read.delim("~/github/zach-lncRNA/output/filtered_count_matrix.tsv", header = TRUE, sep = '\t')
-rownames(countmatrix) <- countmatrix$X
-countmatrix <- countmatrix[,-1]
-head(countmatrix)
-```
-
-Round counts to integers so they can be run through DESeq2 and summarize countmatrix structure to check and see that it worked...
-
-```{r, eval=TRUE, echo=TRUE}
-countmatrix <- round(countmatrix, 0)
-str(countmatrix)
-```
-
-The count matrix should look like this before you input into DESeq2...
-
-```{r, eval=TRUE, echo=FALSE}
-head(countmatrix)
-```
-
-Use the DESeq2 package to create a DESeqDataSet object from a count matrix and metadata...
-
-```{r, eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
-deseq2.dds <- DESeqDataSetFromMatrix(countData = countmatrix,
-                                     colData = metaData, 
-                                     design = ~ treatment)
-```
-
-Performs differential expression analysis using DESeq2 on the deseq2.dds object, extract the results, converts them into a data frame, and then orders the rows of the data frame alphabetically based on the row names...
-
-```{r, eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
-deseq2.dds <- DESeq(deseq2.dds)
-deseq2.res <- results(deseq2.dds)
-deseq2.res <- as.data.frame(deseq2.res)  # Convert to data frame
-deseq2.res <- deseq2.res[order(rownames(deseq2.res)), ]
-```
-
-The results (deseq2.res) should look like this...
-
-```{r, eval=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
-head(deseq2.res)
-```
-
-Count the number of hits with adjusted p-value less then 0.05...
-
-```{r, eval=TRUE, echo=TRUE}
-dim(deseq2.res[!is.na(deseq2.res$padj) & deseq2.res$padj <= 0.05, ])
-```
-
-Retrieve the transcript IDs of the 22 lncRNAs with differential expression p-values less than 0.05 and save them to a text file...
-
-```{r, eval=TRUE, echo=TRUE}
-# Subset the hits with adjusted p-value less than 0.05
-hits <- deseq2.res[!is.na(deseq2.res$padj) & deseq2.res$padj <= 0.05, ]
-
-# View the transcript IDs of the hits
-transcript_ids <- rownames(hits)
-print(transcript_ids)
-
-# Save the transcript IDs in a text file
-writeLines(transcript_ids, "~/github/zach-lncRNA/output/sig_diff_IDs.txt")
-```
-
-These transcript IDs can be found in a text file [here](https://github.com/course-fish546-2023/zach-lncRNA/blob/main/output/sig_diff_IDs.txt).
-
-## Generating Differential Expression Figures
-
-Create a plot of differentially expressed lncRNAs with those that have a p-value less than 0.05 highlighted in red...
-
-```{r, eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
-tmp <- deseq2.res
-# The main plot
-plot(tmp$baseMean, tmp$log2FoldChange, pch=20, cex=0.45, ylim=c(-3, 3), log="x", col="darkgray",
-     main="DEG Nutrient Enrichment  (pval <= 0.05)",
-     xlab="mean of normalized counts",
-     ylab="Log2 Fold Change")
-# Getting the significant points and plotting them again so they're a different color
-tmp.sig <- deseq2.res[!is.na(deseq2.res$padj) & deseq2.res$padj <= 0.05, ]
-points(tmp.sig$baseMean, tmp.sig$log2FoldChange, pch=20, cex=0.45, col="red")
-# 2 FC lines
-abline(h=c(-1,1), col="blue")
-```
-
-Generate a PCA plot to see how all of the differential expression results cluster...
-
-```{r, eval=TRUE, echo=TRUE}
-vsd <- vst(deseq2.dds, blind = FALSE)
-plotPCA(vsd, intgroup = "treatment")
-```
-
-Create heatmaps to view the top 50 and top 22 differentially expressed lncRNAs...
-
-```{r, eval=FALSE, echo=TRUE}
-# Select top 50 differentially expressed genes
-res <- results(deseq2.dds)
-res_ordered <- res[order(res$padj), ]
-top_genes <- row.names(res_ordered)[1:50]
-
-# Extract counts and normalize
-counts <- counts(deseq2.dds, normalized = TRUE)
-counts_top <- counts[top_genes, ]
-
-# Log-transform counts
-log_counts_top <- log2(counts_top + 1)
-
-# Generate heatmap
-pheatmap(log_counts_top, scale = "row")
-```
-
-![](images/top-50-diff-heatmap.png)
-
-```{r, eval=TRUE, echo=TRUE}
-# Select top 22 differentially expressed genes
-res <- results(deseq2.dds)
-res_ordered <- res[order(res$padj), ]
-top_genes <- row.names(res_ordered)[1:22]
-
-# Extract counts and normalize
-counts <- counts(deseq2.dds, normalized = TRUE)
-counts_top <- counts[top_genes, ]
-
-# Log-transform counts
-log_counts_top <- log2(counts_top + 1)
-
-# Generate heatmap
-pheatmap(log_counts_top, scale = "row")
-```
-
-Write final differential expression results table...
-
-```{r, eval=FALSE, echo=TRUE}
-write.table(tmp.sig, "../output/DEGlist.tab", row.names = T)
-```
-
-The final differential gene expression results can be found [here](https://github.com/course-fish546-2023/zach-lncRNA/blob/main/output/DEGlist.tab).
-
-# Part 3: Interpreting Results and Future Work
-
--   Of 6264 identified lncRNA transcripts, only 22 were differentially expressed with a p-value of less than 0.05 in this analysis.
-
--   It may be that lncRNAs don't play much of a role in nutrient enrichment, or that a relatively small number of lncRNAs are particularly important managing nutrient uptake and utilization. Low level nutrient enrichment may also not be enough stimulus to elicit a response in the expression of lncRNAs.
-
--   Further work needs to be done to understand the potential function of these lncRNAs. Preliminary database searches did not yield transcript matches with associated GO terms.
-
--   The next step in this work will be to complete weighted correlation network analysis (WGCNA) to see how these lncRNAs are expressed alongside mRNAs with associated functions. This will provide clues about which GO terms, and thus potential functions, these lncRNAs may be associated with.
