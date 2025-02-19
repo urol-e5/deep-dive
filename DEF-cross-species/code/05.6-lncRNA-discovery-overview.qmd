@@ -1,0 +1,334 @@
+---
+title: "Long non-coding RNA discovery pipeline"
+author: "Steven Roberts"
+date: "`r format(Sys.time(), '%d %B, %Y')`"  
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    html-math-method: katex
+    css: styles.css
+    theme: sandstone
+editor: 
+  markdown: 
+    wrap: 72
+---
+
+Steven's attempt
+
+
+```{r setup, include=FALSE}
+library(knitr)
+library(tidyverse)
+library(kableExtra)
+library(DT)
+library(Biostrings)
+library(tm)
+knitr::opts_chunk$set(
+  echo = TRUE,         # Display code chunks
+  eval = FALSE,         # Evaluate code chunks
+  warning = FALSE,     # Hide warnings
+  message = FALSE,     # Hide messages
+  fig.width = 6,       # Set plot width in inches
+  fig.height = 4,      # Set plot height in inches
+  fig.align = "center", # Align plots to the center
+  comment = ""         # Prevents appending '##' to beginning of lines in code output
+)
+```
+
+
+
+```{r setup, include=FALSE}
+# Global R options
+knitr::opts_chunk$set(echo = TRUE)
+
+# Define key paths and tool directories
+ 
+DATA_DIR <- "../data/05.6-lncRNA"
+OUTPUT_DIR <- "../output/05.6-lncRNA"
+
+FASTQ_SOURCE <- "https://gannet.fish.washington.edu/Atumefaciens/20230519-E5_coral-fastqc-fastp-multiqc-RNAseq/P_meandrina/trimmed/"
+FASTQ_SUFFIX <- "fastq.gz"
+GENOME_SOURCE <- "https://owl.fish.washington.edu/halfshell/genomic-databank/Pocillopora_meandrina_HIv1.assembly.fasta"
+
+
+HISAT2_DIR <- "/home/shared/hisat2-2.2.1"
+SAMTOOLS_DIR <- "/home/shared/samtools-1.12"
+STRINGTIE_DIR <- "/home/shared/stringtie-2.2.1.Linux_x86_64"
+GFFCOMPARE_DIR <- "/home/shared/gffcompare-0.12.6.Linux_x86_64"
+BEDTOOLS_DIR <- "/home/shared/bedtools2/bin"
+CPC2_DIR <- "/home/shared/CPC2_standalone-1.0.1"
+CONDA_PATH <- "/opt/anaconda/anaconda3/bin/conda"
+
+GENOME_FASTA <- file.path(DATA_DIR, "genome.fasta")
+GENOME_GTF <- file.path(DATA_DIR, "genome.gtf")
+FASTQ_DIR <- file.path(DATA_DIR, "fastq")
+GENOME_INDEX <- file.path(OUTPUT_DIR, "genome.index")
+
+# Export these as environment variables for bash chunks.
+Sys.setenv(
+  DATA_DIR = DATA_DIR,
+  FASTQ_SOURCE = FASTQ_SOURCE,
+  FASTQ_SUFFIX = FASTQ_SUFFIX,
+  OUTPUT_DIR = OUTPUT_DIR,
+  GENOME_SOURCE = GENOME_SOURCE,
+  HISAT2_DIR = HISAT2_DIR,
+  SAMTOOLS_DIR = SAMTOOLS_DIR,
+  STRINGTIE_DIR = STRINGTIE_DIR,
+  GFFCOMPARE_DIR = GFFCOMPARE_DIR,
+  BEDTOOLS_DIR = BEDTOOLS_DIR,
+  CPC2_DIR = CPC2_DIR,
+  CONDA_PATH = CONDA_PATH,
+  GENOME_FASTA = GENOME_FASTA,
+  GENOME_GTF = GENOME_GTF,
+  FASTQ_DIR = FASTQ_DIR,
+  GENOME_INDEX = GENOME_INDEX
+)
+```
+
+
+
+
+# Download Genome and Reads for Hisat
+
+```{r, engine='bash'}
+
+wget -r \
+--no-directories --no-parent \
+-P ${FASTQ_DIR} \
+-A "*${FASTQ_SUFFIX}" ${FASTQ_SOURCE}
+```
+
+```{r, engine='bash'}
+ls ${FASTQ_DIR}
+```
+
+
+```{r, engine='bash'}
+
+curl -o "${GENOME_FASTA}" "${GENOME_SOURCE}"
+```
+
+```{r, engine='bash'}
+cd ../data
+
+curl -O https://owl.fish.washington.edu/halfshell/genomic-databank/Pocillopora_meandrina_HIv1.genes.gff3
+```
+
+
+
+
+
+
+wget -P
+"${DATA_DIR}" "http://INSERT_LINK_TO_YOUR_GENOME/download/genome.fasta.gz" gunzip "${DATA_DIR}/genome.fasta.gz"
+
+# Download genome GTF (if compressed adjust accordingly)
+
+wget -P
+"${DATA_DIR}" "http://INSERT_LINK_TO_YOUR_GENOME_GTF/download/genome.gtf" #gunzip "${DATA_DIR}/genome.gtf.gz"
+\# Uncomment if needed
+
+# Download paired-end FASTQ files
+
+wget -r --no-check-certificate --quiet --no-directories --no-parent\
+-P "\${FASTQ_DIR}" -A "\*fastq.gz"\
+https://INSERT_LINK_TO_YOUR_TRIMMED_FASTQ_FILES
+
+
+
+
+
+# #!/bin/bash \#
+
+# \# lncRNA Discovery Pipeline \#
+
+# -----------------------------
+
+# Set directories and file names
+
+# -----------------------------
+
+DATA_DIR="../data" OUTPUT_DIR="../output"
+FASTQ_DIR="${DATA_DIR}/fastq" CANDIDATES_DIR="${OUTPUT_DIR}/lncRNA-discovery"
+STRINGTIE_OUT_DIR="${OUTPUT_DIR}/lncRNA-discovery/stringtie-output" BAM_DIR="${CANDIDATES_DIR}/bam"
+SAM_DIR="${CANDIDATES_DIR}/sam" FILTER_DIR="${OUTPUT_DIR}/filter-output"
+FASTA_CANDIDATES_DIR="${CANDIDATES_DIR}/candidates-fasta" CPC2_DIR="${CANDIDATES_DIR}/cpc2"
+TRANSCRIPT_IDS_DIR="${CANDIDATES_DIR}/transcript-ids" FINAL_FASTA_DIR="${CANDIDATES_DIR}/lncRNA-fasta"
+
+GENOME_FASTA="${DATA_DIR}/genome.fasta" GENOME_GTF="${DATA_DIR}/genome.gtf"
+
+# -----------------------------
+
+# Set tool paths (adjust these to your installation)
+
+# -----------------------------
+
+HISAT2_DIR="/home/shared/hisat2-2.2.1"
+HISAT2_BUILD="${HISAT2_DIR}/hisat2-build" HISAT2="${HISAT2_DIR}/hisat2"
+
+SAMTOOLS="/home/shared/samtools-1.12/samtools"
+
+STRINGTIE="/home/shared/stringtie-2.2.1.Linux_x86_64/stringtie"
+
+GFFCOMPARE="/home/shared/gffcompare-0.12.6.Linux_x86_64/gffcompare"
+
+BEDTOOLS="/home/shared/bedtools2/bin/fastaFromBed"
+
+# For CPC2, we assume you have a working conda environment:
+
+CPC2_PY="/home/shared/CPC2_standalone-1.0.1/bin/CPC2.py"
+
+# -----------------------------
+
+# Download data
+
+# -----------------------------
+
+# Download genome FASTA
+
+wget -P
+"${DATA_DIR}" "http://INSERT_LINK_TO_YOUR_GENOME/download/genome.fasta.gz" gunzip "${DATA_DIR}/genome.fasta.gz"
+
+# Download genome GTF (if compressed adjust accordingly)
+
+wget -P
+"${DATA_DIR}" "http://INSERT_LINK_TO_YOUR_GENOME_GTF/download/genome.gtf" #gunzip "${DATA_DIR}/genome.gtf.gz"
+\# Uncomment if needed
+
+# Download paired-end FASTQ files
+
+wget -r --no-check-certificate --quiet --no-directories --no-parent\
+-P "\${FASTQ_DIR}" -A "\*fastq.gz"\
+https://INSERT_LINK_TO_YOUR_TRIMMED_FASTQ_FILES
+
+# =============================================================================
+
+# Part 1: Finding lncRNAs
+
+# =============================================================================
+
+# -----------------------------
+
+# HISAT2 Build Index
+
+# -----------------------------
+
+${HISAT2_BUILD} -f "${GENOME_FASTA}" "\${OUTPUT_DIR}/genome.index"
+
+# -----------------------------
+
+# HISAT2 Alignment
+
+# -----------------------------
+
+# Loop over FASTQ files (modify file-naming logic as needed)
+
+for file in "${FASTQ_DIR}"/*fastq.gz; do base=$(basename"\$file"
+-R1_001.fastq.gz) \# adjust depending on your naming scheme
+${HISAT2} -x "${OUTPUT_DIR}/genome.index"\
+-p 48\
+-1 "${FASTQ_DIR}/${base}-R1_001.fastq.gz"\
+-2 "${FASTQ_DIR}/${base}-R2_001.fastq.gz"\
+-S "${SAM_DIR}/${base}.sam"\
+2\> "\${SAM_DIR}/hisat.out" done
+
+# -----------------------------
+
+# Samtools: Convert SAM to Sorted BAM and Index
+
+# -----------------------------
+
+mkdir -p "${BAM_DIR}" for samfile in "${SAM_DIR}"/\*.sam; do
+bamfile="${BAM_DIR}/$(basename"${samfile%.sam}.bam")" sorted_bamfile="${BAM_DIR}/$(basename "${samfile%.sam}.sorted.bam")"
+
+${SAMTOOLS} view -bS -@ 20 "$samfile" \> "\$bamfile"
+${SAMTOOLS} sort -@ 20 "$bamfile" -o "\$sorted_bamfile"
+${SAMTOOLS} index -@ 20 "$sorted_bamfile" done
+
+# -----------------------------
+
+# StringTie Assembly and Merge
+
+# -----------------------------
+
+# Assemble transcripts for each sample
+
+mkdir -p "${STRINGTIE_OUT_DIR}" for bam in "${BAM_DIR}"/\*sorted.bam; do
+sample=$(basename "${bam}" -sorted.bam)
+${STRINGTIE} -p 8 -G "${GENOME_GTF}"\
+-o"${STRINGTIE_OUT_DIR}/${sample}.gtf"\
+"\$bam" done
+
+# Merge assemblies
+
+${STRINGTIE} --merge -G "${GENOME_GTF}"\
+-o"\${OUTPUT_DIR}/stringtie-merge-output/stringtie_merged.gtf"\
+\${STRINGTIE_OUT_DIR}/\*.gtf
+
+# -----------------------------
+
+# GffCompare
+
+# -----------------------------
+
+${GFFCOMPARE} -r "${GENOME_GTF}"\
+-o"${CANDIDATES_DIR}/gffcompare_merged" \
+ "${OUTPUT_DIR}/stringtie-merge-output/stringtie_merged.gtf"
+
+# -----------------------------
+
+# Filter for lncRNA Candidates
+
+# -----------------------------
+
+mkdir -p "\${FILTER_DIR}" awk '\$3 == "transcript" &&
+$1 !~ /^#/ {print}' "${OUTPUT_DIR}/gffcompare-merged/gffcompare_merged.annotated.gtf"\
+\| grep 'class_code "u"'\
+\| awk '\$5 - $4 > 199 {print}' \
+ > "${FILTER_DIR}/lncRNA_candidates.gtf"
+
+# -----------------------------
+
+# Extract FASTA with Bedtools
+
+# -----------------------------
+
+mkdir -p "\${FASTA_CANDIDATES_DIR}" ${BEDTOOLS} -fi "${GENOME_FASTA}"\
+-bed"${FILTER_DIR}/lncRNA_candidates.gtf" \
+ -fo "${FASTA_CANDIDATES_DIR}/lncRNA_candidates.fasta"\
+-name -split
+
+# -----------------------------
+
+# CPC2 Prediction
+
+# -----------------------------
+
+# Initialize conda if necessary
+
+eval "\$(/opt/anaconda/anaconda3/bin/conda shell.bash hook)" python
+${CPC2_PY} -i "${FASTA_CANDIDATES_DIR}/lncRNA_candidates.fasta"\
+-o "\${CPC2_DIR}/lncRNA_cpc2.txt"
+
+# -----------------------------
+
+# Final Filtering and Subsetting FASTA
+
+# -----------------------------
+
+mkdir -p "${TRANSCRIPT_IDS_DIR}" "${FINAL_FASTA_DIR}" awk '\$8 ==
+"noncoding" {print $1}' "${CPC2_DIR}/lncRNA_cpc2.txt"\
+\> "\${TRANSCRIPT_IDS_DIR}/noncoding_transcripts_ids.txt"
+
+${SAMTOOLS} faidx "${FASTA_CANDIDATES_DIR}/lncRNA_candidates.fasta"\
+-r "${TRANSCRIPT_IDS_DIR}/noncoding_transcripts_ids.txt" \
+ > "${FINAL_FASTA_DIR}/final_lncRNA.fasta"
+
+# =============================================================================
+
+# Part 2: Expression Count Matrices
+
+# =============================================================================
+
+# (Additional steps would be similarly refactored)
