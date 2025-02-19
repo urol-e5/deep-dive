@@ -46,11 +46,14 @@ knitr::opts_chunk$set(echo = TRUE)
  
 DATA_DIR <- "../data/05.6-lncRNA"
 OUTPUT_DIR <- "../output/05.6-lncRNA"
-
+THREADS <- "32"
+  
 FASTQ_SOURCE <- "https://gannet.fish.washington.edu/Atumefaciens/20230519-E5_coral-fastqc-fastp-multiqc-RNAseq/P_meandrina/trimmed/"
 FASTQ_SUFFIX <- "fastq.gz"
 GENOME_SOURCE <- "https://owl.fish.washington.edu/halfshell/genomic-databank/Pocillopora_meandrina_HIv1.assembly.fasta"
 
+GTF_SOURCE <- "https://github.com/urol-e5/timeseries_molecular/blob/e4361d794b8a6887bc80a979491cb931e93f3e2a/F-Ptua/data/Pocillopora_meandrina_HIv1.genes-validated.gtf"
+GFF_SOURCE <- "https://raw.githubusercontent.com/urol-e5/deep-dive-expression/f62c6d01e04ef0007f2f53af84181481d64d29c1/F-Ptuh/data/Pocillopora_meandrina_HIv1.genes-validated.gff3"
 
 HISAT2_DIR <- "/home/shared/hisat2-2.2.1"
 SAMTOOLS_DIR <- "/home/shared/samtools-1.12"
@@ -62,16 +65,20 @@ CONDA_PATH <- "/opt/anaconda/anaconda3/bin/conda"
 
 GENOME_FASTA <- file.path(DATA_DIR, "genome.fasta")
 GENOME_GTF <- file.path(DATA_DIR, "genome.gtf")
+GENOME_GFF <- file.path(DATA_DIR, "genome.gff")
 FASTQ_DIR <- file.path(DATA_DIR, "fastq")
 GENOME_INDEX <- file.path(OUTPUT_DIR, "genome.index")
 
 # Export these as environment variables for bash chunks.
 Sys.setenv(
+  THREADS = THREADS,
   DATA_DIR = DATA_DIR,
   FASTQ_SOURCE = FASTQ_SOURCE,
   FASTQ_SUFFIX = FASTQ_SUFFIX,
   OUTPUT_DIR = OUTPUT_DIR,
   GENOME_SOURCE = GENOME_SOURCE,
+  GTF_SOURCE = GTF_SOURCE,
+  GFF_SOURCE = GFF_SOURCE,
   HISAT2_DIR = HISAT2_DIR,
   SAMTOOLS_DIR = SAMTOOLS_DIR,
   STRINGTIE_DIR = STRINGTIE_DIR,
@@ -81,6 +88,7 @@ Sys.setenv(
   CONDA_PATH = CONDA_PATH,
   GENOME_FASTA = GENOME_FASTA,
   GENOME_GTF = GENOME_GTF,
+  GENOME_GFF = GENOME_GFF,
   FASTQ_DIR = FASTQ_DIR,
   GENOME_INDEX = GENOME_INDEX
 )
@@ -93,7 +101,7 @@ Sys.setenv(
 
 ```{r, engine='bash'}
 
-wget -r \
+wget -nv -r \
 --no-directories --no-parent \
 -P ${FASTQ_DIR} \
 -A "*${FASTQ_SUFFIX}" ${FASTQ_SOURCE}
@@ -110,14 +118,45 @@ curl -o "${GENOME_FASTA}" "${GENOME_SOURCE}"
 ```
 
 ```{r, engine='bash'}
-cd ../data
 
-curl -O https://owl.fish.washington.edu/halfshell/genomic-databank/Pocillopora_meandrina_HIv1.genes.gff3
+
+curl -o "${GENOME_GTF}" "${GTF_SOURCE}"
+```
+
+
+```{r, engine='bash'}
+
+
+curl -o "${GENOME_GFF}" "${GFF_SOURCE}"
+```
+
+```{bash}
+echo "${GENOME_FASTA}"
+```
+
+
+# HISAT
+
+```{r, engine='python'}
+"${HISAT2_DIR}/hisat2_extract_exons.py" "${GENOME_GTF}" > "${OUTPUT_DIR}/exon.txt"
+
+"${HISAT2_DIR}/hisat2_extract_splice_sites.py" "${GENOME_GTF}" > "${OUTPUT_DIR}/splice_sites.txt"
+
 ```
 
 
 
 
+
+```{r, engine='bash'}
+
+"${HISAT2_DIR}/hisat2-build" \
+  -p "${THREADS}" \
+  "${GENOME_FASTA}" \
+  "${GENOME_INDEX}" \
+  2> "${OUTPUT_DIR}/hisat2-build_stats.txt"
+
+```
 
 
 wget -P
