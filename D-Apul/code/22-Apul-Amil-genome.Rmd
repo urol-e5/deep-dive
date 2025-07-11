@@ -32,5 +32,28 @@ wc -l ../output/22-Apul-Amil-genome/lncRNA.gff
 ```
 
 
+```{bash}
 
+cd ../data/Amil
+
+curl -O https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/013/753/865/GCF_013753865.1_Amil_v2.1/GCF_013753865.1_Amil_v2.1_genomic.fna.gz
+```
+
+```{bash}
+gunzip ../data/Amil/GCF_013753865.1_Amil_v2.1_genomic.fna.gz
+```
+
+
+```{bash}
+/home/shared/gffread-0.12.7.Linux_x86_64/gffread ../output/22-Apul-Amil-genome/lncRNA.gff \
+  -g ../data/Amil/GCF_013753865.1_Amil_v2.1_genomic.fna \
+  -w ../output/22-Apul-Amil-genome/Amil_lncRNA.fasta
+```
+
+
+```{bash}
+head ../output/22-Apul-Amil-genome/Amil_lncRNA.fasta
+grep -c ">" ../output/22-Apul-Amil-genome/Amil_lncRNA.fasta
+
+```
 
