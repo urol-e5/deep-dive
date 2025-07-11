@@ -1,0 +1,36 @@
+---
+title: "22-Apul-Amil-genome"
+output: html_document
+date: "2025-07-11"
+---
+
+```{bash}
+cd ../data/Amil
+
+curl -O https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/013/753/865/GCF_013753865.1_Amil_v2.1/GCF_013753865.1_Amil_v2.1_genomic.gff.gz
+```
+```{bash}
+gunzip ../data/Amil/GCF_013753865.1_Amil_v2.1_genomic.gff.gz
+```
+
+```{bash}
+head ../data/Amil/GCF_013753865.1_Amil_v2.1_genomic.gff
+
+```
+```{bash}
+cat ../data/Amil/GCF_013753865.1_Amil_v2.1_genomic.gff | \
+awk '$0 !~ /^#/ {count[$3]++} END {for (f in count) print f, count[f]}' | sort
+```
+```{bash}
+grep -P '\tlnc_RNA\t' ../data/Amil/GCF_013753865.1_Amil_v2.1_genomic.gff \
+> ../output/22-Apul-Amil-genome/lncRNA.gff
+```
+
+```{bash}
+head ../output/22-Apul-Amil-genome/lncRNA.gff
+wc -l ../output/22-Apul-Amil-genome/lncRNA.gff
+```
+
+
+
+
