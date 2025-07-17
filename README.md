@@ -1,6 +1,8 @@
  ## deep-dive
 
-This repository is focused on taking molecular data from three experiments where integrated epigenetic analysis has already been performed, and doing a _deeper dive_ into datasets to extract and analyze remaining points of excitement. sr test
+This repository is focused on taking molecular data from three experiments where integrated epigenetic analysis has already been performed, and doing a _deeper dive_ into datasets to extract and analyze remaining points of excitement. 
+
+### Explore ncRNA features across three species in our [DIVE genome browser](https://urol-e5.github.io/deep-dive-genome-browser/)!
 
 ### [OSF Project Link](https://osf.io/aw53f/)
 
@@ -56,6 +58,8 @@ Links to other data types (e.g. FastQs, BAMs) can be [found in the project wiki]
 
 All genomes of interest can be found in our [species descriptions and genomic resources wiki page](https://github.com/urol-e5/deep-dive/wiki/Species-Characteristics-and-Genomic-Resources).
 
-### Workflows
+### ncRNA fasta and gff files 
+
+ncRNA fasta and gff files can be found in our [species descriptions and genomic resources wiki page](https://github.com/urol-e5/deep-dive/wiki/Species-Characteristics-and-Genomic-Resources).
 
 
