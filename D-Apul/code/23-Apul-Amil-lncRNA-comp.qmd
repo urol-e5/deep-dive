@@ -1,0 +1,75 @@
+---
+title: "23-Apul Amil lncRNA compare"
+author: Steven Roberts
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+format:
+  gfm:
+    toc: true
+    number-sections: true
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(tidyverse)
+knitr::opts_chunk$set(
+  echo = TRUE,         # Display code chunks
+  eval = TRUE,         # Evaluate code chunks
+  warning = FALSE,     # Hide warnings
+  message = FALSE,     # Hide messages
+  fig.width = 6,       # Set plot width in inches
+  fig.height = 4,      # Set plot height in inches
+  fig.align = "center" # Align plots to the center
+)
+```
+
+
+```{r, engine='bash'}
+head ../output/05.33-lncRNA-discovery/Apul_lncRNA.bed
+wc -l ../output/05.33-lncRNA-discovery/Apul_lncRNA.bed
+```
+```{r, engine='bash'}
+grep -v -- '-[0-9]' ../output/05.33-lncRNA-discovery/Apul_lncRNA.bed > ../output/23-Apul-Amil-lncRNA-comp/Apul_lncRNA.no-negatives.bed
+```
+
+```{r, engine='bash'}
+cat ../data/Amil/GCF_013753865.1_Amil_v2.1_genomic.gff | \
+awk '$0 !~ /^#/ {count[$3]++} END {for (f in count) print f, count[f]}' | sort
+```
+
+
+```{r, engine='bash'}
+grep -i "lnc_RNA" ../data/Amil/GCF_013753865.1_Amil_v2.1_genomic.gff > ../output/23-Apul-Amil-lncRNAlncRNA.gff
+```
+
+
+```{r, engine='bash'}
+head ../output/23-Apul-Amil-lncRNA-comp/lncRNA.gff
+wc -l ../output/23-Apul-Amil-lncRNA-comp/lncRNA.gff
+```
+```{r, engine='bash'}
+wc -l ../output/23-Apul-Amil-lncRNA-comp/Apul_lncRNA.no-negatives.bed
+```
+
+
+```{r, engine='bash'}
+bedtools intersect \
+-a ../output/23-Apul-Amil-lncRNA-comp/Apul_lncRNA.no-negatives.bed \
+-b ../output/23-Apul-Amil-lncRNA-comp/lncRNA.gff
+```
+
+```{r, engine='bash'}
+bedtools intersect \
+-a ../output/23-Apul-Amil-lncRNA-comp/Apul_lncRNA.no-negatives.bed \
+-b ../output/23-Apul-Amil-lncRNA-comp/lncRNA.gff \
+-u | wc -l
+```
+
+
+
+```{r, engine='bash'}
+bedtools intersect \
+-a ../output/23-Apul-Amil-lncRNA-comp/lncRNA.gff \
+-b ../output/23-Apul-Amil-lncRNA-comp/Apul_lncRNA.no-negatives.bed \
+-u | wc -l
+```
+
