@@ -1,6 +1,10 @@
 ## deep-dive
 
-This repository hosts analyses and datasets from three coral epigenetic studies, with a focus on non-coding RNAs (ncRNAs) and other molecular features. 
+This repository hosts analyses and datasets from [Ashey et al. 2025](https://doi.org/10.1101/2025.03.15.643469), which examines ncRNAs in three coral species. 
+
+*Citation: Ashey J, Rodriguez Casariego J, Bengtsson Z, Huffmyer AS,  Becker DM, Durkin KM,  White S, Eirin-Lopez J, Putnam HM, Roberts SB. 2025. Non-coding RNA Repertoire in reef-building corals. bioRxiv. https://doi.org/10.1101/2025.03.15.643469.*
+
+![](https://urol-e5.github.io/deep-dive-genome-browser/img/dive.png)
 
 ### 🔍 Explore 
 
