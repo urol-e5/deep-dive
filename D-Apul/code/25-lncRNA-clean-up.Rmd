@@ -28,37 +28,59 @@ wc -l ~/github/deep-dive/D-Apul/output/25-lncRNA-clean-up/Apulchra_lncRNA_de-dup
 ```{bash}
 awk '{
   $2 = $2 + 1;
-  $3 = $3 + 1;
-  if ($2 < 0) $2 = 0;
-  if ($3 < 0) $3 = 0;
+  $3 = $3;
   print
-}' OFS='\t' ~/github/deep-dive/D-Apul/output/25-lncRNA-clean-up/Apulchra_lncRNA_de-duplicated.bed > ~/github/deep-dive/D-Apul/output/25-lncRNA-clean-up/Apulchra_lncRNA.bed
+}' OFS='\t' ../output/25-lncRNA-clean-up/Apulchra_lncRNA_de-duplicated.bed > ../output/25-lncRNA-clean-up/Apulchra_lncRNA.bed
 
 ```
 
 ```{bash}
-head ~/github/deep-dive/D-Apul/output/25-lncRNA-clean-up/Apulchra_lncRNA.bed
-tail ~/github/deep-dive/D-Apul/output/25-lncRNA-clean-up/Apulchra_lncRNA.bed
+head ../output/25-lncRNA-clean-up/Apulchra_lncRNA.bed
+tail ../output/25-lncRNA-clean-up/Apulchra_lncRNA.bed
+wc -l ../output/25-lncRNA-clean-up/Apulchra_lncRNA.bed
 ```
 
 ctrl+F in bed produced 0 occurences of -1 positions
 
+
+```{bash}
+echo "Negative start coordinates:" 
+awk '$2 < 0' ../output/25-lncRNA-clean-up/Apulchra_lncRNA.bed
+```
+
+
+
 # Subset new FASTA
+
+```{bash}
+cd ../data
+wget http://gannet.fish.washington.edu/seashell/snaps/GCF_013753865.1_Amil_v2.1_genomic.fna
+```
+
 
 Subset original genomic FASTA with new bed file to obstain FASTA of lncRNAs
 ```{bash}
 /home/shared/bedtools2/bin/bedtools getfasta \
--fi ~/github/deep-dive/D-Apul/data/05.34-lncRNA-discovery-overview/GCF_013753865.1_Amil_v2.1_genomic.fna \
--bed ~/github/deep-dive/D-Apul/output/25-lncRNA-clean-up/Apulchra_lncRNA.bed \
--fo ~/github/deep-dive/D-Apul/output/25-lncRNA-clean-up/Apulchra_lncRNA.fasta
+-fi ../data/GCF_013753865.1_Amil_v2.1_genomic.fna \
+-bed ../output/25-lncRNA-clean-up/Apulchra_lncRNA.bed \
+-fo ../output/25-lncRNA-clean-up/Apulchra_lncRNA.fasta
 
+```
+
+
+
+
+
+```{bash}
+grep -c '>' ../output/25-lncRNA-clean-up/Apulchra_lncRNA.fasta
+head ../output/25-lncRNA-clean-up/Apulchra_lncRNA.fasta
+tail ../output/25-lncRNA-clean-up/Apulchra_lncRNA.fasta
+```
+```{bash}
+cp ../output/25-lncRNA-clean-up/Apulchra_lncRNA.fasta ../output/25-lncRNA-clean-up/Apul_lncRNA.fasta
 ```
 
 ```{bash}
-grep -c '>' ~/github/deep-dive/D-Apul/output/25-lncRNA-clean-up/Apulchra_lncRNA.fasta
-head ~/github/deep-dive/D-Apul/output/25-lncRNA-clean-up/Apulchra_lncRNA.fasta
-tail ~/github/deep-dive/D-Apul/output/25-lncRNA-clean-up/Apulchra_lncRNA.fasta
+cp ../output/25-lncRNA-clean-up/Apulchra_lncRNA.bed ../output/25-lncRNA-clean-up/Apul_lncRNA.bed
 ```
-Ran this code and the final count is 16018, which is not the same number of entries in the bed file.
-
 
