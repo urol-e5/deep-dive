@@ -20,6 +20,8 @@ cd ../data
 gunzip GCF_013753865.1_Amil_v2.1_genomic.gtf.gz
 ```
 
+#Variables
+
 ```{r}
 # Global R options
 knitr::opts_chunk$set(echo = TRUE)
@@ -32,21 +34,21 @@ THREADS <- "42"
   
 FASTQ_SOURCE <- "https://gannet.fish.washington.edu/Atumefaciens/20230519-E5_coral-fastqc-fastp-multiqc-RNAseq/A_pulchra/trimmed/"
 FASTQ_SUFFIX <- "fastq.gz"
-GENOME_SOURCE <- "http://gannet.fish.washington.edu/seashell/snaps/GCF_013753865.1_Amil_v2.1_genomic.fna"
+GENOME_SOURCE <- "https://gannet.fish.washington.edu/seashell/snaps/GCF_013753865.1_Amil_v2.1_genomic.fna"
 
 
-GTF_SOURCE <- "../data/GCF_013753865.1_Amil_v2.1_genomic.gtf"
-GFF_SOURCE <- "http://gannet.fish.washington.edu/seashell/snaps/GCF_013753865.1_Amil_v2.1_genomic.gff"
+GTF_SOURCE <- "https://gannet.fish.washington.edu/v1_web/owlshell/bu-github/deep-dive/D-Apul/data/GCF_013753865.1_Amil_v2.1_genomic.gtf"
+GFF_SOURCE <- "https://gannet.fish.washington.edu/seashell/snaps/GCF_013753865.1_Amil_v2.1_genomic.gff"
 
 GFFPATTERN <- 'class_code "u"|class_code "x"|class_code "o"|class_code "i"'
 
 #RAVEN
 HISAT2_DIR <- "/home/shared/hisat2-2.2.1/"
 SAMTOOLS_DIR <- "/home/shared/samtools-1.12/"
-STRINGTIE_DIR <- "/home/shared/stringtie-2.2.1.Linux_x86_64"
-GFFCOMPARE_DIR <- "/home/shared/gffcompare-0.12.6.Linux_x86_64"
-BEDTOOLS_DIR <- "/home/shared/bedtools2/bin"
-CPC2_DIR <- "/home/shared/CPC2_standalone-1.0.1"
+STRINGTIE_DIR <- "/home/shared/stringtie-2.2.1.Linux_x86_64/"
+GFFCOMPARE_DIR <- "/home/shared/gffcompare-0.12.6.Linux_x86_64/"
+BEDTOOLS_DIR <- "/home/shared/bedtools2/bin/"
+CPC2_DIR <- "/home/shared/CPC2_standalone-1.0.1/bin/"
 CONDA_PATH <- "/opt/anaconda/anaconda3/bin/conda"
 
 #KLONE
@@ -279,9 +281,6 @@ head ${OUTPUT_DIR}/lncRNA_candidates.gtf
 wc -l ${OUTPUT_DIR}/lncRNA_candidates.gtf
 ```
 
-```{r, engine='bash'}
-sort ../output/17-Ptuh-lncRNA/lncRNA_candidates.gtf | uniq -d
-```
 
 # Bedtools
 
@@ -299,18 +298,11 @@ head ${OUTPUT_DIR}/lncRNA_candidates.fasta
 
 #CPC2
 
-```{bash}
-wget https://github.com/gao-lab/CPC2_standalone/archive/refs/tags/v1.0.1.zip
-```
 
-```{bash}
-unzip v1.0.1.zip
-```
 
 ```{r, engine='bash'}
-eval "$(/mmfs1/gscratch/srlab/nextflow/bin/miniforge/bin/conda shell.bash hook)"
-conda activate /mmfs1/gscratch/srlab/nextflow/bin/miniforge/envs/nextflow  # replace with your actual env name
-python /mmfs1/gscratch/scrubbed/sr320/github/deep-dive-expression/F-Ptuh/code/CPC2_standalone-1.0.1/bin/CPC2.py \
+eval "$(/opt/anaconda/anaconda3/bin/conda shell.bash hook)"
+python "${CPC2_DIR}"CPC2.py \
   -i "${OUTPUT_DIR}/lncRNA_candidates.fasta" \
   -o "${OUTPUT_DIR}/CPC2"
 ```
