@@ -301,7 +301,7 @@ head ${OUTPUT_DIR}/lncRNA_candidates.fasta
 
 
 ```{r, engine='bash'}
-eval "$(/opt/anaconda/anaconda3/bin/conda shell.bash hook)"
+eval "$(${CONDA_PATH} shell.bash hook)"
 python "${CPC2_DIR}"CPC2.py \
   -i "${OUTPUT_DIR}/lncRNA_candidates.fasta" \
   -o "${OUTPUT_DIR}/CPC2"
@@ -341,6 +341,9 @@ grep -c ">" "${OUTPUT_DIR}/lncRNA.fasta"
 input="${OUTPUT_DIR}/noncoding_transcripts_ids.txt"
 output="${OUTPUT_DIR}/lncRNA.bed"
 
+# Create a temporary file to store intermediate results
+tmp_output="${output}.tmp"
+
 # Process each line of the input file
 while IFS= read -r line; do
     # Remove "transcript::" from the line
@@ -355,14 +358,31 @@ while IFS= read -r line; do
     # Convert the start position to 0-based by subtracting 1
     start=$((start - 1))
     
-    # Write the chromosome, updated start, and end positions to the output file (tab-separated)
+    # Write the chromosome, updated start, and end positions to the temp file (tab-separated)
     printf "%s\t%s\t%s\n" "$chromosome" "$start" "$end"
-done < "$input" > "$output"
+done < "$input" > "$tmp_output"
+
+# Sort and remove duplicate lines, then save to the final output
+sort "$tmp_output" | uniq > "$output"
+
+# Optionally remove the temporary file
+rm "$tmp_output"
 ```
 
 ```{r, engine='bash'}
 head -1 "${OUTPUT_DIR}/lncRNA.bed"
 ```
+
+
+
+```{r, engine='bash'}
+awk '$2 < 0' "${OUTPUT_DIR}/lncRNA.bed"
+```
+```{r, engine='bash'}
+sort "${OUTPUT_DIR}/lncRNA.bed" | uniq -c | awk '$1 > 1'
+```
+
+
 
 ```{r renamegtf, engine='bash'}
 awk 'BEGIN{OFS="\t"; count=1} {printf "%s\t.\tlncRNA\t%d\t%d\t.\t+\t.\tgene_id \"lncRNA_%03d\";\n", $1, $2, $3, count++;}' "${OUTPUT_DIR}/lncRNA.bed" \
@@ -373,6 +393,18 @@ awk 'BEGIN{OFS="\t"; count=1} {printf "%s\t.\tlncRNA\t%d\t%d\t.\t+\t.\tgene_id \
 head "${OUTPUT_DIR}/lncRNA.gtf"
 wc -l "${OUTPUT_DIR}/lncRNA.gtf"
 ```
+
+
+# confirm no dups and negatives
+
+```{r, engine='bash'}
+sort "${OUTPUT_DIR}/lncRNA.gtf" | uniq -d
+```
+
+```{r, engine='bash'}
+sort "${OUTPUT_DIR}/lncRNA.gtf" | uniq -c | awk '$1 > 1'
+```
+
 
 # Summary Table
 
