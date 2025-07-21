@@ -9,22 +9,78 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+# Remove Duplicates
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+Remove duplicates in BED file from output folder
+```{bash}
+awk '!seen[$0]++' ~/github/deep-dive/F-Pmea/output/02-lncRNA-discovery/Pmea_lncRNA.bed > ~/github/deep-dive/F-Pmea/output/22-lncRNA-clean-up/Ptuahiniensis_lncRNA_de-duplicated.bed
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{bash}
+wc -l ~/github/deep-dive/F-Pmea/output/22-lncRNA-clean-up/Ptuahiniensis_lncRNA_de-duplicated.bed
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+12212 after removing duplicates
+
+# Shift BED positions over by 1
+
+```{bash}
+awk '{
+  $2 = $2 + 1;
+  $3 = $3;
+  print
+}' OFS='\t' ~/github/deep-dive/F-Pmea/output/22-lncRNA-clean-up/Ptuahiniensis_lncRNA_de-duplicated.bed > ~/github/deep-dive/F-Pmea/output/22-lncRNA-clean-up/Ptuahiniensis_lncRNA.bed
+
+```
+
+```{bash}
+head ~/github/deep-dive/F-Pmea/output/22-lncRNA-clean-up/Ptuahiniensis_lncRNA.bed
+tail ~/github/deep-dive/F-Pmea/output/22-lncRNA-clean-up/Ptuahiniensis_lncRNA.bed
+```
+
+ctrl+F in bed produced 0 occurences of -1 positions
+
+```{bash}
+echo "Negative start coordinates:" 
+awk '$2 < 0' ~/github/deep-dive/F-Pmea/output/22-lncRNA-clean-up/Ptuahiniensis_lncRNA.bed
+```
+
+# Subset new FASTA
+
+Download genomic fasta
+```{bash}
+# Navigate to your desired download directory
+cd ~/github/deep-dive/F-Pmea/data/22-lncRNA-clean-up
+
+# Use wget to download only .sorted.bam files
+wget "https://owl.fish.washington.edu/halfshell/genomic-databank/Pocillopora_meandrina_HIv1.assembly.fasta"
+
+
+```
+
+
+Subset original genomic FASTA with new bed file to obstain FASTA of lncRNAs
+```{bash}
+/home/shared/bedtools2/bin/bedtools getfasta \
+-fi ~/github/deep-dive/F-Pmea/data/22-lncRNA-clean-up/Pocillopora_meandrina_HIv1.assembly.fasta \
+-bed ~/github/deep-dive/F-Pmea/output/22-lncRNA-clean-up/Ptuahiniensis_lncRNA.bed \
+-fo ~/github/deep-dive/F-Pmea/output/22-lncRNA-clean-up/Ptuahiniensis_lncRNA.fasta
+
+```
+
+
+```{bash}
+grep -c '^>' ~/github/deep-dive/F-Pmea/output/22-lncRNA-clean-up/Ptuahiniensis_lncRNA.fasta
+head ~/github/deep-dive/F-Pmea/output/22-lncRNA-clean-up/Ptuahiniensis_lncRNA.fasta
+tail ~/github/deep-dive/F-Pmea/output/22-lncRNA-clean-up/Ptuahiniensis_lncRNA.fasta
+```
+Ran this code and the final count is 12212, the same as the bed file.
+
+```{bash}
+cp ~/github/deep-dive/F-Pmea/output/22-lncRNA-clean-up/Ptuahiniensis_lncRNA.fasta ~/github/deep-dive/F-Pmea/output/22-lncRNA-clean-up/Ptuh_lncRNA.fasta
+```
+
+```{bash}
+cp ~/github/deep-dive/F-Pmea/output/22-lncRNA-clean-up/Ptuahiniensis_lncRNA.bed ~/github/deep-dive/F-Pmea/output/22-lncRNA-clean-up/Ptuh_lncRNA.bed
+```
