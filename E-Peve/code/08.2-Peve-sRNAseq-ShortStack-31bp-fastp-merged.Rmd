@@ -384,3 +384,54 @@ ggvenn(Peve_shortstack_vennlist)
 ggsave("../output/08.2-Peve-sRNAseq-ShortStack-31bp-fastp-merged/figures/Peve_ShortStack_venn.png", width = 12, height = 7, units = "in")
 ```
 
+Generate separate fastas and gffs for the precursor, star, and mature miRNAs
+```{r, engine='bash'}
+cd ../output/08.2-Peve-sRNAseq-ShortStack-31bp-fastp-merged
+
+awk '/^>/{keep=($0 !~ /mature|star/)} keep' ShortStack_out/mir.fasta > Peve_ShortStack_31bp_fastp_merged_precursor.fasta
+awk '/^>/{keep=($0 ~ /star/)} keep' ShortStack_out/mir.fasta > Peve_ShortStack_31bp_fastp_merged_star.fasta
+awk '/^>/{keep=($0 ~ /mature/)} keep' ShortStack_out/mir.fasta > Peve_ShortStack_31bp_fastp_merged_mature.fasta
+
+awk -F '\t' '$3 == "MIRNA_hairpin"' ShortStack_out/Results.gff3 > Peve_ShortStack_31bp_fastp_merged_precursor.gff3
+awk -F '\t' '$3 == "mature_miRNA"' ShortStack_out/Results.gff3 > Peve_ShortStack_31bp_fastp_merged_mature.gff3
+awk -F '\t' '$3 == "miRNA-star"' ShortStack_out/Results.gff3 > Peve_ShortStack_31bp_fastp_merged_star.gff3
+```
+
+Annotate these files with given miRNA names (e.g., "peve-mir-100") instead of ShortStack labels (e.g. "Cluster_123")
+```{r}
+# Load mapping file
+map <- read.csv("../../DEF-cross-species/output/10-shortRNA-ShortStack-comparison/Peve_results_mature_named.csv", stringsAsFactors = FALSE)
+
+# Define the directory and shared prefix
+input_dir <- "../output/08.2-Peve-sRNAseq-ShortStack-31bp-fastp-merged"               # or path to input files
+output_dir <- "../output/08.2-Peve-sRNAseq-ShortStack-31bp-fastp-merged"
+prefix <- "Peve_ShortStack_31bp_fastp_merged"            # replace with actual file prefix
+
+# List .fasta and .gff files starting with the prefix
+files <- list.files(path = input_dir, pattern = paste0("^", prefix, ".*\\.(fasta|gff3)$"), full.names = TRUE)
+
+# Loop through each file and apply replacements
+for (file in files) {
+  cat("Processing", file, "\n")
+  
+  # Read file as text
+  lines <- readLines(file)
+  
+  # Apply replacements
+  for (i in seq_len(nrow(map))) {
+    lines <- gsub(map$Name[i], map$given_miRNA_name[i], lines, fixed = TRUE)
+  }
+  
+  # Write to output file in output_dir with same base name
+  output_path <- file.path(output_dir, paste0("named_", basename(file)))
+  writeLines(lines, output_path)
+}
+
+```
+
+Check that all ShortStack labels (e.g. "Cluster_123") have been replaced with given miRNA names
+```{r, engine = 'bash'}
+cd ../output/08.2-Peve-sRNAseq-ShortStack-31bp-fastp-merged
+
+grep -l "Cluster" named*.fasta named*.gff3 2>/dev/null
+```
