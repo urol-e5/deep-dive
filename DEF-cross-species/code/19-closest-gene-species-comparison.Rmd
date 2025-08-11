@@ -620,7 +620,6 @@ length_plot_mi <- ggplot(count_by_group_mi, aes(x = length, y = n, fill = Specie
     legend.position = "none"
   ); length_plot_mi
 
-
 ggsave(filename = "../figures/miRNA_lengths.png", length_plot_mi, width = 34, height = 24)
 ggsave(filename = "../figures/miRNA_lengths.pdf", length_plot_mi, width = 34, height = 24)
 ```
@@ -778,11 +777,10 @@ length_plot_lnc <- ggplot(length_freq, aes(x = length_bin, y = frequency, fill =
     axis.ticks = element_line(size = 1.5, color = "black"), # Thicker axis ticks
     plot.margin = unit(c(1, 1, 1, 1), "cm"),                # Margin around plot (top, right, bottom, left)
     legend.title = element_text(size = 70, face = "bold"),  # Increase legend title size
-    legend.text = element_text(size = 70),
+    legend.text = element_text(size = 70, face = "italic"),
     legend.position = "top"                              
   ) +
   guides(fill = guide_legend(override.aes = list(size = 20)));  # Increase the size of legend squares
-
 length_plot_lnc
 
 ggsave(filename = "../figures/lncRNA_lengths.png", length_plot_lnc, width = 34, height = 20)
@@ -796,7 +794,3 @@ plot <- plot_grid(length_plot_lnc, length_plot_mi, length_plot_pi, labels = c("A
 ggsave(filename = "../figures/ncRNA_lengths.png", plot, width = 65, height = 50, limitsize = F)
 ggsave(filename = "../figures/ncRNA_lengths.pdf", plot, width = 65, height = 50, limitsize = F)
 ```
-
-
-
-
