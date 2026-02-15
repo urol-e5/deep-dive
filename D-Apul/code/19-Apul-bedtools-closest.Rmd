@@ -23,12 +23,12 @@ Before analysis, make gene2go file from the annotation information
 ```{r}
 gene2trans <- read.table("../../data/APUL_gene2transcript.tab", header = F) %>%
   mutate(query = gsub("rna-", "", V2)) %>%
-  select(query, V1)
+  dplyr::select(query, V1)
 colnames(gene2trans) <- c("query", "gene_name")
 
 GO_APUL <- GO_APUL %>%
   left_join(.,gene2trans) %>%
-  select(gene_name, GeneOntologyIDs)
+  dplyr::select(gene_name, GeneOntologyIDs)
 write_tsv(GO_APUL, file = "../../data/Apul_gene2go.tab")
 ```
 
@@ -51,37 +51,48 @@ Pull out gene name information from the `gf_attr` column
 ```{r}
 pi_bed_filt <- pi_bed_filt %>%
   mutate(gene_name = str_extract(gf_attr, "Parent=gene-LOC[0-9]+") %>% 
-                      str_replace("Parent=gene-", ""))
+                      str_replace("Parent=gene-", "")) %>%
+  dplyr::select(!gf_attr)
 ```
 
-Calculate the overlap and distance based on the pi_start, pi_end, gf_start, and gf_end columns. Overlap occurs if the start of one feature is within the bounds of another. If there is no overlaps, the distance can be calculated as the gap between the end of one feature and the start of another. 
+Calculate the overlap and distance based on the pi_start, pi_end, gf_start, and gf_end columns. Overlap occurs if the start of one feature is within the bounds of another. If there is no overlaps, it will be 0.
 ```{r}
-pi_bed_filt$overlap <- with(pi_bed_filt, pmin(pi_end, gf_end) - pmax(pi_start, gf_start))
+pi_bed_filt$overlap <- pmax(
+  0,
+  pmin(pi_bed_filt$pi_end, pi_bed_filt$gf_end) -
+    pmax(pi_bed_filt$pi_start, pi_bed_filt$gf_start) + 1)
+```
 
-sum(pi_bed_filt$overlap < 0)
-sum(pi_bed_filt$overlap > 0)
+Add length of features 
+```{r}
+pi_bed_filt <- pi_bed_filt %>%
+  mutate(pi_length = pi_end - pi_start) %>%
+  mutate(gf_length = gf_end - gf_start)
 ```
 
 Calculate average/percentages of distance and overlap. 
 ```{r}
 summary_stats <- pi_bed_filt %>%
   summarize(
-    avg_overlap = mean(overlap[overlap > 0], na.rm = TRUE),
-    median_overlap = median(overlap[overlap > 0], na.rm = TRUE),
-    avg_distance = mean(overlap[overlap < 0], na.rm = TRUE),
-    median_distance = median(overlap[overlap < 0], na.rm = TRUE),
-    percent_overlap = sum(overlap > 0) / n() * 100,
-    percent_distance_lt_1kb = sum(overlap < 0 & overlap > -1000) / n() * 100,
-    percent_distance = sum(overlap < 0) / n() * 100
-  )
+    avg_overlap = mean(overlap_bp[overlap_bp > 0], na.rm = TRUE),
+    min_overlap = min(overlap_bp[overlap_bp > 0], na.rm = T),
+    max_overlap = max(overlap_bp[overlap_bp > 0], na.rm = T),
+    avg_pi = mean(pi_length), na.rm = TRUE),
+    min_pi = min(pi_length, na.rm = T),
+    max_pi = max(pi_length, na.rm = T),
+    median_overlap = median(overlap_bp[overlap_bp > 0], na.rm = TRUE),
+    avg_distance = mean(overlap_bp[overlap_bp < 0], na.rm = TRUE),
+    median_distance = median(overlap_bp[overlap_bp < 0], na.rm = TRUE),
+    percent_overlap = sum(overlap_bp > 0) / n() * 100,
+    percent_distance_lt_1kb = sum(overlap_bp < 0 & overlap_bp > -1000) / n() * 100,
+    percent_distance = sum(overlap_bp < 0) / n() * 100)
 
 # Display the summary statistics
 print(summary_stats)
 ```
 
 Results:
-avg_overlap avg_distance percent_overlap percent_distance_lt_1kb percent_distance
-2557.657    -11468.34        71.32867                4.195804         28.67133
+XXXXXX
 
 Read in gene2go information 
 ```{r}
@@ -90,6 +101,9 @@ APUL_gene2go<-read.delim("../../data/Apul_gene2go.tab", sep="\t")
 
 Make list of genes for input to TopGO
 ```{r}
+pi_bed_filt <- pi_bed_filt %>%
+  filter(overlap > 0)
+
 apul_clust_genes <- as.character(unique(pi_bed_filt$gene_name))
 apul_all_genes <- as.character(APUL_gene2go$gene_name)
 Apul_GeneList <- factor(as.integer(apul_all_genes %in% apul_clust_genes))
@@ -253,7 +267,7 @@ merged_pirna <- GO_APUL_En_sig_gene_pi %>%
   mutate(prop.sig.genes = Significant/Annotated)
 
 # Write to csv 
-write.csv(merged_pirna, "../output/19-bedtools-closest/Apul_GO_en_sig_gene_piRNA.csv")
+write.csv(merged_pirna, "../output/19-Apul-bedtools-closest/Apul_GO_en_sig_gene_piRNA.csv")
 ```
 
 Plot 
@@ -543,7 +557,10 @@ lnc_bed_filt <- lnc_bed_filt %>%
 
 Calculate the overlap and distance based on the l_start, l_end, gf_start, and gf_end columns. Overlap occurs if the start of one feature is within the bounds of another. If there is no overlaps, the distance can be calculated as the gap between the end of one feature and the start of another. 
 ```{r}
-lnc_bed_filt$overlap <- with(lnc_bed_filt, pmin(l_end, gf_end) - pmax(l_start, gf_start))
+lnc_bed_filt$overlap <- pmax(
+  0,
+  pmin(lnc_bed_filt$l_end, lnc_bed_filt$gf_end) -
+    pmax(lnc_bed_filt$l_start, lnc_bed_filt$gf_start) + 1)
 
 sum(lnc_bed_filt$overlap < 0)
 sum(lnc_bed_filt$overlap > 0)

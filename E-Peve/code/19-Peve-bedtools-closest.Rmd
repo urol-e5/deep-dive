@@ -22,9 +22,9 @@ See [bash code](https://github.com/JillAshey/JillAshey_Putnam_Lab_Notebook/blob/
 Before analysis, make gene2go file from the annotation information
 ```{r}
 GO_PEVE <- read.delim("../../data/Peve-rna-GO.tsv", sep = "\t", header = T)  %>%
-  select(query, GeneOntologyIDs) %>%
+  dplyr::select(query, GeneOntologyIDs) %>%
   mutate(gene_name = gsub("Parent=","", query)) %>%
-  select(gene_name, GeneOntologyIDs)
+  dplyr::select(gene_name, GeneOntologyIDs)
 write_tsv(GO_PEVE, file = "../../data/Peve_gene2go.tab")
 ```
 
@@ -32,7 +32,7 @@ write_tsv(GO_PEVE, file = "../../data/Peve_gene2go.tab")
 
 Load Peve piRNA closest file into R. This file represents the genomic features that are closest/are overlapping with piRNA clusters. 
 ```{r}
-pi_bed <- read.delim("../output/19-bedtools-closest/Peve_piRNA_output.bed", header = F)
+pi_bed <- read.delim("../output/19-Peve-bedtools-closest/Peve_piRNA_output.bed", header = F)
 head(pi_bed)
 ```
 
@@ -53,10 +53,20 @@ pi_bed_filt <- pi_bed_filt %>%
 
 Calculate the overlap and distance based on the l_start, l_end, gf_start, and gf_end columns. Overlap occurs if the start of one feature is within the bounds of another. If there is no overlaps, the distance can be calculated as the gap between the end of one feature and the start of another. 
 ```{r}
-pi_bed_filt$overlap <- with(pi_bed_filt, pmin(pi_end, gf_end) - pmax(pi_start, gf_start))
+pi_bed_filt$overlap <- pmax(
+  0,
+  pmin(pi_bed_filt$pi_end, pi_bed_filt$gf_end) -
+    pmax(pi_bed_filt$pi_start, pi_bed_filt$gf_start) + 1)
 
 sum(pi_bed_filt$overlap < 0)
 sum(pi_bed_filt$overlap > 0)
+```
+
+Add length of features 
+```{r}
+pi_bed_filt <- pi_bed_filt %>%
+  mutate(pi_length = pi_end - pi_start) %>%
+  mutate(gf_length = gf_end - gf_start)
 ```
 
 Calculate average/percentages of distance and overlap. 
@@ -85,6 +95,9 @@ PEVE_gene2go<-read.delim("../../data/Peve_gene2go.tab", sep="\t")
 
 Make list of genes for input to TopGO
 ```{r}
+pi_bed_filt <- pi_bed_filt %>%
+  filter(overlap > 0)
+
 peve_clust_genes <- as.character(unique(pi_bed_filt$gene_name))
 peve_all_genes <- as.character(PEVE_gene2go$gene_name)
 Peve_GeneList <- factor(as.integer(peve_all_genes %in% peve_clust_genes))
@@ -125,7 +138,7 @@ Only taking the top 100 GO terms
 Filter by significant results
 ```{r}
 GO_PEVE_BP_En_pi$Fisher<-as.numeric(GO_PEVE_BP_En_pi$Fisher)
-GO_PEVE_BP_En_sig_pi<-GO_PEVE_BP_En[GO_PEVE_BP_En_pi$Fisher<0.05,]
+GO_PEVE_BP_En_sig_pi<-GO_PEVE_BP_En_pi[GO_PEVE_BP_En_pi$Fisher<0.05,]
 ```
 
 Merge `GO_PEVE_BP_En_sig_pi` with GO and gene info. 
@@ -248,7 +261,7 @@ merged_pirna <- GO_PEVE_En_sig_gene_pi %>%
   mutate(prop.sig.genes = Significant/Annotated)
 
 # Write to csv 
-write.csv(merged_pirna, "../output/19-bedtools-closest/Peve_GO_en_sig_gene_piRNA.csv")
+write.csv(merged_pirna, "../output/19-Peve-bedtools-closest/Peve_GO_en_sig_gene_piRNA.csv")
 ```
 
 Plot 

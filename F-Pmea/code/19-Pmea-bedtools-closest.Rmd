@@ -31,7 +31,7 @@ write_tsv(GO_PMEA, file = "../../data/Pmea_gene2go.tab")
 
 Load Ptuh piRNA closest file into R. This file represents the genomic features that are closest/are overlapping with piRNA clusters. 
 ```{r}
-pi_bed <- read.delim("../output/19-bedtools-closest/Ptuh_piRNA_output.bed", header = F)
+pi_bed <- read.delim("../output/19-Pmea-bedtools-closest/Ptuh_piRNA_output.bed", header = F)
 head(pi_bed)
 ```
 
@@ -52,7 +52,10 @@ pi_bed_filt <- pi_bed_filt %>%
 
 Calculate the overlap and distance based on the m_start, m_end, gf_start, and gf_end columns. Overlap occurs if the start of one feature is within the bounds of another. If there is no overlaps, the distance can be calculated as the gap between the end of one feature and the start of another. 
 ```{r}
-pi_bed_filt$overlap <- with(pi_bed_filt, pmin(pi_end, gf_end) - pmax(pi_start, gf_start))
+pi_bed_filt$overlap <- pmax(
+  0,
+  pmin(pi_bed_filt$pi_end, pi_bed_filt$gf_end) -
+    pmax(pi_bed_filt$pi_start, pi_bed_filt$gf_start) + 1)
 
 sum(pi_bed_filt$overlap < 0)
 sum(pi_bed_filt$overlap > 0)
@@ -86,6 +89,9 @@ PMEA_gene2go<-read.delim("../../data/Pmea_gene2go.tab", sep="\t")
 
 Make list of genes for input to TopGO
 ```{r}
+pi_bed_filt <- pi_bed_filt %>%
+  filter(overlap > 0)
+
 pmea_clust_genes <- as.character(unique(pi_bed_filt$gene_name))
 pmea_all_genes <- as.character(PMEA_gene2go$gene_name)
 Pmea_GeneList <- factor(as.integer(pmea_all_genes %in% pmea_clust_genes))
@@ -249,7 +255,7 @@ merged_pirna <- GO_PMEA_En_sig_gene_pi %>%
   mutate(prop.sig.genes = Significant/Annotated)
 
 # Write to csv 
-write.csv(merged_pirna, "../output/19-bedtools-closest/Pmea_GO_en_sig_gene_piRNA.csv")
+write.csv(merged_pirna, "../output/19-Pmea-bedtools-closest/Pmea_GO_en_sig_gene_piRNA.csv")
 ```
 
 Plot 
