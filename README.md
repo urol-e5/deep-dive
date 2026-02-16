@@ -10,7 +10,7 @@ This repository hosts analyses and datasets from [Ashey et al. 2025](https://doi
 
 - [DIVE genome browser](https://urol-e5.github.io/deep-dive-genome-browser/) - View ncRNA features across all three species in our interactive genome browser.
 - [OSF Project Link](https://osf.io/aw53f/) - Access large genomic reference files in our Open Science Framework (OSF) storage directory. 
-- [![SRA](https://img.shields.io/badge/SRA-PRJNA1236658-blue)](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA1236658/) - Access raw RNA sequences stored on NCBI. 
+- [![SRA](https://img.shields.io/badge/SRA-PRJNA1201098-blue)](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA1201098/) - Access raw RNA sequences stored on NCBI. 
 - [![SRA](https://img.shields.io/badge/SRA-PRJNA1236666-blue)](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA1236666/) - Access raw small RNA sequences stored on NCBI. 
 
 ### 📂 Repository Structure

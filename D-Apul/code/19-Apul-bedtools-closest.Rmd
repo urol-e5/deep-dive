@@ -557,10 +557,7 @@ lnc_bed_filt <- lnc_bed_filt %>%
 
 Calculate the overlap and distance based on the l_start, l_end, gf_start, and gf_end columns. Overlap occurs if the start of one feature is within the bounds of another. If there is no overlaps, the distance can be calculated as the gap between the end of one feature and the start of another. 
 ```{r}
-lnc_bed_filt$overlap <- pmax(
-  0,
-  pmin(lnc_bed_filt$l_end, lnc_bed_filt$gf_end) -
-    pmax(lnc_bed_filt$l_start, lnc_bed_filt$gf_start) + 1)
+lnc_bed_filt$overlap <- with(lnc_bed_filt, pmin(l_end, gf_end) - pmax(l_start, gf_start))
 
 sum(lnc_bed_filt$overlap < 0)
 sum(lnc_bed_filt$overlap > 0)
