@@ -50,6 +50,16 @@ mirna_gene_summary <- miranda_1kb %>%
   summarize(num_genes = n_distinct(gene_id))
 ```
 
+Remove % from the query identity column and calculate the percent of the query (miRNA) covered 
+```{r}
+miranda_1kb$Query_Identity <- gsub("%", "", miranda_1kb$Query_Identity)
+miranda_1kb$Query_Identity <- as.numeric(miranda_1kb$Query_Identity)
+
+# Examine miRNA query coverage 
+mean(miranda_1kb$Query_Identity)
+min(miranda_1kb$Query_Identity)
+```
+
 Read in gene to go information (generated [here](https://github.com/urol-e5/deep-dive/blob/main/D-Apul/code/19-Apul-bedtools-closest.Rmd))
 ```{r}
 APUL_gene2go<-read.delim("../../data/Apul_gene2go.tab", sep="\t")

@@ -52,6 +52,16 @@ mirna_gene_summary <- miranda_1kb %>%
   summarize(num_genes = n_distinct(gene_id))
 ```
 
+Remove % from the query identity column and calculate the percent of the query (miRNA) covered 
+```{r}
+miranda_1kb$Query_Identity <- gsub("%", "", miranda_1kb$Query_Identity)
+miranda_1kb$Query_Identity <- as.numeric(miranda_1kb$Query_Identity)
+
+# Examine miRNA query coverage 
+mean(miranda_1kb$Query_Identity)
+min(miranda_1kb$Query_Identity)
+```
+
 Read in gene to go information (generated [here](https://github.com/urol-e5/deep-dive/blob/main/E-Peve/code/19-Peve-bedtools-closest.Rmd))
 ```{r}
 PEVE_gene2go<-read.delim("../../data/Peve_gene2go.tab", sep="\t")
