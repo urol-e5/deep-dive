@@ -664,7 +664,7 @@ combo <- combo %>%
   mutate(ACR = rowSums(combo[,2:6])) %>%
   mutate(POC = rowSums(combo[,7:11])) %>%
   mutate(POR = rowSums(combo[,12:14])) %>%
-  select(length,ACR,POC,POR) %>%
+  dplyr::select(length,ACR,POC,POR) %>%
   pivot_longer(c("ACR", "POC", "POR"), values_to = "sums", names_to = "group") %>%
   mutate(Species = case_when(
     group == "ACR" ~ "A. pulchra", 
@@ -710,27 +710,27 @@ ggsave(filename = "../figures/piRNA_lengths.pdf", length_plot_pi, width = 34, he
 
 Calculate length from bed files
 ```{r}
-apul_lnc_bed <- read.delim("../../D-Apul/output/05.33-lncRNA-discovery/Apul_lncRNA.bed", header = F) %>%
-  rename("lncRNA" = "V1", "start" = "V2", "end" = "V3") %>%
-  mutate(length = end-start) %>%
+apul_lnc_bed <- read.delim("../../D-Apul/output/26-Apul-lncRNA-expression-filtering/apul_final_lncRNAs.bed", header = F) %>%
+  dplyr::select(V1, V2, V3)%>%
+  mutate(length = V3-V2) %>%
   mutate(Species = "Acropora pulchra")
 mean(apul_lnc_bed$length)
 median(apul_lnc_bed$length)
 max(apul_lnc_bed$length)
 min(apul_lnc_bed$length)
 
-peve_lnc_bed <- read.delim("../../E-Peve/output/Peve_lncRNA.bed", header = F) %>%
-  rename("lncRNA" = "V1", "start" = "V2", "end" = "V3") %>%
-  mutate(length = end-start) %>%
+peve_lnc_bed <- read.delim("../../E-Peve/output/23-Peve-lncRNA-expression-filtering/peve_final_lncRNAs.bed", header = F) %>%
+  dplyr::select(V1, V2, V3)%>%
+  mutate(length = V3-V2) %>%
   mutate(Species = "Porites evermanni")
 mean(peve_lnc_bed$length)
 median(peve_lnc_bed$length)
 max(peve_lnc_bed$length)
 min(peve_lnc_bed$length)
 
-pmea_lnc_bed <- read.delim("../../F-Pmea/output/02-lncRNA-discovery/Pmea_lncRNA.bed", header = F) %>%
-  rename("lncRNA" = "V1", "start" = "V2", "end" = "V3") %>%
-  mutate(length = end-start) %>%
+pmea_lnc_bed <- read.delim("../../F-Pmea/output/23-Pmea-lncRNA-expression-filtering/pmea_final_lncRNAs.bed", header = F) %>%
+  dplyr::select(V1, V2, V3)%>%
+  mutate(length = V3-V2) %>%
   mutate(Species = "Pocillopora tuahiniensis")
 mean(pmea_lnc_bed$length)
 median(pmea_lnc_bed$length)

@@ -1,0 +1,119 @@
+---
+title: "lncRNA blast update"
+author: "Jill Ashey"
+date: "2026-03-11"
+output: html_document
+---
+
+BLAST update for shared and unique lncRNA sequences using lncRNAs filtered for expression. 
+
+BLAST was run on Unity 
+```{bash}
+#!/usr/bin/env bash
+#SBATCH --export=NONE
+#SBATCH --nodes=1 
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=8
+#SBATCH --partition=uri-cpu
+#SBATCH --mem=200GB
+#SBATCH -t 100:00:00
+#SBATCH -o slurm-%j.out
+#SBATCH -e slurm-%j.error
+#SBATCH -D /scratch3/workspace/jillashey_uri_edu-e5_deepdive
+
+module load uri/main all/BLAST+/2.13.0-gompi-2022a
+
+echo "make blast dbs" $(date)
+makeblastdb -in apul/apul_final_lncRNAs.fasta -dbtype nucl -out Apul_lncRNA
+makeblastdb -in peve/peve_final_lncRNAs.fasta -dbtype nucl -out Peve_lncRNA
+makeblastdb -in ptua/pmea_final_lncRNAs.fasta -dbtype nucl -out Pmea_lncRNA
+
+echo "Apul v Peve" $(date)
+blastn -query apul/apul_final_lncRNAs.fasta \
+       -db Peve_lncRNA \
+       -outfmt "6 qseqid sseqid pident length evalue" \
+       -evalue 1e-40 \
+       -max_target_seqs 1 \
+       -out apul_vs_peve.tab
+       
+echo "Apul v Pmea" $(date)
+blastn -query apul/apul_final_lncRNAs.fasta \
+       -db Pmea_lncRNA \
+       -outfmt "6 qseqid sseqid pident length evalue" \
+       -evalue 1e-40 \
+       -max_target_seqs 1 \
+       -out apul_vs_pmea.tab
+       
+echo "Peve v Pmea" $(date)
+blastn -query peve/peve_final_lncRNAs.fasta \
+       -db Pmea_lncRNA \
+       -outfmt "6 qseqid sseqid pident length evalue" \
+       -evalue 1e-40 \
+       -max_target_seqs 1 \
+       -out peve_vs_pmea.tab
+```
+
+Look at BLAST output
+```{r}
+library(tidyverse)
+
+# Load BLAST results (just the query and subject columns)
+apul_peve <- read.table("../output/22-lncRNA-comparative-blast/apul_vs_peve.tab")[,1:2]
+apul_pmea <- read.table("../output/22-lncRNA-comparative-blast/apul_vs_pmea.tab")[,1:2]
+peve_pmea <- read.table("../output/22-lncRNA-comparative-blast/peve_vs_pmea.tab")[,1:2]
+
+# Identify shared IDs
+# Note: Use unique() because one lncRNA might hit multiple targets
+shared_apul_peve <- unique(apul_peve$V1)
+shared_apul_pmea <- unique(apul_pmea$V1)
+shared_peve_pmea <- unique(peve_pmea$V1)
+
+# Find the 3-way intersection (Shared by all three)
+# This finds IDs in Apul that have hits in BOTH Peve and Pmea
+shared_all <- intersect(shared_apul_peve, shared_apul_pmea)
+```
+
+8 lncRNAs shared across all three spp. 
+
+APUL: 6798
+PEVE: 2812
+PTUA: 4924
+
+Look at shared and unique 
+```{r}
+# Total unique pool size
+total_lncs <- 6798+2812+4924
+
+# Counts 
+n_all <- length(shared_all)
+n_apul_peve_only <- length(setdiff(shared_apul_peve, shared_all))
+n_apul_pmea_only <- length(setdiff(shared_apul_pmea, shared_all))
+n_peve_pmea_only <- length(setdiff(shared_peve_pmea, shared_all))
+
+# Unique to each (Total - any shared)
+unique_apul <- 6798 - length(union(shared_apul_peve, shared_apul_pmea))
+unique_peve <- 2812 - length(union(shared_apul_peve, shared_peve_pmea))
+unique_pmea <- 4924 - length(union(shared_peve_pmea, shared_apul_pmea))
+
+## Calculate percentages 
+# Denominator
+total_lncs <- 6798 + 2812 + 4924
+
+# Percentage Shared by All Three
+p_all <- (n_all / total_lncs) * 100
+
+# Percentage Unique to each species
+p_unique_apul <- (unique_apul / total_lncs) * 100
+p_unique_peve <- (unique_peve / total_lncs) * 100
+p_unique_pmea <- (unique_pmea / total_lncs) * 100
+
+# Percentage Shared between pairs (not including 'all')
+# This reflects "A. pulchra shared X with P. evermanni"
+p_apul_peve <- (length(shared_apul_peve) / total_lncs) * 100
+p_apul_pmea <- (length(shared_apul_pmea) / total_lncs) * 100
+p_peve_pmea <- (length(shared_peve_pmea) / total_lncs) * 100
+```
+
+
+
+
