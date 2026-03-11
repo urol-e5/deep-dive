@@ -346,11 +346,19 @@ Compare terms identified in piRNA GO enrichment analysis across species
 Read in data from all species
 ```{r}
 apul_go_lnc <- read.csv("../../D-Apul/output/19-Apul-bedtools-closest/Apul_GO_en_sig_gene_lncRNA.csv")
-apul_go_lnc$Species <- "Acropora pulchra"
+apul_go_lnc <- apul_go_lnc %>%
+  dplyr::select(gene_name, GeneOntologyIDs, Term, Annotated, Significant, Expected, Fisher, ontology, prop.sig.genes) %>%
+  mutate(Species = "Acropora pulchra")
+
 peve_go_lnc <- read.csv("../../E-Peve/output/19-Peve-bedtools-closest/Peve_GO_en_sig_gene_lncRNA.csv")
-peve_go_lnc$Species <- "Porites evermanni"
+peve_go_lnc <- peve_go_lnc %>%
+  dplyr::select(gene_name, GeneOntologyIDs, Term, Annotated, Significant, Expected, Fisher, ontology, prop.sig.genes) %>%
+  mutate(Species = "Porites evermanni")
+
 pmea_go_lnc <- read.csv("../../F-Pmea/output/19-Pmea-bedtools-closest/Pmea_GO_en_sig_gene_lncRNA.csv")
-pmea_go_lnc$Species <- "Pocillopora tuahiniensis"
+pmea_go_lnc <- pmea_go_lnc %>%
+  dplyr::select(gene_name, GeneOntologyIDs, Term, Annotated, Significant, Expected, Fisher, ontology, prop.sig.genes) %>%
+  mutate(Species = "Pocillopora tuahiniensis")
 
 all_go_lnc <- rbind(apul_go_lnc, pmea_go_lnc, peve_go_lnc)
 ```

@@ -532,15 +532,15 @@ GO_plot_mi<-ggplot(merged_mirna, aes(x = Term, y = -log10(Fisher), size = prop.s
 
 Load Peve lncRNA closest file into R. This file represents the genomic features that are closest/are overlapping with lncRNA clusters. 
 ```{r}
-lnc_bed <- read.delim("../output/19-Peve-bedtools-closest/Peve_lncRNA_output.bed", header = F)
+lnc_bed <- read.delim("../output/19-Peve-bedtools-closest/Peve_lncRNA_closest_mRNA_only.bed", header = F)
 head(lnc_bed)
 ```
 
 Keep specific columns and rename them 
 ```{r}
 lnc_bed_filt <- lnc_bed %>%
-  dplyr::select(V1, V2, V3, V4, V6, V7, V8, V12) %>%
-  dplyr::rename("l_chrom" = "V1", "l_start" = "V2", "l_end" = "V3", "gf_chrom" = "V4", "gf_type" = "V6", "gf_start" = "V7", "gf_end" = "V8", "gf_attr" = "V12")
+  dplyr::select(V1, V2, V3, V4, V5, V7, V8, V9, V13) %>%
+  dplyr::rename("l_chrom" = "V1", "l_start" = "V2", "l_end" = "V3", "gf_chrom" = "V5", "gf_type" = "V7", "gf_start" = "V8", "gf_end" = "V9", "gf_attr" = "V13")
 ```
 
 Pull out gene name information from the `gf_attr` column and subset by mRNA
@@ -553,32 +553,33 @@ lnc_bed_filt <- lnc_bed_filt %>%
 
 Calculate the overlap and distance based on the l_start, l_end, gf_start, and gf_end columns. Overlap occurs if the start of one feature is within the bounds of another. If there is no overlaps, the distance can be calculated as the gap between the end of one feature and the start of another. 
 ```{r}
-lnc_bed_filt$overlap <- with(lnc_bed_filt, pmin(l_end, gf_end) - pmax(l_start, gf_start))
+# Calculate distance
+lnc_bed_filt$overlap <- pmax(0, 
+    pmax(lnc_bed_filt$gf_start - lnc_bed_filt$l_end,  # mRNA is after lncRNA
+         lnc_bed_filt$l_start - lnc_bed_filt$gf_end) # lncRNA is after mRNA
+)
 
-sum(lnc_bed_filt$overlap < 0)
+# Add a column to see if they overlap (TRUE/FALSE)
+lnc_bed_filt$is_overlapping <- lnc_bed_filt$overlap == 0
+
+sum(lnc_bed_filt$overlap == 0)
 sum(lnc_bed_filt$overlap > 0)
 ```
 
 Calculate average/percentages of distance and overlap. 
 ```{r}
-summary_stats <- lnc_bed_filt %>%
-  summarize(
-    avg_overlap = mean(overlap[overlap > 0], na.rm = TRUE),
-    median_overlap = median(overlap[overlap > 0], na.rm = TRUE),
-    avg_distance = mean(overlap[overlap < 0], na.rm = TRUE),
-    median_distance = median(overlap[overlap < 0], na.rm = TRUE),
-    percent_overlap = sum(overlap > 0) / n() * 100,
-    percent_distance_lt_1kb = sum(overlap < 0 & overlap > -1000) / n() * 100,
-    percent_distance = sum(overlap < 0) / n() * 100
+lnc_summary <- lnc_bed_filt %>%
+  group_by(V4) %>% # V4 is your unique lncRNA ID
+  summarise(
+    min_dist = min(overlap),
+    max_overlap = max(overlap),
+    is_coding_neighbor = any(is_overlapping)
   )
 
-# Display the summary statistics
-print(summary_stats)
+# Calculate percentages on the summary
+final_perc_overlap <- mean(lnc_summary$is_coding_neighbor) * 100
+final_avg_dist <- mean(lnc_summary$min_dist[lnc_summary$min_dist > 0])
 ```
-
-Results: 
-avg_overlap avg_distance percent_overlap percent_distance_lt_1kb percent_distance
-  3751.919    -6298.915        2.032885                17.18984         97.96712
 
 Read in gene2go information 
 ```{r}
@@ -750,7 +751,7 @@ merged_lncrna <- GO_PEVE_En_sig_gene_lnc %>%
   mutate(prop.sig.genes = Significant/Annotated)
 
 # Write to csv 
-write.csv(merged_lncrna, "../output/19-bedtools-closest/Peve_GO_en_sig_gene_lncRNA.csv")
+write.csv(merged_lncrna, "../output/19-Peve-bedtools-closest/Peve_GO_en_sig_gene_lncRNA.csv")
 ```
 
 Plot 
